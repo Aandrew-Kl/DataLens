@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Database,
@@ -26,11 +26,14 @@ import {
   FileText,
   GitMerge,
   Keyboard,
+  RefreshCw,
+  Share2,
 } from "lucide-react";
 
 import { loadCSVIntoDB, runQuery, getTableRowCount } from "@/lib/duckdb/client";
 import { profileTable } from "@/lib/duckdb/profiler";
 import { useDatasetStore } from "@/stores/dataset-store";
+import { useQueryStore } from "@/stores/query-store";
 import { useUIStore } from "@/stores/ui-store";
 import {
   formatNumber,
@@ -51,7 +54,11 @@ import ColumnDetail from "@/components/data/column-detail";
 import SettingsPanel from "@/components/settings/settings-panel";
 import CommandPalette from "@/components/layout/command-palette";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import ChartBuilder from "@/components/charts/chart-builder";
+import ChartBuilder, {
+  CHART_SAVED_EVENT,
+  SAVED_CHARTS_STORAGE_KEY,
+  type SavedChartSnapshot,
+} from "@/components/charts/chart-builder";
 import TransformPanel from "@/components/data/transform-panel";
 import CorrelationMatrix from "@/components/data/correlation-matrix";
 import OutlierDetector from "@/components/data/outlier-detector";
@@ -64,11 +71,36 @@ import DataSummary from "@/components/data/data-summary";
 import SampleDatasets from "@/components/data/sample-datasets";
 import KeyboardShortcutsDialog from "@/components/ui/keyboard-shortcuts-dialog";
 import PivotTable from "@/components/data/pivot-table";
-import DataComparison from "@/components/data/data-comparison";
 import SchemaViewer from "@/components/data/schema-viewer";
 import ExportWizard from "@/components/data/export-wizard";
 import TemplatePicker from "@/components/query/template-picker";
-import DataLineage from "@/components/data/data-lineage";
+import NotificationCenter, {
+  useNotifications,
+} from "@/components/ui/notification-center";
+import NaturalLanguageBar from "@/components/query/natural-language-bar";
+import SharePanel from "@/components/data/share-panel";
+import SnapshotManager from "@/components/data/snapshot-manager";
+import RowDetailModal from "@/components/data/row-detail-modal";
+import AIInsights from "@/components/ai/ai-insights";
+import ColumnStats from "@/components/data/column-stats";
+import Crosstab from "@/components/data/crosstab";
+import FrequencyTable from "@/components/data/frequency-table";
+import TimeSeriesAnalyzer from "@/components/data/time-series-analyzer";
+import DataValidator from "@/components/data/data-validator";
+import AnomalyHeatmap from "@/components/data/anomaly-heatmap";
+import ChartRecommendations from "@/components/charts/chart-recommendations";
+import ChartGallery from "@/components/charts/chart-gallery";
+import SparklineGrid from "@/components/charts/sparkline-grid";
+import ScatterMatrix from "@/components/charts/scatter-matrix";
+import DataDictionary from "@/components/data/data-dictionary";
+import VirtualDataGrid from "@/components/data/virtual-data-grid";
+import MetricCard from "@/components/data/metric-card";
+import ColumnRenamer from "@/components/data/column-renamer";
+import NullHandler from "@/components/data/null-handler";
+import TypeConverter from "@/components/data/type-converter";
+import DuplicateFinder from "@/components/data/duplicate-finder";
+import DataSampler from "@/components/data/data-sampler";
+import FormulaEditor from "@/components/data/formula-editor";
 
 // ─────────────────────────────────────────────
 // Types
@@ -80,6 +112,24 @@ interface FileDropResult {
   fileName: string;
   csvContent: string;
   sizeBytes: number;
+}
+
+function readSavedChartsFromStorage(): SavedChartSnapshot[] {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(SAVED_CHARTS_STORAGE_KEY);
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed) ? (parsed as SavedChartSnapshot[]) : [];
+  } catch {
+    return [];
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -320,9 +370,13 @@ function DatasetSidebar({
 function TablePreview({
   tableName,
   columns,
+  onRowsLoaded,
+  onRowClick,
 }: {
   tableName: string;
   columns: ColumnProfile[];
+  onRowsLoaded?: (rows: Record<string, unknown>[]) => void;
+  onRowClick?: (row: Record<string, unknown>, index: number) => void;
 }) {
   const [rows, setRows] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
@@ -335,9 +389,15 @@ function TablePreview({
         const data = await runQuery(
           `SELECT * FROM "${tableName}" LIMIT 200`
         );
-        if (!cancelled) setRows(data);
+        if (!cancelled) {
+          setRows(data);
+          onRowsLoaded?.(data);
+        }
       } catch (err) {
         console.error("Failed to load table preview:", err);
+        if (!cancelled) {
+          onRowsLoaded?.([]);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -345,7 +405,7 @@ function TablePreview({
     return () => {
       cancelled = true;
     };
-  }, [tableName]);
+  }, [onRowsLoaded, tableName]);
 
   if (loading) {
     return (
@@ -371,6 +431,7 @@ function TablePreview({
       exportable
       stickyHeader
       columnTypes={columnTypes}
+      onRowClick={onRowClick}
     />
   );
 }
@@ -438,10 +499,20 @@ function SQLEditorTab({
 export default function Home() {
   const { theme, toggleTheme } = useUIStore();
   const { addDataset, setActiveDataset } = useDatasetStore();
+  const lastQueryResult = useQueryStore((s) => s.lastResult);
   const activeDataset = useDatasetStore((s) =>
     s.datasets.find((d) => d.id === s.activeDatasetId)
   );
   const datasetCount = useDatasetStore((s) => s.datasets.length);
+  const tableName = activeDataset
+    ? sanitizeTableName(activeDataset.fileName)
+    : "";
+  const {
+    notifications,
+    addNotification,
+    removeNotification,
+    clearAll,
+  } = useNotifications();
 
   const [activeTab, setActiveTab] = useState<AppTab>("profile");
   const [profileData, setProfileData] = useState<ColumnProfile[]>([]);
@@ -454,6 +525,13 @@ export default function Home() {
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
   const [showExportWizard, setShowExportWizard] = useState(false);
+  const [showSharePanel, setShowSharePanel] = useState(false);
+  const [previewRows, setPreviewRows] = useState<Record<string, unknown>[]>([]);
+  const [selectedPreviewRow, setSelectedPreviewRow] = useState<Record<string, unknown> | null>(null);
+  const [selectedPreviewRowIndex, setSelectedPreviewRowIndex] = useState<number | null>(null);
+  const [analyticsColumnName, setAnalyticsColumnName] = useState("");
+  const [savedCharts, setSavedCharts] = useState<SavedChartSnapshot[]>([]);
+  const queryTabRef = useRef<HTMLDivElement>(null);
   const datasets = useDatasetStore((s) => s.datasets);
 
   // Initialize theme from system preference
@@ -509,6 +587,9 @@ export default function Home() {
         setSelectedColumn(null);
         setShowUploader(false);
         setShowKeyboardShortcuts(false);
+        setShowSharePanel(false);
+        setSelectedPreviewRow(null);
+        setSelectedPreviewRowIndex(null);
       }
     };
 
@@ -549,6 +630,13 @@ export default function Home() {
         addDataset(meta);
         setProfileData(columns);
         setActiveTab("profile");
+        addNotification({
+          type: "success",
+          title: "Dataset loaded",
+          message: `${result.fileName} is ready with ${formatNumber(
+            rowCount
+          )} rows and ${columns.length} columns.`,
+        });
 
         // Save to recent datasets in localStorage
         try {
@@ -570,14 +658,19 @@ export default function Home() {
         }
       } catch (err) {
         console.error("Failed to load dataset:", err);
-        setLoadError(
-          err instanceof Error ? err.message : "Failed to load dataset"
-        );
+        const message =
+          err instanceof Error ? err.message : "Failed to load dataset";
+        setLoadError(message);
+        addNotification({
+          type: "error",
+          title: "Dataset load failed",
+          message,
+        });
       } finally {
         setIsLoading(false);
       }
     },
-    [addDataset]
+    [addDataset, addNotification]
   );
 
   // Update profile data when active dataset changes
@@ -586,6 +679,307 @@ export default function Home() {
       setProfileData(activeDataset.columns);
     }
   }, [activeDataset]);
+
+  useEffect(() => {
+    if (!profileData.length) {
+      setAnalyticsColumnName("");
+      return;
+    }
+
+    if (!profileData.some((column) => column.name === analyticsColumnName)) {
+      const fallback =
+        profileData.find((column) => column.type === "number")?.name ??
+        profileData[0]?.name ??
+        "";
+      setAnalyticsColumnName(fallback);
+    }
+  }, [analyticsColumnName, profileData]);
+
+  useEffect(() => {
+    setPreviewRows([]);
+    setSelectedPreviewRow(null);
+    setSelectedPreviewRowIndex(null);
+  }, [activeDataset?.id]);
+
+  useEffect(() => {
+    if (!activeDataset) {
+      setSavedCharts([]);
+      return;
+    }
+
+    const syncSavedCharts = () => {
+      setSavedCharts(
+        readSavedChartsFromStorage().filter(
+          (chart) => chart.tableName === tableName
+        )
+      );
+    };
+
+    const handleChartSaved = (event: Event) => {
+      syncSavedCharts();
+      const detail = (event as CustomEvent<SavedChartSnapshot>).detail;
+      if (detail?.tableName === tableName) {
+        addNotification({
+          type: "success",
+          title: "Chart saved",
+          message: `${
+            detail.config.title || "Untitled chart"
+          } was added to the gallery.`,
+        });
+      }
+    };
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === null || event.key === SAVED_CHARTS_STORAGE_KEY) {
+        syncSavedCharts();
+      }
+    };
+
+    syncSavedCharts();
+    window.addEventListener(CHART_SAVED_EVENT, handleChartSaved as EventListener);
+    window.addEventListener("storage", handleStorage);
+
+    return () => {
+      window.removeEventListener(
+        CHART_SAVED_EVENT,
+        handleChartSaved as EventListener
+      );
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, [activeDataset, addNotification, tableName]);
+
+  const refreshActiveDataset = useCallback(
+    async (title = "Dataset refreshed", message?: string) => {
+      if (!activeDataset) {
+        return;
+      }
+
+      try {
+        const datasetId = activeDataset.id;
+        const [columns, rowCount] = await Promise.all([
+          profileTable(tableName),
+          getTableRowCount(tableName),
+        ]);
+
+        setProfileData(columns);
+        setPreviewRows([]);
+        setSelectedPreviewRow(null);
+        setSelectedPreviewRowIndex(null);
+
+        useDatasetStore.setState((state) => ({
+          datasets: state.datasets.map((dataset) =>
+            dataset.id === datasetId
+              ? {
+                  ...dataset,
+                  rowCount,
+                  columnCount: columns.length,
+                  columns,
+                }
+              : dataset
+          ),
+        }));
+
+        addNotification({
+          type: "success",
+          title,
+          message:
+            message ??
+            `${tableName} now has ${formatNumber(rowCount)} rows and ${
+              columns.length
+            } columns.`,
+        });
+      } catch (error) {
+        addNotification({
+          type: "error",
+          title: "Refresh failed",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Unable to refresh the dataset metadata.",
+        });
+      }
+    },
+    [activeDataset, addNotification, tableName]
+  );
+
+  const submitNaturalLanguageQuestion = useCallback(
+    (question: string) => {
+      const container = queryTabRef.current;
+      const input = container?.querySelector<HTMLInputElement>(
+        'input[placeholder="Ask anything about your data..."]'
+      );
+      const form = input?.closest("form");
+
+      if (!input || !(form instanceof HTMLFormElement)) {
+        addNotification({
+          type: "warning",
+          title: "Query input unavailable",
+          message: "The chat input is not mounted yet.",
+        });
+        return;
+      }
+
+      const setter = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value"
+      )?.set;
+
+      setter?.call(input, question);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+
+      if (typeof form.requestSubmit === "function") {
+        form.requestSubmit();
+      } else {
+        form.dispatchEvent(
+          new Event("submit", { bubbles: true, cancelable: true })
+        );
+      }
+    },
+    [addNotification]
+  );
+
+  const handlePreviewRowsLoaded = useCallback(
+    (rows: Record<string, unknown>[]) => {
+      setPreviewRows(rows);
+      setSelectedPreviewRow(null);
+      setSelectedPreviewRowIndex(null);
+    },
+    []
+  );
+
+  const handlePreviewRowClick = useCallback(
+    (row: Record<string, unknown>) => {
+      const nextIndex = previewRows.indexOf(row);
+      setSelectedPreviewRow(row);
+      setSelectedPreviewRowIndex(nextIndex >= 0 ? nextIndex : null);
+    },
+    [previewRows]
+  );
+
+  const handleOpenPreviousPreviewRow = useCallback(() => {
+    if (selectedPreviewRowIndex == null || selectedPreviewRowIndex <= 0) {
+      return;
+    }
+
+    const nextIndex = selectedPreviewRowIndex - 1;
+    setSelectedPreviewRowIndex(nextIndex);
+    setSelectedPreviewRow(previewRows[nextIndex] ?? null);
+  }, [previewRows, selectedPreviewRowIndex]);
+
+  const handleOpenNextPreviewRow = useCallback(() => {
+    if (
+      selectedPreviewRowIndex == null ||
+      selectedPreviewRowIndex >= previewRows.length - 1
+    ) {
+      return;
+    }
+
+    const nextIndex = selectedPreviewRowIndex + 1;
+    setSelectedPreviewRowIndex(nextIndex);
+    setSelectedPreviewRow(previewRows[nextIndex] ?? null);
+  }, [previewRows, selectedPreviewRowIndex]);
+
+  const handleSavedChartRemove = useCallback(
+    (chartId: string) => {
+      const nextCharts = readSavedChartsFromStorage().filter(
+        (entry) => entry.config.id !== chartId
+      );
+
+      try {
+        window.localStorage.setItem(
+          SAVED_CHARTS_STORAGE_KEY,
+          JSON.stringify(nextCharts)
+        );
+      } catch {
+        // localStorage failures are non-critical
+      }
+
+      setSavedCharts(nextCharts.filter((entry) => entry.tableName === tableName));
+      addNotification({
+        type: "info",
+        title: "Chart removed",
+        message: "The saved chart was removed from the gallery.",
+      });
+    },
+    [addNotification, tableName]
+  );
+
+  const handleSavedChartEdit = useCallback(
+    async (chart: {
+      title: string;
+      xAxis?: string;
+      yAxis?: string;
+      groupBy?: string;
+      aggregation?: string;
+    }) => {
+      const summary = JSON.stringify(chart, null, 2);
+
+      try {
+        await navigator.clipboard.writeText(summary);
+        addNotification({
+          type: "info",
+          title: "Chart config copied",
+          message:
+            "ChartBuilder does not expose external edit props, so the saved config was copied to the clipboard.",
+        });
+      } catch {
+        addNotification({
+          type: "warning",
+          title: "Clipboard unavailable",
+          message: "The saved chart config could not be copied.",
+        });
+      }
+    },
+    [addNotification]
+  );
+
+  const handleFormulaSave = useCallback(
+    async (name: string, expression: string) => {
+      const stamp = Date.now();
+      const escapedTableName = tableName.replace(/"/g, '""');
+      const sourceSql = `"${escapedTableName}"`;
+      const tempSql = `"${escapedTableName}__formula_${stamp}"`;
+      const backupSql = `"${escapedTableName}__formula_backup_${stamp}"`;
+      const aliasSql = `"${name.replace(/"/g, '""')}"`;
+
+      try {
+        await runQuery(`DROP TABLE IF EXISTS ${tempSql}`);
+        await runQuery(`DROP TABLE IF EXISTS ${backupSql}`);
+        await runQuery(
+          `CREATE TABLE ${tempSql} AS SELECT *, ${expression} AS ${aliasSql} FROM ${sourceSql}`
+        );
+        await runQuery(`ALTER TABLE ${sourceSql} RENAME TO ${backupSql}`);
+
+        try {
+          await runQuery(`ALTER TABLE ${tempSql} RENAME TO ${sourceSql}`);
+          await runQuery(`DROP TABLE ${backupSql}`);
+        } catch (swapError) {
+          await runQuery(`ALTER TABLE ${backupSql} RENAME TO ${sourceSql}`).catch(
+            () => undefined
+          );
+          await runQuery(`DROP TABLE IF EXISTS ${tempSql}`).catch(
+            () => undefined
+          );
+          throw swapError;
+        }
+
+        await refreshActiveDataset(
+          "Computed column added",
+          `${name} was added to ${tableName}.`
+        );
+      } catch (error) {
+        addNotification({
+          type: "error",
+          title: "Computed column failed",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Unable to save the computed column.",
+        });
+      }
+    },
+    [addNotification, refreshActiveDataset, tableName]
+  );
 
   const handleNewDataset = useCallback(() => {
     if (datasetCount > 0) {
@@ -826,10 +1220,24 @@ export default function Home() {
   }
 
   // ─── Workspace State ───
-
-  const tableName = activeDataset
-    ? sanitizeTableName(activeDataset.fileName)
-    : "";
+  const analyticsColumn =
+    profileData.find((column) => column.name === analyticsColumnName) ??
+    profileData.find((column) => column.type === "number") ??
+    profileData[0] ??
+    null;
+  const totalNulls = activeDataset
+    ? profileData.reduce((sum, column) => sum + column.nullCount, 0)
+    : 0;
+  const completenessPct =
+    activeDataset && activeDataset.rowCount > 0 && profileData.length > 0
+      ? ((activeDataset.rowCount * profileData.length - totalNulls) /
+          (activeDataset.rowCount * profileData.length)) *
+        100
+      : 100;
+  const savedChartConfigs = savedCharts.map((chart) => chart.config);
+  const savedChartData = Object.fromEntries(
+    savedCharts.map((chart) => [chart.config.id, chart.data])
+  );
 
   return (
     <ErrorBoundary>
@@ -905,6 +1313,13 @@ export default function Home() {
                 >
                   <Upload className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">New Dataset</span>
+                </button>
+                <button
+                  onClick={() => setShowSharePanel(true)}
+                  className="flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <Share2 className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Share</span>
                 </button>
                 <button
                   onClick={() => setShowSettings(true)}
@@ -1025,15 +1440,29 @@ export default function Home() {
                     transition={{ duration: 0.2 }}
                     className="space-y-6"
                   >
-                    <div>
-                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
-                        Column Profiles
-                      </h2>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
-                        Automated data profiling for{" "}
-                        {profileData.length} columns across{" "}
-                        {formatNumber(activeDataset.rowCount)} rows
-                      </p>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                          Column Profiles
+                        </h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          Automated data profiling for{" "}
+                          {profileData.length} columns across{" "}
+                          {formatNumber(activeDataset.rowCount)} rows
+                        </p>
+                      </div>
+                      <button
+                        onClick={() =>
+                          void refreshActiveDataset(
+                            "Profile refreshed",
+                            `Re-profiled ${tableName}.`
+                          )
+                        }
+                        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        Refresh Metadata
+                      </button>
                     </div>
                     <ErrorBoundary>
                       <DataProfiler
@@ -1063,6 +1492,8 @@ export default function Home() {
                         <TablePreview
                           tableName={tableName}
                           columns={profileData}
+                          onRowsLoaded={handlePreviewRowsLoaded}
+                          onRowClick={handlePreviewRowClick}
                         />
                       </ErrorBoundary>
                     </div>
@@ -1076,6 +1507,45 @@ export default function Home() {
                         />
                       </ErrorBoundary>
                     </div>
+
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                      <MetricCard label="Rows" value={activeDataset.rowCount} emoji="📄" />
+                      <MetricCard label="Columns" value={profileData.length} emoji="🧱" />
+                      <MetricCard
+                        label="Completeness"
+                        value={`${completenessPct.toFixed(1)}%`}
+                        emoji="✅"
+                      />
+                      <MetricCard
+                        label="Dataset Size"
+                        value={formatBytes(activeDataset.sizeBytes)}
+                        emoji="💾"
+                      />
+                    </div>
+
+                    <ErrorBoundary>
+                      <DataDictionary
+                        tableName={tableName}
+                        columns={profileData}
+                        rowCount={activeDataset.rowCount}
+                      />
+                    </ErrorBoundary>
+
+                    <ErrorBoundary>
+                      <VirtualDataGrid
+                        tableName={tableName}
+                        columns={profileData}
+                        totalRows={activeDataset.rowCount}
+                      />
+                    </ErrorBoundary>
+
+                    <ErrorBoundary>
+                      <SnapshotManager
+                        tableName={tableName}
+                        columns={profileData}
+                        rowCount={activeDataset.rowCount}
+                      />
+                    </ErrorBoundary>
                   </motion.div>
                 )}
 
@@ -1105,7 +1575,7 @@ export default function Home() {
                     transition={{ duration: 0.2 }}
                     className="max-w-4xl mx-auto"
                   >
-                    <div className="mb-4">
+                    <div ref={queryTabRef} className="space-y-4">
                       <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
                         Ask Your Data
                       </h2>
@@ -1113,14 +1583,21 @@ export default function Home() {
                         Ask questions in plain English — AI generates SQL and
                         shows results instantly
                       </p>
+                      <ErrorBoundary>
+                        <NaturalLanguageBar
+                          tableName={tableName}
+                          columns={profileData}
+                          onSubmit={submitNaturalLanguageQuestion}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <ChatInterface
+                          datasetId={activeDataset.id}
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
                     </div>
-                    <ErrorBoundary>
-                      <ChatInterface
-                        datasetId={activeDataset.id}
-                        tableName={tableName}
-                        columns={profileData}
-                      />
-                    </ErrorBoundary>
                   </motion.div>
                 )}
 
@@ -1199,6 +1676,35 @@ export default function Home() {
                         columns={profileData}
                       />
                     </ErrorBoundary>
+                    <div className="mt-6 space-y-6">
+                      <ErrorBoundary>
+                        <ChartRecommendations
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <ChartGallery
+                          charts={savedChartConfigs}
+                          chartData={savedChartData}
+                          onRemove={handleSavedChartRemove}
+                          onEdit={handleSavedChartEdit}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <SparklineGrid
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <ScatterMatrix
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </div>
                   </motion.div>
                 )}
 
@@ -1224,26 +1730,89 @@ export default function Home() {
                         <TransformPanel
                           tableName={tableName}
                           columns={profileData}
-                          onTransformComplete={() => {
-                            // Re-profile after transform
-                            profileTable(tableName).then((cols) =>
-                              setProfileData(cols)
-                            );
-                          }}
+                          onTransformComplete={() =>
+                            void refreshActiveDataset(
+                              "Transform complete",
+                              `Updated ${tableName} after the transform run.`
+                            )
+                          }
                         />
                       </ErrorBoundary>
                       {datasets.length > 1 && (
                         <ErrorBoundary>
                           <JoinBuilder
                             datasets={datasets}
-                            onJoinComplete={(result) => {
-                              profileTable(result.tableName).then((cols) =>
-                                setProfileData(cols)
-                              );
-                            }}
+                            onJoinComplete={() =>
+                              void refreshActiveDataset(
+                                "Join complete",
+                                `Re-profiled ${tableName} after the join finished.`
+                              )
+                            }
                           />
                         </ErrorBoundary>
                       )}
+                    </div>
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <ErrorBoundary>
+                          <ColumnRenamer
+                            tableName={tableName}
+                            columns={profileData}
+                            onComplete={() =>
+                              void refreshActiveDataset(
+                                "Columns renamed",
+                                `Updated column names for ${tableName}.`
+                              )
+                            }
+                          />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <NullHandler
+                            tableName={tableName}
+                            columns={profileData}
+                            onComplete={() =>
+                              void refreshActiveDataset(
+                                "Null handling applied",
+                                `Updated null handling rules for ${tableName}.`
+                              )
+                            }
+                          />
+                        </ErrorBoundary>
+                      </div>
+                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <ErrorBoundary>
+                          <TypeConverter
+                            tableName={tableName}
+                            columns={profileData}
+                            onConvert={() =>
+                              void refreshActiveDataset(
+                                "Types converted",
+                                `Column types were refreshed for ${tableName}.`
+                              )
+                            }
+                          />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <DuplicateFinder
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </div>
+                      <ErrorBoundary>
+                        <DataSampler
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <FormulaEditor
+                          tableName={tableName}
+                          columns={profileData}
+                          onSave={handleFormulaSave}
+                        />
+                      </ErrorBoundary>
                     </div>
                   </motion.div>
                 )}
@@ -1291,6 +1860,77 @@ export default function Home() {
                           tableName={tableName}
                           columns={profileData}
                           rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <AIInsights
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                      {analyticsColumn && (
+                        <div className="space-y-4">
+                          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-800/80 dark:bg-slate-950/55 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                                Focused Column Statistics
+                              </h3>
+                              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                Drill into distribution, quality, and trend details for one field.
+                              </p>
+                            </div>
+                            <select
+                              value={analyticsColumn.name}
+                              onChange={(event) =>
+                                setAnalyticsColumnName(event.target.value)
+                              }
+                              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                            >
+                              {profileData.map((column) => (
+                                <option key={column.name} value={column.name}>
+                                  {column.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <ErrorBoundary>
+                            <ColumnStats
+                              tableName={tableName}
+                              column={analyticsColumn}
+                              rowCount={activeDataset.rowCount}
+                            />
+                          </ErrorBoundary>
+                        </div>
+                      )}
+                      <ErrorBoundary>
+                        <Crosstab
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <FrequencyTable
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <TimeSeriesAnalyzer
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <DataValidator
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <AnomalyHeatmap
+                          tableName={tableName}
+                          columns={profileData}
                         />
                       </ErrorBoundary>
                     </div>
@@ -1382,6 +2022,50 @@ export default function Home() {
             rowCount={activeDataset.rowCount}
           />
         )}
+
+        {activeDataset && (
+          <SharePanel
+            open={showSharePanel}
+            onClose={() => setShowSharePanel(false)}
+            dataset={activeDataset}
+            currentTab={activeTab}
+            currentSQL={lastQueryResult?.sql}
+          />
+        )}
+
+        <RowDetailModal
+          open={selectedPreviewRow !== null}
+          onClose={() => {
+            setSelectedPreviewRow(null);
+            setSelectedPreviewRowIndex(null);
+          }}
+          row={selectedPreviewRow ?? {}}
+          columns={profileData}
+          onPrevious={
+            selectedPreviewRowIndex != null && selectedPreviewRowIndex > 0
+              ? handleOpenPreviousPreviewRow
+              : undefined
+          }
+          onNext={
+            selectedPreviewRowIndex != null &&
+            selectedPreviewRowIndex < previewRows.length - 1
+              ? handleOpenNextPreviewRow
+              : undefined
+          }
+          hasPrevious={selectedPreviewRowIndex != null && selectedPreviewRowIndex > 0}
+          hasNext={
+            selectedPreviewRowIndex != null &&
+            selectedPreviewRowIndex < previewRows.length - 1
+          }
+          rowIndex={selectedPreviewRowIndex ?? undefined}
+          totalRows={previewRows.length || undefined}
+        />
+
+        <NotificationCenter
+          notifications={notifications}
+          removeNotification={removeNotification}
+          clearAll={clearAll}
+        />
       </div>
     </ErrorBoundary>
   );
