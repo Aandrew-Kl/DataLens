@@ -17,13 +17,45 @@ DataLens turns any CSV, Excel, or JSON file into instant dashboards, charts, and
 
 ## Features
 
+### Core
 - **Drag & Drop** — CSV, Excel (.xlsx), and JSON files
 - **Auto-Profiling** — Instant column analysis, types, distributions, nulls
 - **AI Dashboard** — Auto-generated charts and KPIs on upload
 - **Natural Language Queries** — "What were total sales by region?"
-- **Interactive Charts** — Bar, line, pie, scatter, histogram, area
+- **SQL Editor** — Full editor with syntax highlighting and auto-complete
 - **DuckDB-WASM** — Analytical SQL runs in your browser, not a server
-- **Dark Mode** — Full dark mode support
+
+### Charts & Visualization
+- **Chart Builder** — Interactive drag-and-drop chart configuration
+- **6 Chart Types** — Bar, line, pie, scatter, histogram, area
+- **Correlation Matrix** — Heatmap of column correlations
+- **Missing Data Map** — Visual null data patterns
+
+### Data Tools
+- **Transform Panel** — Filter, sort, group, and computed columns
+- **Join Builder** — Visual SQL join wizard for multi-dataset joins
+- **Pivot Tables** — Interactive cross-tabulation with aggregation
+- **Export Wizard** — CSV, JSON, SQL INSERT, Markdown, HTML export
+- **Formula Editor** — Expression builder for computed columns
+
+### Analytics
+- **Outlier Detection** — IQR-based anomaly detection
+- **Data Quality Scoring** — Automated completeness and quality assessment
+- **Data Summary** — Natural language dataset summaries
+- **Data Comparison** — Side-by-side dataset comparison
+
+### Reports & History
+- **Report Builder** — Create and export standalone HTML reports
+- **Query History** — Browse and re-run past queries
+- **Saved Queries** — Bookmark your favorite queries
+- **SQL Templates** — 20+ pre-built, parameterized SQL templates
+
+### UX
+- **Dark Mode** — Full dark mode with system preference detection
+- **Command Palette** — Cmd+K quick access to all features
+- **Keyboard Shortcuts** — Power-user shortcuts (Cmd+D, Cmd+N, Cmd+/)
+- **Sample Datasets** — Built-in demo data for instant exploration
+- **Onboarding Tour** — First-time user guided tour
 - **Self-Hosted** — Deploy with Docker Compose in one command
 
 ## Quick Start
