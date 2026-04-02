@@ -1,977 +1,587 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState, type ElementType, type ReactNode } from "react";
 import ReactECharts from "echarts-for-react";
+import { motion } from "framer-motion";
 import {
-  Hash,
-  Type,
-  Calendar,
-  ToggleLeft,
-  HelpCircle,
-  BarChart3,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  Loader2,
-  AlertTriangle,
-  ListOrdered,
-  Regex,
-  Clock,
-  ArrowDownUp,
+  Activity, AlertTriangle, BarChart3, Calendar, Clock3, Database, Hash, Layers3,
+  LineChart, Loader2, Search, Sigma, Type,
 } from "lucide-react";
-import type { ColumnProfile, ColumnType } from "@/types/dataset";
 import { runQuery } from "@/lib/duckdb/client";
-import { formatNumber, formatPercent } from "@/lib/utils/formatters";
+import { SkeletonCard, SkeletonChart } from "@/components/ui/skeleton";
+import { formatNumber } from "@/lib/utils/formatters";
+import type { ColumnProfile } from "@/types/dataset";
 
-/* -------------------------------------------------------------------------- */
-/*  Types                                                                     */
-/* -------------------------------------------------------------------------- */
+interface ColumnStatsProps { tableName: string; column: ColumnProfile; rowCount: number; }
+interface Bin { label: string; count: number; start?: number; end?: number; }
+interface BaseStats { count: number; distinct: number; nulls: number; }
+interface NumericStats extends BaseStats {
+  kind: "number"; mean: number | null; median: number | null; mode: string | null; stddev: number | null;
+  min: number | null; max: number | null; range: number | null; q1: number | null; q3: number | null; iqr: number | null;
+  histogram: Bin[];
+}
+interface PatternMetric { label: string; count: number; }
+interface StringStats extends BaseStats {
+  kind: "string"; minLength: number | null; maxLength: number | null; avgLength: number | null;
+  topValues: Bin[]; patterns: PatternMetric[];
+}
+interface Gap { start: string; end: string; days: number; }
+interface DateStats extends BaseStats {
+  kind: "date"; minDate: string | null; maxDate: string | null; rangeDays: number | null;
+  monthly: Bin[]; dayOfWeek: Bin[]; gaps: Gap[];
+}
+type Stats = NumericStats | StringStats | DateStats;
 
-interface ColumnStatsProps {
-  tableName: string;
-  column: ColumnProfile;
-  rowCount: number;
+const COLORS = { numeric: "#06b6d4", string: "#f97316", date: "#22c55e" };
+const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+const quote = (value: string) => `"${value.replace(/"/g, '""')}"`;
+const asNumber = (value: unknown) => {
+  const num = value == null ? NaN : Number(value);
+  return Number.isFinite(num) ? num : null;
+};
+const asText = (value: unknown) => (value == null ? null : String(value));
+const truncate = (value: string, max = 32) => (value.length > max ? `${value.slice(0, max - 1)}…` : value);
+const pct = (part: number, whole: number) => (whole ? (part / whole) * 100 : 0);
+function formatMetric(value: number | null, digits = 2) {
+  if (value == null) return "—";
+  if (Math.abs(value) >= 1000 || Number.isInteger(value)) return formatNumber(value);
+  return value.toFixed(digits);
+}
+function formatDateLabel(value: string | null) {
+  if (!value) return "—";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(parsed);
 }
 
-interface NumericStats {
-  count: number;
-  distinctCount: number;
-  nullCount: number;
-  mean: number;
-  median: number;
-  mode: number | null;
-  stddev: number;
-  min: number;
-  max: number;
-  range: number;
-  q1: number;
-  q2: number;
-  q3: number;
-  skewness: number;
-  histogram: { bin: string; count: number }[];
-  boxplot: { min: number; q1: number; median: number; q3: number; max: number };
+function useDarkMode() {
+  const [dark, setDark] = useState(false);
+  useEffect(() => {
+    const root = document.documentElement;
+    const sync = () => setDark(root.classList.contains("dark"));
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+  return dark;
 }
 
-interface StringStats {
-  count: number;
-  distinctCount: number;
-  nullCount: number;
-  minLength: number;
-  maxLength: number;
-  avgLength: number;
-  topValues: { value: string; count: number }[];
-  leastCommon: { value: string; count: number }[];
-  patterns: string[];
-}
+function buildChart(data: Bin[], dark: boolean, color: string, options?: { horizontal?: boolean; line?: boolean }) {
+  const horizontal = options?.horizontal ?? false;
+  const line = options?.line ?? false;
+  const labels = data.map((item) => item.label);
+  const values = data.map((item) => item.count);
+  const textColor = dark ? "#a1a1aa" : "#6b7280";
+  const borderColor = dark ? "#27272a" : "#e5e7eb";
+  const tooltipBg = dark ? "#111827ee" : "#ffffffee";
 
-interface DateStats {
-  count: number;
-  distinctCount: number;
-  nullCount: number;
-  minDate: string;
-  maxDate: string;
-  dateRange: string;
-  monthly: { month: string; count: number }[];
-  dayOfWeek: { day: string; count: number }[];
-  gaps: { from: string; to: string; gapDays: number }[];
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Helpers                                                                   */
-/* -------------------------------------------------------------------------- */
-
-function quoteId(id: string): string {
-  return `"${id.replace(/"/g, '""')}"`;
-}
-
-function toNum(v: unknown): number {
-  if (typeof v === "number" && Number.isFinite(v)) return v;
-  if (typeof v === "bigint") return Number(v);
-  if (typeof v === "string") {
-    const n = Number(v);
-    return Number.isFinite(n) ? n : 0;
+  if (horizontal) {
+    return {
+      animationDuration: 450,
+      tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, backgroundColor: tooltipBg, borderColor, textStyle: { color: dark ? "#f3f4f6" : "#111827" } },
+      grid: { left: 16, right: 24, top: 12, bottom: 12, containLabel: true },
+      xAxis: { type: "value", axisLabel: { color: textColor, fontSize: 11 }, splitLine: { lineStyle: { color: borderColor, type: "dashed" } } },
+      yAxis: { type: "category", data: labels, axisLabel: { color: textColor, fontSize: 11, width: 120, overflow: "truncate" }, axisLine: { lineStyle: { color: borderColor } } },
+      series: [{ type: "bar", data: values, barWidth: 18, itemStyle: { color, borderRadius: [0, 8, 8, 0] } }],
+    };
   }
-  return 0;
+
+  return {
+    animationDuration: 450,
+    tooltip: { trigger: line ? "axis" : "item", backgroundColor: tooltipBg, borderColor, textStyle: { color: dark ? "#f3f4f6" : "#111827" } },
+    grid: { left: 16, right: 24, top: 20, bottom: 30, containLabel: true },
+    xAxis: {
+      type: "category",
+      data: labels,
+      boundaryGap: !line,
+      axisLabel: { color: textColor, fontSize: 11, rotate: labels.length > 8 ? 25 : 0 },
+      axisLine: { lineStyle: { color: borderColor } },
+    },
+    yAxis: { type: "value", axisLabel: { color: textColor, fontSize: 11 }, splitLine: { lineStyle: { color: borderColor, type: "dashed" } } },
+    series: [{
+      type: line ? "line" : "bar",
+      smooth: line,
+      data: values,
+      symbol: line ? "circle" : "none",
+      symbolSize: 6,
+      lineStyle: { color, width: 3 },
+      areaStyle: line ? { color, opacity: 0.1 } : undefined,
+      itemStyle: { color, borderRadius: [8, 8, 0, 0] },
+    }],
+  };
 }
 
-function isDark(): boolean {
-  if (typeof document === "undefined") return false;
-  return document.documentElement.classList.contains("dark");
+function buildBoxPlot(stats: NumericStats, dark: boolean) {
+  const borderColor = dark ? "#27272a" : "#e5e7eb";
+  const textColor = dark ? "#a1a1aa" : "#6b7280";
+  if ([stats.min, stats.q1, stats.median, stats.q3, stats.max].some((value) => value == null)) return {};
+  return {
+    animationDuration: 450,
+    tooltip: {
+      trigger: "item",
+      formatter: [`min: ${formatMetric(stats.min)}`, `Q1: ${formatMetric(stats.q1)}`, `median: ${formatMetric(stats.median)}`, `Q3: ${formatMetric(stats.q3)}`, `max: ${formatMetric(stats.max)}`].join("<br/>"),
+      backgroundColor: dark ? "#111827ee" : "#ffffffee",
+      borderColor,
+      textStyle: { color: dark ? "#f3f4f6" : "#111827" },
+    },
+    grid: { left: 16, right: 24, top: 12, bottom: 24, containLabel: true },
+    xAxis: { type: "category", data: ["Spread"], axisLabel: { color: textColor, fontSize: 11 }, axisLine: { lineStyle: { color: borderColor } } },
+    yAxis: { type: "value", axisLabel: { color: textColor, fontSize: 11 }, splitLine: { lineStyle: { color: borderColor, type: "dashed" } } },
+    series: [{ type: "boxplot", data: [[stats.min, stats.q1, stats.median, stats.q3, stats.max]], itemStyle: { color: "rgba(6, 182, 212, 0.25)", borderColor: COLORS.numeric, borderWidth: 2 } }],
+  };
 }
 
-const TYPE_ICONS: Record<ColumnType, React.ElementType> = {
-  string: Type,
-  number: Hash,
-  date: Calendar,
-  boolean: ToggleLeft,
-  unknown: HelpCircle,
-};
-
-const TYPE_COLORS: Record<ColumnType, { accent: string; bg: string }> = {
-  number: { accent: "#10b981", bg: "bg-emerald-100 dark:bg-emerald-900/40" },
-  string: { accent: "#3b82f6", bg: "bg-blue-100 dark:bg-blue-900/40" },
-  date: { accent: "#f59e0b", bg: "bg-amber-100 dark:bg-amber-900/40" },
-  boolean: { accent: "#8b5cf6", bg: "bg-purple-100 dark:bg-purple-900/40" },
-  unknown: { accent: "#6b7280", bg: "bg-gray-100 dark:bg-gray-800" },
-};
-
-const SECTION_VARIANTS = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.35, ease: "easeOut" as const },
-  }),
-};
-
-const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-/* -------------------------------------------------------------------------- */
-/*  Stat presentational pieces                                                */
-/* -------------------------------------------------------------------------- */
-
-function StatRow({ label, value, mono = true }: { label: string; value: string | number; mono?: boolean }) {
+function Panel({ title, icon: Icon, accent, children }: { title: string; icon: ElementType; accent: string; children: ReactNode }) {
   return (
-    <div className="flex items-center justify-between py-1.5 border-b border-gray-100 dark:border-gray-800 last:border-0">
-      <span className="text-xs text-gray-500 dark:text-gray-400">{label}</span>
-      <span className={`text-xs font-medium text-gray-800 dark:text-gray-200 ${mono ? "font-mono" : ""}`}>
-        {typeof value === "number" ? formatNumber(value) : value}
-      </span>
-    </div>
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: "easeOut" }}
+      className="rounded-2xl border border-gray-200/70 bg-white/80 p-5 shadow-sm dark:border-gray-700/70 dark:bg-gray-900/60">
+      <div className="mb-4 flex items-center gap-3">
+        <div className={`rounded-xl p-2 ${accent}`}><Icon className="h-4 w-4" /></div>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
+      </div>
+      {children}
+    </motion.div>
   );
 }
 
-function SectionHeading({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
+function MetricGrid({ items }: { items: { label: string; value: string | number; tone?: "default" | "danger" }[] }) {
   return (
-    <div className="flex items-center gap-2 mb-3">
-      <Icon className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{title}</h4>
-    </div>
-  );
-}
-
-function SkeletonBlock({ className = "" }: { className?: string }) {
-  return (
-    <div className={`animate-pulse rounded-lg bg-gray-200/60 dark:bg-gray-700/40 ${className}`} />
-  );
-}
-
-function SkeletonRows({ count = 6 }: { count?: number }) {
-  return (
-    <div className="space-y-3">
-      {Array.from({ length: count }).map((_, i) => (
-        <SkeletonBlock key={i} className="h-4 w-full" />
+    <div className="grid gap-3 sm:grid-cols-2">
+      {items.map((item) => (
+        <div key={item.label} className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">{item.label}</p>
+          <p className={`mt-1 text-xl font-semibold ${item.tone === "danger" ? "text-amber-600 dark:text-amber-400" : "text-gray-900 dark:text-gray-100"}`}>{item.value}</p>
+        </div>
       ))}
     </div>
   );
 }
 
-function ErrorState({ message }: { message: string }) {
+function InsightList({ items }: { items: string[] }) {
   return (
-    <div className="flex items-center gap-2 text-red-500 dark:text-red-400 p-4">
-      <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-      <p className="text-sm">{message}</p>
+    <div className="space-y-3">
+      {items.map((item, index) => (
+        <motion.div key={item} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.03, duration: 0.22 }}
+          className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-4 py-3 text-sm leading-6 text-gray-700 dark:border-gray-800/70 dark:bg-gray-950/35 dark:text-gray-300">
+          {item}
+        </motion.div>
+      ))}
     </div>
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Chart helpers                                                             */
-/* -------------------------------------------------------------------------- */
-
-function baseChartTheme(dark: boolean) {
-  return {
-    textColor: dark ? "#a1a1aa" : "#71717a",
-    borderColor: dark ? "#27272a" : "#e5e7eb",
-    bgColor: dark ? "#18181bee" : "#ffffffee",
-    tooltipBorder: dark ? "#3f3f46" : "#e5e7eb",
-    tooltipText: dark ? "#e4e4e7" : "#27272a",
-  };
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Numeric stats fetcher + view                                              */
-/* -------------------------------------------------------------------------- */
-
-async function fetchNumericStats(tableName: string, col: string): Promise<NumericStats> {
-  const c = quoteId(col);
-
-  const [basicRows, modeRows, histRows, boxRows] = await Promise.all([
-    runQuery(`
-      SELECT
-        COUNT(${c}) AS cnt,
-        COUNT(DISTINCT ${c}) AS distinct_cnt,
-        COUNT(*) - COUNT(${c}) AS null_cnt,
-        AVG(${c}::DOUBLE) AS mean_val,
-        MEDIAN(${c}::DOUBLE) AS median_val,
-        STDDEV_SAMP(${c}::DOUBLE) AS stddev_val,
-        MIN(${c}::DOUBLE) AS min_val,
-        MAX(${c}::DOUBLE) AS max_val,
-        QUANTILE_CONT(${c}::DOUBLE, 0.25) AS q1,
-        QUANTILE_CONT(${c}::DOUBLE, 0.50) AS q2,
-        QUANTILE_CONT(${c}::DOUBLE, 0.75) AS q3,
-        SKEWNESS(${c}::DOUBLE) AS skew_val
-      FROM "${tableName}"
-    `),
-    runQuery(`
-      SELECT ${c}::DOUBLE AS mode_val, COUNT(*) AS freq
-      FROM "${tableName}"
-      WHERE ${c} IS NOT NULL
-      GROUP BY ${c}
-      ORDER BY freq DESC
-      LIMIT 1
-    `),
-    runQuery(`
-      WITH bounds AS (
-        SELECT MIN(${c}::DOUBLE) AS lo, MAX(${c}::DOUBLE) AS hi FROM "${tableName}" WHERE ${c} IS NOT NULL
-      ),
-      params AS (
-        SELECT lo, hi, CASE WHEN hi = lo THEN 1 ELSE (hi - lo) / 20.0 END AS bw FROM bounds
-      )
-      SELECT
-        FLOOR((${c}::DOUBLE - p.lo) / p.bw) AS bucket,
-        ROUND(p.lo + FLOOR((${c}::DOUBLE - p.lo) / p.bw) * p.bw, 4) AS bin_start,
-        COUNT(*) AS cnt
-      FROM "${tableName}", params p
-      WHERE ${c} IS NOT NULL
-      GROUP BY bucket, bin_start
-      ORDER BY bucket
-    `),
-    runQuery(`
-      SELECT
-        MIN(${c}::DOUBLE) AS bx_min,
-        QUANTILE_CONT(${c}::DOUBLE, 0.25) AS bx_q1,
-        MEDIAN(${c}::DOUBLE) AS bx_med,
-        QUANTILE_CONT(${c}::DOUBLE, 0.75) AS bx_q3,
-        MAX(${c}::DOUBLE) AS bx_max
-      FROM "${tableName}"
-      WHERE ${c} IS NOT NULL
-    `),
-  ]);
-
-  const b = basicRows[0] ?? {};
-  const m = modeRows[0];
-  const bx = boxRows[0] ?? {};
-
-  return {
-    count: toNum(b.cnt),
-    distinctCount: toNum(b.distinct_cnt),
-    nullCount: toNum(b.null_cnt),
-    mean: toNum(b.mean_val),
-    median: toNum(b.median_val),
-    mode: m ? toNum(m.mode_val) : null,
-    stddev: toNum(b.stddev_val),
-    min: toNum(b.min_val),
-    max: toNum(b.max_val),
-    range: toNum(b.max_val) - toNum(b.min_val),
-    q1: toNum(b.q1),
-    q2: toNum(b.q2),
-    q3: toNum(b.q3),
-    skewness: toNum(b.skew_val),
-    histogram: histRows.map((r) => ({
-      bin: String(r.bin_start),
-      count: toNum(r.cnt),
-    })),
-    boxplot: {
-      min: toNum(bx.bx_min),
-      q1: toNum(bx.bx_q1),
-      median: toNum(bx.bx_med),
-      q3: toNum(bx.bx_q3),
-      max: toNum(bx.bx_max),
-    },
-  };
-}
-
-function NumericStatsView({ stats }: { stats: NumericStats }) {
-  const dark = isDark();
-  const t = baseChartTheme(dark);
-  const accent = TYPE_COLORS.number.accent;
-
-  const SkewnessIcon = stats.skewness > 0.5 ? TrendingUp : stats.skewness < -0.5 ? TrendingDown : Minus;
-  const skewnessLabel =
-    stats.skewness > 0.5
-      ? "Right-skewed"
-      : stats.skewness < -0.5
-        ? "Left-skewed"
-        : "Approximately symmetric";
-
-  const histogramOption = useMemo(
-    () => ({
-      tooltip: {
-        trigger: "axis",
-        backgroundColor: t.bgColor,
-        borderColor: t.tooltipBorder,
-        textStyle: { color: t.tooltipText, fontSize: 12 },
-        borderWidth: 1,
-      },
-      grid: { left: 40, right: 16, top: 16, bottom: 32, containLabel: true },
-      xAxis: {
-        type: "category",
-        data: stats.histogram.map((h) => h.bin),
-        axisLabel: {
-          color: t.textColor,
-          fontSize: 10,
-          rotate: 45,
-          formatter: (v: string) => {
-            const n = Number(v);
-            return Number.isFinite(n) ? formatNumber(n) : v;
-          },
-        },
-        axisLine: { lineStyle: { color: t.borderColor } },
-        axisTick: { show: false },
-      },
-      yAxis: {
-        type: "value",
-        axisLabel: { color: t.textColor, fontSize: 10 },
-        splitLine: { lineStyle: { color: t.borderColor, type: "dashed" } },
-      },
-      series: [
-        {
-          type: "bar",
-          data: stats.histogram.map((h) => h.count),
-          itemStyle: { color: accent, borderRadius: [3, 3, 0, 0] },
-          barMaxWidth: 28,
-        },
-      ],
-    }),
-    [stats.histogram, t, accent],
-  );
-
-  const boxplotOption = useMemo(() => {
-    const bp = stats.boxplot;
-    return {
-      tooltip: {
-        trigger: "item",
-        backgroundColor: t.bgColor,
-        borderColor: t.tooltipBorder,
-        textStyle: { color: t.tooltipText, fontSize: 12 },
-        borderWidth: 1,
-        formatter: () =>
-          `Min: ${formatNumber(bp.min)}<br/>Q1: ${formatNumber(bp.q1)}<br/>Median: ${formatNumber(bp.median)}<br/>Q3: ${formatNumber(bp.q3)}<br/>Max: ${formatNumber(bp.max)}`,
-      },
-      grid: { left: 40, right: 16, top: 16, bottom: 24 },
-      xAxis: { type: "category", data: [""], axisLine: { lineStyle: { color: t.borderColor } } },
-      yAxis: {
-        type: "value",
-        axisLabel: { color: t.textColor, fontSize: 10 },
-        splitLine: { lineStyle: { color: t.borderColor, type: "dashed" } },
-      },
-      series: [
-        {
-          type: "boxplot",
-          data: [[bp.min, bp.q1, bp.median, bp.q3, bp.max]],
-          itemStyle: { color: accent, borderColor: accent },
-        },
-      ],
-    };
-  }, [stats.boxplot, t, accent]);
-
+function LoadingView({ name }: { name: string }) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Left - Stats */}
-      <div className="space-y-5">
-        <motion.div custom={0} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={ListOrdered} title="Counts" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3">
-            <StatRow label="Total Count" value={stats.count} />
-            <StatRow label="Distinct Count" value={stats.distinctCount} />
-            <StatRow label="Null Count" value={stats.nullCount} />
-            <StatRow label="Null %" value={stats.count + stats.nullCount > 0 ? formatPercent((stats.nullCount / (stats.count + stats.nullCount)) * 100) : "0%"} />
-          </div>
-        </motion.div>
-
-        <motion.div custom={1} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={BarChart3} title="Central Tendency" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3">
-            <StatRow label="Mean" value={stats.mean.toFixed(4)} />
-            <StatRow label="Median" value={stats.median.toFixed(4)} />
-            <StatRow label="Mode" value={stats.mode !== null ? stats.mode.toFixed(4) : "N/A"} />
-            <StatRow label="Std Deviation" value={stats.stddev.toFixed(4)} />
-          </div>
-        </motion.div>
-
-        <motion.div custom={2} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={ArrowDownUp} title="Range & Quartiles" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3">
-            <StatRow label="Min" value={stats.min.toFixed(4)} />
-            <StatRow label="Max" value={stats.max.toFixed(4)} />
-            <StatRow label="Range" value={stats.range.toFixed(4)} />
-            <StatRow label="Q1 (25th)" value={stats.q1.toFixed(4)} />
-            <StatRow label="Q2 (50th)" value={stats.q2.toFixed(4)} />
-            <StatRow label="Q3 (75th)" value={stats.q3.toFixed(4)} />
-            <StatRow label="IQR" value={(stats.q3 - stats.q1).toFixed(4)} />
-          </div>
-        </motion.div>
-
-        <motion.div custom={3} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <div className="flex items-center gap-2 mb-2">
-            <SkewnessIcon className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Skewness</h4>
-          </div>
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3">
-            <StatRow label="Skewness" value={stats.skewness.toFixed(4)} />
-            <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 italic">{skewnessLabel}</div>
-          </div>
-        </motion.div>
+    <section className="rounded-2xl border border-gray-200/70 bg-white/80 p-6 dark:border-gray-700/70 dark:bg-gray-900/60">
+      <div className="mb-6 flex items-start justify-between gap-4 border-b border-gray-200/70 pb-5 dark:border-gray-700/70">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-600 dark:text-cyan-400">Column Statistics</p>
+          <h2 className="mt-2 text-xl font-semibold text-gray-900 dark:text-gray-100">{name}</h2>
+        </div>
+        <Loader2 className="h-5 w-5 animate-spin text-cyan-500" />
       </div>
-
-      {/* Right - Charts */}
-      <div className="space-y-5">
-        <motion.div custom={0} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={BarChart3} title="Histogram" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-2">
-            <ReactECharts option={histogramOption} style={{ height: 240 }} notMerge />
-          </div>
-        </motion.div>
-
-        <motion.div custom={1} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={ArrowDownUp} title="Box Plot" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-2">
-            <ReactECharts option={boxplotOption} style={{ height: 200 }} notMerge />
-          </div>
-        </motion.div>
+      <div className="grid gap-6 xl:grid-cols-2">
+        <div className="space-y-6"><SkeletonCard className="min-h-[240px]" /><SkeletonChart className="min-h-[280px]" /></div>
+        <div className="space-y-6"><SkeletonCard className="min-h-[240px]" /><SkeletonChart className="min-h-[280px]" /></div>
       </div>
-    </div>
+    </section>
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  String stats fetcher + view                                               */
-/* -------------------------------------------------------------------------- */
-
-async function fetchStringStats(tableName: string, col: string): Promise<StringStats> {
-  const c = quoteId(col);
-
-  const [basicRows, topRows, leastRows, patternRows] = await Promise.all([
-    runQuery(`
-      SELECT
-        COUNT(${c}) AS cnt,
-        COUNT(DISTINCT ${c}) AS distinct_cnt,
-        COUNT(*) - COUNT(${c}) AS null_cnt,
-        MIN(LENGTH(${c})) AS min_len,
-        MAX(LENGTH(${c})) AS max_len,
-        AVG(LENGTH(${c})) AS avg_len
-      FROM "${tableName}"
-    `),
-    runQuery(`
-      SELECT ${c} AS val, COUNT(*) AS freq
-      FROM "${tableName}"
-      WHERE ${c} IS NOT NULL
-      GROUP BY ${c}
-      ORDER BY freq DESC
-      LIMIT 10
-    `),
-    runQuery(`
-      SELECT ${c} AS val, COUNT(*) AS freq
-      FROM "${tableName}"
-      WHERE ${c} IS NOT NULL
-      GROUP BY ${c}
-      ORDER BY freq ASC
-      LIMIT 5
-    `),
-    runQuery(`
-      SELECT
-        SUM(CASE WHEN regexp_matches(${c}, '^[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}$') THEN 1 ELSE 0 END) AS email_cnt,
-        SUM(CASE WHEN regexp_matches(${c}, '^\\d{4}-\\d{2}-\\d{2}') THEN 1 ELSE 0 END) AS date_cnt,
-        SUM(CASE WHEN regexp_matches(${c}, '^https?://') THEN 1 ELSE 0 END) AS url_cnt,
-        SUM(CASE WHEN regexp_matches(${c}, '^\\+?\\d[\\d\\s\\-()]{6,}$') THEN 1 ELSE 0 END) AS phone_cnt,
-        SUM(CASE WHEN regexp_matches(${c}, '^[A-Z]{1,3}[\\-\\s]?\\d{2,}') THEN 1 ELSE 0 END) AS code_cnt,
-        COUNT(${c}) AS total
-      FROM "${tableName}"
-      WHERE ${c} IS NOT NULL
-    `),
-  ]);
-
-  const b = basicRows[0] ?? {};
-  const p = patternRows[0] ?? {};
-  const total = toNum(p.total) || 1;
-  const patterns: string[] = [];
-
-  if (toNum(p.email_cnt) / total > 0.5) patterns.push("Looks like email addresses");
-  if (toNum(p.date_cnt) / total > 0.5) patterns.push("Looks like date strings");
-  if (toNum(p.url_cnt) / total > 0.5) patterns.push("Looks like URLs");
-  if (toNum(p.phone_cnt) / total > 0.5) patterns.push("Looks like phone numbers");
-  if (toNum(p.code_cnt) / total > 0.3) patterns.push("Looks like codes / identifiers");
-  if (patterns.length === 0) patterns.push("No dominant pattern detected");
-
+async function loadNumeric(tableName: string, columnName: string): Promise<NumericStats> {
+  const table = quote(tableName);
+  const column = quote(columnName);
+  const base = await runQuery(`
+    SELECT COUNT(${column}) AS count, COUNT(DISTINCT ${column}) AS distinct_count, SUM(CASE WHEN ${column} IS NULL THEN 1 ELSE 0 END) AS nulls,
+      AVG(${column}) AS mean, MEDIAN(${column}) AS median, STDDEV_SAMP(${column}) AS stddev,
+      MIN(${column}) AS min_value, MAX(${column}) AS max_value, MAX(${column}) - MIN(${column}) AS range_value,
+      QUANTILE_CONT(${column}, 0.25) AS q1, QUANTILE_CONT(${column}, 0.75) AS q3
+    FROM ${table}
+  `);
+  const mode = await runQuery(`
+    SELECT CAST(${column} AS VARCHAR) AS value FROM ${table}
+    WHERE ${column} IS NOT NULL GROUP BY 1 ORDER BY COUNT(*) DESC, value LIMIT 1
+  `);
+  const histogram = await runQuery(`
+    WITH clean AS (SELECT CAST(${column} AS DOUBLE) AS value FROM ${table} WHERE ${column} IS NOT NULL),
+    bounds AS (SELECT MIN(value) AS min_value, MAX(value) AS max_value FROM clean),
+    ids AS (SELECT range AS bin FROM range(0, 12)),
+    binned AS (
+      SELECT CASE WHEN b.max_value = b.min_value THEN 0 ELSE LEAST(CAST(FLOOR(((c.value - b.min_value) / NULLIF(b.max_value - b.min_value, 0)) * 12) AS INTEGER), 11) END AS bin,
+        COUNT(*) AS count
+      FROM clean c CROSS JOIN bounds b GROUP BY 1
+    )
+    SELECT ids.bin, b.min_value + ((b.max_value - b.min_value) / 12.0) * ids.bin AS start_value,
+      CASE WHEN ids.bin = 11 THEN b.max_value ELSE b.min_value + ((b.max_value - b.min_value) / 12.0) * (ids.bin + 1) END AS end_value,
+      COALESCE(binned.count, 0) AS count
+    FROM ids CROSS JOIN bounds b LEFT JOIN binned ON binned.bin = ids.bin ORDER BY ids.bin
+  `);
+  const row = base[0] ?? {};
+  const q1 = asNumber(row.q1);
+  const q3 = asNumber(row.q3);
   return {
-    count: toNum(b.cnt),
-    distinctCount: toNum(b.distinct_cnt),
-    nullCount: toNum(b.null_cnt),
-    minLength: toNum(b.min_len),
-    maxLength: toNum(b.max_len),
-    avgLength: toNum(b.avg_len),
-    topValues: topRows.map((r) => ({ value: String(r.val ?? ""), count: toNum(r.freq) })),
-    leastCommon: leastRows.map((r) => ({ value: String(r.val ?? ""), count: toNum(r.freq) })),
-    patterns,
-  };
-}
-
-function StringStatsView({ stats }: { stats: StringStats }) {
-  const dark = isDark();
-  const t = baseChartTheme(dark);
-  const accent = TYPE_COLORS.string.accent;
-  const maxCount = stats.topValues.length > 0 ? stats.topValues[0].count : 1;
-
-  const topValuesOption = useMemo(
-    () => ({
-      tooltip: {
-        trigger: "axis",
-        backgroundColor: t.bgColor,
-        borderColor: t.tooltipBorder,
-        textStyle: { color: t.tooltipText, fontSize: 12 },
-        borderWidth: 1,
-      },
-      grid: { left: 8, right: 24, top: 8, bottom: 8, containLabel: true },
-      xAxis: {
-        type: "value",
-        axisLabel: { color: t.textColor, fontSize: 10 },
-        splitLine: { lineStyle: { color: t.borderColor, type: "dashed" } },
-      },
-      yAxis: {
-        type: "category",
-        data: [...stats.topValues].reverse().map((v) => {
-          const label = v.value;
-          return label.length > 20 ? label.slice(0, 18) + "\u2026" : label;
-        }),
-        axisLabel: { color: t.textColor, fontSize: 10, width: 120, overflow: "truncate" },
-        axisLine: { lineStyle: { color: t.borderColor } },
-        axisTick: { show: false },
-      },
-      series: [
-        {
-          type: "bar",
-          data: [...stats.topValues].reverse().map((v) => v.count),
-          itemStyle: { color: accent, borderRadius: [0, 3, 3, 0] },
-          barMaxWidth: 20,
-        },
-      ],
-    }),
-    [stats.topValues, t, accent],
-  );
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Left - Stats */}
-      <div className="space-y-5">
-        <motion.div custom={0} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={ListOrdered} title="Counts" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3">
-            <StatRow label="Total Count" value={stats.count} />
-            <StatRow label="Distinct Count" value={stats.distinctCount} />
-            <StatRow label="Null Count" value={stats.nullCount} />
-            <StatRow label="Uniqueness" value={stats.count > 0 ? formatPercent((stats.distinctCount / stats.count) * 100) : "N/A"} />
-          </div>
-        </motion.div>
-
-        <motion.div custom={1} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={Type} title="Length Analysis" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3">
-            <StatRow label="Min Length" value={stats.minLength} />
-            <StatRow label="Max Length" value={stats.maxLength} />
-            <StatRow label="Avg Length" value={stats.avgLength.toFixed(1)} />
-          </div>
-        </motion.div>
-
-        <motion.div custom={2} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={Regex} title="Pattern Analysis" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 space-y-1.5">
-            {stats.patterns.map((p, i) => (
-              <div key={i} className="text-xs text-gray-600 dark:text-gray-400 flex items-start gap-2">
-                <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-blue-400 dark:bg-blue-500 flex-shrink-0" />
-                {p}
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div custom={3} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={ArrowDownUp} title="Least Common Values" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3">
-            {stats.leastCommon.map((v, i) => (
-              <div key={i} className="flex items-center justify-between py-1.5 border-b border-gray-100 dark:border-gray-800 last:border-0">
-                <span className="text-xs text-gray-600 dark:text-gray-400 truncate max-w-[60%]" title={v.value}>
-                  {v.value || "(empty)"}
-                </span>
-                <span className="text-xs font-mono text-gray-800 dark:text-gray-200">{formatNumber(v.count)}</span>
-              </div>
-            ))}
-            {stats.leastCommon.length === 0 && (
-              <p className="text-xs text-gray-400 dark:text-gray-500 italic">No data</p>
-            )}
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Right - Charts */}
-      <div className="space-y-5">
-        <motion.div custom={0} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={BarChart3} title="Top 10 Values" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-2">
-            <ReactECharts option={topValuesOption} style={{ height: Math.max(180, stats.topValues.length * 28) }} notMerge />
-          </div>
-        </motion.div>
-
-        <motion.div custom={1} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={BarChart3} title="Value Frequency" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 space-y-2">
-            {stats.topValues.slice(0, 5).map((v, i) => (
-              <div key={i}>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-gray-600 dark:text-gray-400 truncate max-w-[60%]" title={v.value}>
-                    {v.value || "(empty)"}
-                  </span>
-                  <span className="font-mono text-gray-700 dark:text-gray-300">{formatNumber(v.count)}</span>
-                </div>
-                <div className="h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                  <motion.div
-                    className="h-full rounded-full"
-                    style={{ backgroundColor: accent }}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(v.count / maxCount) * 100}%` }}
-                    transition={{ duration: 0.5, delay: i * 0.06 }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Date stats fetcher + view                                                 */
-/* -------------------------------------------------------------------------- */
-
-async function fetchDateStats(tableName: string, col: string): Promise<DateStats> {
-  const c = quoteId(col);
-
-  const [basicRows, monthlyRows, dowRows, gapRows] = await Promise.all([
-    runQuery(`
-      SELECT
-        COUNT(${c}) AS cnt,
-        COUNT(DISTINCT ${c}) AS distinct_cnt,
-        COUNT(*) - COUNT(${c}) AS null_cnt,
-        MIN(${c}::DATE)::VARCHAR AS min_d,
-        MAX(${c}::DATE)::VARCHAR AS max_d,
-        DATEDIFF('day', MIN(${c}::DATE), MAX(${c}::DATE)) AS range_days
-      FROM "${tableName}"
-    `),
-    runQuery(`
-      SELECT
-        STRFTIME(${c}::DATE, '%Y-%m') AS month_key,
-        COUNT(*) AS cnt
-      FROM "${tableName}"
-      WHERE ${c} IS NOT NULL
-      GROUP BY month_key
-      ORDER BY month_key
-    `),
-    runQuery(`
-      SELECT
-        DAYOFWEEK(${c}::DATE) AS dow,
-        COUNT(*) AS cnt
-      FROM "${tableName}"
-      WHERE ${c} IS NOT NULL
-      GROUP BY dow
-      ORDER BY dow
-    `),
-    runQuery(`
-      WITH ordered AS (
-        SELECT ${c}::DATE AS d, LAG(${c}::DATE) OVER (ORDER BY ${c}::DATE) AS prev_d
-        FROM "${tableName}"
-        WHERE ${c} IS NOT NULL
-      ),
-      gaps AS (
-        SELECT prev_d::VARCHAR AS gap_from, d::VARCHAR AS gap_to, DATEDIFF('day', prev_d, d) AS gap_days
-        FROM ordered
-        WHERE prev_d IS NOT NULL AND DATEDIFF('day', prev_d, d) > 30
-      )
-      SELECT * FROM gaps ORDER BY gap_days DESC LIMIT 5
-    `),
-  ]);
-
-  const b = basicRows[0] ?? {};
-  const rangeDays = toNum(b.range_days);
-  let dateRange = `${rangeDays} days`;
-  if (rangeDays > 365) dateRange = `${(rangeDays / 365.25).toFixed(1)} years`;
-  else if (rangeDays > 60) dateRange = `${Math.round(rangeDays / 30.44)} months`;
-
-  return {
-    count: toNum(b.cnt),
-    distinctCount: toNum(b.distinct_cnt),
-    nullCount: toNum(b.null_cnt),
-    minDate: String(b.min_d ?? "N/A"),
-    maxDate: String(b.max_d ?? "N/A"),
-    dateRange,
-    monthly: monthlyRows.map((r) => ({ month: String(r.month_key), count: toNum(r.cnt) })),
-    dayOfWeek: dowRows.map((r) => ({
-      day: DAY_LABELS[toNum(r.dow)] ?? String(r.dow),
-      count: toNum(r.cnt),
-    })),
-    gaps: gapRows.map((r) => ({
-      from: String(r.gap_from),
-      to: String(r.gap_to),
-      gapDays: toNum(r.gap_days),
+    kind: "number",
+    count: asNumber(row.count) ?? 0,
+    distinct: asNumber(row.distinct_count) ?? 0,
+    nulls: asNumber(row.nulls) ?? 0,
+    mean: asNumber(row.mean),
+    median: asNumber(row.median),
+    mode: asText(mode[0]?.value),
+    stddev: asNumber(row.stddev),
+    min: asNumber(row.min_value),
+    max: asNumber(row.max_value),
+    range: asNumber(row.range_value),
+    q1, q3, iqr: q1 != null && q3 != null ? q3 - q1 : null,
+    histogram: histogram.map((item) => ({
+      label: formatMetric(asNumber(item.start_value), 1),
+      count: asNumber(item.count) ?? 0,
+      start: asNumber(item.start_value) ?? undefined,
+      end: asNumber(item.end_value) ?? undefined,
     })),
   };
 }
 
-function DateStatsView({ stats }: { stats: DateStats }) {
-  const dark = isDark();
-  const t = baseChartTheme(dark);
-  const accent = TYPE_COLORS.date.accent;
-
-  const monthlyOption = useMemo(
-    () => ({
-      tooltip: {
-        trigger: "axis",
-        backgroundColor: t.bgColor,
-        borderColor: t.tooltipBorder,
-        textStyle: { color: t.tooltipText, fontSize: 12 },
-        borderWidth: 1,
-      },
-      grid: { left: 40, right: 16, top: 16, bottom: 40, containLabel: true },
-      xAxis: {
-        type: "category",
-        data: stats.monthly.map((m) => m.month),
-        axisLabel: { color: t.textColor, fontSize: 10, rotate: 45 },
-        axisLine: { lineStyle: { color: t.borderColor } },
-        axisTick: { show: false },
-      },
-      yAxis: {
-        type: "value",
-        axisLabel: { color: t.textColor, fontSize: 10 },
-        splitLine: { lineStyle: { color: t.borderColor, type: "dashed" } },
-      },
-      series: [
-        {
-          type: "line",
-          data: stats.monthly.map((m) => m.count),
-          smooth: true,
-          lineStyle: { color: accent, width: 2 },
-          itemStyle: { color: accent },
-          areaStyle: { color: accent + "22" },
-          symbol: "circle",
-          symbolSize: 4,
-        },
-      ],
-    }),
-    [stats.monthly, t, accent],
-  );
-
-  const dowOption = useMemo(
-    () => ({
-      tooltip: {
-        trigger: "axis",
-        backgroundColor: t.bgColor,
-        borderColor: t.tooltipBorder,
-        textStyle: { color: t.tooltipText, fontSize: 12 },
-        borderWidth: 1,
-      },
-      grid: { left: 40, right: 16, top: 16, bottom: 24 },
-      xAxis: {
-        type: "category",
-        data: stats.dayOfWeek.map((d) => d.day),
-        axisLabel: { color: t.textColor, fontSize: 10 },
-        axisLine: { lineStyle: { color: t.borderColor } },
-        axisTick: { show: false },
-      },
-      yAxis: {
-        type: "value",
-        axisLabel: { color: t.textColor, fontSize: 10 },
-        splitLine: { lineStyle: { color: t.borderColor, type: "dashed" } },
-      },
-      series: [
-        {
-          type: "bar",
-          data: stats.dayOfWeek.map((d) => d.count),
-          itemStyle: { color: accent, borderRadius: [3, 3, 0, 0] },
-          barMaxWidth: 32,
-        },
-      ],
-    }),
-    [stats.dayOfWeek, t, accent],
-  );
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Left - Stats */}
-      <div className="space-y-5">
-        <motion.div custom={0} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={ListOrdered} title="Counts" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3">
-            <StatRow label="Total Count" value={stats.count} />
-            <StatRow label="Distinct Count" value={stats.distinctCount} />
-            <StatRow label="Null Count" value={stats.nullCount} />
-          </div>
-        </motion.div>
-
-        <motion.div custom={1} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={Calendar} title="Date Range" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3">
-            <StatRow label="Earliest" value={stats.minDate} mono={false} />
-            <StatRow label="Latest" value={stats.maxDate} mono={false} />
-            <StatRow label="Span" value={stats.dateRange} mono={false} />
-          </div>
-        </motion.div>
-
-        <motion.div custom={2} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={Clock} title="Gap Detection" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3">
-            {stats.gaps.length === 0 && (
-              <p className="text-xs text-gray-400 dark:text-gray-500 italic">No significant gaps ({">"}30 days) detected</p>
-            )}
-            {stats.gaps.map((g, i) => (
-              <div key={i} className="py-1.5 border-b border-gray-100 dark:border-gray-800 last:border-0">
-                <div className="flex justify-between">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{g.from} to {g.to}</span>
-                  <span className="text-xs font-mono font-medium text-amber-600 dark:text-amber-400">{g.gapDays}d</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Right - Charts */}
-      <div className="space-y-5">
-        <motion.div custom={0} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={TrendingUp} title="Values per Month" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-2">
-            <ReactECharts option={monthlyOption} style={{ height: 240 }} notMerge />
-          </div>
-        </motion.div>
-
-        <motion.div custom={1} variants={SECTION_VARIANTS} initial="hidden" animate="visible">
-          <SectionHeading icon={BarChart3} title="Day of Week Distribution" />
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-2">
-            <ReactECharts option={dowOption} style={{ height: 200 }} notMerge />
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
+async function loadString(tableName: string, columnName: string): Promise<StringStats> {
+  const table = quote(tableName);
+  const column = quote(columnName);
+  const base = await runQuery(`
+    SELECT COUNT(${column}) AS count, COUNT(DISTINCT ${column}) AS distinct_count, SUM(CASE WHEN ${column} IS NULL THEN 1 ELSE 0 END) AS nulls,
+      MIN(CASE WHEN ${column} IS NOT NULL THEN LENGTH(CAST(${column} AS VARCHAR)) END) AS min_length,
+      MAX(CASE WHEN ${column} IS NOT NULL THEN LENGTH(CAST(${column} AS VARCHAR)) END) AS max_length,
+      AVG(CASE WHEN ${column} IS NOT NULL THEN LENGTH(CAST(${column} AS VARCHAR)) END) AS avg_length
+    FROM ${table}
+  `);
+  const topValues = await runQuery(`
+    SELECT CAST(${column} AS VARCHAR) AS value, COUNT(*) AS count
+    FROM ${table} WHERE ${column} IS NOT NULL GROUP BY 1 ORDER BY count DESC, value LIMIT 10
+  `);
+  const patterns = await runQuery(String.raw`
+    WITH clean AS (SELECT CAST(${column} AS VARCHAR) AS value FROM ${table} WHERE ${column} IS NOT NULL)
+    SELECT
+      SUM(CASE WHEN TRIM(value) = '' THEN 1 ELSE 0 END) AS empty_like,
+      SUM(CASE WHEN regexp_matches(value, '^[0-9]+$') THEN 1 ELSE 0 END) AS numeric_like,
+      SUM(CASE WHEN regexp_matches(value, '^[A-Za-z]+$') THEN 1 ELSE 0 END) AS alpha_like,
+      SUM(CASE WHEN regexp_matches(value, '^[A-Za-z0-9]+$') THEN 1 ELSE 0 END) AS alphanumeric,
+      SUM(CASE WHEN regexp_matches(value, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$') THEN 1 ELSE 0 END) AS email_like,
+      SUM(CASE WHEN regexp_matches(value, '^(https?://|www\.)') THEN 1 ELSE 0 END) AS url_like,
+      SUM(CASE WHEN value != TRIM(value) THEN 1 ELSE 0 END) AS surrounding_whitespace,
+      SUM(CASE WHEN regexp_matches(value, '[0-9]') AND regexp_matches(value, '[A-Za-z]') THEN 1 ELSE 0 END) AS mixed_token
+    FROM clean
+  `);
+  const row = base[0] ?? {};
+  const patternRow = patterns[0] ?? {};
+  return {
+    kind: "string",
+    count: asNumber(row.count) ?? 0,
+    distinct: asNumber(row.distinct_count) ?? 0,
+    nulls: asNumber(row.nulls) ?? 0,
+    minLength: asNumber(row.min_length),
+    maxLength: asNumber(row.max_length),
+    avgLength: asNumber(row.avg_length),
+    topValues: topValues.map((item) => ({ label: truncate(asText(item.value) ?? "null"), count: asNumber(item.count) ?? 0 })),
+    patterns: [
+      { label: "Empty strings", count: asNumber(patternRow.empty_like) ?? 0 },
+      { label: "Numeric-like", count: asNumber(patternRow.numeric_like) ?? 0 },
+      { label: "Alphabetic", count: asNumber(patternRow.alpha_like) ?? 0 },
+      { label: "Alphanumeric", count: asNumber(patternRow.alphanumeric) ?? 0 },
+      { label: "Email-like", count: asNumber(patternRow.email_like) ?? 0 },
+      { label: "URL-like", count: asNumber(patternRow.url_like) ?? 0 },
+      { label: "Leading or trailing spaces", count: asNumber(patternRow.surrounding_whitespace) ?? 0 },
+      { label: "Mixed letters and numbers", count: asNumber(patternRow.mixed_token) ?? 0 },
+    ],
+  };
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Main component                                                            */
-/* -------------------------------------------------------------------------- */
+async function loadDate(tableName: string, columnName: string): Promise<DateStats> {
+  const table = quote(tableName);
+  const column = quote(columnName);
+  const parsed = `TRY_CAST(${column} AS TIMESTAMP)`;
+  const base = await runQuery(`
+    WITH parsed AS (SELECT ${column} AS raw_value, ${parsed} AS value FROM ${table}),
+    clean AS (SELECT value FROM parsed WHERE value IS NOT NULL)
+    SELECT (SELECT COUNT(*) FROM clean) AS count, (SELECT COUNT(DISTINCT value) FROM clean) AS distinct_count,
+      (SELECT SUM(CASE WHEN raw_value IS NULL THEN 1 ELSE 0 END) FROM parsed) AS nulls,
+      (SELECT MIN(value) FROM clean) AS min_date, (SELECT MAX(value) FROM clean) AS max_date,
+      (SELECT DATE_DIFF('day', CAST(MIN(value) AS DATE), CAST(MAX(value) AS DATE)) FROM clean) AS range_days
+  `);
+  const monthly = await runQuery(`
+    WITH clean AS (SELECT DATE_TRUNC('month', ${parsed}) AS bucket FROM ${table} WHERE ${parsed} IS NOT NULL)
+    SELECT STRFTIME(bucket, '%Y-%m') AS label, COUNT(*) AS count FROM clean GROUP BY 1 ORDER BY 1
+  `);
+  const dayOfWeek = await runQuery(`
+    WITH clean AS (SELECT ${parsed} AS value FROM ${table} WHERE ${parsed} IS NOT NULL)
+    SELECT CAST(STRFTIME(value, '%w') AS INTEGER) AS idx, STRFTIME(value, '%A') AS label, COUNT(*) AS count
+    FROM clean GROUP BY 1, 2 ORDER BY 1
+  `);
+  const gaps = await runQuery(`
+    WITH clean AS (SELECT DISTINCT CAST(${parsed} AS DATE) AS day_value FROM ${table} WHERE ${parsed} IS NOT NULL),
+    lagged AS (
+      SELECT LAG(day_value) OVER (ORDER BY day_value) AS previous_day, day_value AS current_day,
+        DATE_DIFF('day', LAG(day_value) OVER (ORDER BY day_value), day_value) AS gap_days
+      FROM clean
+    )
+    SELECT CAST(previous_day AS VARCHAR) AS start_date, CAST(current_day AS VARCHAR) AS end_date, gap_days
+    FROM lagged WHERE previous_day IS NOT NULL AND gap_days > 1 ORDER BY gap_days DESC, current_day LIMIT 8
+  `);
+  const row = base[0] ?? {};
+  const weekdayMap = new Map(dayOfWeek.map((item) => [asText(item.label) ?? "", asNumber(item.count) ?? 0]));
+  return {
+    kind: "date",
+    count: asNumber(row.count) ?? 0,
+    distinct: asNumber(row.distinct_count) ?? 0,
+    nulls: asNumber(row.nulls) ?? 0,
+    minDate: asText(row.min_date),
+    maxDate: asText(row.max_date),
+    rangeDays: asNumber(row.range_days),
+    monthly: monthly.map((item) => ({ label: asText(item.label) ?? "", count: asNumber(item.count) ?? 0 })),
+    dayOfWeek: DAYS.map((day) => ({ label: day, count: weekdayMap.get(day) ?? 0 })),
+    gaps: gaps.map((item) => ({ start: asText(item.start_date) ?? "", end: asText(item.end_date) ?? "", days: asNumber(item.gap_days) ?? 0 })),
+  };
+}
+
+function getInsights(column: ColumnProfile, rowCount: number, stats: Stats) {
+  const nullRate = pct(stats.nulls, rowCount);
+  if (stats.kind === "number") {
+    return [
+      `Coverage is ${formatMetric(pct(stats.count, rowCount), 1)}% non-null with ${formatNumber(stats.distinct)} distinct numeric values.`,
+      stats.mean != null && stats.median != null
+        ? `Mean is ${formatMetric(stats.mean)} versus median ${formatMetric(stats.median)}; ${Math.abs(stats.mean - stats.median) > (stats.stddev ?? 0) * 0.2 ? "the separation suggests skew or long tails." : "the closeness suggests a comparatively balanced center."}`
+        : "Central tendency is limited because mean or median could not be estimated.",
+      stats.iqr != null && stats.range != null
+        ? `Spread runs from ${formatMetric(stats.min)} to ${formatMetric(stats.max)} with IQR ${formatMetric(stats.iqr)} across a total range of ${formatMetric(stats.range)}.`
+        : "Quartile spread is not available for this numeric field.",
+      nullRate > 15 ? `${formatMetric(nullRate, 1)}% missingness is material and can distort aggregate comparisons.` : "Missingness is modest enough that the distribution should stay stable under light filtering.",
+    ];
+  }
+  if (stats.kind === "string") {
+    const dominant = [...stats.patterns].sort((a, b) => b.count - a.count)[0];
+    return [
+      `Distinct ratio is ${formatMetric(pct(stats.distinct, Math.max(stats.count, 1)), 1)}% of non-null rows, so ${column.name} ${stats.distinct > Math.max(stats.count * 0.5, 20) ? "behaves more like identifiers or free text." : "looks more categorical than unique."}`,
+      stats.avgLength != null
+        ? `Observed lengths range from ${formatMetric(stats.minLength, 0)} to ${formatMetric(stats.maxLength, 0)} characters with an average of ${formatMetric(stats.avgLength)}.`
+        : "Text length metrics are unavailable for this field.",
+      dominant ? `The strongest detected pattern is ${dominant.label.toLowerCase()} with ${formatNumber(dominant.count)} matches.` : "No dominant string pattern was detected.",
+      nullRate > 15 ? `${formatMetric(nullRate, 1)}% nulls indicates the field is often omitted or sparsely collected.` : "Null exposure is limited, which makes top-value comparisons more trustworthy.",
+    ];
+  }
+  return [
+    `Coverage is ${formatMetric(pct(stats.count, rowCount), 1)}% non-null with a span from ${formatDateLabel(stats.minDate)} to ${formatDateLabel(stats.maxDate)}.`,
+    stats.rangeDays != null ? `The timeline spans ${formatNumber(stats.rangeDays)} days, which is enough to inspect seasonality and dormant periods.` : "The temporal range could not be measured.",
+    stats.monthly.length > 1 ? `Monthly activity covers ${formatNumber(stats.monthly.length)} buckets, revealing whether the field arrives in bursts or sustained flows.` : "Activity is concentrated in a single monthly bucket, limiting trend analysis.",
+    stats.gaps.length > 0 ? `Largest gap is ${formatNumber(stats.gaps[0].days)} days between ${formatDateLabel(stats.gaps[0].start)} and ${formatDateLabel(stats.gaps[0].end)}.` : "No multi-day gaps were detected between consecutive observed dates.",
+  ];
+}
 
 export default function ColumnStats({ tableName, column, rowCount }: ColumnStatsProps) {
-  const [numericStats, setNumericStats] = useState<NumericStats | null>(null);
-  const [stringStats, setStringStats] = useState<StringStats | null>(null);
-  const [dateStats, setDateStats] = useState<DateStats | null>(null);
+  const dark = useDarkMode();
+  const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const TypeIcon = TYPE_ICONS[column.type] ?? HelpCircle;
-  const colors = TYPE_COLORS[column.type] ?? TYPE_COLORS.unknown;
-
   useEffect(() => {
     let cancelled = false;
-
     async function load() {
       setLoading(true);
       setError(null);
-
       try {
-        if (column.type === "number") {
-          const data = await fetchNumericStats(tableName, column.name);
-          if (!cancelled) setNumericStats(data);
-        } else if (column.type === "string") {
-          const data = await fetchStringStats(tableName, column.name);
-          if (!cancelled) setStringStats(data);
-        } else if (column.type === "date") {
-          const data = await fetchDateStats(tableName, column.name);
-          if (!cancelled) setDateStats(data);
+        const result =
+          column.type === "number" ? await loadNumeric(tableName, column.name)
+          : column.type === "string" ? await loadString(tableName, column.name)
+          : column.type === "date" ? await loadDate(tableName, column.name)
+          : (() => { throw new Error("Detailed statistics are only supported for numeric, string, and date columns."); })();
+        if (!cancelled) setStats(result);
+      } catch (fetchError) {
+        if (!cancelled) {
+          setStats(null);
+          setError(fetchError instanceof Error ? fetchError.message : "Failed to load column statistics.");
         }
-      } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load column statistics");
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
-
-    load();
+    void load();
     return () => { cancelled = true; };
-  }, [tableName, column.name, column.type]);
+  }, [column.name, column.type, tableName]);
+
+  if (loading) return <LoadingView name={column.name} />;
+  if (error || !stats) {
+    return (
+      <section className="rounded-2xl border border-red-200/70 bg-red-500/10 p-6 dark:border-red-500/30 dark:bg-red-500/10">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="mt-0.5 h-5 w-5 text-red-600 dark:text-red-400" />
+          <div>
+            <h2 className="text-base font-semibold text-red-700 dark:text-red-300">Column statistics unavailable</h2>
+            <p className="mt-1 text-sm text-red-600 dark:text-red-300">{error ?? "No statistics were returned."}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const insights = getInsights(column, rowCount, stats);
+  const summary = [
+    { label: "Rows", value: formatNumber(rowCount) },
+    { label: "Non-null", value: formatNumber(stats.count) },
+    { label: "Distinct", value: formatNumber(stats.distinct) },
+    { label: "Nulls", value: formatNumber(stats.nulls), tone: stats.nulls > 0 ? "danger" as const : "default" as const },
+  ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      className="rounded-xl backdrop-blur-xl bg-white/60 dark:bg-gray-900/60 border border-gray-200/50 dark:border-gray-700/50 shadow-sm"
-    >
-      {/* Header */}
-      <div className="flex items-center gap-3 p-5 border-b border-gray-200 dark:border-gray-700">
-        <div className={`w-8 h-8 rounded-lg ${colors.bg} flex items-center justify-center`}>
-          <TypeIcon className="w-4 h-4" style={{ color: colors.accent }} />
+    <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.32, ease: "easeOut" }}
+      className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white/80 dark:border-gray-700/70 dark:bg-gray-900/60">
+      <div className="border-b border-gray-200/70 px-6 py-5 dark:border-gray-700/70">
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700 dark:border-cyan-500/20 dark:text-cyan-300">
+              {column.type === "number" ? <Hash className="h-3.5 w-3.5" /> : column.type === "string" ? <Type className="h-3.5 w-3.5" /> : <Calendar className="h-3.5 w-3.5" />}
+              Column Statistics
+            </div>
+            <h2 className="mt-3 text-xl font-semibold text-gray-900 dark:text-gray-100">{column.name}</h2>
+            <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+              Deep profile for <span className="font-semibold text-gray-900 dark:text-gray-100">{column.name}</span> in{" "}
+              <span className="font-semibold text-gray-900 dark:text-gray-100">{tableName}</span>, covering distribution, quality signals, and type-specific diagnostics.
+            </p>
+            {column.sampleValues.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {column.sampleValues.slice(0, 5).map((sample, index) => (
+                  <span key={`${column.name}-sample-${index}`} className="rounded-full border border-gray-200/70 bg-gray-50/80 px-3 py-1 text-xs text-gray-600 dark:border-gray-800/70 dark:bg-gray-950/35 dark:text-gray-300">
+                    {sample == null ? "null" : truncate(String(sample), 28)}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:w-[360px]">
+            {summary.map((card) => (
+              <div key={card.label} className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">{card.label}</p>
+                <p className={`mt-1 text-xl font-semibold ${card.tone === "danger" ? "text-amber-600 dark:text-amber-400" : "text-gray-900 dark:text-gray-100"}`}>{card.value}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{column.name}</h3>
-          <p className="text-xs text-gray-400 dark:text-gray-500">
-            {column.type.charAt(0).toUpperCase() + column.type.slice(1)} column &middot; {formatNumber(rowCount)} rows
-          </p>
-        </div>
-        {loading && (
-          <Loader2 className="w-4 h-4 text-gray-400 dark:text-gray-500 animate-spin flex-shrink-0" />
-        )}
       </div>
 
-      {/* Body */}
-      <div className="p-5">
-        <AnimatePresence mode="wait">
-          {loading && (
-            <motion.div key="skeleton" exit={{ opacity: 0 }} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <SkeletonRows count={8} />
-              <div className="space-y-4">
-                <SkeletonBlock className="h-48" />
-                <SkeletonBlock className="h-36" />
-              </div>
-            </motion.div>
+      <div className="grid gap-6 px-6 py-6 xl:grid-cols-2">
+        <div className="space-y-6">
+          <Panel title="Analyst Notes" icon={Search} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400"><InsightList items={insights} /></Panel>
+
+          {stats.kind === "number" && (
+            <>
+              <Panel title="Core Metrics" icon={Sigma} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400">
+                <MetricGrid items={[
+                  { label: "Mean", value: formatMetric(stats.mean) }, { label: "Median", value: formatMetric(stats.median) },
+                  { label: "Mode", value: stats.mode ?? "—" }, { label: "Std Dev", value: formatMetric(stats.stddev) },
+                  { label: "Min", value: formatMetric(stats.min) }, { label: "Max", value: formatMetric(stats.max) },
+                  { label: "Range", value: formatMetric(stats.range) }, { label: "Null Rate", value: `${formatMetric(pct(stats.nulls, rowCount), 1)}%` },
+                ]} />
+              </Panel>
+              <Panel title="Histogram" icon={BarChart3} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400">
+                <ReactECharts option={buildChart(stats.histogram, dark, COLORS.numeric)} style={{ height: 300 }} notMerge lazyUpdate />
+              </Panel>
+            </>
           )}
 
-          {!loading && error && <ErrorState message={error} />}
-
-          {!loading && !error && column.type === "number" && numericStats && (
-            <motion.div key="numeric" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <NumericStatsView stats={numericStats} />
-            </motion.div>
+          {stats.kind === "string" && (
+            <>
+              <Panel title="Text Shape" icon={Type} accent="bg-orange-500/15 text-orange-600 dark:text-orange-400">
+                <MetricGrid items={[
+                  { label: "Min Length", value: formatMetric(stats.minLength, 0) }, { label: "Max Length", value: formatMetric(stats.maxLength, 0) },
+                  { label: "Avg Length", value: formatMetric(stats.avgLength) }, { label: "Null Rate", value: `${formatMetric(pct(stats.nulls, rowCount), 1)}%` },
+                ]} />
+              </Panel>
+              <Panel title="Top 10 Values" icon={BarChart3} accent="bg-orange-500/15 text-orange-600 dark:text-orange-400">
+                <ReactECharts option={buildChart(stats.topValues, dark, COLORS.string, { horizontal: true })} style={{ height: 320 }} notMerge lazyUpdate />
+              </Panel>
+            </>
           )}
 
-          {!loading && !error && column.type === "string" && stringStats && (
-            <motion.div key="string" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <StringStatsView stats={stringStats} />
-            </motion.div>
+          {stats.kind === "date" && (
+            <>
+              <Panel title="Temporal Coverage" icon={Clock3} accent="bg-green-500/15 text-green-600 dark:text-green-400">
+                <MetricGrid items={[
+                  { label: "Min Date", value: formatDateLabel(stats.minDate) }, { label: "Max Date", value: formatDateLabel(stats.maxDate) },
+                  { label: "Range", value: stats.rangeDays != null ? `${formatNumber(stats.rangeDays)} days` : "—" }, { label: "Null Rate", value: `${formatMetric(pct(stats.nulls, rowCount), 1)}%` },
+                ]} />
+              </Panel>
+              <Panel title="Monthly Activity" icon={LineChart} accent="bg-green-500/15 text-green-600 dark:text-green-400">
+                <ReactECharts option={buildChart(stats.monthly, dark, COLORS.date, { line: true })} style={{ height: 300 }} notMerge lazyUpdate />
+              </Panel>
+            </>
+          )}
+        </div>
+
+        <div className="space-y-6">
+          {stats.kind === "number" && (
+            <>
+              <Panel title="Quartiles & Spread" icon={Layers3} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400">
+                <MetricGrid items={[
+                  { label: "Q1", value: formatMetric(stats.q1) }, { label: "Median", value: formatMetric(stats.median) },
+                  { label: "Q3", value: formatMetric(stats.q3) }, { label: "IQR", value: formatMetric(stats.iqr) },
+                ]} />
+              </Panel>
+              <Panel title="Box Plot" icon={Activity} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400">
+                <ReactECharts option={buildBoxPlot(stats, dark)} style={{ height: 300 }} notMerge lazyUpdate />
+              </Panel>
+            </>
           )}
 
-          {!loading && !error && column.type === "date" && dateStats && (
-            <motion.div key="date" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <DateStatsView stats={dateStats} />
-            </motion.div>
-          )}
-
-          {!loading && !error && !["number", "string", "date"].includes(column.type) && (
-            <motion.div key="unsupported" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <div className="text-center py-8">
-                <HelpCircle className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Detailed statistics are not available for <span className="font-medium">{column.type}</span> columns.
-                </p>
-                <div className="mt-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 max-w-xs mx-auto">
-                  <StatRow label="Non-null Count" value={rowCount - column.nullCount} />
-                  <StatRow label="Null Count" value={column.nullCount} />
-                  <StatRow label="Unique Count" value={column.uniqueCount} />
+          {stats.kind === "string" && (
+            <>
+              <Panel title="Pattern Analysis" icon={Search} accent="bg-orange-500/15 text-orange-600 dark:text-orange-400">
+                <div className="space-y-3">
+                  {stats.patterns.map((pattern) => (
+                    <div key={pattern.label}>
+                      <div className="mb-1 flex items-center justify-between gap-4 text-sm text-gray-700 dark:text-gray-300">
+                        <span>{pattern.label}</span>
+                        <span className="font-mono text-xs text-gray-500 dark:text-gray-400">{formatNumber(pattern.count)}</span>
+                      </div>
+                      <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+                        <div className="h-full rounded-full bg-orange-500" style={{ width: `${Math.min(100, pct(pattern.count, Math.max(stats.count, 1)))}%` }} />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </motion.div>
+              </Panel>
+              <Panel title="Field Profile" icon={Database} accent="bg-orange-500/15 text-orange-600 dark:text-orange-400">
+                <MetricGrid items={[
+                  { label: "Distinct Ratio", value: `${formatMetric(pct(stats.distinct, Math.max(stats.count, 1)), 1)}%` }, { label: "Null Rate", value: `${formatMetric(pct(stats.nulls, rowCount), 1)}%` },
+                  { label: "Sample Count", value: column.sampleValues.length }, { label: "Rows Profiled", value: formatNumber(rowCount) },
+                ]} />
+              </Panel>
+            </>
           )}
-        </AnimatePresence>
+
+          {stats.kind === "date" && (
+            <>
+              <Panel title="Day Of Week" icon={Calendar} accent="bg-green-500/15 text-green-600 dark:text-green-400">
+                <ReactECharts option={buildChart(stats.dayOfWeek, dark, COLORS.date)} style={{ height: 300 }} notMerge lazyUpdate />
+              </Panel>
+              <Panel title="Gap Detection" icon={AlertTriangle} accent="bg-green-500/15 text-green-600 dark:text-green-400">
+                {stats.gaps.length === 0 ? (
+                  <p className="text-sm text-gray-600 dark:text-gray-300">No multi-day gaps detected between consecutive observed dates.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {stats.gaps.map((gap) => (
+                      <div key={`${gap.start}-${gap.end}`} className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
+                        <div className="flex items-center justify-between gap-4">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{formatDateLabel(gap.start)} → {formatDateLabel(gap.end)}</p>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Gap between consecutive observed dates</p>
+                          </div>
+                          <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs font-semibold text-green-700 dark:text-green-300">{formatNumber(gap.days)} days</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Panel>
+            </>
+          )}
+        </div>
       </div>
-    </motion.div>
+    </motion.section>
   );
 }
