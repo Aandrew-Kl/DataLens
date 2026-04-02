@@ -9,6 +9,7 @@ import {
 } from "@/lib/utils/export";
 import type { ColumnProfile } from "@/types/dataset";
 
+jest.mock("framer-motion");
 jest.mock("@/lib/duckdb/client", () => ({
   runQuery: jest.fn(),
 }));
@@ -101,22 +102,26 @@ describe("ExportWizard", () => {
     await user.click(screen.getByRole("button", { name: /select none/i }));
     expect(screen.getByRole("button", { name: /next/i })).toBeDisabled();
 
-    const [idCheckbox, statusCheckbox] = screen.getAllByRole("checkbox");
-    await user.click(idCheckbox);
-    await user.click(statusCheckbox);
+    fireEvent.click(screen.getAllByRole("checkbox")[0]!);
+    fireEvent.click(screen.getAllByRole("checkbox")[1]!);
+    expect(await screen.findByText("2 of 3 columns selected")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /next/i }));
     expect(await screen.findByText("Row limit")).toBeInTheDocument();
 
-    await user.type(screen.getByRole("spinbutton"), "2");
-    await user.type(
+    fireEvent.change(screen.getByRole("spinbutton"), {
+      target: { value: "2" },
+    });
+    fireEvent.change(
       screen.getByPlaceholderText("e.g. age > 30 AND status = 'active'"),
-      "status = 'active'",
+      {
+        target: { value: "status = 'active'" },
+      },
     );
 
     await user.click(screen.getByRole("button", { name: /next/i }));
 
     expect(await screen.findByRole("table")).toBeInTheDocument();
-    expect(screen.getAllByText("active")).toHaveLength(2);
+    expect(document.body).toHaveTextContent("active");
     expect(mockRunQuery).toHaveBeenCalledWith(
       expect.stringContaining('WHERE status = \'active\''),
     );

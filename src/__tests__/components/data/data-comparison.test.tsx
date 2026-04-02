@@ -1,9 +1,10 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import DataComparison from "@/components/data/data-comparison";
 import { runQuery } from "@/lib/duckdb/client";
 import type { DatasetMeta } from "@/types/dataset";
 
+jest.mock("framer-motion");
 jest.mock("@/lib/duckdb/client", () => ({
   runQuery: jest.fn(),
 }));
@@ -111,15 +112,24 @@ describe("DataComparison", () => {
 
     render(<DataComparison datasets={datasets} />);
 
-    const [leftSelector, rightSelector] = screen.getAllByRole("button", {
+    const [leftSelector] = screen.getAllByRole("button", {
       name: /select dataset/i,
     });
 
-    await user.click(leftSelector);
-    await user.click(screen.getByRole("button", { name: /orders a/i }));
+    fireEvent.click(leftSelector);
+    fireEvent.click(screen.getAllByRole("button", { name: /orders a/i })[0]!);
 
-    await user.click(rightSelector);
-    await user.click(screen.getAllByRole("button", { name: /orders b/i }).at(-1)!);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Orders A" })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Select dataset…" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Orders B")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("Orders B"));
 
     expect(await screen.findByText("2 Common")).toBeInTheDocument();
     expect(screen.getByText("1 Only in A")).toBeInTheDocument();
@@ -141,15 +151,24 @@ describe("DataComparison", () => {
 
     render(<DataComparison datasets={datasets} />);
 
-    const [leftSelector, rightSelector] = screen.getAllByRole("button", {
+    const [leftSelector] = screen.getAllByRole("button", {
       name: /select dataset/i,
     });
 
-    await user.click(leftSelector);
-    await user.click(screen.getByRole("button", { name: /orders a/i }));
+    fireEvent.click(leftSelector);
+    fireEvent.click(screen.getAllByRole("button", { name: /orders a/i })[0]!);
 
-    await user.click(rightSelector);
-    await user.click(screen.getAllByRole("button", { name: /orders b/i }).at(-1)!);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Orders A" })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Select dataset…" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Orders B")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("Orders B"));
 
     expect(await screen.findByText("Comparison failed badly")).toBeInTheDocument();
   });

@@ -102,6 +102,9 @@ import DataSampler from "@/components/data/data-sampler";
 import FormulaEditor from "@/components/data/formula-editor";
 import OnboardingTour from "@/components/ui/onboarding-tour";
 import DataQualityDashboard from "@/components/data/data-quality-dashboard";
+import LoadingOverlay from "@/components/ui/loading-overlay";
+import DataLineage from "@/components/data/data-lineage";
+import DataStory from "@/components/data/data-story";
 
 // ─────────────────────────────────────────────
 // Types
@@ -1046,6 +1049,10 @@ export default function Home() {
   if (!activeDataset && !showUploader) {
     return (
       <ErrorBoundary>
+        <LoadingOverlay
+          visible={isLoading}
+          message="Loading and profiling dataset..."
+        />
         <OnboardingTour />
         <div className="flex flex-1 flex-col min-h-screen">
           {/* Top bar */}
@@ -1243,6 +1250,10 @@ export default function Home() {
 
   return (
     <ErrorBoundary>
+      <LoadingOverlay
+        visible={isLoading}
+        message="Loading and profiling dataset..."
+      />
       <OnboardingTour />
       <div className="flex min-h-screen">
         {/* Sidebar */}
@@ -1844,6 +1855,9 @@ export default function Home() {
                           columns={profileData}
                         />
                       </ErrorBoundary>
+                      <ErrorBoundary>
+                        <DataLineage tableName={tableName} />
+                      </ErrorBoundary>
                       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         <ErrorBoundary>
                           <CorrelationMatrix
@@ -1940,6 +1954,13 @@ export default function Home() {
                         <DataQualityDashboard
                           tableName={tableName}
                           columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <DataStory
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
                         />
                       </ErrorBoundary>
                     </div>

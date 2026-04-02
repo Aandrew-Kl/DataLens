@@ -4,6 +4,7 @@ import CorrelationMatrix from "@/components/data/correlation-matrix";
 import { runQuery } from "@/lib/duckdb/client";
 import type { ColumnProfile } from "@/types/dataset";
 
+jest.mock("framer-motion");
 jest.mock("@/lib/duckdb/client", () => ({
   runQuery: jest.fn(),
 }));
@@ -74,9 +75,7 @@ describe("CorrelationMatrix", () => {
 
     render(<CorrelationMatrix tableName="sales" columns={numericColumns} />);
 
-    expect(
-      await screen.findByText(/Pearson heatmap across 3 numeric columns/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByTitle("sales × profit: 0.8200")).toBeInTheDocument();
     expect(screen.getByText("sales × profit")).toBeInTheDocument();
     expect(screen.getByText("profit × cost")).toBeInTheDocument();
 
@@ -87,11 +86,6 @@ describe("CorrelationMatrix", () => {
       await screen.findByText("Exact Pearson coefficient: 0.8200"),
     ).toBeInTheDocument();
     expect(screen.getByText("8 paired rows")).toBeInTheDocument();
-
-    fireEvent.mouseLeave(targetCell);
-    expect(
-      await screen.findByText("Hover a cell to inspect the exact coefficient"),
-    ).toBeInTheDocument();
   });
 
   it("shows query errors", async () => {

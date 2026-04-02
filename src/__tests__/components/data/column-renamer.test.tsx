@@ -1,9 +1,11 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ColumnRenamer from "@/components/data/column-renamer";
 import { runQuery } from "@/lib/duckdb/client";
 import type { ColumnProfile } from "@/types/dataset";
 
+jest.mock("framer-motion");
 jest.mock("@/lib/duckdb/client", () => ({
   runQuery: jest.fn(),
 }));
@@ -119,12 +121,13 @@ describe("ColumnRenamer", () => {
 
     const secondInput = screen.getByDisplayValue("Order Total");
 
-    await user.clear(secondInput);
-    await user.type(secondInput, "First Name");
+    fireEvent.change(secondInput, {
+      target: { value: "First Name" },
+    });
 
-    expect(
-      screen.getByText('"First Name" would duplicate "First Name".'),
-    ).toBeInTheDocument();
+    expect(document.body).toHaveTextContent(
+      '"First Name" would duplicate "First Name".',
+    );
     expect(screen.getByRole("button", { name: /apply/i })).toBeDisabled();
     expect(mockRunQuery).not.toHaveBeenCalled();
   });

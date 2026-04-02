@@ -4,6 +4,7 @@ import TransformPanel from "@/components/data/transform-panel";
 import { runQuery } from "@/lib/duckdb/client";
 import type { ColumnProfile } from "@/types/dataset";
 
+jest.mock("framer-motion");
 jest.mock("@/lib/duckdb/client", () => ({
   runQuery: jest.fn(),
 }));
@@ -125,8 +126,17 @@ describe("TransformPanel", () => {
       />,
     );
 
-    const filterValueInput = await screen.findByPlaceholderText("42");
-    fireEvent.change(filterValueInput, { target: { value: "100" } });
+    fireEvent.change(screen.getAllByRole("combobox")[1]!, {
+      target: { value: "is_not_null" },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("This operator does not require a comparison value."),
+      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /create view/i })).toBeEnabled();
+    });
+
     fireEvent.click(screen.getByRole("button", { name: /create view/i }));
 
     await waitFor(() =>
@@ -154,9 +164,17 @@ describe("TransformPanel", () => {
       />,
     );
 
-    fireEvent.change(await screen.findByPlaceholderText("42"), {
-      target: { value: "100" },
+    fireEvent.change(screen.getAllByRole("combobox")[1]!, {
+      target: { value: "is_not_null" },
     });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("This operator does not require a comparison value."),
+      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /create view/i })).toBeEnabled();
+    });
+
     fireEvent.click(screen.getByRole("button", { name: /create view/i }));
 
     await screen.findByText('Created view "sales_filter_v1" from sales.');

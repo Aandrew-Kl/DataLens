@@ -14,6 +14,7 @@ interface NaturalLanguageBarProps {
 const RECENT_QUERY_LIMIT = 6;
 const STORAGE_PREFIX = "datalens:nlq-recent:";
 const RECENT_QUERY_EVENT = "datalens:nlq-recent-sync";
+const recentQueryCache = new Map<string, { raw: string | null; parsed: string[] }>();
 
 function formatColumnName(name: string): string {
   return name.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
@@ -21,13 +22,20 @@ function formatColumnName(name: string): string {
 
 function readRecentQueries(storageKey: string): string[] {
   if (typeof window === "undefined") return [];
+  const raw = window.localStorage.getItem(storageKey);
+  const cached = recentQueryCache.get(storageKey);
+  if (cached && cached.raw === raw) {
+    return cached.parsed;
+  }
   try {
-    const stored = window.localStorage.getItem(storageKey);
-    const parsed = stored ? JSON.parse(stored) : [];
-    return Array.isArray(parsed)
+    const parsed = raw ? JSON.parse(raw) : [];
+    const next = Array.isArray(parsed)
       ? parsed.filter((item): item is string => typeof item === "string")
       : [];
+    recentQueryCache.set(storageKey, { raw, parsed: next });
+    return next;
   } catch {
+    recentQueryCache.set(storageKey, { raw, parsed: [] });
     return [];
   }
 }
@@ -121,7 +129,9 @@ export default function NaturalLanguageBar({
       0,
       RECENT_QUERY_LIMIT,
     );
-    window.localStorage.setItem(storageKey, JSON.stringify(nextQueries));
+    const raw = JSON.stringify(nextQueries);
+    recentQueryCache.set(storageKey, { raw, parsed: nextQueries });
+    window.localStorage.setItem(storageKey, raw);
     window.dispatchEvent(new CustomEvent<string>(RECENT_QUERY_EVENT, { detail: storageKey }));
   };
 

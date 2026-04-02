@@ -1,0 +1,41 @@
+name: Feature request
+description: Propose an improvement or new capability for DataLens
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the feature request clearly.
+      placeholder: I would like DataLens to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use case
+      description: Explain the workflow or problem this would improve.
+      placeholder: This would help when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed solution
+      description: Describe the approach you have in mind.
+      placeholder: A possible implementation is...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives_considered
+    attributes:
+      label: Alternatives considered
+      description: Describe any workarounds or alternative ideas you considered.
+      placeholder: I also considered...
+    validations:
+      required: false

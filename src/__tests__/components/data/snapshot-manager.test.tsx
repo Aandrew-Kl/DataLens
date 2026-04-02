@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import SnapshotManager from "@/components/data/snapshot-manager";
@@ -48,10 +48,9 @@ describe("SnapshotManager", () => {
       />,
     );
 
-    await user.type(
-      screen.getByPlaceholderText("pre-cleaning audit"),
-      "Pre-cleaning audit",
-    );
+    fireEvent.change(screen.getByPlaceholderText("pre-cleaning audit"), {
+      target: { value: "Pre-cleaning audit" },
+    });
     await user.click(screen.getByRole("button", { name: /create snapshot/i }));
 
     await waitFor(() => {

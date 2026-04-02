@@ -102,7 +102,9 @@ describe("DataDictionary", () => {
     const descriptionField = await screen.findByPlaceholderText(
       "Document what amount represents, business rules, and caveats.",
     );
-    await user.type(descriptionField, "Net revenue amount");
+    fireEvent.change(descriptionField, {
+      target: { value: "Net revenue amount" },
+    });
 
     await waitFor(() => {
       expect(window.localStorage.getItem(STORAGE_KEY)).toContain(

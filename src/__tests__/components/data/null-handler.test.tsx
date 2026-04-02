@@ -1,9 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import NullHandler from "@/components/data/null-handler";
 import { runQuery } from "@/lib/duckdb/client";
 import type { ColumnProfile } from "@/types/dataset";
 
+jest.mock("framer-motion");
 jest.mock("@/lib/duckdb/client", () => ({
   runQuery: jest.fn(),
 }));
@@ -57,13 +58,15 @@ describe("NullHandler", () => {
     );
 
     expect(screen.getByText("No null values detected")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(mockRunQuery).toHaveBeenCalledWith(
+        'SELECT COUNT(*) AS cnt FROM "customers"',
+      );
+    });
 
     await user.click(screen.getByRole("button", { name: /continue/i }));
 
     expect(onComplete).toHaveBeenCalledTimes(1);
-    expect(mockRunQuery).toHaveBeenCalledWith(
-      'SELECT COUNT(*) AS cnt FROM "customers"',
-    );
   });
 
   it("loads preview data and applies the null-handling plan with a table swap", async () => {
@@ -104,16 +107,27 @@ describe("NullHandler", () => {
       );
     });
 
-    const applyButton = screen.getByRole("button", { name: /apply changes/i });
-    expect(applyButton).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: /apply changes/i }),
+    ).toBeDisabled();
 
-    await user.click(screen.getByRole("button", { name: /preview result/i }));
+    fireEvent.click(screen.getByRole("button", { name: /preview result/i }));
 
-    expect(await screen.findByText("Athens")).toBeInTheDocument();
-    expect(screen.getByText("Ready")).toBeInTheDocument();
-    expect(applyButton).toBeEnabled();
+    await waitFor(() => {
+      expect(mockRunQuery).toHaveBeenCalledWith(
+        expect.stringContaining("SELECT COUNT(*) AS row_count"),
+      );
+      expect(mockRunQuery).toHaveBeenCalledWith(
+        expect.stringContaining("LIMIT 6"),
+      );
+      expect(document.body).toHaveTextContent("Athens");
+      expect(document.body).toHaveTextContent("Ready");
+      expect(
+        screen.getByRole("button", { name: /apply changes/i }),
+      ).toBeEnabled();
+    });
 
-    await user.click(applyButton);
+    await user.click(screen.getByRole("button", { name: /apply changes/i }));
 
     await waitFor(() => {
       expect(mockRunQuery).toHaveBeenCalledWith(
@@ -166,7 +180,9 @@ describe("NullHandler", () => {
     });
 
     const [ageActionSelect] = screen.getAllByRole("combobox");
-    await user.selectOptions(ageActionSelect, "custom");
+    fireEvent.change(ageActionSelect, {
+      target: { value: "custom" },
+    });
 
     expect(screen.getByPlaceholderText("Custom number value")).toBeInTheDocument();
     expect(

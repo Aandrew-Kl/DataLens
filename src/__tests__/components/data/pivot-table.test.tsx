@@ -5,6 +5,7 @@ import { runQuery } from "@/lib/duckdb/client";
 import { downloadFile } from "@/lib/utils/export";
 import type { ColumnProfile } from "@/types/dataset";
 
+jest.mock("framer-motion");
 jest.mock("@/lib/duckdb/client", () => ({
   runQuery: jest.fn(),
 }));
@@ -90,7 +91,11 @@ describe("PivotTable", () => {
     });
 
     await user.click(totalHeader);
-    await user.click(totalHeader);
+    await user.click(
+      within(screen.getByRole("table")).getByRole("columnheader", {
+        name: "Total",
+      }),
+    );
 
     await waitFor(() => {
       expect(getBodyRowLabels()).toEqual(["B", "A"]);
