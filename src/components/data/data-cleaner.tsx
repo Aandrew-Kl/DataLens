@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useEffect, useMemo, useState } from "react";
+import { startTransition, useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -11,10 +11,8 @@ import {
   Eye,
   History,
   Loader2,
-  RefreshCw,
   RotateCcw,
   Sparkles,
-  Trash2,
   Wand2,
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
@@ -102,13 +100,6 @@ function toNumber(value: unknown): number {
     return Number.isFinite(parsed) ? parsed : 0;
   }
   return 0;
-}
-
-function formatCell(value: unknown): string {
-  if (value === null || value === undefined) return "null";
-  if (typeof value === "number") return formatNumber(value);
-  if (typeof value === "boolean") return value ? "true" : "false";
-  return String(value);
 }
 
 function literalForType(value: string, type: ColumnType): string {
@@ -290,7 +281,7 @@ export default function DataCleaner({
     }
   }
 
-  async function scanIssues() {
+  const scanIssues = useCallback(async () => {
     if (!tableName || !columns.length) {
       setIssues([]);
       setRowCount(0);
@@ -342,7 +333,6 @@ export default function DataCleaner({
                   WHERE ${field} IS NOT NULL
                 )
                 SELECT
-                  ${field} IS NOT NULL AS has_values,
                   COALESCE(q1 - 1.5 * (q3 - q1), 0) AS lower_bound,
                   COALESCE(q3 + 1.5 * (q3 - q1), 0) AS upper_bound,
                   COUNT(*) FILTER (
@@ -491,11 +481,11 @@ export default function DataCleaner({
     } finally {
       setLoading(false);
     }
-  }
+  }, [columns, tableName]);
 
   useEffect(() => {
     void scanIssues();
-  }, [columns, tableName]);
+  }, [scanIssues]);
 
   function selectSqlForIssue(issue: DataIssue): string {
     const tableSql = quoteId(tableName);
