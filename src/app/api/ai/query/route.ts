@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { generateSQL, recommendChart, generateSummary } from "@/lib/ai/sql-generator";
+import { generateSQL } from "@/lib/ai/sql-generator";
+import { generateFallbackSQL } from "@/lib/ai/fallback";
+import { checkOllamaHealth } from "@/lib/ai/ollama-client";
 import type { ColumnProfile } from "@/types/dataset";
 
 export async function POST(request: Request) {
@@ -22,10 +24,24 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate SQL
-    const sql = await generateSQL(question, tableName, columns);
+    // Try Ollama first, fall back to rule-based SQL generation
+    const ollamaOk = await checkOllamaHealth();
 
-    return NextResponse.json({ sql });
+    let sql: string;
+    if (ollamaOk) {
+      sql = await generateSQL(question, tableName, columns);
+    } else {
+      const fallback = generateFallbackSQL(question, tableName, columns);
+      if (!fallback) {
+        return NextResponse.json(
+          { error: "Could not generate query. Try rephrasing or start Ollama for AI-powered queries." },
+          { status: 400 }
+        );
+      }
+      sql = fallback;
+    }
+
+    return NextResponse.json({ sql, mode: ollamaOk ? "ai" : "fallback" });
   } catch (error) {
     console.error("AI query error:", error);
     return NextResponse.json(

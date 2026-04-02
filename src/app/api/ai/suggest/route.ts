@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { chat } from "@/lib/ai/ollama-client";
+import { chat, checkOllamaHealth } from "@/lib/ai/ollama-client";
 import { suggestQuestionsPrompt, autoDashboardPrompt } from "@/lib/ai/prompts";
+import { generateFallbackQuestions, generateFallbackDashboard } from "@/lib/ai/fallback";
 import type { ColumnProfile } from "@/types/dataset";
 
 export async function POST(request: Request) {
@@ -18,7 +19,15 @@ export async function POST(request: Request) {
       rowCount: number;
     } = body;
 
+    const ollamaOk = await checkOllamaHealth();
+
     if (type === "questions") {
+      if (!ollamaOk) {
+        // Fallback: generate questions from schema analysis
+        const questions = generateFallbackQuestions(tableName, columns);
+        return NextResponse.json({ questions, mode: "fallback" });
+      }
+
       const messages = suggestQuestionsPrompt(tableName, columns, rowCount);
       const response = await chat(messages);
 
@@ -30,17 +39,19 @@ export async function POST(request: Request) {
         }
         questions = JSON.parse(json);
       } catch {
-        questions = [
-          `How many rows are in the dataset?`,
-          `What are the unique values in the first column?`,
-          `Show the top 10 records.`,
-        ];
+        questions = generateFallbackQuestions(tableName, columns);
       }
 
-      return NextResponse.json({ questions });
+      return NextResponse.json({ questions, mode: "ai" });
     }
 
     if (type === "dashboard") {
+      if (!ollamaOk) {
+        // Fallback: generate dashboard from schema analysis
+        const dashboard = generateFallbackDashboard(tableName, columns, rowCount);
+        return NextResponse.json({ ...dashboard, mode: "fallback" });
+      }
+
       const messages = autoDashboardPrompt(tableName, columns, rowCount);
       const response = await chat(messages);
 
@@ -52,17 +63,30 @@ export async function POST(request: Request) {
         }
         dashboard = JSON.parse(json);
       } catch {
-        dashboard = { metrics: [], charts: [] };
+        dashboard = generateFallbackDashboard(tableName, columns, rowCount);
       }
 
-      return NextResponse.json(dashboard);
+      return NextResponse.json({ ...dashboard, mode: ollamaOk ? "ai" : "fallback" });
     }
 
     return NextResponse.json({ error: "Invalid type" }, { status: 400 });
   } catch (error) {
     console.error("AI suggest error:", error);
+    // On any error, try fallback
+    try {
+      const body = await request.clone().json();
+      const { type, tableName, columns, rowCount } = body;
+      if (type === "questions") {
+        return NextResponse.json({ questions: generateFallbackQuestions(tableName, columns), mode: "fallback" });
+      }
+      if (type === "dashboard") {
+        return NextResponse.json({ ...generateFallbackDashboard(tableName, columns, rowCount), mode: "fallback" });
+      }
+    } catch {
+      // ignore
+    }
     return NextResponse.json(
-      { error: "Failed to generate suggestions. Is Ollama running?" },
+      { error: "Failed to generate suggestions." },
       { status: 500 }
     );
   }
