@@ -102,7 +102,7 @@ export function assessDataQuality(
       const pct = (nullRate * 100).toFixed(1);
       issues.push({
         column: col.name,
-        severity: nullRate > 0.5 ? "high" : "medium",
+        severity: nullRate >= 0.5 ? "high" : "medium",
         message: `High null rate: ${pct}% of values are missing.`,
       });
     }
