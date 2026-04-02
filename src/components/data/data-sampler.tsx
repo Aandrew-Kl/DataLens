@@ -1,39 +1,31 @@
 "use client";
-
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Download, Shuffle, Table2 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { downloadFile } from "@/lib/utils/export";
 import { formatNumber } from "@/lib/utils/formatters";
 import type { ColumnProfile } from "@/types/dataset";
-
 interface DataSamplerProps {
   tableName: string;
   columns: ColumnProfile[];
   rowCount: number;
 }
-
 type SampleMode = "random" | "stratified" | "top" | "bottom" | "systematic";
-
 const PREVIEW_LIMIT = 10;
 const MODE_OPTIONS: { id: SampleMode; label: string; hint: string }[] = [
-  { id: "random", label: "Random %", hint: "Shuffle the dataset and keep a share." },
-  { id: "stratified", label: "Stratified", hint: "Preserve category balance by column." },
-  { id: "top", label: "Top N", hint: "Return the highest ranked rows." },
-  { id: "bottom", label: "Bottom N", hint: "Return the lowest ranked rows." },
-  { id: "systematic", label: "Every Nth", hint: "Walk the table at a fixed interval." },
+  { id: "random", label: "Random %", hint: "Shuffle then keep a percentage." },
+  { id: "stratified", label: "Stratified", hint: "Sample inside each category." },
+  { id: "top", label: "Top N", hint: "Keep the highest ranked rows." },
+  { id: "bottom", label: "Bottom N", hint: "Keep the lowest ranked rows." },
+  { id: "systematic", label: "Every Nth", hint: "Walk the table at an interval." },
 ];
-
 function quoteIdentifier(value: string) {
   return `"${value.replace(/"/g, '""')}"`;
 }
-
 function clampInt(value: number, min: number, max: number) {
-  if (!Number.isFinite(value)) return min;
-  return Math.min(Math.max(Math.round(value), min), max);
+  return Number.isFinite(value) ? Math.min(Math.max(Math.round(value), min), max) : min;
 }
-
 function formatCell(value: unknown, type: ColumnProfile["type"]) {
   if (value === null || value === undefined) return "null";
   if (type === "number" && typeof value === "number") return value.toLocaleString();
@@ -44,42 +36,28 @@ function formatCell(value: unknown, type: ColumnProfile["type"]) {
   }
   return String(value);
 }
-
 function toCsv(rows: Record<string, unknown>[], headers: string[]) {
   const escape = (value: unknown) => {
     const text = value === null || value === undefined ? "" : String(value);
     return /[,"\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
   };
-
-  const headerLine = headers.map(escape).join(",");
-  const body = rows.map((row) => headers.map((header) => escape(row[header])).join(","));
-  return [headerLine, ...body].join("\n");
+  return [
+    headers.map(escape).join(","),
+    ...rows.map((row) => headers.map((header) => escape(row[header])).join(",")),
+  ].join("\n");
 }
-
-export default function DataSampler({
-  tableName,
-  columns,
-  rowCount,
-}: DataSamplerProps) {
-  const categoricalColumns = useMemo(
-    () =>
-      columns.filter(
-        (column) =>
-          (column.type === "string" || column.type === "boolean") &&
-          column.uniqueCount > 1 &&
-          column.uniqueCount <= Math.max(24, Math.min(rowCount, 60)),
-      ),
-    [columns, rowCount],
+export default function DataSampler({ tableName, columns, rowCount }: DataSamplerProps) {
+  const categoricalColumns = columns.filter(
+    (column) =>
+      (column.type === "string" || column.type === "boolean") &&
+      column.uniqueCount > 1 &&
+      column.uniqueCount <= Math.max(24, Math.min(rowCount, 60)),
   );
-  const rankingColumns = useMemo(
-    () => columns.filter((column) => column.type !== "unknown"),
-    [columns],
+  const rankingColumns = columns.filter(
+    (column) => column.type !== "unknown" && column.type !== "boolean",
   );
   const columnNames = columns.map((column) => column.name);
-  const columnTypes = Object.fromEntries(
-    columns.map((column) => [column.name, column.type]),
-  ) as Record<string, ColumnProfile["type"]>;
-
+  const columnTypes = Object.fromEntries(columns.map((column) => [column.name, column.type])) as Record<string, ColumnProfile["type"]>;
   const [mode, setMode] = useState<SampleMode>("random");
   const [percent, setPercent] = useState(10);
   const [stratifyColumn, setStratifyColumn] = useState("");
@@ -90,39 +68,25 @@ export default function DataSampler({
   const [sampleSize, setSampleSize] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const activeStratifyColumn =
-    categoricalColumns.find((column) => column.name === stratifyColumn)?.name ??
-    categoricalColumns[0]?.name ??
-    "";
-  const activeOrderColumn =
-    rankingColumns.find((column) => column.name === orderColumn)?.name ??
-    rankingColumns[0]?.name ??
-    "";
+  const activeStratifyColumn = categoricalColumns.find((column) => column.name === stratifyColumn)?.name ?? categoricalColumns[0]?.name ?? "";
+  const activeOrderColumn = rankingColumns.find((column) => column.name === orderColumn)?.name ?? rankingColumns[0]?.name ?? "";
   const samplePercent = clampInt(percent, 1, 100);
   const sampleCount = clampInt(count, 1, Math.max(rowCount, 1));
   const sampleStep = clampInt(step, 1, Math.max(rowCount, 1));
-
   useEffect(() => {
     if (activeStratifyColumn !== stratifyColumn) setStratifyColumn(activeStratifyColumn);
     if (activeOrderColumn !== orderColumn) setOrderColumn(activeOrderColumn);
   }, [activeOrderColumn, activeStratifyColumn, orderColumn, stratifyColumn]);
-
   function buildSampleSql() {
     const safeTable = quoteIdentifier(tableName);
     const limit = Math.max(1, Math.ceil((rowCount * samplePercent) / 100));
-
-    if (mode === "random") {
-      return `SELECT * FROM ${safeTable} ORDER BY RANDOM() LIMIT ${limit}`;
-    }
-
+    if (mode === "random") return `SELECT * FROM ${safeTable} ORDER BY RANDOM() LIMIT ${limit}`;
     if (mode === "stratified") {
       if (!activeStratifyColumn) return `SELECT * FROM ${safeTable} LIMIT 0`;
       const safeColumn = quoteIdentifier(activeStratifyColumn);
       return `
         WITH stratified AS (
-          SELECT
-            *,
+          SELECT *,
             ROW_NUMBER() OVER (PARTITION BY ${safeColumn} ORDER BY RANDOM()) AS sample_rank,
             COUNT(*) OVER (PARTITION BY ${safeColumn}) AS sample_group_size
           FROM ${safeTable}
@@ -132,12 +96,10 @@ export default function DataSampler({
         WHERE sample_rank <= GREATEST(1, CAST(CEIL(sample_group_size * ${samplePercent} / 100.0) AS BIGINT))
       `;
     }
-
     if (mode === "top" || mode === "bottom") {
       if (!activeOrderColumn) return `SELECT * FROM ${safeTable} LIMIT 0`;
       return `SELECT * FROM ${safeTable} ORDER BY ${quoteIdentifier(activeOrderColumn)} ${mode === "top" ? "DESC" : "ASC"} NULLS LAST LIMIT ${sampleCount}`;
     }
-
     return `
       WITH ordered AS (
         SELECT *, ROW_NUMBER() OVER () AS sample_row_number
@@ -149,12 +111,10 @@ export default function DataSampler({
       ORDER BY sample_row_number
     `;
   }
-
   async function refreshPreview() {
     setLoading(true);
     setError(null);
     const sampleSql = buildSampleSql();
-
     try {
       const [rows, countRows] = await Promise.all([
         runQuery(`SELECT * FROM (${sampleSql}) AS sample_preview LIMIT ${PREVIEW_LIMIT}`),
@@ -170,22 +130,18 @@ export default function DataSampler({
       setLoading(false);
     }
   }
-
   async function downloadSample() {
     setLoading(true);
     setError(null);
-
     try {
       const rows = await runQuery(buildSampleSql());
-      const csv = toCsv(rows, columnNames);
-      downloadFile(csv, `${tableName}-${mode}-sample.csv`, "text/csv;charset=utf-8;");
+      downloadFile(toCsv(rows, columnNames), `${tableName}-${mode}-sample.csv`, "text/csv;charset=utf-8;");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Download failed.");
     } finally {
       setLoading(false);
     }
   }
-
   const modeSummary =
     mode === "random"
       ? `Randomly shuffling ${tableName} and keeping ${samplePercent}% of rows.`
@@ -211,14 +167,9 @@ export default function DataSampler({
               <Shuffle className="h-3.5 w-3.5" />
               Data Sampling
             </div>
-            <h2 className="mt-3 text-xl font-semibold text-gray-900 dark:text-gray-50">
-              Sample rows from {tableName}
-            </h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-600 dark:text-gray-300">
-              {modeSummary}
-            </p>
+            <h2 className="mt-3 text-xl font-semibold text-gray-900 dark:text-gray-50">Sample rows from {tableName}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-600 dark:text-gray-300">{modeSummary}</p>
           </div>
-
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
@@ -241,7 +192,6 @@ export default function DataSampler({
           </div>
         </div>
       </div>
-
       <div className="grid gap-5 px-6 py-6 xl:grid-cols-[1.3fr_0.7fr]">
         <div className="space-y-4">
           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
@@ -257,14 +207,12 @@ export default function DataSampler({
               </button>
             ))}
           </div>
-
           <div className="grid gap-4 rounded-2xl border border-gray-200/80 bg-gray-50/70 p-4 dark:border-gray-700/70 dark:bg-gray-950/30 md:grid-cols-2">
             <label className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
               <span className="font-medium">Sample percentage</span>
               <input type="range" min={1} max={100} value={samplePercent} onChange={(event) => setPercent(Number(event.target.value))} className="w-full accent-cyan-500" />
               <span className="block text-xs text-gray-500 dark:text-gray-400">{samplePercent}% of {formatNumber(rowCount)} rows</span>
             </label>
-
             <label className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
               <span className="font-medium">Stratify by category</span>
               <select value={activeStratifyColumn} onChange={(event) => setStratifyColumn(event.target.value)} disabled={!categoricalColumns.length} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-cyan-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
@@ -272,15 +220,13 @@ export default function DataSampler({
               </select>
               <span className="block text-xs text-gray-500 dark:text-gray-400">Recommended for low-cardinality text or boolean fields.</span>
             </label>
-
             <label className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
               <span className="font-medium">Top or bottom by</span>
               <select value={activeOrderColumn} onChange={(event) => setOrderColumn(event.target.value)} disabled={!rankingColumns.length} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-cyan-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
-                {rankingColumns.length ? rankingColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>) : <option value="">No columns available</option>}
+                {rankingColumns.length ? rankingColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>) : <option value="">No sortable columns</option>}
               </select>
               <input type="number" min={1} max={Math.max(rowCount, 1)} value={sampleCount} onChange={(event) => setCount(Number(event.target.value))} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-cyan-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
             </label>
-
             <label className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
               <span className="font-medium">Systematic interval</span>
               <input type="number" min={1} max={Math.max(rowCount, 1)} value={sampleStep} onChange={(event) => setStep(Number(event.target.value))} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-cyan-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
@@ -288,7 +234,6 @@ export default function DataSampler({
             </label>
           </div>
         </div>
-
         <div className="rounded-2xl border border-gray-200/80 bg-gray-50/80 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
             <Table2 className="h-4 w-4 text-cyan-500" />
@@ -299,20 +244,14 @@ export default function DataSampler({
             <p className="flex items-center justify-between gap-3"><span>Rows in sample</span><span className="font-semibold">{formatNumber(sampleSize)}</span></p>
             <p className="flex items-center justify-between gap-3"><span>Preview size</span><span className="font-semibold">{formatNumber(Math.min(sampleSize, PREVIEW_LIMIT))}</span></p>
           </div>
-          <p className="mt-4 text-xs leading-5 text-gray-500 dark:text-gray-400">
-            Random and stratified modes use `ORDER BY RANDOM()` to reshuffle candidate rows before returning the sample.
-          </p>
+          <p className="mt-4 text-xs leading-5 text-gray-500 dark:text-gray-400">Random and stratified modes use `ORDER BY RANDOM()` before rows are returned.</p>
         </div>
       </div>
-
       <div className="border-t border-gray-200/70 px-6 py-5 dark:border-gray-700/70">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Sample preview</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Previewing up to {PREVIEW_LIMIT} rows from the current sampling query.</p>
-          </div>
+        <div className="mb-3">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Sample preview</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Previewing up to {PREVIEW_LIMIT} rows from the current sampling query.</p>
         </div>
-
         <AnimatePresence mode="wait">
           {error ? (
             <motion.div key="error" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-2xl border border-red-300/60 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:text-red-300">
@@ -327,22 +266,12 @@ export default function DataSampler({
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
                   <thead className="bg-gray-50/90 dark:bg-gray-900/80">
-                    <tr>
-                      {columnNames.map((name) => (
-                        <th key={name} className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">
-                          {name}
-                        </th>
-                      ))}
-                    </tr>
+                    <tr>{columnNames.map((name) => <th key={name} className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{name}</th>)}</tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 bg-white/80 dark:divide-gray-800 dark:bg-gray-950/20">
                     {preview.map((row, index) => (
                       <tr key={`${mode}-${index}`} className="hover:bg-cyan-500/5 dark:hover:bg-cyan-500/5">
-                        {columnNames.map((name) => (
-                          <td key={`${index}-${name}`} className="max-w-[220px] truncate px-4 py-3 text-gray-700 dark:text-gray-200">
-                            {formatCell(row[name], columnTypes[name] ?? "unknown")}
-                          </td>
-                        ))}
+                        {columnNames.map((name) => <td key={`${index}-${name}`} className="max-w-[220px] truncate px-4 py-3 text-gray-700 dark:text-gray-200">{formatCell(row[name], columnTypes[name] ?? "unknown")}</td>)}
                       </tr>
                     ))}
                   </tbody>
