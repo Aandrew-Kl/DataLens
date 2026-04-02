@@ -21,6 +21,11 @@ import {
   Lock,
   Sparkles,
   ExternalLink as GithubIcon,
+  Wand2,
+  PieChart,
+  FileText,
+  GitMerge,
+  Keyboard,
 } from "lucide-react";
 
 import { loadCSVIntoDB, runQuery, getTableRowCount } from "@/lib/duckdb/client";
@@ -46,12 +51,24 @@ import ColumnDetail from "@/components/data/column-detail";
 import SettingsPanel from "@/components/settings/settings-panel";
 import CommandPalette from "@/components/layout/command-palette";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import ChartBuilder from "@/components/charts/chart-builder";
+import TransformPanel from "@/components/data/transform-panel";
+import CorrelationMatrix from "@/components/data/correlation-matrix";
+import OutlierDetector from "@/components/data/outlier-detector";
+import MissingDataMap from "@/components/data/missing-data-map";
+import ReportBuilder from "@/components/report/report-builder";
+import JoinBuilder from "@/components/data/join-builder";
+import QueryHistory from "@/components/query/query-history";
+import SavedQueries from "@/components/query/saved-queries";
+import DataSummary from "@/components/data/data-summary";
+import SampleDatasets from "@/components/data/sample-datasets";
+import KeyboardShortcutsDialog from "@/components/ui/keyboard-shortcuts-dialog";
 
 // ─────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────
 
-type AppTab = "profile" | "dashboard" | "query" | "sql";
+type AppTab = "profile" | "dashboard" | "query" | "sql" | "charts" | "transforms" | "analytics" | "reports";
 
 interface FileDropResult {
   fileName: string;
@@ -68,6 +85,10 @@ const TABS: { id: AppTab; label: string; icon: typeof Database }[] = [
   { id: "dashboard", label: "Dashboard", icon: BarChart3 },
   { id: "query", label: "Ask AI", icon: MessageSquare },
   { id: "sql", label: "SQL Editor", icon: Code2 },
+  { id: "charts", label: "Charts", icon: PieChart },
+  { id: "transforms", label: "Transforms", icon: Wand2 },
+  { id: "analytics", label: "Analytics", icon: GitMerge },
+  { id: "reports", label: "Reports", icon: FileText },
 ];
 
 // ─────────────────────────────────────────────
@@ -424,6 +445,8 @@ export default function Home() {
   const [selectedColumn, setSelectedColumn] = useState<ColumnProfile | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
+  const datasets = useDatasetStore((s) => s.datasets);
 
   // Initialize theme from system preference
   useEffect(() => {
@@ -469,11 +492,15 @@ export default function Home() {
         if (activeDataset) {
           setShowUploader(true);
         }
+      } else if (mod && e.key === "/") {
+        e.preventDefault();
+        setShowKeyboardShortcuts((v) => !v);
       } else if (e.key === "Escape") {
         setShowCommandPalette(false);
         setShowSettings(false);
         setSelectedColumn(null);
         setShowUploader(false);
+        setShowKeyboardShortcuts(false);
       }
     };
 
@@ -708,6 +735,24 @@ export default function Home() {
                   {loadError}
                 </motion.div>
               )}
+
+              {/* Sample datasets */}
+              <div className="pt-2">
+                <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
+                  Or try a sample dataset:
+                </p>
+                <ErrorBoundary>
+                  <SampleDatasets
+                    onLoad={(fileName, csvContent) => {
+                      handleFileLoaded({
+                        fileName,
+                        csvContent,
+                        sizeBytes: new Blob([csvContent]).size,
+                      });
+                    }}
+                  />
+                </ErrorBoundary>
+              </div>
 
               {/* Feature badges */}
               <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
@@ -1061,17 +1106,174 @@ export default function Home() {
                     transition={{ duration: 0.2 }}
                   >
                     <div className="mb-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                            SQL Editor
+                          </h2>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
+                            Write and execute SQL queries directly against your
+                            data with DuckDB
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                      <div className="lg:col-span-3">
+                        <ErrorBoundary>
+                          <SQLEditorTab
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </div>
+                      <div className="space-y-4">
+                        <ErrorBoundary>
+                          <QueryHistory
+                            datasetId={activeDataset.id}
+                            onSelectQuery={() => {}}
+                          />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <SavedQueries onSelectQuery={() => {}} />
+                        </ErrorBoundary>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "charts" && (
+                  <motion.div
+                    key="charts"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="mb-4">
                       <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
-                        SQL Editor
+                        Chart Builder
                       </h2>
                       <p className="text-sm text-slate-500 dark:text-slate-400">
-                        Write and execute SQL queries directly against your
-                        data with DuckDB
+                        Create custom visualizations with drag-and-drop chart
+                        configuration
                       </p>
                     </div>
                     <ErrorBoundary>
-                      <SQLEditorTab
+                      <ChartBuilder
                         tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                  </motion.div>
+                )}
+
+                {activeTab === "transforms" && (
+                  <motion.div
+                    key="transforms"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="mb-4">
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Data Transforms
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Filter, sort, group, and create computed columns on
+                        your data
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                      <ErrorBoundary>
+                        <TransformPanel
+                          tableName={tableName}
+                          columns={profileData}
+                          onTransformComplete={() => {
+                            // Re-profile after transform
+                            profileTable(tableName).then((cols) =>
+                              setProfileData(cols)
+                            );
+                          }}
+                        />
+                      </ErrorBoundary>
+                      {datasets.length > 1 && (
+                        <ErrorBoundary>
+                          <JoinBuilder
+                            datasets={datasets}
+                            onJoinComplete={(result) => {
+                              profileTable(result.tableName).then((cols) =>
+                                setProfileData(cols)
+                              );
+                            }}
+                          />
+                        </ErrorBoundary>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "analytics" && (
+                  <motion.div
+                    key="analytics"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="mb-4">
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Advanced Analytics
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Correlation analysis, outlier detection, and data
+                        quality assessment
+                      </p>
+                    </div>
+                    <div className="space-y-6">
+                      <ErrorBoundary>
+                        <DataSummary
+                          dataset={activeDataset}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <ErrorBoundary>
+                          <CorrelationMatrix
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <OutlierDetector
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </div>
+                      <ErrorBoundary>
+                        <MissingDataMap
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "reports" && (
+                  <motion.div
+                    key="reports"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ErrorBoundary>
+                      <ReportBuilder
+                        dataset={activeDataset}
                         columns={profileData}
                       />
                     </ErrorBoundary>
@@ -1103,6 +1305,12 @@ export default function Home() {
           open={showCommandPalette}
           onClose={() => setShowCommandPalette(false)}
           onAction={handleCommandAction}
+        />
+
+        {/* Keyboard shortcuts dialog */}
+        <KeyboardShortcutsDialog
+          open={showKeyboardShortcuts}
+          onClose={() => setShowKeyboardShortcuts(false)}
         />
       </div>
     </ErrorBoundary>
