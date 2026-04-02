@@ -63,12 +63,18 @@ import SavedQueries from "@/components/query/saved-queries";
 import DataSummary from "@/components/data/data-summary";
 import SampleDatasets from "@/components/data/sample-datasets";
 import KeyboardShortcutsDialog from "@/components/ui/keyboard-shortcuts-dialog";
+import PivotTable from "@/components/data/pivot-table";
+import DataComparison from "@/components/data/data-comparison";
+import SchemaViewer from "@/components/data/schema-viewer";
+import ExportWizard from "@/components/data/export-wizard";
+import TemplatePicker from "@/components/query/template-picker";
+import DataLineage from "@/components/data/data-lineage";
 
 // ─────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────
 
-type AppTab = "profile" | "dashboard" | "query" | "sql" | "charts" | "transforms" | "analytics" | "reports";
+type AppTab = "profile" | "dashboard" | "query" | "sql" | "charts" | "transforms" | "analytics" | "reports" | "pivot" | "compare";
 
 interface FileDropResult {
   fileName: string;
@@ -88,6 +94,7 @@ const TABS: { id: AppTab; label: string; icon: typeof Database }[] = [
   { id: "charts", label: "Charts", icon: PieChart },
   { id: "transforms", label: "Transforms", icon: Wand2 },
   { id: "analytics", label: "Analytics", icon: GitMerge },
+  { id: "pivot", label: "Pivot", icon: Table },
   { id: "reports", label: "Reports", icon: FileText },
 ];
 
@@ -446,6 +453,7 @@ export default function Home() {
   const [showSettings, setShowSettings] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
+  const [showExportWizard, setShowExportWizard] = useState(false);
   const datasets = useDatasetStore((s) => s.datasets);
 
   // Initialize theme from system preference
@@ -1036,9 +1044,18 @@ export default function Home() {
                     </ErrorBoundary>
 
                     <div className="pt-4">
-                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
-                        Data Preview
-                      </h2>
+                      <div className="flex items-center justify-between mb-1">
+                        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                          Data Preview
+                        </h2>
+                        <button
+                          onClick={() => setShowExportWizard(true)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                        >
+                          <Upload className="h-3.5 w-3.5 rotate-180" />
+                          Export
+                        </button>
+                      </div>
                       <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
                         First 200 rows
                       </p>
@@ -1046,6 +1063,16 @@ export default function Home() {
                         <TablePreview
                           tableName={tableName}
                           columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </div>
+
+                    <div className="pt-4">
+                      <ErrorBoundary>
+                        <SchemaViewer
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
                         />
                       </ErrorBoundary>
                     </div>
@@ -1128,6 +1155,13 @@ export default function Home() {
                         </ErrorBoundary>
                       </div>
                       <div className="space-y-4">
+                        <ErrorBoundary>
+                          <TemplatePicker
+                            tableName={tableName}
+                            columns={profileData}
+                            onSelectSQL={() => {}}
+                          />
+                        </ErrorBoundary>
                         <ErrorBoundary>
                           <QueryHistory
                             datasetId={activeDataset.id}
@@ -1279,6 +1313,31 @@ export default function Home() {
                     </ErrorBoundary>
                   </motion.div>
                 )}
+
+                {activeTab === "pivot" && (
+                  <motion.div
+                    key="pivot"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="mb-4">
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Pivot Table
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Cross-tabulate your data with custom aggregations and heatmap formatting
+                      </p>
+                    </div>
+                    <ErrorBoundary>
+                      <PivotTable
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                  </motion.div>
+                )}
               </AnimatePresence>
             )}
           </main>
@@ -1312,6 +1371,17 @@ export default function Home() {
           open={showKeyboardShortcuts}
           onClose={() => setShowKeyboardShortcuts(false)}
         />
+
+        {/* Export wizard */}
+        {activeDataset && (
+          <ExportWizard
+            open={showExportWizard}
+            onClose={() => setShowExportWizard(false)}
+            tableName={tableName}
+            columns={profileData}
+            rowCount={activeDataset.rowCount}
+          />
+        )}
       </div>
     </ErrorBoundary>
   );
