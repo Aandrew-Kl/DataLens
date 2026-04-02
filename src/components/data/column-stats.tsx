@@ -4,7 +4,7 @@ import { useEffect, useState, type ElementType, type ReactNode } from "react";
 import ReactECharts from "echarts-for-react";
 import { motion } from "framer-motion";
 import {
-  Activity, AlertTriangle, BarChart3, Calendar, Clock3, Database, Hash, Layers3,
+  Activity, AlertTriangle, BarChart3, Calendar, Clock3, Hash, Layers3,
   LineChart, Loader2, Search, Sigma, Type,
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
@@ -15,46 +15,26 @@ import type { ColumnProfile } from "@/types/dataset";
 interface ColumnStatsProps { tableName: string; column: ColumnProfile; rowCount: number; }
 interface Bin { label: string; count: number; start?: number; end?: number; }
 interface BaseStats { count: number; distinct: number; nulls: number; }
-interface NumericStats extends BaseStats {
-  kind: "number"; mean: number | null; median: number | null; mode: string | null; stddev: number | null;
-  min: number | null; max: number | null; range: number | null; q1: number | null; q3: number | null; iqr: number | null;
-  histogram: Bin[];
-}
+interface NumericStats extends BaseStats { kind: "number"; mean: number | null; median: number | null; mode: string | null; stddev: number | null; min: number | null; max: number | null; range: number | null; q1: number | null; q3: number | null; iqr: number | null; histogram: Bin[]; }
 interface PatternMetric { label: string; count: number; }
-interface StringStats extends BaseStats {
-  kind: "string"; minLength: number | null; maxLength: number | null; avgLength: number | null;
-  topValues: Bin[]; patterns: PatternMetric[];
-}
+interface StringStats extends BaseStats { kind: "string"; minLength: number | null; maxLength: number | null; avgLength: number | null; topValues: Bin[]; patterns: PatternMetric[]; }
 interface Gap { start: string; end: string; days: number; }
-interface DateStats extends BaseStats {
-  kind: "date"; minDate: string | null; maxDate: string | null; rangeDays: number | null;
-  monthly: Bin[]; dayOfWeek: Bin[]; gaps: Gap[];
-}
+interface DateStats extends BaseStats { kind: "date"; minDate: string | null; maxDate: string | null; rangeDays: number | null; monthly: Bin[]; dayOfWeek: Bin[]; gaps: Gap[]; }
 type Stats = NumericStats | StringStats | DateStats;
-
 const COLORS = { numeric: "#06b6d4", string: "#f97316", date: "#22c55e" };
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
 const quote = (value: string) => `"${value.replace(/"/g, '""')}"`;
-const asNumber = (value: unknown) => {
-  const num = value == null ? NaN : Number(value);
-  return Number.isFinite(num) ? num : null;
-};
+const asNumber = (value: unknown) => { const num = value == null ? NaN : Number(value); return Number.isFinite(num) ? num : null; };
 const asText = (value: unknown) => (value == null ? null : String(value));
 const truncate = (value: string, max = 32) => (value.length > max ? `${value.slice(0, max - 1)}…` : value);
 const pct = (part: number, whole: number) => (whole ? (part / whole) * 100 : 0);
-function formatMetric(value: number | null, digits = 2) {
-  if (value == null) return "—";
-  if (Math.abs(value) >= 1000 || Number.isInteger(value)) return formatNumber(value);
-  return value.toFixed(digits);
-}
+const formatMetric = (value: number | null, digits = 2) => value == null ? "—" : Math.abs(value) >= 1000 || Number.isInteger(value) ? formatNumber(value) : value.toFixed(digits);
 function formatDateLabel(value: string | null) {
   if (!value) return "—";
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return value;
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(parsed);
 }
-
 function useDarkMode() {
   const [dark, setDark] = useState(false);
   useEffect(() => {
@@ -67,7 +47,6 @@ function useDarkMode() {
   }, []);
   return dark;
 }
-
 function buildChart(data: Bin[], dark: boolean, color: string, options?: { horizontal?: boolean; line?: boolean }) {
   const horizontal = options?.horizontal ?? false;
   const line = options?.line ?? false;
@@ -76,63 +55,35 @@ function buildChart(data: Bin[], dark: boolean, color: string, options?: { horiz
   const textColor = dark ? "#a1a1aa" : "#6b7280";
   const borderColor = dark ? "#27272a" : "#e5e7eb";
   const tooltipBg = dark ? "#111827ee" : "#ffffffee";
-
-  if (horizontal) {
-    return {
-      animationDuration: 450,
-      tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, backgroundColor: tooltipBg, borderColor, textStyle: { color: dark ? "#f3f4f6" : "#111827" } },
-      grid: { left: 16, right: 24, top: 12, bottom: 12, containLabel: true },
-      xAxis: { type: "value", axisLabel: { color: textColor, fontSize: 11 }, splitLine: { lineStyle: { color: borderColor, type: "dashed" } } },
-      yAxis: { type: "category", data: labels, axisLabel: { color: textColor, fontSize: 11, width: 120, overflow: "truncate" }, axisLine: { lineStyle: { color: borderColor } } },
-      series: [{ type: "bar", data: values, barWidth: 18, itemStyle: { color, borderRadius: [0, 8, 8, 0] } }],
-    };
-  }
-
-  return {
+  return horizontal ? {
+    animationDuration: 450,
+    tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, backgroundColor: tooltipBg, borderColor, textStyle: { color: dark ? "#f3f4f6" : "#111827" } },
+    grid: { left: 16, right: 24, top: 12, bottom: 12, containLabel: true },
+    xAxis: { type: "value", axisLabel: { color: textColor, fontSize: 11 }, splitLine: { lineStyle: { color: borderColor, type: "dashed" } } },
+    yAxis: { type: "category", data: labels, axisLabel: { color: textColor, fontSize: 11, width: 120, overflow: "truncate" }, axisLine: { lineStyle: { color: borderColor } } },
+    series: [{ type: "bar", data: values, barWidth: 18, itemStyle: { color, borderRadius: [0, 8, 8, 0] } }],
+  } : {
     animationDuration: 450,
     tooltip: { trigger: line ? "axis" : "item", backgroundColor: tooltipBg, borderColor, textStyle: { color: dark ? "#f3f4f6" : "#111827" } },
     grid: { left: 16, right: 24, top: 20, bottom: 30, containLabel: true },
-    xAxis: {
-      type: "category",
-      data: labels,
-      boundaryGap: !line,
-      axisLabel: { color: textColor, fontSize: 11, rotate: labels.length > 8 ? 25 : 0 },
-      axisLine: { lineStyle: { color: borderColor } },
-    },
+    xAxis: { type: "category", data: labels, boundaryGap: !line, axisLabel: { color: textColor, fontSize: 11, rotate: labels.length > 8 ? 25 : 0 }, axisLine: { lineStyle: { color: borderColor } } },
     yAxis: { type: "value", axisLabel: { color: textColor, fontSize: 11 }, splitLine: { lineStyle: { color: borderColor, type: "dashed" } } },
-    series: [{
-      type: line ? "line" : "bar",
-      smooth: line,
-      data: values,
-      symbol: line ? "circle" : "none",
-      symbolSize: 6,
-      lineStyle: { color, width: 3 },
-      areaStyle: line ? { color, opacity: 0.1 } : undefined,
-      itemStyle: { color, borderRadius: [8, 8, 0, 0] },
-    }],
+    series: [{ type: line ? "line" : "bar", smooth: line, data: values, symbol: line ? "circle" : "none", symbolSize: 6, lineStyle: { color, width: 3 }, areaStyle: line ? { color, opacity: 0.1 } : undefined, itemStyle: { color, borderRadius: [8, 8, 0, 0] } }],
   };
 }
-
 function buildBoxPlot(stats: NumericStats, dark: boolean) {
   const borderColor = dark ? "#27272a" : "#e5e7eb";
   const textColor = dark ? "#a1a1aa" : "#6b7280";
   if ([stats.min, stats.q1, stats.median, stats.q3, stats.max].some((value) => value == null)) return {};
   return {
     animationDuration: 450,
-    tooltip: {
-      trigger: "item",
-      formatter: [`min: ${formatMetric(stats.min)}`, `Q1: ${formatMetric(stats.q1)}`, `median: ${formatMetric(stats.median)}`, `Q3: ${formatMetric(stats.q3)}`, `max: ${formatMetric(stats.max)}`].join("<br/>"),
-      backgroundColor: dark ? "#111827ee" : "#ffffffee",
-      borderColor,
-      textStyle: { color: dark ? "#f3f4f6" : "#111827" },
-    },
+    tooltip: { trigger: "item", formatter: [`min: ${formatMetric(stats.min)}`, `Q1: ${formatMetric(stats.q1)}`, `median: ${formatMetric(stats.median)}`, `Q3: ${formatMetric(stats.q3)}`, `max: ${formatMetric(stats.max)}`].join("<br/>"), backgroundColor: dark ? "#111827ee" : "#ffffffee", borderColor, textStyle: { color: dark ? "#f3f4f6" : "#111827" } },
     grid: { left: 16, right: 24, top: 12, bottom: 24, containLabel: true },
     xAxis: { type: "category", data: ["Spread"], axisLabel: { color: textColor, fontSize: 11 }, axisLine: { lineStyle: { color: borderColor } } },
     yAxis: { type: "value", axisLabel: { color: textColor, fontSize: 11 }, splitLine: { lineStyle: { color: borderColor, type: "dashed" } } },
     series: [{ type: "boxplot", data: [[stats.min, stats.q1, stats.median, stats.q3, stats.max]], itemStyle: { color: "rgba(6, 182, 212, 0.25)", borderColor: COLORS.numeric, borderWidth: 2 } }],
   };
 }
-
 function Panel({ title, icon: Icon, accent, children }: { title: string; icon: ElementType; accent: string; children: ReactNode }) {
   return (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: "easeOut" }}
@@ -145,7 +96,6 @@ function Panel({ title, icon: Icon, accent, children }: { title: string; icon: E
     </motion.div>
   );
 }
-
 function MetricGrid({ items }: { items: { label: string; value: string | number; tone?: "default" | "danger" }[] }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2">
@@ -158,7 +108,6 @@ function MetricGrid({ items }: { items: { label: string; value: string | number;
     </div>
   );
 }
-
 function InsightList({ items }: { items: string[] }) {
   return (
     <div className="space-y-3">
@@ -171,7 +120,6 @@ function InsightList({ items }: { items: string[] }) {
     </div>
   );
 }
-
 function LoadingView({ name }: { name: string }) {
   return (
     <section className="rounded-2xl border border-gray-200/70 bg-white/80 p-6 dark:border-gray-700/70 dark:bg-gray-900/60">
@@ -341,7 +289,7 @@ async function loadDate(tableName: string, columnName: string): Promise<DateStat
   };
 }
 
-function getInsights(column: ColumnProfile, rowCount: number, stats: Stats) {
+function getInsights(rowCount: number, stats: Stats) {
   const nullRate = pct(stats.nulls, rowCount);
   if (stats.kind === "number") {
     return [
@@ -358,7 +306,7 @@ function getInsights(column: ColumnProfile, rowCount: number, stats: Stats) {
   if (stats.kind === "string") {
     const dominant = [...stats.patterns].sort((a, b) => b.count - a.count)[0];
     return [
-      `Distinct ratio is ${formatMetric(pct(stats.distinct, Math.max(stats.count, 1)), 1)}% of non-null rows, so ${column.name} ${stats.distinct > Math.max(stats.count * 0.5, 20) ? "behaves more like identifiers or free text." : "looks more categorical than unique."}`,
+      `Distinct ratio is ${formatMetric(pct(stats.distinct, Math.max(stats.count, 1)), 1)}% of non-null rows, so this field ${stats.distinct > Math.max(stats.count * 0.5, 20) ? "behaves more like identifiers or free text." : "looks more categorical than unique."}`,
       stats.avgLength != null
         ? `Observed lengths range from ${formatMetric(stats.minLength, 0)} to ${formatMetric(stats.maxLength, 0)} characters with an average of ${formatMetric(stats.avgLength)}.`
         : "Text length metrics are unavailable for this field.",
@@ -420,7 +368,7 @@ export default function ColumnStats({ tableName, column, rowCount }: ColumnStats
     );
   }
 
-  const insights = getInsights(column, rowCount, stats);
+  const insights = getInsights(rowCount, stats);
   const summary = [
     { label: "Rows", value: formatNumber(rowCount) },
     { label: "Non-null", value: formatNumber(stats.count) },
@@ -467,98 +415,50 @@ export default function ColumnStats({ tableName, column, rowCount }: ColumnStats
       <div className="grid gap-6 px-6 py-6 xl:grid-cols-2">
         <div className="space-y-6">
           <Panel title="Analyst Notes" icon={Search} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400"><InsightList items={insights} /></Panel>
-
           {stats.kind === "number" && (
             <>
-              <Panel title="Core Metrics" icon={Sigma} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400">
-                <MetricGrid items={[
-                  { label: "Mean", value: formatMetric(stats.mean) }, { label: "Median", value: formatMetric(stats.median) },
-                  { label: "Mode", value: stats.mode ?? "—" }, { label: "Std Dev", value: formatMetric(stats.stddev) },
-                  { label: "Min", value: formatMetric(stats.min) }, { label: "Max", value: formatMetric(stats.max) },
-                  { label: "Range", value: formatMetric(stats.range) }, { label: "Null Rate", value: `${formatMetric(pct(stats.nulls, rowCount), 1)}%` },
-                ]} />
-              </Panel>
-              <Panel title="Histogram" icon={BarChart3} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400">
-                <ReactECharts option={buildChart(stats.histogram, dark, COLORS.numeric)} style={{ height: 300 }} notMerge lazyUpdate />
-              </Panel>
+              <Panel title="Core Metrics" icon={Sigma} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400"><MetricGrid items={[{ label: "Mean", value: formatMetric(stats.mean) }, { label: "Median", value: formatMetric(stats.median) }, { label: "Mode", value: stats.mode ?? "—" }, { label: "Std Dev", value: formatMetric(stats.stddev) }, { label: "Min", value: formatMetric(stats.min) }, { label: "Max", value: formatMetric(stats.max) }, { label: "Range", value: formatMetric(stats.range) }, { label: "Null Rate", value: `${formatMetric(pct(stats.nulls, rowCount), 1)}%` }]} /></Panel>
+              <Panel title="Histogram" icon={BarChart3} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400"><ReactECharts option={buildChart(stats.histogram, dark, COLORS.numeric)} style={{ height: 300 }} notMerge lazyUpdate /></Panel>
             </>
           )}
-
           {stats.kind === "string" && (
             <>
-              <Panel title="Text Shape" icon={Type} accent="bg-orange-500/15 text-orange-600 dark:text-orange-400">
-                <MetricGrid items={[
-                  { label: "Min Length", value: formatMetric(stats.minLength, 0) }, { label: "Max Length", value: formatMetric(stats.maxLength, 0) },
-                  { label: "Avg Length", value: formatMetric(stats.avgLength) }, { label: "Null Rate", value: `${formatMetric(pct(stats.nulls, rowCount), 1)}%` },
-                ]} />
-              </Panel>
-              <Panel title="Top 10 Values" icon={BarChart3} accent="bg-orange-500/15 text-orange-600 dark:text-orange-400">
-                <ReactECharts option={buildChart(stats.topValues, dark, COLORS.string, { horizontal: true })} style={{ height: 320 }} notMerge lazyUpdate />
-              </Panel>
+              <Panel title="Text Shape" icon={Type} accent="bg-orange-500/15 text-orange-600 dark:text-orange-400"><MetricGrid items={[{ label: "Min Length", value: formatMetric(stats.minLength, 0) }, { label: "Max Length", value: formatMetric(stats.maxLength, 0) }, { label: "Avg Length", value: formatMetric(stats.avgLength) }, { label: "Null Rate", value: `${formatMetric(pct(stats.nulls, rowCount), 1)}%` }]} /></Panel>
+              <Panel title="Top 10 Values" icon={BarChart3} accent="bg-orange-500/15 text-orange-600 dark:text-orange-400"><ReactECharts option={buildChart(stats.topValues, dark, COLORS.string, { horizontal: true })} style={{ height: 320 }} notMerge lazyUpdate /></Panel>
             </>
           )}
-
           {stats.kind === "date" && (
             <>
-              <Panel title="Temporal Coverage" icon={Clock3} accent="bg-green-500/15 text-green-600 dark:text-green-400">
-                <MetricGrid items={[
-                  { label: "Min Date", value: formatDateLabel(stats.minDate) }, { label: "Max Date", value: formatDateLabel(stats.maxDate) },
-                  { label: "Range", value: stats.rangeDays != null ? `${formatNumber(stats.rangeDays)} days` : "—" }, { label: "Null Rate", value: `${formatMetric(pct(stats.nulls, rowCount), 1)}%` },
-                ]} />
-              </Panel>
-              <Panel title="Monthly Activity" icon={LineChart} accent="bg-green-500/15 text-green-600 dark:text-green-400">
-                <ReactECharts option={buildChart(stats.monthly, dark, COLORS.date, { line: true })} style={{ height: 300 }} notMerge lazyUpdate />
-              </Panel>
+              <Panel title="Temporal Coverage" icon={Clock3} accent="bg-green-500/15 text-green-600 dark:text-green-400"><MetricGrid items={[{ label: "Min Date", value: formatDateLabel(stats.minDate) }, { label: "Max Date", value: formatDateLabel(stats.maxDate) }, { label: "Range", value: stats.rangeDays != null ? `${formatNumber(stats.rangeDays)} days` : "—" }, { label: "Null Rate", value: `${formatMetric(pct(stats.nulls, rowCount), 1)}%` }]} /></Panel>
+              <Panel title="Monthly Activity" icon={LineChart} accent="bg-green-500/15 text-green-600 dark:text-green-400"><ReactECharts option={buildChart(stats.monthly, dark, COLORS.date, { line: true })} style={{ height: 300 }} notMerge lazyUpdate /></Panel>
             </>
           )}
         </div>
-
         <div className="space-y-6">
           {stats.kind === "number" && (
             <>
-              <Panel title="Quartiles & Spread" icon={Layers3} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400">
-                <MetricGrid items={[
-                  { label: "Q1", value: formatMetric(stats.q1) }, { label: "Median", value: formatMetric(stats.median) },
-                  { label: "Q3", value: formatMetric(stats.q3) }, { label: "IQR", value: formatMetric(stats.iqr) },
-                ]} />
-              </Panel>
-              <Panel title="Box Plot" icon={Activity} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400">
-                <ReactECharts option={buildBoxPlot(stats, dark)} style={{ height: 300 }} notMerge lazyUpdate />
-              </Panel>
+              <Panel title="Quartiles & Spread" icon={Layers3} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400"><MetricGrid items={[{ label: "Q1", value: formatMetric(stats.q1) }, { label: "Median", value: formatMetric(stats.median) }, { label: "Q3", value: formatMetric(stats.q3) }, { label: "IQR", value: formatMetric(stats.iqr) }]} /></Panel>
+              <Panel title="Box Plot" icon={Activity} accent="bg-cyan-500/15 text-cyan-600 dark:text-cyan-400"><ReactECharts option={buildBoxPlot(stats, dark)} style={{ height: 300 }} notMerge lazyUpdate /></Panel>
             </>
           )}
-
           {stats.kind === "string" && (
-            <>
-              <Panel title="Pattern Analysis" icon={Search} accent="bg-orange-500/15 text-orange-600 dark:text-orange-400">
-                <div className="space-y-3">
-                  {stats.patterns.map((pattern) => (
-                    <div key={pattern.label}>
-                      <div className="mb-1 flex items-center justify-between gap-4 text-sm text-gray-700 dark:text-gray-300">
-                        <span>{pattern.label}</span>
-                        <span className="font-mono text-xs text-gray-500 dark:text-gray-400">{formatNumber(pattern.count)}</span>
-                      </div>
-                      <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
-                        <div className="h-full rounded-full bg-orange-500" style={{ width: `${Math.min(100, pct(pattern.count, Math.max(stats.count, 1)))}%` }} />
-                      </div>
+            <Panel title="Pattern Analysis" icon={Search} accent="bg-orange-500/15 text-orange-600 dark:text-orange-400">
+              <div className="space-y-3">
+                {stats.patterns.map((pattern) => (
+                  <div key={pattern.label}>
+                    <div className="mb-1 flex items-center justify-between gap-4 text-sm text-gray-700 dark:text-gray-300">
+                      <span>{pattern.label}</span>
+                      <span className="font-mono text-xs text-gray-500 dark:text-gray-400">{formatNumber(pattern.count)}</span>
                     </div>
-                  ))}
-                </div>
-              </Panel>
-              <Panel title="Field Profile" icon={Database} accent="bg-orange-500/15 text-orange-600 dark:text-orange-400">
-                <MetricGrid items={[
-                  { label: "Distinct Ratio", value: `${formatMetric(pct(stats.distinct, Math.max(stats.count, 1)), 1)}%` }, { label: "Null Rate", value: `${formatMetric(pct(stats.nulls, rowCount), 1)}%` },
-                  { label: "Sample Count", value: column.sampleValues.length }, { label: "Rows Profiled", value: formatNumber(rowCount) },
-                ]} />
-              </Panel>
-            </>
+                    <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800"><div className="h-full rounded-full bg-orange-500" style={{ width: `${Math.min(100, pct(pattern.count, Math.max(stats.count, 1)))}%` }} /></div>
+                  </div>
+                ))}
+              </div>
+            </Panel>
           )}
-
           {stats.kind === "date" && (
             <>
-              <Panel title="Day Of Week" icon={Calendar} accent="bg-green-500/15 text-green-600 dark:text-green-400">
-                <ReactECharts option={buildChart(stats.dayOfWeek, dark, COLORS.date)} style={{ height: 300 }} notMerge lazyUpdate />
-              </Panel>
+              <Panel title="Day Of Week" icon={Calendar} accent="bg-green-500/15 text-green-600 dark:text-green-400"><ReactECharts option={buildChart(stats.dayOfWeek, dark, COLORS.date)} style={{ height: 300 }} notMerge lazyUpdate /></Panel>
               <Panel title="Gap Detection" icon={AlertTriangle} accent="bg-green-500/15 text-green-600 dark:text-green-400">
                 {stats.gaps.length === 0 ? (
                   <p className="text-sm text-gray-600 dark:text-gray-300">No multi-day gaps detected between consecutive observed dates.</p>

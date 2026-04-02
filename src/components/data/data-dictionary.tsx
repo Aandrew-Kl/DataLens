@@ -2,20 +2,7 @@
 
 import { Fragment, useDeferredValue, useEffect, useMemo, useState, type ElementType } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  BarChart3,
-  Calendar,
-  ChevronRight,
-  Database,
-  Download,
-  FileText,
-  Hash,
-  HelpCircle,
-  Pencil,
-  Search,
-  ToggleLeft,
-  Type,
-} from "lucide-react";
+import { BarChart3, Calendar, ChevronRight, Database, Download, FileText, Hash, HelpCircle, Pencil, Search, ToggleLeft, Type } from "lucide-react";
 import type { ColumnProfile, ColumnType } from "@/types/dataset";
 import { downloadFile } from "@/lib/utils/export";
 import { formatNumber, formatPercent } from "@/lib/utils/formatters";
@@ -39,30 +26,14 @@ const TYPE_META: Record<ColumnType, { label: string; tone: string; icon: Element
   unknown: { label: "Unknown", tone: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300", icon: HelpCircle },
 };
 
-function readDescriptions(key: string): Record<string, string> {
-  try {
-    const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as Record<string, string>) : {};
-  } catch {
-    return {};
-  }
-}
+/* Helper functions */
 
-function normalize(value: string | number | boolean | null): string {
-  return value === null ? "" : String(value).trim();
-}
 
-function looksBoolean(value: string) {
-  return /^(true|false|yes|no|0|1)$/i.test(value);
-}
-
-function looksNumber(value: string) {
-  return Boolean(value) && !looksBoolean(value) && /^-?\d+(\.\d+)?$/.test(value.replace(/,/g, ""));
-}
-
-function looksDate(value: string) {
-  return Boolean(value) && !looksNumber(value) && Number.isFinite(Date.parse(value));
-}
+function readDescriptions(key: string): Record<string, string> { try { const raw = window.localStorage.getItem(key); return raw ? (JSON.parse(raw) as Record<string, string>) : {}; } catch { return {}; } }
+function normalize(value: string | number | boolean | null) { return value === null ? "" : String(value).trim(); }
+function looksBoolean(value: string) { return /^(true|false|yes|no|0|1)$/i.test(value); }
+function looksNumber(value: string) { return Boolean(value) && !looksBoolean(value) && /^-?\d+(\.\d+)?$/.test(value.replace(/,/g, "")); }
+function looksDate(value: string) { return Boolean(value) && !looksNumber(value) && Number.isFinite(Date.parse(value)); }
 
 function detectColumnType(column: ColumnProfile): ColumnType {
   const values = column.sampleValues.map(normalize).filter(Boolean);
@@ -72,22 +43,9 @@ function detectColumnType(column: ColumnProfile): ColumnType {
   if (values.every(looksDate)) return "date";
   return "string";
 }
-
-function formatValue(value: unknown) {
-  if (value === null || value === undefined || value === "") return "—";
-  if (typeof value === "number") return formatNumber(value);
-  if (typeof value === "boolean") return value ? "true" : "false";
-  return String(value);
-}
-
-function getNullRate(column: ColumnProfile, rowCount: number) {
-  return rowCount > 0 ? (column.nullCount / rowCount) * 100 : 0;
-}
-
-function getUniqueRate(column: ColumnProfile, rowCount: number) {
-  const nonNull = Math.max(rowCount - column.nullCount, 0);
-  return nonNull > 0 ? (column.uniqueCount / nonNull) * 100 : 0;
-}
+function formatValue(value: unknown) { return value === null || value === undefined || value === "" ? "—" : typeof value === "number" ? formatNumber(value) : typeof value === "boolean" ? (value ? "true" : "false") : String(value); }
+function getNullRate(column: ColumnProfile, rowCount: number) { return rowCount > 0 ? (column.nullCount / rowCount) * 100 : 0; }
+function getUniqueRate(column: ColumnProfile, rowCount: number) { const nonNull = Math.max(rowCount - column.nullCount, 0); return nonNull > 0 ? (column.uniqueCount / nonNull) * 100 : 0; }
 
 function getStats(column: ColumnProfile, detectedType: ColumnType, rowCount: number) {
   const base = [
@@ -109,18 +67,7 @@ function buildPayload(tableName: string, rowCount: number, columns: DictionaryCo
     tableName,
     rowCount,
     exportedAt: new Date().toISOString(),
-    columns: columns.map((column) => ({
-      name: column.name,
-      type: column.detectedType,
-      description: column.description,
-      nullCount: column.nullCount,
-      uniqueCount: column.uniqueCount,
-      sampleValues: column.sampleValues,
-      min: column.min,
-      max: column.max,
-      mean: column.mean,
-      median: column.median,
-    })),
+    columns: columns.map((column) => ({ name: column.name, type: column.detectedType, description: column.description, nullCount: column.nullCount, uniqueCount: column.uniqueCount, sampleValues: column.sampleValues, min: column.min, max: column.max, mean: column.mean, median: column.median })),
   };
 }
 
@@ -141,16 +88,7 @@ function buildMarkdown(payload: ReturnType<typeof buildPayload>) {
   }
   return lines.join("\n");
 }
-
-function TypeBadge({ type }: { type: ColumnType }) {
-  const { label, tone, icon: Icon } = TYPE_META[type];
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${tone}`}>
-      <Icon className="h-3.5 w-3.5" />
-      {label}
-    </span>
-  );
-}
+function TypeBadge({ type }: { type: ColumnType }) { const { label, tone, icon: Icon } = TYPE_META[type]; return <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${tone}`}><Icon className="h-3.5 w-3.5" />{label}</span>; }
 
 export default function DataDictionary({ tableName, columns, rowCount }: DataDictionaryProps) {
   const storageKey = `${STORAGE_PREFIX}:${tableName}`;
@@ -162,11 +100,7 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
   const descriptions = store[storageKey] ?? readDescriptions(storageKey);
 
   useEffect(() => {
-    try {
-      window.localStorage.setItem(storageKey, JSON.stringify(descriptions));
-    } catch {
-      // localStorage unavailable or full.
-    }
+    try { window.localStorage.setItem(storageKey, JSON.stringify(descriptions)); } catch { /* localStorage unavailable or full. */ }
   }, [descriptions, storageKey]);
 
   const enrichedColumns = useMemo<DictionaryColumn[]>(
@@ -214,15 +148,9 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
       >
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Database className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Data Dictionary</h2>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Documentation for <span className="font-medium text-gray-900 dark:text-white">{tableName}</span>. Edit descriptions inline, filter the schema, and export the result as JSON or Markdown.
-            </p>
+            <div className="flex items-center gap-2"><Database className="h-5 w-5 text-cyan-600 dark:text-cyan-400" /><h2 className="text-lg font-semibold text-gray-900 dark:text-white">Data Dictionary</h2></div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Documentation for <span className="font-medium text-gray-900 dark:text-white">{tableName}</span>. Edit descriptions inline, filter the schema, and export the result as JSON or Markdown.</p>
           </div>
-
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <label className="relative block min-w-0 sm:w-80">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -254,10 +182,7 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
             { icon: BarChart3, label: "Coverage", value: formatPercent(completeness) },
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} className="rounded-xl border border-gray-200/70 bg-white/70 p-4 dark:border-gray-800 dark:bg-gray-950/40">
-              <div className="mb-2 flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                <Icon className="h-4 w-4" />
-                <span className="text-xs font-medium uppercase tracking-[0.16em]">{label}</span>
-              </div>
+              <div className="mb-2 flex items-center gap-2 text-gray-500 dark:text-gray-400"><Icon className="h-4 w-4" /><span className="text-xs font-medium uppercase tracking-[0.16em]">{label}</span></div>
               <p className="text-xl font-semibold text-gray-900 dark:text-white">{value}</p>
             </div>
           ))}
@@ -298,13 +223,7 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
                 const stats = getStats(column, column.detectedType, rowCount);
                 return (
                   <Fragment key={column.name}>
-                    <motion.tr
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.02 }}
-                      className="cursor-pointer transition hover:bg-cyan-50/60 dark:hover:bg-cyan-950/20"
-                      onClick={() => toggleRow(column.name)}
-                    >
+                    <motion.tr initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.02 }} className="cursor-pointer transition hover:bg-cyan-50/60 dark:hover:bg-cyan-950/20" onClick={() => toggleRow(column.name)}>
                       <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
                         <ChevronRight className={`h-4 w-4 transition ${isExpanded ? "rotate-90 text-cyan-600 dark:text-cyan-400" : ""}`} />
                       </td>
@@ -317,13 +236,7 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
                       <td className="px-4 py-3"><TypeBadge type={column.detectedType} /></td>
                       <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{column.sampleValues.length ? formatValue(column.sampleValues[0]) : "—"}</td>
                       <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
-                        <div className="flex flex-wrap gap-x-4 gap-y-1">
-                          {stats.slice(0, 3).map((item) => (
-                            <span key={item.label} className="whitespace-nowrap">
-                              <span className="text-gray-400 dark:text-gray-500">{item.label}:</span> {item.value}
-                            </span>
-                          ))}
-                        </div>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1">{stats.slice(0, 3).map((item) => <span key={item.label} className="whitespace-nowrap"><span className="text-gray-400 dark:text-gray-500">{item.label}:</span> {item.value}</span>)}</div>
                       </td>
                     </motion.tr>
 
@@ -334,10 +247,7 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
                             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                               <div className="grid gap-4 py-4 lg:grid-cols-[1.1fr,0.9fr]">
                                 <div className="space-y-3">
-                                  <div className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
-                                    <Pencil className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-                                    Description
-                                  </div>
+                                  <div className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"><Pencil className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />Description</div>
                                   <textarea
                                     value={descriptions[column.name] ?? ""}
                                     onChange={(event) => updateDescription(column.name, event.target.value)}
@@ -348,25 +258,13 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
                                   />
 
                                   <div>
-                                    <div className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
-                                      <Search className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-                                      Sample Values
-                                    </div>
-                                    <div className="flex flex-wrap gap-2">
-                                      {column.sampleValues.length ? column.sampleValues.slice(0, 8).map((value, valueIndex) => (
-                                        <span key={`${column.name}-${valueIndex}`} className="rounded-full bg-gray-200/80 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                                          {formatValue(value)}
-                                        </span>
-                                      )) : <span className="text-sm text-gray-500 dark:text-gray-400">No samples available.</span>}
-                                    </div>
+                                    <div className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"><Search className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />Sample Values</div>
+                                    <div className="flex flex-wrap gap-2">{column.sampleValues.length ? column.sampleValues.slice(0, 8).map((value, valueIndex) => <span key={`${column.name}-${valueIndex}`} className="rounded-full bg-gray-200/80 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">{formatValue(value)}</span>) : <span className="text-sm text-gray-500 dark:text-gray-400">No samples available.</span>}</div>
                                   </div>
                                 </div>
 
                                 <div className="space-y-3">
-                                  <div className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
-                                    <BarChart3 className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-                                    Statistics Summary
-                                  </div>
+                                  <div className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"><BarChart3 className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />Statistics Summary</div>
                                   <div className="grid gap-2 sm:grid-cols-2">
                                     {stats.map((item) => (
                                       <div key={item.label} className="rounded-xl border border-gray-200/70 bg-white/80 px-3 py-2 dark:border-gray-800 dark:bg-gray-900/70">
