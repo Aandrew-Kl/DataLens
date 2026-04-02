@@ -1,187 +1,274 @@
+<div align="center">
+
 # DataLens
 
-**Drop a file. Ask anything. See everything.**
+### AI-Powered Data Explorer — 100% Free, 100% Private
 
-Open source AI-powered data explorer. No SQL needed. Runs 100% locally.
+<p>
+  <a href="./LICENSE">
+    <img src="https://img.shields.io/github/license/Aandrew-Kl/DataLens?style=for-the-badge" alt="MIT License" />
+  </a>
+  <a href="./CONTRIBUTING.md">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge" alt="PRs Welcome" />
+  </a>
+  <a href="https://github.com/Aandrew-Kl/DataLens/stargazers">
+    <img src="https://img.shields.io/github/stars/Aandrew-Kl/DataLens?style=for-the-badge" alt="GitHub Stars" />
+  </a>
+</p>
+
+<p>
+  Drop in a CSV, Excel, or JSON file and turn raw data into profiles, dashboards,
+  SQL, charts, and local AI insights in seconds.
+</p>
+
+<p>
+  No cloud dependency. No API keys. No paid credits. No data leaving your browser.
+</p>
+
+<p>
+  <a href="#-quick-start"><strong>Quick Start</strong></a>
+  ·
+  <a href="#-feature-grid"><strong>Features</strong></a>
+  ·
+  <a href="#-docker"><strong>Docker</strong></a>
+  ·
+  <a href="#-tech-stack"><strong>Tech Stack</strong></a>
+</p>
+
+</div>
 
 ---
 
-## What is DataLens?
+## 🚀 Why DataLens?
 
-DataLens turns any CSV, Excel, or JSON file into instant dashboards, charts, and insights — powered by AI that runs entirely on your machine.
+DataLens is built for people who want answers from data immediately without handing
+that data to a third-party platform.
 
-- **Zero SQL required** — Ask questions in plain English
-- **Zero API costs** — Powered by Ollama (local AI)
-- **100% private** — Your data never leaves your machine
-- **Instant insights** — Drop a file, see a dashboard in seconds
+- **💸 Zero cost**: no API keys, no usage credits, no hidden SaaS meter running in the background.
+- **🔒 Private by default**: your data stays in the browser for analysis, not on somebody else’s server.
+- **⚡ Powerful under the hood**: DuckDB-WASM gives you a real analytical SQL engine running locally.
+- **🧠 AI-powered locally**: Ollama brings natural language workflows and smart suggestions to your machine.
 
-## Features
+That means you can move from raw file to real insight fast:
 
-### Core
-- **Drag & Drop** — CSV, Excel (.xlsx), and JSON files
-- **Auto-Profiling** — Instant column analysis, types, distributions, nulls
-- **AI Dashboard** — Auto-generated charts and KPIs on upload
-- **Natural Language Queries** — "What were total sales by region?"
-- **SQL Editor** — Full editor with syntax highlighting and auto-complete
-- **DuckDB-WASM** — Analytical SQL runs in your browser, not a server
+- Upload a file and get instant profiling.
+- Ask questions in plain English.
+- Drop to SQL when you want exact control.
+- Build charts, reports, and exports without leaving the app.
+- Keep the entire workflow local-first from start to finish.
 
-### Charts & Visualization
-- **Chart Builder** — Interactive drag-and-drop chart configuration
-- **6 Chart Types** — Bar, line, pie, scatter, histogram, area
-- **Correlation Matrix** — Heatmap of column correlations
-- **Missing Data Map** — Visual null data patterns
+## 🎯 Built For
 
-### Data Tools
-- **Transform Panel** — Filter, sort, group, and computed columns
-- **Join Builder** — Visual SQL join wizard for multi-dataset joins
-- **Pivot Tables** — Interactive cross-tabulation with aggregation
-- **Export Wizard** — CSV, JSON, SQL INSERT, Markdown, HTML export
-- **Formula Editor** — Expression builder for computed columns
+DataLens fits especially well when you need speed, control, and privacy:
 
-### Analytics
-- **Outlier Detection** — IQR-based anomaly detection
-- **Data Quality Scoring** — Automated completeness and quality assessment
-- **Data Summary** — Natural language dataset summaries
-- **Data Comparison** — Side-by-side dataset comparison
+- Developers exploring exports, logs, and product analytics snapshots.
+- Analysts who want dashboards without spinning up a full BI stack.
+- Founders and operators working from CSVs exported from business tools.
+- Students and researchers who need a free local analysis environment.
+- Security-conscious teams that cannot upload sensitive data to cloud AI products.
 
-### Reports & History
-- **Report Builder** — Create and export standalone HTML reports
-- **Query History** — Browse and re-run past queries
-- **Saved Queries** — Bookmark your favorite queries
-- **SQL Templates** — 20+ pre-built, parameterized SQL templates
+## 📁 Supported Data
 
-### UX
-- **Dark Mode** — Full dark mode with system preference detection
-- **Command Palette** — Cmd+K quick access to all features
-- **Keyboard Shortcuts** — Power-user shortcuts (Cmd+D, Cmd+N, Cmd+/)
-- **Sample Datasets** — Built-in demo data for instant exploration
-- **Onboarding Tour** — First-time user guided tour
-- **Self-Hosted** — Deploy with Docker Compose in one command
+DataLens is designed for the formats people actually receive every day:
 
-## Quick Start
+- **CSV** for ad hoc exports and operational data.
+- **Excel (`.xlsx`)** for stakeholder handoffs and spreadsheet-heavy workflows.
+- **JSON** for API responses, structured events, and app data dumps.
 
-### Option 1: Run locally (development)
+## ✨ Feature Grid
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>📊 Data Profiling</strong><br />
+      Instant column stats, type detection, null analysis, distributions, and quality signals the moment a dataset lands.
+    </td>
+    <td width="50%" valign="top">
+      <strong>⚡ Auto Dashboards</strong><br />
+      Generate metrics, KPIs, and chart suggestions automatically so you can start exploring before writing a single query.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>💬 Natural Language Queries</strong><br />
+      Ask questions in plain English and let local AI translate intent into usable analysis workflows.
+    </td>
+    <td width="50%" valign="top">
+      <strong>🧾 SQL Editor with Templates</strong><br />
+      Write analytical SQL with built-in templates, syntax support, and a faster path to exact answers.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>📈 Chart Builder (10+ chart types)</strong><br />
+      Build interactive visuals with core charts plus specialized visual analysis views, from bar and line to matrices and heatmaps.
+    </td>
+    <td width="50%" valign="top">
+      <strong>🪄 Data Transforms</strong><br />
+      Filter, sort, group, sample, clean, rename, and derive new fields without leaving the exploratory flow.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>🧮 Pivot Tables</strong><br />
+      Slice measures across dimensions with interactive pivot workflows built for real dataset exploration, not toy demos.
+    </td>
+    <td width="50%" valign="top">
+      <strong>🔀 Cross Tabulation</strong><br />
+      Inspect category intersections and count patterns fast when you need structure across multiple dimensions.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>🚨 Anomaly Detection</strong><br />
+      Surface outliers, unusual rows, and suspicious patterns before they distort dashboards, summaries, or downstream decisions.
+    </td>
+    <td width="50%" valign="top">
+      <strong>🛡️ Data Quality Dashboard</strong><br />
+      Track completeness, validity, uniqueness, consistency, and timeliness from one purpose-built quality surface.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>⏱️ Time Series Analysis</strong><br />
+      Explore trends, moving averages, seasonality, and directional change without stitching together external notebooks.
+    </td>
+    <td width="50%" valign="top">
+      <strong>🔵 Scatter Matrix</strong><br />
+      Compare multiple numeric fields side by side and inspect pairwise relationships with optional category coloring.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>🧊 Correlation Matrix</strong><br />
+      See numeric relationships at a glance with matrix-based correlation views for rapid exploratory analysis.
+    </td>
+    <td width="50%" valign="top">
+      <strong>📦 Export (CSV/JSON/SQL/HTML reports)</strong><br />
+      Ship cleaned data, query output, and shareable artifacts in practical formats people already use.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>🆚 Data Comparison</strong><br />
+      Compare datasets side by side to spot drift, schema changes, quality deltas, and behavioral differences.
+    </td>
+    <td width="50%" valign="top">
+      <strong>🗂️ Schema Viewer</strong><br />
+      Inspect field types, shapes, and structural details without digging through raw tables manually.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>📚 Data Dictionary</strong><br />
+      Document columns, preserve context, and export reusable dataset documentation directly from the app.
+    </td>
+    <td width="50%" valign="top">
+      <strong>⌨️ Keyboard Shortcuts</strong><br />
+      Move faster with power-user workflows for navigation, querying, dataset actions, and export flows.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>🌙 Dark Mode</strong><br />
+      A first-class light and dark experience built for long exploratory sessions, not an afterthought theme toggle.
+    </td>
+    <td width="50%" valign="top">
+      <strong>🧭 Onboarding Tour</strong><br />
+      Guide new users from upload to insight with a polished first-run experience that reduces friction immediately.
+    </td>
+  </tr>
+</table>
+
+## 🧠 How It Works
+
+DataLens keeps the full loop local:
+
+1. Upload a CSV, Excel, or JSON file.
+2. Parse it and load it into **DuckDB-WASM** in the browser.
+3. Profile the dataset automatically for types, nulls, quality, and shape.
+4. Explore through natural language, SQL, dashboards, transforms, and charts.
+5. Export your findings as data files, SQL, or HTML-based reporting artifacts.
+
+When Ollama is running locally, DataLens adds AI-assisted workflows without sending
+your dataset to a remote LLM provider.
+
+## ⚡ Quick Start
+
+Clone the repo, install dependencies, run the app, and open it locally:
 
 ```bash
-# Clone the repo
-git clone https://github.com/Aandrew-Kl/datalens.git
+git clone https://github.com/Aandrew-Kl/DataLens.git datalens
 cd datalens
-
-# Install dependencies
 npm install
-
-# Start the dev server
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000)
+Open `http://localhost:3000`
 
-### Option 2: Docker Compose (production)
+DataLens works without Ollama for core profiling, querying, visualization, and
+exports. Local AI features become available when your Ollama server is running.
 
-```bash
-# Clone and run
-git clone https://github.com/Aandrew-Kl/datalens.git
-cd datalens
+## 🐳 Docker
 
-# Start everything (app + Ollama)
-docker compose -f docker/docker-compose.yml up -d
-```
-
-This starts:
-- **DataLens** on port 3000
-- **Ollama** on port 11434 (auto-pulls llama3.2)
-
-### Prerequisites for AI features
-
-DataLens uses [Ollama](https://ollama.com) for AI features. Install it:
+Run DataLens and Ollama together with Docker Compose from the project root:
 
 ```bash
-# macOS / Linux
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Pull a model
-ollama pull llama3.2
+docker compose -f docker/docker-compose.yml up
 ```
 
-> **Note:** DataLens works WITHOUT Ollama — you get full data profiling, tables, and manual querying. Ollama adds natural language queries and auto-dashboards.
+This brings up:
 
-## Tech Stack
+- **DataLens** on `http://localhost:3000`
+- **Ollama** on `http://localhost:11434`
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS v4 |
-| Charts | Apache ECharts |
-| In-Browser DB | DuckDB-WASM |
-| AI | Ollama (local LLM) |
-| State | Zustand |
-| Animations | Framer Motion |
+If you prefer detached mode, add `-d`.
 
-## How It Works
+## 🧱 Tech Stack
 
-```
-┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│  Drop File  │────▶│  DuckDB-WASM │────▶│  Auto-Profile│
-│  (CSV/XLSX) │     │  (In-Browser) │     │  (Instant)   │
-└─────────────┘     └──────────────┘     └─────────────┘
-                           │
-                    ┌──────▼──────┐
-                    │   Ollama    │
-                    │  (Local AI) │
-                    └──────┬──────┘
-                           │
-              ┌────────────┼────────────┐
-              ▼            ▼            ▼
-        ┌──────────┐ ┌──────────┐ ┌──────────┐
-        │ Auto-    │ │ NL Query │ │ Chart    │
-        │ Dashboard│ │ → SQL    │ │ Suggest  │
-        └──────────┘ └──────────┘ └──────────┘
-```
+| Layer | Technology | Why it matters |
+| --- | --- | --- |
+| Framework | **Next.js 16** | Modern app foundation and fast local development |
+| UI Runtime | **React 19** | Responsive, interactive client-side experience |
+| Query Engine | **DuckDB-WASM** | Real analytical SQL in the browser |
+| Local AI | **Ollama** | Private natural language workflows with no API keys |
+| Language | **TypeScript** | Safer iteration and maintainable app logic |
+| Styling | **Tailwind CSS v4** | Fast UI development with consistent design primitives |
+| Charts | **ECharts** | Flexible, rich visualizations for exploratory analysis |
+| Motion | **Framer Motion** | Polished transitions and interaction feedback |
+| State | **Zustand** | Lightweight shared state for app workflows |
 
-**Key insight:** DuckDB-WASM runs analytical queries directly in your browser. Your data never hits a server for analysis. Ollama runs AI locally for natural language processing.
+## 🤝 Contributing
 
-## Configuration
+Contributions are welcome.
 
-Copy `.env.example` to `.env.local`:
+If you want to improve DataLens, start with [CONTRIBUTING.md](./CONTRIBUTING.md)
+for setup steps, coding conventions, testing guidance, and pull request
+expectations.
 
-```bash
-cp .env.example .env.local
-```
+Great contributions include:
 
-Available options:
+- Bug fixes and regression tests
+- UX refinements and accessibility improvements
+- New analysis workflows and data tooling
+- Documentation, onboarding, and developer-experience improvements
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `OLLAMA_URL` | `http://localhost:11434` | Ollama server URL |
-| `OLLAMA_MODEL` | `llama3.2` | Model for AI features |
+## 📄 License
 
-## Supported Models
+DataLens is open source under the [MIT License](./LICENSE).
 
-Any Ollama model works. Recommended:
+Use it commercially, self-host it privately, fork it, remix it, and build on top
+of it.
 
-| Model | Speed | SQL Quality | RAM |
-|-------|-------|-------------|-----|
-| `llama3.2` | Fast | Good | 4GB |
-| `qwen2.5:14b` | Medium | Excellent | 10GB |
-| `deepseek-r1:8b` | Medium | Very Good | 6GB |
-| `mistral` | Fast | Good | 4GB |
+## ⭐ Star History
 
-## Contributing
+This section is intentionally left as a launch-ready placeholder for the repo’s
+growth chart.
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+When you want to switch it on, replace this block with:
 
-```bash
-# Development
-npm run dev       # Start dev server
-npm run build     # Production build
-npm run lint      # Run linter
+```md
+[![Star History Chart](https://api.star-history.com/svg?repos=Aandrew-Kl/DataLens&type=Date)](https://star-history.com/#Aandrew-Kl/DataLens&Date)
 ```
 
-## License
-
-MIT License — free for personal and commercial use.
-
----
-
-Built with AI by the community. Star this repo if you find it useful!
+If DataLens helps you, star the repo and help make the chart worth embedding.

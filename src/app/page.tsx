@@ -100,6 +100,8 @@ import TypeConverter from "@/components/data/type-converter";
 import DuplicateFinder from "@/components/data/duplicate-finder";
 import DataSampler from "@/components/data/data-sampler";
 import FormulaEditor from "@/components/data/formula-editor";
+import OnboardingTour from "@/components/ui/onboarding-tour";
+import DataQualityDashboard from "@/components/data/data-quality-dashboard";
 
 // ─────────────────────────────────────────────
 // Types
@@ -1044,6 +1046,7 @@ export default function Home() {
   if (!activeDataset && !showUploader) {
     return (
       <ErrorBoundary>
+        <OnboardingTour />
         <div className="flex flex-1 flex-col min-h-screen">
           {/* Top bar */}
           <header className="flex items-center justify-between px-6 py-4">
@@ -1240,6 +1243,7 @@ export default function Home() {
 
   return (
     <ErrorBoundary>
+      <OnboardingTour />
       <div className="flex min-h-screen">
         {/* Sidebar */}
         <AnimatePresence>
@@ -1928,6 +1932,12 @@ export default function Home() {
                       </ErrorBoundary>
                       <ErrorBoundary>
                         <AnomalyHeatmap
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <DataQualityDashboard
                           tableName={tableName}
                           columns={profileData}
                         />
