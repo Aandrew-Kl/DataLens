@@ -1,5 +1,4 @@
 "use client";
-
 import { startTransition, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, CheckCircle2, Loader2, Plus, ShieldAlert, Trash2, XCircle } from "lucide-react";
@@ -53,98 +52,43 @@ function buildRangeCondition(column: ColumnProfile, safeColumn: string, rule: Va
   if (column.type === "number") {
     const minValue = hasMin ? Number(rule.min) : null;
     const maxValue = hasMax ? Number(rule.max) : null;
-    if ((hasMin && !Number.isFinite(minValue)) || (hasMax && !Number.isFinite(maxValue))) {
-      return { warning: "Numeric range rules need valid numeric bounds." };
-    }
+    if ((hasMin && !Number.isFinite(minValue)) || (hasMax && !Number.isFinite(maxValue))) return { warning: "Numeric range rules need valid numeric bounds." };
     const expr = `TRY_CAST(${safeColumn} AS DOUBLE)`;
-    return {
-      detail: `Expected between ${hasMin ? rule.min : "-∞"} and ${hasMax ? rule.max : "+∞"}.`,
-      condition: [minValue != null ? `${expr} < ${minValue}` : null, maxValue != null ? `${expr} > ${maxValue}` : null].filter(Boolean).join(" OR "),
-    };
+    return { detail: `Expected between ${hasMin ? rule.min : "-∞"} and ${hasMax ? rule.max : "+∞"}.`, condition: [minValue != null ? `${expr} < ${minValue}` : null, maxValue != null ? `${expr} > ${maxValue}` : null].filter(Boolean).join(" OR ") };
   }
   if (column.type === "date") {
     const expr = `TRY_CAST(${safeColumn} AS TIMESTAMP)`;
     const minValue = hasMin ? rule.min.trim() : null;
     const maxValue = hasMax ? rule.max.trim() : null;
-    return {
-      detail: `Expected between ${minValue ?? "start"} and ${maxValue ?? "end"}.`,
-      condition: [
-        minValue ? `${expr} < TRY_CAST(${escapeLiteral(minValue)} AS TIMESTAMP)` : null,
-        maxValue ? `${expr} > TRY_CAST(${escapeLiteral(maxValue)} AS TIMESTAMP)` : null,
-      ].filter(Boolean).join(" OR "),
-    };
+    return { detail: `Expected between ${minValue ?? "start"} and ${maxValue ?? "end"}.`, condition: [minValue ? `${expr} < TRY_CAST(${escapeLiteral(minValue)} AS TIMESTAMP)` : null, maxValue ? `${expr} > TRY_CAST(${escapeLiteral(maxValue)} AS TIMESTAMP)` : null].filter(Boolean).join(" OR ") };
   }
-  return {
-    detail: `Expected between ${hasMin ? rule.min : "start"} and ${hasMax ? rule.max : "end"}.`,
-    condition: [
-      hasMin ? `CAST(${safeColumn} AS VARCHAR) < ${escapeLiteral(rule.min.trim())}` : null,
-      hasMax ? `CAST(${safeColumn} AS VARCHAR) > ${escapeLiteral(rule.max.trim())}` : null,
-    ].filter(Boolean).join(" OR "),
-  };
+  return { detail: `Expected between ${hasMin ? rule.min : "start"} and ${hasMax ? rule.max : "end"}.`, condition: [hasMin ? `CAST(${safeColumn} AS VARCHAR) < ${escapeLiteral(rule.min.trim())}` : null, hasMax ? `CAST(${safeColumn} AS VARCHAR) > ${escapeLiteral(rule.max.trim())}` : null].filter(Boolean).join(" OR ") };
 }
-
 function buildValidationTask(tableName: string, columns: ColumnProfile[], column: ColumnProfile, rule: ValidationRule): ValidationTask | ValidationWarning {
   const safeTable = quoteIdentifier(tableName);
   const safeColumn = quoteIdentifier(column.name);
   const sampleSelect = getSampleSelect(columns, column.name);
-
   switch (rule.type) {
-    case "not_null":
-      return {
-        id: rule.id,
-        columnName: column.name,
-        label: "Not null",
-        detail: "Every row must contain a value.",
-        countSql: `SELECT COUNT(*) AS violations FROM ${safeTable} WHERE ${safeColumn} IS NULL`,
-        sampleSql: `SELECT ${sampleSelect} FROM ${safeTable} WHERE ${safeColumn} IS NULL LIMIT 5`,
-      };
+    case "not_null": return { id: rule.id, columnName: column.name, label: "Not null", detail: "Every row must contain a value.", countSql: `SELECT COUNT(*) AS violations FROM ${safeTable} WHERE ${safeColumn} IS NULL`, sampleSql: `SELECT ${sampleSelect} FROM ${safeTable} WHERE ${safeColumn} IS NULL LIMIT 5` };
     case "unique": {
       const sourceSql = `SELECT ${sampleSelect}, COUNT(*) OVER (PARTITION BY ${safeColumn}) AS __duplicate_count FROM ${safeTable}`;
-      return {
-        id: rule.id,
-        columnName: column.name,
-        label: "Unique",
-        detail: "Non-null values must appear only once.",
-        countSql: `SELECT COUNT(*) AS violations FROM (${sourceSql}) AS violations WHERE ${safeColumn} IS NOT NULL AND __duplicate_count > 1`,
-        sampleSql: `SELECT * FROM (${sourceSql}) AS violations WHERE ${safeColumn} IS NOT NULL AND __duplicate_count > 1 LIMIT 5`,
-      };
+      return { id: rule.id, columnName: column.name, label: "Unique", detail: "Non-null values must appear only once.", countSql: `SELECT COUNT(*) AS violations FROM (${sourceSql}) AS violations WHERE ${safeColumn} IS NOT NULL AND __duplicate_count > 1`, sampleSql: `SELECT * FROM (${sourceSql}) AS violations WHERE ${safeColumn} IS NOT NULL AND __duplicate_count > 1 LIMIT 5` };
     }
     case "range": {
       const range = buildRangeCondition(column, safeColumn, rule);
       if ("warning" in range) return { id: rule.id, columnName: column.name, message: range.warning as string };
-      return {
-        id: rule.id,
-        columnName: column.name,
-        label: "Range",
-        detail: range.detail,
-        countSql: `SELECT COUNT(*) AS violations FROM ${safeTable} WHERE ${safeColumn} IS NOT NULL AND (${range.condition})`,
-        sampleSql: `SELECT ${sampleSelect} FROM ${safeTable} WHERE ${safeColumn} IS NOT NULL AND (${range.condition}) LIMIT 5`,
-      };
+      return { id: rule.id, columnName: column.name, label: "Range", detail: (range as { detail: string; condition: string }).detail, countSql: `SELECT COUNT(*) AS violations FROM ${safeTable} WHERE ${safeColumn} IS NOT NULL AND (${(range as { detail: string; condition: string }).condition})`, sampleSql: `SELECT ${sampleSelect} FROM ${safeTable} WHERE ${safeColumn} IS NOT NULL AND (${(range as { detail: string; condition: string }).condition}) LIMIT 5` };
     }
     case "regex": {
       const pattern = rule.pattern.trim();
       if (!pattern) return { id: rule.id, columnName: column.name, message: "Regex rules need a pattern." };
-      return {
-        id: rule.id,
-        columnName: column.name,
-        label: "Regex pattern",
-        detail: `Must match ${pattern}.`,
-        countSql: `SELECT COUNT(*) AS violations FROM ${safeTable} WHERE ${safeColumn} IS NOT NULL AND NOT regexp_matches(CAST(${safeColumn} AS VARCHAR), ${escapeLiteral(pattern)})`,
-        sampleSql: `SELECT ${sampleSelect} FROM ${safeTable} WHERE ${safeColumn} IS NOT NULL AND NOT regexp_matches(CAST(${safeColumn} AS VARCHAR), ${escapeLiteral(pattern)}) LIMIT 5`,
-      };
+      return { id: rule.id, columnName: column.name, label: "Regex pattern", detail: `Must match ${pattern}.`, countSql: `SELECT COUNT(*) AS violations FROM ${safeTable} WHERE ${safeColumn} IS NOT NULL AND NOT regexp_matches(CAST(${safeColumn} AS VARCHAR), ${escapeLiteral(pattern)})`, sampleSql: `SELECT ${sampleSelect} FROM ${safeTable} WHERE ${safeColumn} IS NOT NULL AND NOT regexp_matches(CAST(${safeColumn} AS VARCHAR), ${escapeLiteral(pattern)}) LIMIT 5` };
     }
     case "allowed_values": {
       const values = parseAllowedValues(rule.allowedValues);
       if (values.length === 0) return { id: rule.id, columnName: column.name, message: "Allowed values rules need at least one value." };
       const list = values.map((value) => escapeLiteral(value)).join(", ");
-      return {
-        id: rule.id,
-        columnName: column.name,
-        label: "Allowed values",
-        detail: `Accepted: ${values.slice(0, 4).join(", ")}${values.length > 4 ? ", …" : ""}.`,
-        countSql: `SELECT COUNT(*) AS violations FROM ${safeTable} WHERE ${safeColumn} IS NOT NULL AND CAST(${safeColumn} AS VARCHAR) NOT IN (${list})`,
-        sampleSql: `SELECT ${sampleSelect} FROM ${safeTable} WHERE ${safeColumn} IS NOT NULL AND CAST(${safeColumn} AS VARCHAR) NOT IN (${list}) LIMIT 5`,
-      };
+      return { id: rule.id, columnName: column.name, label: "Allowed values", detail: `Accepted: ${values.slice(0, 4).join(", ")}${values.length > 4 ? ", …" : ""}.`, countSql: `SELECT COUNT(*) AS violations FROM ${safeTable} WHERE ${safeColumn} IS NOT NULL AND CAST(${safeColumn} AS VARCHAR) NOT IN (${list})`, sampleSql: `SELECT ${sampleSelect} FROM ${safeTable} WHERE ${safeColumn} IS NOT NULL AND CAST(${safeColumn} AS VARCHAR) NOT IN (${list}) LIMIT 5` };
     }
   }
 }
@@ -168,7 +112,6 @@ function RuleEditor({ column, rules, onAdd, onChange, onRemove }: {
           Add rule
         </button>
       </div>
-
       <AnimatePresence initial={false}>
         {rules.length === 0 ? (
           <motion.div key="empty" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-dashed border-slate-300/80 px-4 py-5 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
@@ -186,7 +129,6 @@ function RuleEditor({ column, rules, onAdd, onChange, onRemove }: {
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-
                 {rule.type === "range" && (
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     <input value={rule.min} onChange={(event) => onChange(rule.id, { min: event.target.value })} placeholder={`Min${column.min != null ? ` (${column.min})` : ""}`} className={fieldClass} />
@@ -204,12 +146,20 @@ function RuleEditor({ column, rules, onAdd, onChange, onRemove }: {
   );
 }
 
+function SummaryTile({ label, value, tone = "text-slate-950 dark:text-slate-50" }: { label: string; value: string | number; tone?: string }) {
+  return (
+    <div className={`${panelClass} px-4 py-3`}>
+      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{label}</p>
+      <p className={`mt-1 text-lg font-semibold ${tone}`}>{value}</p>
+    </div>
+  );
+}
+
 function ResultCard({ result }: { result: ValidationResult }) {
   const passed = result.violationCount === 0;
   const Icon = passed ? CheckCircle2 : XCircle;
-  const badgeClass = passed ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-200" : "border-rose-500/20 bg-rose-500/10 text-rose-200";
   const headers = Object.keys(result.sampleRows[0] ?? {});
-
+  const badgeClass = passed ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-200" : "border-rose-500/20 bg-rose-500/10 text-rose-200";
   return (
     <motion.div layout initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-slate-800 bg-slate-950/85 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -226,7 +176,6 @@ function ResultCard({ result }: { result: ValidationResult }) {
           <p className="mt-1 text-xl font-semibold text-slate-100">{formatNumber(result.violationCount)}</p>
         </div>
       </div>
-
       <div className="mt-4">
         {result.sampleRows.length === 0 ? (
           <p className="text-sm text-slate-400">No violating rows were found.</p>
@@ -234,12 +183,8 @@ function ResultCard({ result }: { result: ValidationResult }) {
           <div className="overflow-hidden rounded-xl border border-slate-800">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-slate-800 text-sm">
-                <thead className="bg-slate-900/90">
-                  <tr>{headers.map((header) => <th key={header} className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{header}</th>)}</tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800 bg-slate-950/70">
-                  {result.sampleRows.map((row, index) => <tr key={`${result.id}-${index}`}>{headers.map((header) => <td key={header} className="px-3 py-2 text-slate-300">{renderValue(row[header])}</td>)}</tr>)}
-                </tbody>
+                <thead className="bg-slate-900/90"><tr>{headers.map((header) => <th key={header} className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{header}</th>)}</tr></thead>
+                <tbody className="divide-y divide-slate-800 bg-slate-950/70">{result.sampleRows.map((row, index) => <tr key={`${result.id}-${index}`}>{headers.map((header) => <td key={header} className="px-3 py-2 text-slate-300">{renderValue(row[header])}</td>)}</tr>)}</tbody>
               </table>
             </div>
           </div>
@@ -256,10 +201,7 @@ export default function DataValidator({ tableName, columns }: DataValidatorProps
   const [error, setError] = useState<string | null>(null);
   const [lastRunAt, setLastRunAt] = useState<number | null>(null);
 
-  useEffect(() => {
-    setRulesByColumn((previous) => Object.fromEntries(columns.map((column) => [column.name, previous[column.name] ?? []])));
-  }, [columns]);
-
+  useEffect(() => { setRulesByColumn((previous) => Object.fromEntries(columns.map((column) => [column.name, previous[column.name] ?? []]))); }, [columns]);
   const plan = useMemo(() => {
     const tasks: ValidationTask[] = [];
     const warnings: ValidationWarning[] = [];
@@ -271,21 +213,13 @@ export default function DataValidator({ tableName, columns }: DataValidatorProps
     }
     return { tasks, warnings };
   }, [columns, rulesByColumn, tableName]);
-
   const configuredCount = Object.values(rulesByColumn).reduce((sum, rules) => sum + rules.length, 0);
   const failingCount = results.filter((result) => result.violationCount > 0).length;
   const totalViolations = results.reduce((sum, result) => sum + result.violationCount, 0);
-
-  useEffect(() => {
-    setResults([]);
-    setLastRunAt(null);
-    setError(null);
-  }, [rulesByColumn, tableName]);
-
+  useEffect(() => { setResults([]); setLastRunAt(null); setError(null); }, [rulesByColumn, tableName]);
   function updateColumnRules(columnName: string, updater: (rules: ValidationRule[]) => ValidationRule[]) {
     setRulesByColumn((previous) => ({ ...previous, [columnName]: updater(previous[columnName] ?? []) }));
   }
-
   async function runValidation() {
     if (plan.tasks.length === 0) return;
     setRunning(true);
@@ -299,10 +233,7 @@ export default function DataValidator({ tableName, columns }: DataValidatorProps
         nextResults.push({ ...task, violationCount, sampleRows });
       }
       nextResults.sort((left, right) => right.violationCount - left.violationCount || left.columnName.localeCompare(right.columnName));
-      startTransition(() => {
-        setResults(nextResults);
-        setLastRunAt(Date.now());
-      });
+      startTransition(() => { setResults(nextResults); setLastRunAt(Date.now()); });
     } catch (validationError) {
       setError(validationError instanceof Error ? validationError.message : "Validation failed.");
     } finally {
@@ -321,13 +252,9 @@ export default function DataValidator({ tableName, columns }: DataValidatorProps
           <h2 className="mt-3 text-2xl font-semibold text-slate-950 dark:text-slate-50">Configure checks for {tableName}</h2>
           <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400">Define rules column by column, then scan the DuckDB table for nulls, duplicates, range violations, regex misses, and invalid categories.</p>
         </div>
-
         <div className="flex flex-wrap gap-3">
           {[{ label: "Configured", value: configuredCount }, { label: "Runnable", value: plan.tasks.length }].map((metric) => (
-            <div key={metric.label} className={`${panelClass} px-4 py-3`}>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{metric.label}</p>
-              <p className="mt-1 text-lg font-semibold text-slate-950 dark:text-slate-50">{metric.value}</p>
-            </div>
+            <SummaryTile key={metric.label} label={metric.label} value={metric.value} />
           ))}
           <button type="button" onClick={() => void runValidation()} disabled={running || plan.tasks.length === 0} className="inline-flex items-center gap-2 rounded-2xl bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 dark:disabled:bg-slate-800 dark:disabled:text-slate-500">
             {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
@@ -335,27 +262,15 @@ export default function DataValidator({ tableName, columns }: DataValidatorProps
           </button>
         </div>
       </div>
-
       {plan.warnings.length > 0 && (
         <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 text-amber-900 dark:text-amber-200">
           <div className="flex items-center gap-2 text-sm font-semibold"><AlertTriangle className="h-4 w-4" />{plan.warnings.length} incomplete {plan.warnings.length === 1 ? "rule" : "rules"} will be skipped</div>
           <div className="mt-3 space-y-1 text-sm">{plan.warnings.map((warning) => <p key={warning.id}>{warning.columnName}: {warning.message}</p>)}</div>
         </div>
       )}
-
       <div className="grid gap-4 xl:grid-cols-2">
-        {columns.map((column) => (
-          <RuleEditor
-            key={column.name}
-            column={column}
-            rules={rulesByColumn[column.name] ?? []}
-            onAdd={() => updateColumnRules(column.name, (rules) => [...rules, createRule()])}
-            onChange={(ruleId, patch) => updateColumnRules(column.name, (rules) => rules.map((rule) => (rule.id === ruleId ? { ...rule, ...patch } : rule)))}
-            onRemove={(ruleId) => updateColumnRules(column.name, (rules) => rules.filter((rule) => rule.id !== ruleId))}
-          />
-        ))}
+        {columns.map((column) => <RuleEditor key={column.name} column={column} rules={rulesByColumn[column.name] ?? []} onAdd={() => updateColumnRules(column.name, (rules) => [...rules, createRule()])} onChange={(ruleId, patch) => updateColumnRules(column.name, (rules) => rules.map((rule) => (rule.id === ruleId ? { ...rule, ...patch } : rule)))} onRemove={(ruleId) => updateColumnRules(column.name, (rules) => rules.filter((rule) => rule.id !== ruleId))} />)}
       </div>
-
       <div className="rounded-3xl border border-slate-800 bg-slate-950/95 p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -365,20 +280,12 @@ export default function DataValidator({ tableName, columns }: DataValidatorProps
           </div>
           {results.length > 0 && (
             <div className="flex flex-wrap gap-3">
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Failures</p>
-                <p className="mt-1 text-lg font-semibold text-rose-300">{failingCount}</p>
-              </div>
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Total violations</p>
-                <p className="mt-1 text-lg font-semibold text-slate-100">{formatNumber(totalViolations)}</p>
-              </div>
+              <SummaryTile label="Failures" value={failingCount} tone="text-rose-300" />
+              <SummaryTile label="Total violations" value={formatNumber(totalViolations)} tone="text-slate-100" />
             </div>
           )}
         </div>
-
         {error && <div className="mt-4 rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{error}</div>}
-
         <div className="mt-5">
           <AnimatePresence initial={false}>
             {results.length === 0 ? (
