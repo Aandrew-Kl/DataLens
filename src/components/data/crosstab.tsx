@@ -2,16 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  AlertCircle,
-  BadgePercent,
-  Columns3,
-  FlaskConical,
-  Loader2,
-  Rows3,
-  Sigma,
-  Table2,
-} from "lucide-react";
+import { AlertCircle, BadgePercent, Columns3, FlaskConical, Loader2, Rows3, Sigma, Table2 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { formatNumber } from "@/lib/utils/formatters";
 import type { ColumnProfile } from "@/types/dataset";
@@ -176,7 +167,7 @@ export default function CrossTabulation({ tableName, columns }: CrossTabProps) {
       }
     }
     const df = (data.rowKeys.length - 1) * (data.colKeys.length - 1);
-    const pValue = regularizedGammaQ(df / 2, chiSquare / 2);
+    const pValue = chiSquarePValue(chiSquare, df);
     const cramerV = Math.sqrt(chiSquare / (data.grandTotal * Math.max(1, Math.min(data.rowKeys.length - 1, data.colKeys.length - 1))));
     return { chiSquare, df, pValue, cramerV };
   }, [data]);
