@@ -25,7 +25,6 @@ import {
   PieChart,
   FileText,
   GitMerge,
-  Keyboard,
   RefreshCw,
   Share2,
 } from "lucide-react";

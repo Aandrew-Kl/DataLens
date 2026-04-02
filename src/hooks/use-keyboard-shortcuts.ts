@@ -47,7 +47,9 @@ export function useKeyboardShortcuts(shortcuts: Shortcut[]): void {
   // Store shortcuts in a ref so the event handler always sees the latest list
   // without needing to re-attach the listener.
   const shortcutsRef = useRef(shortcuts);
-  shortcutsRef.current = shortcuts;
+  useEffect(() => {
+    shortcutsRef.current = shortcuts;
+  });
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {

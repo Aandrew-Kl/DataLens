@@ -155,7 +155,7 @@ export default function ExportWizard({ open, onClose, tableName, columns, rowCou
   }, [totalExportRows, selectedCols.size, format]);
 
   const toggleCol = (name: string) => {
-    setSelectedCols((prev) => { const n = new Set(prev); n.has(name) ? n.delete(name) : n.add(name); return n; });
+    setSelectedCols((prev) => { const n = new Set(prev); if (n.has(name)) { n.delete(name); } else { n.add(name); } return n; });
   };
   const selectAll = () => setSelectedCols(new Set(columns.map((c) => c.name)));
   const selectNone = () => setSelectedCols(new Set());

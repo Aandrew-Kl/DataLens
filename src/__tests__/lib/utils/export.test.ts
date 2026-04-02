@@ -4,7 +4,6 @@
 import { exportToCSV, exportToJSON, exportToClipboard } from "@/lib/utils/export";
 
 // Mock browser APIs
-const mockCreateElement = jest.fn();
 const mockClick = jest.fn();
 const mockRevokeObjectURL = jest.fn();
 let lastCreatedUrl: string | undefined;

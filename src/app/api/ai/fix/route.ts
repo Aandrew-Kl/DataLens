@@ -60,10 +60,6 @@ function quoteIdentifier(identifier: string): string {
   return `"${identifier.replace(/"/g, "\"\"")}"`;
 }
 
-function unquoteIdentifier(identifier: string): string {
-  return identifier.replace(/^["'`[]|["'`\]]$/g, "").trim();
-}
-
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

@@ -43,8 +43,10 @@ export function useLocalStorage<T>(
   // without needing to re-register the listener on every render.
   const keyRef = useRef(key);
   const initialValueRef = useRef(initialValue);
-  keyRef.current = key;
-  initialValueRef.current = initialValue;
+  useEffect(() => {
+    keyRef.current = key;
+    initialValueRef.current = initialValue;
+  });
 
   /**
    * Persist `value` (or the result of an updater function) to localStorage

@@ -153,14 +153,20 @@ export default function CommandPalette({
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Load recent commands on open
-  useEffect(() => {
+  // Reset state when dialog opens (React-recommended derived state pattern)
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open) {
       setQuery("");
       setSelectedIndex(0);
       setRecentIds(readRecentCommands());
+    }
+  }
 
-      // Focus the input after the animation frame
+  // Focus the input when opened
+  useEffect(() => {
+    if (open) {
       requestAnimationFrame(() => {
         inputRef.current?.focus();
       });
@@ -203,11 +209,12 @@ export default function CommandPalette({
   }, [recentItems, flatItems]);
 
   // Clamp selected index when list changes
-  useEffect(() => {
-    if (selectedIndex >= allSelectableItems.length) {
-      setSelectedIndex(Math.max(0, allSelectableItems.length - 1));
-    }
-  }, [allSelectableItems.length, selectedIndex]);
+  const clampedIndex = selectedIndex >= allSelectableItems.length
+    ? Math.max(0, allSelectableItems.length - 1)
+    : selectedIndex;
+  if (clampedIndex !== selectedIndex) {
+    setSelectedIndex(clampedIndex);
+  }
 
   const executeCommand = useCallback(
     (cmd: Command) => {

@@ -158,11 +158,14 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
     "idle" | "testing" | "connected" | "disconnected"
   >("idle");
 
-  useEffect(() => {
+  // Reload settings when panel opens (React-recommended derived state pattern)
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open) {
       setSettings(loadSettings());
     }
-  }, [open]);
+  }
 
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {

@@ -17,11 +17,10 @@ import {
   Clock,
   Wifi,
   WifiOff,
-  X,
 } from "lucide-react";
 import { useDatasetStore } from "@/stores/dataset-store";
 import { useUIStore } from "@/stores/ui-store";
-import { formatNumber, formatBytes } from "@/lib/utils/formatters";
+import { formatNumber } from "@/lib/utils/formatters";
 
 // ---------------------------------------------------------------------------
 // Types

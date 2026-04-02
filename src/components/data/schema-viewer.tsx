@@ -106,16 +106,24 @@ function SchemaSummary({ columns, rowCount }: { columns: ColumnProfile[]; rowCou
 }
 
 /* ------------------------------------------------------------------ */
+function StatLine({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+      <span>{label}</span><span className="font-mono">{typeof value === "number" ? formatNumber(value) : value}</span>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Expanded detail row (fetches stddev via DuckDB)                    */
 /* ------------------------------------------------------------------ */
 function ExpandedDetail({ col, tableName, rowCount }: { col: ColumnProfile; tableName: string; rowCount: number }) {
   const [stddev, setStddev] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(col.type === "number");
 
   useEffect(() => {
     if (col.type !== "number") return;
     let cancelled = false;
-    setLoading(true);
     const esc = col.name.replace(/"/g, '""');
     runQuery(`SELECT STDDEV_SAMP("${esc}") AS sd FROM "${tableName}" WHERE "${esc}" IS NOT NULL`)
       .then((r) => { if (!cancelled) setStddev(r[0]?.sd != null ? Number(Number(r[0].sd).toFixed(4)) : null); })
@@ -127,12 +135,6 @@ function ExpandedDetail({ col, tableName, rowCount }: { col: ColumnProfile; tabl
   const np = getNullPct(col, rowCount);
   const card = getCardinality(col, rowCount);
 
-  const Stat = ({ label, value }: { label: string; value: string | number }) => (
-    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
-      <span>{label}</span><span className="font-mono">{typeof value === "number" ? formatNumber(value) : value}</span>
-    </div>
-  );
-
   return (
     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
       exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: "easeInOut" }} className="overflow-hidden">
@@ -140,8 +142,8 @@ function ExpandedDetail({ col, tableName, rowCount }: { col: ColumnProfile; tabl
         {/* Null analysis */}
         <div className="space-y-1.5">
           <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-semibold">Null Analysis</p>
-          <Stat label="Null count" value={col.nullCount} />
-          <Stat label="Null %" value={`${np.toFixed(1)}%`} />
+          <StatLine label="Null count" value={col.nullCount} />
+          <StatLine label="Null %" value={`${np.toFixed(1)}%`} />
           <div className="h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
             <div className={`h-full rounded-full ${nullColor(np)} transition-all duration-500`} style={{ width: `${Math.max(100 - np, 0)}%` }} />
           </div>
@@ -149,32 +151,32 @@ function ExpandedDetail({ col, tableName, rowCount }: { col: ColumnProfile; tabl
         {/* Cardinality */}
         <div className="space-y-1.5">
           <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-semibold">Cardinality</p>
-          <Stat label="Unique values" value={col.uniqueCount} />
-          <Stat label="Cardinality" value={`${card.toFixed(1)}%`} />
+          <StatLine label="Unique values" value={col.uniqueCount} />
+          <StatLine label="Cardinality" value={`${card.toFixed(1)}%`} />
         </div>
         {/* Type-specific */}
         <div className="space-y-1.5">
           {col.type === "number" && (
             <>
               <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-semibold">Numeric Stats</p>
-              {col.min !== undefined && <Stat label="Min" value={col.min as number} />}
-              {col.max !== undefined && <Stat label="Max" value={col.max as number} />}
-              {col.mean !== undefined && <Stat label="Mean" value={Number(col.mean.toFixed(2))} />}
-              {col.median !== undefined && <Stat label="Median" value={Number(col.median.toFixed(2))} />}
-              <Stat label="Std Dev" value={loading ? "..." : stddev != null ? stddev : "--"} />
+              {col.min !== undefined && <StatLine label="Min" value={col.min as number} />}
+              {col.max !== undefined && <StatLine label="Max" value={col.max as number} />}
+              {col.mean !== undefined && <StatLine label="Mean" value={Number(col.mean.toFixed(2))} />}
+              {col.median !== undefined && <StatLine label="Median" value={Number(col.median.toFixed(2))} />}
+              <StatLine label="Std Dev" value={loading ? "..." : stddev != null ? stddev : "--"} />
             </>
           )}
           {col.type === "date" && (
             <>
               <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-semibold">Date Range</p>
-              {col.min !== undefined && <Stat label="Min date" value={String(col.min)} />}
-              {col.max !== undefined && <Stat label="Max date" value={String(col.max)} />}
+              {col.min !== undefined && <StatLine label="Min date" value={String(col.min)} />}
+              {col.max !== undefined && <StatLine label="Max date" value={String(col.max)} />}
             </>
           )}
           {col.type !== "number" && col.type !== "date" && (
             <>
               <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-semibold">Details</p>
-              <Stat label="Unique values" value={col.uniqueCount} />
+              <StatLine label="Unique values" value={col.uniqueCount} />
             </>
           )}
         </div>
@@ -199,8 +201,8 @@ function ExpandedDetail({ col, tableName, rowCount }: { col: ColumnProfile; tabl
 /* ------------------------------------------------------------------ */
 /*  Sortable table header                                              */
 /* ------------------------------------------------------------------ */
-function SortHeader({ label, sortKey, currentKey, currentDir, onSort, align = "left" }: {
-  label: string; sortKey: SortKey; currentKey: SortKey; currentDir: SortDir;
+function SortHeader({ label, sortKey, currentKey, onSort, align = "left" }: {
+  label: string; sortKey: SortKey; currentKey: SortKey;
   onSort: (k: SortKey) => void; align?: "left" | "right";
 }) {
   const active = currentKey === sortKey;
@@ -305,10 +307,10 @@ export default function SchemaViewer({ tableName, columns, rowCount }: SchemaVie
           <thead>
             <tr className="bg-gray-50 dark:bg-gray-800/60">
               <th className="w-8" />
-              <SortHeader label="Column" sortKey="name" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-              <SortHeader label="Type" sortKey="type" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-              <SortHeader label="Null %" sortKey="nullPct" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} align="right" />
-              <SortHeader label="Cardinality" sortKey="cardinality" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} align="right" />
+              <SortHeader label="Column" sortKey="name" currentKey={sortKey} onSort={handleSort} />
+              <SortHeader label="Type" sortKey="type" currentKey={sortKey} onSort={handleSort} />
+              <SortHeader label="Null %" sortKey="nullPct" currentKey={sortKey} onSort={handleSort} align="right" />
+              <SortHeader label="Cardinality" sortKey="cardinality" currentKey={sortKey} onSort={handleSort} align="right" />
               <th className="px-4 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-left">Samples</th>
             </tr>
           </thead>

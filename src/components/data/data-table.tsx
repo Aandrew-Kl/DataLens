@@ -338,9 +338,11 @@ export default function DataTable({
   const endRow = Math.min(safePage * pageSize, totalRows);
 
   // Reset to page 1 when search changes
-  useEffect(() => {
+  const [prevSearch, setPrevSearch] = useState(debouncedSearch);
+  if (debouncedSearch !== prevSearch) {
+    setPrevSearch(debouncedSearch);
     setCurrentPage(1);
-  }, [debouncedSearch]);
+  }
 
   // ---- Handlers ----
   const handleSort = useCallback(

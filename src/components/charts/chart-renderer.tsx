@@ -300,11 +300,9 @@ function buildOption(
 }
 
 export default function ChartRenderer({ config, data }: ChartRendererProps) {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(() => isDarkMode());
 
   useEffect(() => {
-    setDark(isDarkMode());
-
     const observer = new MutationObserver(() => {
       setDark(isDarkMode());
     });
