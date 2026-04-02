@@ -27,10 +27,10 @@ function omitMotionProps(props: Record<string, unknown>) {
   );
 }
 
-function createMotionComponent(tag: React.ElementType) {
+function createMotionComponent(tag: string) {
   const MotionComponent = React.forwardRef<HTMLElement, Record<string, unknown>>(
     ({ children, ...props }, ref) =>
-      React.createElement(tag, { ...omitMotionProps(props), ref }, children),
+      React.createElement(tag as string, { ...omitMotionProps(props), ref }, children as React.ReactNode),
   );
 
   MotionComponent.displayName = `MockMotion(${
@@ -43,7 +43,7 @@ function createMotionComponent(tag: React.ElementType) {
 export const motion = new Proxy(
   {},
   {
-    get: (_target, tag: string) => createMotionComponent(tag),
+    get: (_target, tag: string | symbol) => createMotionComponent(String(tag)),
   },
 ) as Record<string, React.ComponentType<Record<string, unknown>>>;
 

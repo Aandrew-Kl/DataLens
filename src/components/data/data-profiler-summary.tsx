@@ -3,6 +3,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore,
   type ElementType,
@@ -108,13 +109,14 @@ function useDarkMode() {
 
 function useCountUp(target: number, duration = 900) {
   const [value, setValue] = useState(0);
+  const previousTargetRef = useRef(0);
 
   useEffect(() => {
     let frame = 0;
     let startTime = 0;
-
-    const previous = value;
+    const previous = previousTargetRef.current;
     const delta = target - previous;
+    previousTargetRef.current = target;
 
     function tick(timestamp: number) {
       if (!startTime) startTime = timestamp;
@@ -470,7 +472,7 @@ export default function DataProfilerSummary({
     if (!metrics) return "";
 
     const dominantSegment =
-      typeDistribution.sort((left, right) => right.count - left.count)[0]?.label.toLowerCase() ?? "mixed";
+      [...typeDistribution].sort((left, right) => right.count - left.count)[0]?.label.toLowerCase() ?? "mixed";
     const completenessText = formatPercent(metrics.completeness, 1);
     const outlierText =
       metrics.outlierColumns === 0
