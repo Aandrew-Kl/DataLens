@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  ci:
+  frontend:
     runs-on: ubuntu-latest
 
     steps:
@@ -41,3 +41,25 @@ jobs:
 
       - name: Run build
         run: npm run build
+
+  backend:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: sqlite+aiosqlite:///./test.db
+      JWT_SECRET: ci-test-secret
+      OLLAMA_URL: http://localhost:11434
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Run backend tests
+        run: cd backend && python -m pytest tests/ -v --tb=short
