@@ -301,6 +301,19 @@ function firstStatementToken(tokens: Token[]): Token | null {
   return tokens.find((token) => token.type === "word" || token.type === "quoted") ?? null;
 }
 
+function skipTableModifiers(tokens: Token[], start: number): number {
+  let cursor = start;
+
+  while (
+    tokens[cursor]?.type === "word" &&
+    ["IF", "NOT", "EXISTS", "ONLY"].includes(tokens[cursor].upper ?? "")
+  ) {
+    cursor += 1;
+  }
+
+  return cursor;
+}
+
 export function validateSQL(sql: string): {
   valid: boolean;
   errors: ValidationError[];
@@ -396,7 +409,7 @@ export function extractTableNames(sql: string): string[] {
     }
 
     if (upper === "TABLE" && tokens[index - 1]?.upper === "CREATE") {
-      const maybeIdentifier = readIdentifier(tokens, index + 1);
+      const maybeIdentifier = readIdentifier(tokens, skipTableModifiers(tokens, index + 1));
       if (maybeIdentifier?.name) {
         tables.add(maybeIdentifier.name);
         index = maybeIdentifier.nextIndex - 1;
@@ -405,7 +418,7 @@ export function extractTableNames(sql: string): string[] {
     }
 
     if (upper === "TABLE" && (tokens[index - 1]?.upper === "DROP" || tokens[index - 1]?.upper === "ALTER")) {
-      const maybeIdentifier = readIdentifier(tokens, index + 1);
+      const maybeIdentifier = readIdentifier(tokens, skipTableModifiers(tokens, index + 1));
       if (maybeIdentifier?.name) {
         tables.add(maybeIdentifier.name);
         index = maybeIdentifier.nextIndex - 1;

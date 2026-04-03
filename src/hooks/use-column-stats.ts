@@ -58,6 +58,10 @@ function quoteIdentifier(value: string): string {
 }
 
 function toNumber(value: unknown): number | null {
+  if (value == null) {
+    return null;
+  }
+
   if (typeof value === "number") {
     return Number.isFinite(value) ? value : null;
   }
