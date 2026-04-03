@@ -21,6 +21,10 @@ jest.mock("@/lib/utils/export", () => ({
   exportToCSV: jest.fn(),
 }));
 
+jest.mock("@/lib/api/ml", () => ({
+  regression: jest.fn().mockRejectedValue(new Error("no backend")),
+}));
+
 jest.mock("echarts-for-react/lib/core", () => {
   const React = jest.requireActual<typeof import("react")>("react");
   return {
@@ -145,7 +149,7 @@ describe("RegressionView", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("Linear regression fitted on 3 rows."),
+        screen.getByText("Linear regression fitted on 3 rows (client-side)."),
       ).toBeInTheDocument();
     });
 
@@ -169,7 +173,7 @@ describe("RegressionView", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("Linear regression fitted on 3 rows."),
+        screen.getByText("Linear regression fitted on 3 rows (client-side)."),
       ).toBeInTheDocument();
     });
 

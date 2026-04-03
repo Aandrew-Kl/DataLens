@@ -21,6 +21,10 @@ jest.mock("@/lib/utils/export", () => ({
   exportToCSV: jest.fn(),
 }));
 
+jest.mock("@/lib/api/ml", () => ({
+  cluster: jest.fn().mockRejectedValue(new Error("no backend")),
+}));
+
 jest.mock("echarts-for-react/lib/core", () => {
   const React = jest.requireActual<typeof import("react")>("react");
   return {
@@ -140,7 +144,7 @@ describe("ClusteringView", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("K-means completed with 2 clusters."),
+        screen.getByText("K-means completed with 2 clusters (client-side)."),
       ).toBeInTheDocument();
     });
 
@@ -161,7 +165,7 @@ describe("ClusteringView", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("K-means completed with 2 clusters."),
+        screen.getByText("K-means completed with 2 clusters (client-side)."),
       ).toBeInTheDocument();
     });
 

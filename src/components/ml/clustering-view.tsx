@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import * as echarts from "echarts/core";
 import type { EChartsOption } from "echarts";
@@ -15,14 +15,17 @@ import { motion } from "framer-motion";
 import {
   Download,
   Loader2,
+  Monitor,
   Orbit,
   Play,
+  Server,
   Sigma,
   Sparkles,
 } from "lucide-react";
 import { exportToCSV } from "@/lib/utils/export";
 import { formatNumber } from "@/lib/utils/formatters";
 import { runQuery } from "@/lib/duckdb/client";
+import { cluster as apiCluster } from "@/lib/api/ml";
 import type { ColumnProfile } from "@/types/dataset";
 
 echarts.use([ScatterChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);
@@ -258,6 +261,8 @@ export default function ClusteringView({ tableName, columns }: ClusteringViewPro
   const [minPts, setMinPts] = useState(5);
   const [points, setPoints] = useState<ClusterPoint[]>([]);
   const [summaries, setSummaries] = useState<ClusterSummary[]>([]);
+  const [useBackend, setUseBackend] = useState(true);
+  const [backendFailed, setBackendFailed] = useState(false);
   const [status, setStatus] = useState("Pick 2-3 numeric columns and run clustering.");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -490,6 +495,56 @@ export default function ClusteringView({ tableName, columns }: ClusteringViewPro
     };
   }
 
+  const fetchSamplesForBackend = useCallback(async () => {
+    const whereClause = selectedColumns
+      .map((column) => `${quoteIdentifier(column)} IS NOT NULL`)
+      .join(" AND ");
+
+    const sampleRows = await runQuery(
+      `SELECT ${selectedColumns.map((column) => `CAST(${quoteIdentifier(column)} AS DOUBLE) AS ${quoteIdentifier(column)}`).join(", ")}
+       FROM ${quoteIdentifier(tableName)}
+       WHERE ${whereClause}
+       LIMIT 1500`,
+    );
+    return sampleRows.map((row) =>
+      Object.fromEntries(selectedColumns.map((column) => [column, toNumber(row[column])])),
+    );
+  }, [tableName, selectedColumns]);
+
+  async function runClusteringClientSide() {
+    const tempSource = createTempName("cluster_source");
+    const dimensions = selectedColumns.length;
+    const selectColumns = selectedColumns
+      .map((column, index) => `CAST(${quoteIdentifier(column)} AS DOUBLE) AS f${index + 1}`)
+      .join(", ");
+    const whereClause = selectedColumns
+      .map((column) => `${quoteIdentifier(column)} IS NOT NULL`)
+      .join(" AND ");
+
+    await runQuery(
+      `CREATE OR REPLACE TEMP TABLE ${quoteIdentifier(tempSource)} AS
+       SELECT
+         ROW_NUMBER() OVER () AS point_id,
+         ${selectColumns}
+       FROM ${quoteIdentifier(tableName)}
+       WHERE ${whereClause}
+       LIMIT 1500`,
+    );
+
+    const result =
+      algorithm === "kmeans"
+        ? await runKMeans(tempSource, dimensions)
+        : await runDbscan(tempSource, dimensions);
+
+    setPoints(result.points);
+    setSummaries(result.summaries);
+    setStatus(
+      algorithm === "kmeans"
+        ? `K-means completed with ${result.summaries.length} clusters (client-side).`
+        : `DBSCAN completed with ${result.summaries.filter((summary) => summary.clusterId !== -1).length} dense regions (client-side).`,
+    );
+  }
+
   async function runClustering() {
     if (selectedColumns.length < 2 || selectedColumns.length > 3) {
       setError("Select exactly 2 or 3 numeric columns for clustering.");
@@ -500,37 +555,59 @@ export default function ClusteringView({ tableName, columns }: ClusteringViewPro
     setError(null);
 
     try {
-      const tempSource = createTempName("cluster_source");
-      const dimensions = selectedColumns.length;
-      const selectColumns = selectedColumns
-        .map((column, index) => `CAST(${quoteIdentifier(column)} AS DOUBLE) AS f${index + 1}`)
-        .join(", ");
-      const whereClause = selectedColumns
-        .map((column) => `${quoteIdentifier(column)} IS NOT NULL`)
-        .join(" AND ");
+      if (useBackend && !backendFailed) {
+        try {
+          const rawSamples = await fetchSamplesForBackend();
+          const apiResult = await apiCluster(rawSamples, selectedColumns, algorithm, kValue);
+          const dimensions = selectedColumns.length;
 
-      await runQuery(
-        `CREATE OR REPLACE TEMP TABLE ${quoteIdentifier(tempSource)} AS
-         SELECT
-           ROW_NUMBER() OVER () AS point_id,
-           ${selectColumns}
-         FROM ${quoteIdentifier(tableName)}
-         WHERE ${whereClause}
-         LIMIT 1500`,
-      );
+          const nextPoints: ClusterPoint[] = rawSamples.map((row, index) => ({
+            pointId: index,
+            clusterId: apiResult.labels[index] ?? -1,
+            values: selectedColumns.map((column) => toNumber(row[column])),
+          }));
 
-      const result =
-        algorithm === "kmeans"
-          ? await runKMeans(tempSource, dimensions)
-          : await runDbscan(tempSource, dimensions);
+          const grouped = new Map<number, ClusterPoint[]>();
+          nextPoints.forEach((point) => {
+            const bucket = grouped.get(point.clusterId) ?? [];
+            bucket.push(point);
+            grouped.set(point.clusterId, bucket);
+          });
 
-      setPoints(result.points);
-      setSummaries(result.summaries);
-      setStatus(
-        algorithm === "kmeans"
-          ? `K-means completed with ${result.summaries.length} clusters.`
-          : `DBSCAN completed with ${result.summaries.filter((summary) => summary.clusterId !== -1).length} dense regions.`,
-      );
+          const nextSummaries: ClusterSummary[] = Array.from(grouped.entries())
+            .map(([clusterId, clusterPoints]) => {
+              const centroid = Array.from({ length: dimensions }, (_, dimIdx) => {
+                const sum = clusterPoints.reduce((acc, p) => acc + (p.values[dimIdx] ?? 0), 0);
+                return sum / Math.max(clusterPoints.length, 1);
+              });
+              const variance =
+                clusterPoints.reduce((acc, point) => {
+                  const distSq = centroid.reduce((dist, val, dimIdx) => {
+                    const delta = (point.values[dimIdx] ?? 0) - val;
+                    return dist + delta * delta;
+                  }, 0);
+                  return acc + distSq;
+                }, 0) / Math.max(clusterPoints.length, 1);
+
+              return { clusterId, size: clusterPoints.length, withinClusterVariance: variance, centroid };
+            })
+            .sort((l, r) => l.clusterId - r.clusterId);
+
+          setPoints(nextPoints);
+          setSummaries(nextSummaries);
+          setStatus(
+            algorithm === "kmeans"
+              ? `K-means completed with ${nextSummaries.length} clusters (server-side).`
+              : `DBSCAN completed with ${nextSummaries.filter((s) => s.clusterId !== -1).length} dense regions (server-side).`,
+          );
+          return;
+        } catch {
+          setBackendFailed(true);
+          setUseBackend(false);
+        }
+      }
+
+      await runClusteringClientSide();
     } catch (clusterError) {
       setError(clusterError instanceof Error ? clusterError.message : "Clustering failed.");
     } finally {
@@ -567,9 +644,37 @@ export default function ClusteringView({ tableName, columns }: ClusteringViewPro
           </div>
         </div>
 
-        <div className="rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
-          {status}
+        <div className="flex items-center gap-3">
+          <label className="flex cursor-pointer items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
+            <input
+              type="checkbox"
+              checked={useBackend}
+              onChange={(event) => {
+                setUseBackend(event.target.checked);
+                if (event.target.checked) setBackendFailed(false);
+              }}
+              className="h-4 w-4 rounded accent-cyan-500"
+            />
+            Use server-side ML
+          </label>
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
+              useBackend && !backendFailed
+                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                : "bg-amber-500/10 text-amber-700 dark:text-amber-300"
+            }`}
+          >
+            {useBackend && !backendFailed ? (
+              <><Server className="h-3 w-3" /> Backend</>
+            ) : (
+              <><Monitor className="h-3 w-3" /> Client-side</>
+            )}
+          </span>
         </div>
+      </div>
+
+      <div className="rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 mt-4 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
+        {status}
       </div>
 
       {error ? (

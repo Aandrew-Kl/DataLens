@@ -10,6 +10,7 @@ import { CanvasRenderer } from "echarts/renderers";
 import { motion } from "framer-motion";
 import { AlertTriangle, Download, Loader2, ShieldAlert, Users } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
+import { churnPredict } from "@/lib/api/analytics";
 import { downloadFile } from "@/lib/utils/export";
 import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import {
@@ -102,7 +103,7 @@ function bandForRisk(score: number) {
   return "Low";
 }
 
-function computeChurnSnapshot(rows: Record<string, unknown>[]): ChurnSnapshot {
+function aggregateUserFeatures(rows: Record<string, unknown>[]) {
   const grouped = new Map<string, { lastSeen: Date; activityCount: number; engagementTotal: number }>();
   let referenceDate: Date | null = null;
 
@@ -134,6 +135,36 @@ function computeChurnSnapshot(rows: Record<string, unknown>[]): ChurnSnapshot {
   }
 
   if (!referenceDate) {
+    return { userRecords: [] as Array<{ userId: string; recency_days: number; avg_engagement: number; activity_count: number }>, featureData: [] as Record<string, unknown>[] };
+  }
+
+  const userRecords = Array.from(grouped.entries()).map(([userId, stats]) => {
+    const recencyDays = Math.max(
+      0,
+      Math.round((referenceDate.getTime() - stats.lastSeen.getTime()) / 86_400_000),
+    );
+    const avgEngagement = stats.engagementTotal / Math.max(stats.activityCount, 1);
+    return {
+      userId,
+      recency_days: recencyDays,
+      avg_engagement: avgEngagement,
+      activity_count: stats.activityCount,
+    };
+  });
+
+  const featureData = userRecords.map((record) => ({
+    recency_days: record.recency_days,
+    avg_engagement: record.avg_engagement,
+    activity_count: record.activity_count,
+  }));
+
+  return { userRecords, featureData };
+}
+
+async function computeChurnSnapshot(rows: Record<string, unknown>[]): Promise<ChurnSnapshot> {
+  const { userRecords, featureData } = aggregateUserFeatures(rows);
+
+  if (userRecords.length === 0) {
     return {
       users: [],
       distribution: RISK_BANDS.map((band) => ({ band, count: 0 })),
@@ -142,26 +173,23 @@ function computeChurnSnapshot(rows: Record<string, unknown>[]): ChurnSnapshot {
     };
   }
 
-  const users = Array.from(grouped.entries())
-    .map<ChurnUserRow>(([userId, stats]) => {
-      const recencyDays = Math.max(
-        0,
-        Math.round((referenceDate.getTime() - stats.lastSeen.getTime()) / 86_400_000),
-      );
-      const averageEngagement = stats.engagementTotal / Math.max(stats.activityCount, 1);
-      const recencyScore = Math.min(1, recencyDays / 45);
-      const engagementScore = 1 - Math.min(1, averageEngagement / 12);
-      const frequencyScore = 1 - Math.min(1, stats.activityCount / 10);
+  const features = ["recency_days", "avg_engagement", "activity_count"];
+
+  // Call the Python backend for real ML-based churn prediction
+  const apiResult = await churnPredict(featureData, features, "recency_days");
+
+  const users = userRecords
+    .map<ChurnUserRow>((record, index) => {
       const riskScore = Math.round(
-        (recencyScore * 0.5 + engagementScore * 0.3 + frequencyScore * 0.2) * 100,
+        Math.min(100, Math.max(0, (apiResult.risk_scores[index] ?? 0) * 100)),
       );
       const band = bandForRisk(riskScore);
 
       return {
-        userId,
-        recencyDays,
-        averageEngagement,
-        activityCount: stats.activityCount,
+        userId: record.userId,
+        recencyDays: record.recency_days,
+        averageEngagement: record.avg_engagement,
+        activityCount: record.activity_count,
         riskScore,
         band,
         churnIndicator: riskScore >= 60 ? "yes" : "no",
@@ -306,7 +334,7 @@ export default function ChurnPredictor({ tableName, columns }: ChurnPredictorPro
       const rows = await runQuery(
         buildQuery(tableName, userColumn, activityDateColumn, engagementColumn),
       );
-      const nextSnapshot = computeChurnSnapshot(rows);
+      const nextSnapshot = await computeChurnSnapshot(rows);
 
       startTransition(() => {
         setSnapshot(nextSnapshot);
@@ -314,8 +342,20 @@ export default function ChurnPredictor({ tableName, columns }: ChurnPredictorPro
           `Flagged ${nextSnapshot.atRiskCount} at-risk users from ${nextSnapshot.users.length} accounts.`,
         );
       });
-    } catch {
-      setStatus("Churn scoring failed. Verify the selected identifier and metrics.");
+    } catch (analysisError) {
+      if (
+        analysisError instanceof Error &&
+        (analysisError.message.includes("fetch") ||
+          analysisError.message.includes("Failed") ||
+          analysisError.message.includes("ECONNREFUSED") ||
+          analysisError.message.includes("NetworkError"))
+      ) {
+        setStatus(
+          "Could not reach the AI backend. Make sure the Python API server is running.",
+        );
+      } else {
+        setStatus("Churn scoring failed. Verify the selected identifier and metrics.");
+      }
     } finally {
       setIsLoading(false);
     }

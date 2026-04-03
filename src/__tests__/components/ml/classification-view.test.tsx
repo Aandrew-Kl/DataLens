@@ -14,6 +14,11 @@ jest.mock("@/lib/duckdb/client", () => ({
 jest.mock("@/lib/utils/export", () => ({
   downloadFile: jest.fn(),
 }));
+
+jest.mock("@/lib/api/ml", () => ({
+  classify: jest.fn().mockRejectedValue(new Error("no backend")),
+}));
+
 jest.mock("echarts-for-react/lib/core", () => {
   const React = jest.requireActual<typeof import("react")>("react");
   return {
@@ -121,7 +126,7 @@ describe("ClassificationView", () => {
     await user.click(screen.getByRole("button", { name: "Run analysis" }));
 
     expect(
-      await screen.findByText("Evaluated 6 holdout predictions across 2 classes."),
+      await screen.findByText("Evaluated 6 holdout predictions across 2 classes (client-side)."),
     ).toBeInTheDocument();
 
     const lastOption = chartPropsSpy.mock.calls.at(-1)?.[0]?.option as {
@@ -139,8 +144,8 @@ describe("ClassificationView", () => {
 
     await renderAsync();
     await user.click(screen.getByRole("button", { name: "Run analysis" }));
-    await screen.findByText("Evaluated 6 holdout predictions across 2 classes.");
-
+    await screen.findByText("Evaluated 6 holdout predictions across 2 classes (client-side).");
+    
     await user.click(screen.getByRole("button", { name: "Export CSV" }));
 
     expect(mockDownloadFile).toHaveBeenCalledWith(

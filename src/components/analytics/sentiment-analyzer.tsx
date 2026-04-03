@@ -10,6 +10,7 @@ import { CanvasRenderer } from "echarts/renderers";
 import { motion } from "framer-motion";
 import { Download, MessageSquareHeart, SmilePlus, Tags } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
+import { sentiment } from "@/lib/api/ai";
 import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import {
   ANALYTICS_EASE,
@@ -43,7 +44,7 @@ interface SentimentWord {
   tone: "positive" | "negative";
 }
 
-interface SentimentResult {
+interface LocalSentimentResult {
   rows: SentimentRow[];
   counts: {
     positive: number;
@@ -52,30 +53,6 @@ interface SentimentResult {
   };
   topWords: SentimentWord[];
 }
-
-const POSITIVE_WORDS = [
-  "great",
-  "excellent",
-  "love",
-  "happy",
-  "amazing",
-  "good",
-  "fast",
-  "clear",
-  "helpful",
-] as const;
-
-const NEGATIVE_WORDS = [
-  "bad",
-  "poor",
-  "hate",
-  "slow",
-  "broken",
-  "angry",
-  "confusing",
-  "bug",
-  "issue",
-] as const;
 
 function escapeCsv(value: unknown): string {
   const text = String(value ?? "");
@@ -88,64 +65,7 @@ function buildCsv(rows: SentimentRow[]): string {
   return [header, ...body].join("\n");
 }
 
-function tokenize(value: string): string[] {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]+/g, " ")
-    .split(/\s+/)
-    .filter((token) => token.length > 1);
-}
-
-function buildSentimentResult(values: string[]): SentimentResult {
-  const positiveSet = new Set(POSITIVE_WORDS);
-  const negativeSet = new Set(NEGATIVE_WORDS);
-  const wordCounts = new Map<string, SentimentWord>();
-
-  const rows = values.map<SentimentRow>((text) => {
-    const tokens = tokenize(text);
-    let score = 0;
-
-    for (const token of tokens) {
-      if (positiveSet.has(token)) {
-        score += 1;
-        wordCounts.set(token, {
-          word: token,
-          count: (wordCounts.get(token)?.count ?? 0) + 1,
-          tone: "positive",
-        });
-      }
-
-      if (negativeSet.has(token)) {
-        score -= 1;
-        wordCounts.set(token, {
-          word: token,
-          count: (wordCounts.get(token)?.count ?? 0) + 1,
-          tone: "negative",
-        });
-      }
-    }
-
-    return {
-      text,
-      score,
-      label: score > 0 ? "Positive" : score < 0 ? "Negative" : "Neutral",
-    };
-  });
-
-  return {
-    rows,
-    counts: {
-      positive: rows.filter((row) => row.label === "Positive").length,
-      negative: rows.filter((row) => row.label === "Negative").length,
-      neutral: rows.filter((row) => row.label === "Neutral").length,
-    },
-    topWords: [...wordCounts.values()]
-      .sort((left, right) => right.count - left.count || left.word.localeCompare(right.word))
-      .slice(0, 8),
-  };
-}
-
-function buildChartOption(result: SentimentResult | null, dark: boolean): EChartsOption {
+function buildChartOption(result: LocalSentimentResult | null, dark: boolean): EChartsOption {
   const borderColor = dark ? "#334155" : "#cbd5e1";
   const textColor = dark ? "#cbd5e1" : "#475569";
 
@@ -189,8 +109,8 @@ export default function SentimentAnalyzer({ tableName, columns }: SentimentAnaly
     [columns],
   );
   const [selectedColumn, setSelectedColumn] = useState(textColumns[0]?.name ?? "");
-  const [result, setResult] = useState<SentimentResult | null>(null);
-  const [status, setStatus] = useState("Pick a text column to score rows with a lightweight keyword sentiment model.");
+  const [result, setResult] = useState<LocalSentimentResult | null>(null);
+  const [status, setStatus] = useState("Pick a text column to score sentiment via the AI backend.");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -229,11 +149,73 @@ export default function SentimentAnalyzer({ tableName, columns }: SentimentAnaly
         throw new Error("The selected text column does not contain usable values.");
       }
 
-      const nextResult = buildSentimentResult(values);
+      const apiResult = await sentiment(values);
+
+      const sentimentRows: SentimentRow[] = apiResult.results.map((item) => ({
+        text: item.text,
+        score: item.polarity,
+        label:
+          item.label === "positive"
+            ? "Positive"
+            : item.label === "negative"
+              ? "Negative"
+              : "Neutral",
+      }));
+
+      const counts = {
+        positive: sentimentRows.filter((row) => row.label === "Positive").length,
+        negative: sentimentRows.filter((row) => row.label === "Negative").length,
+        neutral: sentimentRows.filter((row) => row.label === "Neutral").length,
+      };
+
+      // Extract top sentiment words from the analyzed texts by frequency
+      const wordCounts = new Map<string, SentimentWord>();
+      for (const item of apiResult.results) {
+        if (item.label === "positive" || item.label === "negative") {
+          const tone = item.label as "positive" | "negative";
+          const tokens = item.text
+            .toLowerCase()
+            .replace(/[^a-z0-9\s]+/g, " ")
+            .split(/\s+/)
+            .filter((token) => token.length > 2);
+          for (const token of tokens) {
+            const existing = wordCounts.get(token);
+            if (!existing) {
+              wordCounts.set(token, { word: token, count: 1, tone });
+            } else {
+              existing.count += 1;
+            }
+          }
+        }
+      }
+
+      const topWords = [...wordCounts.values()]
+        .sort((left, right) => right.count - left.count || left.word.localeCompare(right.word))
+        .slice(0, 8);
+
+      const nextResult: LocalSentimentResult = { rows: sentimentRows, counts, topWords };
       setResult(nextResult);
-      setStatus(`Scored ${formatNumber(nextResult.rows.length)} text rows across positive, neutral, and negative tones.`);
+      setStatus(
+        `Scored ${formatNumber(nextResult.rows.length)} text rows across positive, neutral, and negative tones (avg polarity: ${apiResult.avg_polarity.toFixed(2)}).`,
+      );
     } catch (analysisError) {
-      setError(analysisError instanceof Error ? analysisError.message : "Unable to analyze sentiment.");
+      if (
+        analysisError instanceof Error &&
+        (analysisError.message.includes("fetch") ||
+          analysisError.message.includes("Failed") ||
+          analysisError.message.includes("ECONNREFUSED") ||
+          analysisError.message.includes("NetworkError"))
+      ) {
+        setError(
+          "Could not reach the AI backend. Make sure the Python API server is running.",
+        );
+      } else {
+        setError(
+          analysisError instanceof Error
+            ? analysisError.message
+            : "Unable to analyze sentiment.",
+        );
+      }
     } finally {
       setLoading(false);
     }

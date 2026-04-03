@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import * as echarts from "echarts/core";
 import type { EChartsOption } from "echarts";
@@ -14,12 +14,15 @@ import {
   FunctionSquare,
   LineChart as LineChartIcon,
   Loader2,
+  Monitor,
   Play,
+  Server,
   Sigma,
 } from "lucide-react";
 import { exportToCSV } from "@/lib/utils/export";
 import { formatNumber } from "@/lib/utils/formatters";
 import { runQuery } from "@/lib/duckdb/client";
+import { regression as apiRegression } from "@/lib/api/ml";
 import type { ColumnProfile } from "@/types/dataset";
 
 echarts.use([LineChart, ScatterChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);
@@ -252,6 +255,8 @@ export default function RegressionView({ tableName, columns }: RegressionViewPro
   const [rSquared, setRSquared] = useState(0);
   const [anova, setAnova] = useState<AnovaSummary | null>(null);
   const [predictionInput, setPredictionInput] = useState("");
+  const [useBackend, setUseBackend] = useState(true);
+  const [backendFailed, setBackendFailed] = useState(false);
   const [status, setStatus] = useState("Choose X and Y numeric columns, then fit a model.");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -290,6 +295,89 @@ export default function RegressionView({ tableName, columns }: RegressionViewPro
     [dark, residualData, xColumn],
   );
 
+  async function runRegressionClientSide() {
+    const powerTerms = Array.from({ length: degree * 2 + 1 }, (_, index) => index);
+    const aggregateSql = `
+      SELECT
+        COUNT(*) AS row_count,
+        ${powerTerms.map((power) => `SUM(POWER(CAST(${quoteIdentifier(xColumn)} AS DOUBLE), ${power})) AS sx${power}`).join(",\n        ")},
+        ${Array.from({ length: degree + 1 }, (_, index) => `SUM(POWER(CAST(${quoteIdentifier(xColumn)} AS DOUBLE), ${index}) * CAST(${quoteIdentifier(yColumn)} AS DOUBLE)) AS sxy${index}`).join(",\n        ")}
+      FROM ${quoteIdentifier(tableName)}
+      WHERE ${quoteIdentifier(xColumn)} IS NOT NULL AND ${quoteIdentifier(yColumn)} IS NOT NULL
+    `;
+
+    const [aggregateRow] = await runQuery(aggregateSql);
+    const rowCount = Number(aggregateRow?.row_count ?? 0);
+
+    const normalMatrix = Array.from({ length: degree + 1 }, (_, row) =>
+      Array.from({ length: degree + 1 }, (_, column) => toNumber(aggregateRow?.[`sx${row + column}`])),
+    );
+    const rhsVector = Array.from({ length: degree + 1 }, (_, index) => toNumber(aggregateRow?.[`sxy${index}`]));
+    const nextCoefficients = solveLinearSystem(normalMatrix, rhsVector);
+
+    const sampleRows = await runQuery(
+      `SELECT
+         CAST(${quoteIdentifier(xColumn)} AS DOUBLE) AS x_value,
+         CAST(${quoteIdentifier(yColumn)} AS DOUBLE) AS y_value
+       FROM ${quoteIdentifier(tableName)}
+       WHERE ${quoteIdentifier(xColumn)} IS NOT NULL AND ${quoteIdentifier(yColumn)} IS NOT NULL
+       ORDER BY x_value
+       LIMIT 3000`,
+    );
+    const nextSamples = sampleRows.map((row) => ({
+      x: toNumber(row.x_value),
+      y: toNumber(row.y_value),
+    }));
+
+    const yMean = nextSamples.reduce((sum, sample) => sum + sample.y, 0) / Math.max(nextSamples.length, 1);
+    const sse = nextSamples.reduce((sum, sample) => {
+      const residual = sample.y - evaluatePolynomial(nextCoefficients, sample.x);
+      return sum + residual * residual;
+    }, 0);
+    const sst = nextSamples.reduce((sum, sample) => {
+      const delta = sample.y - yMean;
+      return sum + delta * delta;
+    }, 0);
+    const ssr = Math.max(sst - sse, 0);
+    const nextRSquared = sst === 0 ? 1 : 1 - sse / sst;
+    const dfModel = degree;
+    const dfResidual = Math.max(rowCount - degree - 1, 1);
+    const msr = ssr / Math.max(dfModel, 1);
+    const mse = sse / dfResidual;
+    const nextAnova: AnovaSummary = {
+      sst,
+      ssr,
+      sse,
+      dfModel,
+      dfResidual,
+      msr,
+      mse,
+      fStatistic: mse === 0 ? 0 : msr / mse,
+    };
+
+    setCoefficients(nextCoefficients);
+    setSamples(nextSamples);
+    setRSquared(nextRSquared);
+    setAnova(nextAnova);
+    setStatus(`${regressionType === "linear" ? "Linear" : `Polynomial degree ${degree}`} regression fitted on ${rowCount} rows (client-side).`);
+  }
+
+  const fetchSamplesForBackend = useCallback(async () => {
+    const sampleRows = await runQuery(
+      `SELECT
+         CAST(${quoteIdentifier(xColumn)} AS DOUBLE) AS x_value,
+         CAST(${quoteIdentifier(yColumn)} AS DOUBLE) AS y_value
+       FROM ${quoteIdentifier(tableName)}
+       WHERE ${quoteIdentifier(xColumn)} IS NOT NULL AND ${quoteIdentifier(yColumn)} IS NOT NULL
+       ORDER BY x_value
+       LIMIT 3000`,
+    );
+    return sampleRows.map((row) => ({
+      [xColumn]: toNumber(row.x_value),
+      [yColumn]: toNumber(row.y_value),
+    }));
+  }, [tableName, xColumn, yColumn]);
+
   async function runRegression() {
     if (!xColumn || !yColumn || xColumn === yColumn) {
       setError("Pick two distinct numeric columns.");
@@ -300,70 +388,74 @@ export default function RegressionView({ tableName, columns }: RegressionViewPro
     setError(null);
 
     try {
-      const powerTerms = Array.from({ length: degree * 2 + 1 }, (_, index) => index);
-      const aggregateSql = `
-        SELECT
-          COUNT(*) AS row_count,
-          ${powerTerms.map((power) => `SUM(POWER(CAST(${quoteIdentifier(xColumn)} AS DOUBLE), ${power})) AS sx${power}`).join(",\n          ")},
-          ${Array.from({ length: degree + 1 }, (_, index) => `SUM(POWER(CAST(${quoteIdentifier(xColumn)} AS DOUBLE), ${index}) * CAST(${quoteIdentifier(yColumn)} AS DOUBLE)) AS sxy${index}`).join(",\n          ")}
-        FROM ${quoteIdentifier(tableName)}
-        WHERE ${quoteIdentifier(xColumn)} IS NOT NULL AND ${quoteIdentifier(yColumn)} IS NOT NULL
-      `;
+      if (useBackend && !backendFailed) {
+        try {
+          const rawSamples = await fetchSamplesForBackend();
+          const methodMap: Record<string, string> = {
+            linear: "linear",
+            poly2: "polynomial_2",
+            poly3: "polynomial_3",
+            poly4: "polynomial_4",
+            poly5: "polynomial_5",
+          };
+          const apiResult = await apiRegression(
+            rawSamples,
+            yColumn,
+            [xColumn],
+            methodMap[regressionType] ?? "linear",
+          );
 
-      const [aggregateRow] = await runQuery(aggregateSql);
-      const rowCount = Number(aggregateRow?.row_count ?? 0);
+          const nextSamples = rawSamples.map((row) => ({
+            x: row[xColumn] as number,
+            y: row[yColumn] as number,
+          }));
 
-      const normalMatrix = Array.from({ length: degree + 1 }, (_, row) =>
-        Array.from({ length: degree + 1 }, (_, column) => toNumber(aggregateRow?.[`sx${row + column}`])),
-      );
-      const rhsVector = Array.from({ length: degree + 1 }, (_, index) => toNumber(aggregateRow?.[`sxy${index}`]));
-      const nextCoefficients = solveLinearSystem(normalMatrix, rhsVector);
+          const nextCoefficients: number[] = [];
+          nextCoefficients[0] = apiResult.intercept;
+          for (let d = 1; d <= degree; d += 1) {
+            const key = d === 1 ? xColumn : `${xColumn}^${d}`;
+            nextCoefficients[d] = apiResult.coefficients[key] ?? apiResult.coefficients[xColumn] ?? 0;
+          }
 
-      const sampleRows = await runQuery(
-        `SELECT
-           CAST(${quoteIdentifier(xColumn)} AS DOUBLE) AS x_value,
-           CAST(${quoteIdentifier(yColumn)} AS DOUBLE) AS y_value
-         FROM ${quoteIdentifier(tableName)}
-         WHERE ${quoteIdentifier(xColumn)} IS NOT NULL AND ${quoteIdentifier(yColumn)} IS NOT NULL
-         ORDER BY x_value
-         LIMIT 3000`,
-      );
-      const nextSamples = sampleRows.map((row) => ({
-        x: toNumber(row.x_value),
-        y: toNumber(row.y_value),
-      }));
+          const yMean = nextSamples.reduce((s, p) => s + p.y, 0) / Math.max(nextSamples.length, 1);
+          const sse = nextSamples.reduce((s, p) => {
+            const r = p.y - evaluatePolynomial(nextCoefficients, p.x);
+            return s + r * r;
+          }, 0);
+          const sst = nextSamples.reduce((s, p) => {
+            const d = p.y - yMean;
+            return s + d * d;
+          }, 0);
+          const ssr = Math.max(sst - sse, 0);
+          const dfModel = degree;
+          const dfResidual = Math.max(nextSamples.length - degree - 1, 1);
+          const msr = ssr / Math.max(dfModel, 1);
+          const mse = sse / dfResidual;
 
-      const yMean = nextSamples.reduce((sum, sample) => sum + sample.y, 0) / Math.max(nextSamples.length, 1);
-      const sse = nextSamples.reduce((sum, sample) => {
-        const residual = sample.y - evaluatePolynomial(nextCoefficients, sample.x);
-        return sum + residual * residual;
-      }, 0);
-      const sst = nextSamples.reduce((sum, sample) => {
-        const delta = sample.y - yMean;
-        return sum + delta * delta;
-      }, 0);
-      const ssr = Math.max(sst - sse, 0);
-      const nextRSquared = sst === 0 ? 1 : 1 - sse / sst;
-      const dfModel = degree;
-      const dfResidual = Math.max(rowCount - degree - 1, 1);
-      const msr = ssr / Math.max(dfModel, 1);
-      const mse = sse / dfResidual;
-      const nextAnova: AnovaSummary = {
-        sst,
-        ssr,
-        sse,
-        dfModel,
-        dfResidual,
-        msr,
-        mse,
-        fStatistic: mse === 0 ? 0 : msr / mse,
-      };
+          setCoefficients(nextCoefficients);
+          setSamples(nextSamples);
+          setRSquared(apiResult.r2);
+          setAnova({
+            sst,
+            ssr,
+            sse,
+            dfModel,
+            dfResidual,
+            msr,
+            mse,
+            fStatistic: mse === 0 ? 0 : msr / mse,
+          });
+          setStatus(
+            `${regressionType === "linear" ? "Linear" : `Polynomial degree ${degree}`} regression fitted on ${nextSamples.length} rows (server-side).`,
+          );
+          return;
+        } catch {
+          setBackendFailed(true);
+          setUseBackend(false);
+        }
+      }
 
-      setCoefficients(nextCoefficients);
-      setSamples(nextSamples);
-      setRSquared(nextRSquared);
-      setAnova(nextAnova);
-      setStatus(`${regressionType === "linear" ? "Linear" : `Polynomial degree ${degree}`} regression fitted on ${rowCount} rows.`);
+      await runRegressionClientSide();
     } catch (regressionError) {
       setError(regressionError instanceof Error ? regressionError.message : "Regression failed.");
     } finally {
@@ -399,9 +491,37 @@ export default function RegressionView({ tableName, columns }: RegressionViewPro
           </div>
         </div>
 
-        <div className="rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
-          {status}
+        <div className="flex items-center gap-3">
+          <label className="flex cursor-pointer items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
+            <input
+              type="checkbox"
+              checked={useBackend}
+              onChange={(event) => {
+                setUseBackend(event.target.checked);
+                if (event.target.checked) setBackendFailed(false);
+              }}
+              className="h-4 w-4 rounded accent-cyan-500"
+            />
+            Use server-side ML
+          </label>
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
+              useBackend && !backendFailed
+                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                : "bg-amber-500/10 text-amber-700 dark:text-amber-300"
+            }`}
+          >
+            {useBackend && !backendFailed ? (
+              <><Server className="h-3 w-3" /> Backend</>
+            ) : (
+              <><Monitor className="h-3 w-3" /> Client-side</>
+            )}
+          </span>
         </div>
+      </div>
+
+      <div className="rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 mt-4 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
+        {status}
       </div>
 
       {error ? (

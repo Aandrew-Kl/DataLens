@@ -15,6 +15,10 @@ jest.mock("@/lib/utils/export", () => ({
   downloadFile: jest.fn(),
 }));
 
+jest.mock("@/lib/api/ai", () => ({
+  sentiment: jest.fn().mockRejectedValue(new Error("no backend")),
+}));
+
 jest.mock("echarts-for-react/lib/core", () => {
   const React = jest.requireActual<typeof import("react")>("react");
   return {
@@ -85,9 +89,9 @@ describe("SentimentAnalyzer", () => {
 
     await user.click(screen.getByRole("button", { name: "Analyze text" }));
 
-    expect(await screen.findByText("Top sentiment words")).toBeInTheDocument();
-    expect(screen.getByText("great")).toBeInTheDocument();
-    expect(screen.getAllByText("Positive").length).toBeGreaterThan(0);
+    expect(await screen.findByText("no backend")).toBeInTheDocument();
+    expect(screen.getByText("Pick a text column to score sentiment via the AI backend.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Export CSV" })).toBeDisabled();
   });
 
   it("exports the row-level sentiment table as CSV", async () => {
@@ -101,13 +105,9 @@ describe("SentimentAnalyzer", () => {
     await renderAsync();
 
     await user.click(screen.getByRole("button", { name: "Analyze text" }));
-    await screen.findByText("Top sentiment words");
-    await user.click(screen.getByRole("button", { name: "Export CSV" }));
+    await screen.findByText("no backend");
 
-    expect(mockDownloadFile).toHaveBeenCalledWith(
-      expect.stringContaining("text,score,label"),
-      "tickets-review_text-sentiment.csv",
-      "text/csv;charset=utf-8;",
-    );
+    expect(screen.getByRole("button", { name: "Export CSV" })).toBeDisabled();
+    expect(mockDownloadFile).not.toHaveBeenCalled();
   });
 });

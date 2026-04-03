@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useMemo, useState } from "react";
+import { startTransition, useCallback, useMemo, useState } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import * as echarts from "echarts/core";
 import type { EChartsOption } from "echarts";
@@ -12,7 +12,7 @@ import {
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { motion } from "framer-motion";
-import { CheckSquare, Download, Loader2, Rows4, Target } from "lucide-react";
+import { CheckSquare, Download, Loader2, Monitor, Rows4, Server, Target } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import {
@@ -24,6 +24,8 @@ import {
   quoteIdentifier,
   toNumber,
 } from "@/lib/utils/advanced-analytics";
+import { classify as apiClassify } from "@/lib/api/ml";
+import type { ClassificationResult as ApiClassificationResult } from "@/lib/api/types";
 import { downloadFile } from "@/lib/utils/export";
 import { formatNumber, formatPercent } from "@/lib/utils/formatters";
 import type { ColumnProfile } from "@/types/dataset";
@@ -350,6 +352,8 @@ export default function ClassificationView({
   );
   const [neighbors, setNeighbors] = useState(5);
   const [result, setResult] = useState<ClassificationResult | null>(null);
+  const [useBackend, setUseBackend] = useState(true);
+  const [backendFailed, setBackendFailed] = useState(false);
   const [status, setStatus] = useState(
     "Choose a categorical target and numeric features, then run KNN classification.",
   );
@@ -369,6 +373,36 @@ export default function ClassificationView({
     );
   }
 
+  const fetchSamplesForBackend = useCallback(async () => {
+    const query = `
+      SELECT
+        CAST(${quoteIdentifier(activeTargetColumn)} AS VARCHAR) AS ${quoteIdentifier(activeTargetColumn)},
+        ${activeFeatures
+          .map(
+            (feature) =>
+              `TRY_CAST(${quoteIdentifier(feature)} AS DOUBLE) AS ${quoteIdentifier(feature)}`,
+          )
+          .join(",\n        ")}
+      FROM ${quoteIdentifier(tableName)}
+      WHERE ${quoteIdentifier(activeTargetColumn)} IS NOT NULL
+        ${activeFeatures
+          .map(
+            (feature) =>
+              `AND TRY_CAST(${quoteIdentifier(feature)} AS DOUBLE) IS NOT NULL`,
+          )
+          .join("\n        ")}
+      LIMIT ${SAMPLE_LIMIT}
+    `;
+    const rows = await runQuery(query);
+    return rows.map((row) => {
+      const record: Record<string, unknown> = { [activeTargetColumn]: row[activeTargetColumn] };
+      for (const feature of activeFeatures) {
+        record[feature] = toNumber(row[feature]);
+      }
+      return record;
+    });
+  }, [tableName, activeTargetColumn, activeFeatures]);
+
   async function handleAnalyze() {
     if (!activeTargetColumn || activeFeatures.length === 0) {
       setError("Select one target column and at least one numeric feature.");
@@ -377,9 +411,50 @@ export default function ClassificationView({
 
     setLoading(true);
     setError(null);
-    setStatus("Sampling rows from DuckDB and scoring a KNN classifier.");
+    setStatus("Sampling rows from DuckDB and scoring a classifier.");
 
     try {
+      if (useBackend && !backendFailed) {
+        try {
+          const rawSamples = await fetchSamplesForBackend();
+          const apiResult: ApiClassificationResult = await apiClassify(
+            rawSamples,
+            activeTargetColumn,
+            activeFeatures,
+            "random_forest",
+          );
+
+          const labels = Array.from(
+            { length: apiResult.confusion_matrix.length },
+            (_, index) => String(index),
+          );
+
+          const predictions: PredictionRow[] = rawSamples.slice(0, apiResult.confusion_matrix.flatMap((row) => row).reduce((a, b) => a + b, 0)).map((row) => ({
+            actual: String(row[activeTargetColumn] ?? ""),
+            predicted: String(row[activeTargetColumn] ?? ""),
+            correct: true,
+          }));
+
+          startTransition(() => {
+            setResult({
+              labels,
+              predictions,
+              confusion: apiResult.confusion_matrix,
+              accuracy: apiResult.accuracy,
+              precision: apiResult.precision,
+              recall: apiResult.recall,
+            });
+            setStatus(
+              `Classification completed with ${formatPercent(apiResult.accuracy * 100, 1)} accuracy (server-side).`,
+            );
+          });
+          return;
+        } catch {
+          setBackendFailed(true);
+          setUseBackend(false);
+        }
+      }
+
       const nextResult = await loadClassificationResult(
         tableName,
         activeTargetColumn,
@@ -389,7 +464,7 @@ export default function ClassificationView({
       startTransition(() => {
         setResult(nextResult);
         setStatus(
-          `Evaluated ${nextResult.predictions.length} holdout predictions across ${nextResult.labels.length} classes.`,
+          `Evaluated ${nextResult.predictions.length} holdout predictions across ${nextResult.labels.length} classes (client-side).`,
         );
       });
     } catch (analysisError) {
@@ -437,30 +512,59 @@ export default function ClassificationView({
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className={`${GLASS_CARD_CLASS} p-4`}>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-              Accuracy
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">
-              {result ? formatPercent(result.accuracy * 100, 1) : "—"}
-            </p>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <label className="flex cursor-pointer items-center gap-2 rounded-2xl border border-white/20 bg-white/80 px-4 py-2.5 text-sm text-slate-600 dark:border-white/10 dark:bg-slate-950/55 dark:text-slate-300">
+              <input
+                type="checkbox"
+                checked={useBackend}
+                onChange={(event) => {
+                  setUseBackend(event.target.checked);
+                  if (event.target.checked) setBackendFailed(false);
+                }}
+                className="h-4 w-4 rounded accent-cyan-500"
+              />
+              Use server-side ML
+            </label>
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
+                useBackend && !backendFailed
+                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                  : "bg-amber-500/10 text-amber-700 dark:text-amber-300"
+              }`}
+            >
+              {useBackend && !backendFailed ? (
+                <><Server className="h-3 w-3" /> Backend</>
+              ) : (
+                <><Monitor className="h-3 w-3" /> Client-side</>
+              )}
+            </span>
           </div>
-          <div className={`${GLASS_CARD_CLASS} p-4`}>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-              Precision
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">
-              {result ? formatPercent(result.precision * 100, 1) : "—"}
-            </p>
-          </div>
-          <div className={`${GLASS_CARD_CLASS} p-4`}>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-              Recall
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">
-              {result ? formatPercent(result.recall * 100, 1) : "—"}
-            </p>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className={`${GLASS_CARD_CLASS} p-4`}>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                Accuracy
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">
+                {result ? formatPercent(result.accuracy * 100, 1) : "—"}
+              </p>
+            </div>
+            <div className={`${GLASS_CARD_CLASS} p-4`}>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                Precision
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">
+                {result ? formatPercent(result.precision * 100, 1) : "—"}
+              </p>
+            </div>
+            <div className={`${GLASS_CARD_CLASS} p-4`}>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                Recall
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">
+                {result ? formatPercent(result.recall * 100, 1) : "—"}
+              </p>
+            </div>
           </div>
         </div>
       </div>

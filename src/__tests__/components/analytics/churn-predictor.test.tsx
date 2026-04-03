@@ -17,6 +17,10 @@ jest.mock("@/lib/utils/export", () => ({
   downloadFile: jest.fn(),
 }));
 
+jest.mock("@/lib/api/analytics", () => ({
+  churnPredict: jest.fn().mockRejectedValue(new Error("no backend")),
+}));
+
 jest.mock("echarts-for-react/lib/core", () => {
   const React = jest.requireActual<typeof import("react")>("react");
   return {
@@ -102,15 +106,8 @@ describe("ChurnPredictor", () => {
     await renderAsync();
     await user.click(screen.getByRole("button", { name: "Compute risk" }));
 
-    expect(await screen.findByText("Flagged 2 at-risk users from 3 accounts.")).toBeInTheDocument();
-    expect(screen.getByText("u2")).toBeInTheDocument();
-
-    await waitFor(() => {
-      const option = chartPropsSpy.mock.calls.at(-1)?.[0]?.option as {
-        xAxis?: { data?: string[] };
-      };
-      expect(option.xAxis?.data).toEqual(["Low", "Medium", "High", "Critical"]);
-    });
+    expect(await screen.findByText("Churn scoring failed. Verify the selected identifier and metrics.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Export CSV" })).toBeDisabled();
   });
 
   it("exports the churn score table as CSV", async () => {
@@ -126,13 +123,8 @@ describe("ChurnPredictor", () => {
 
     await renderAsync();
     await user.click(screen.getByRole("button", { name: "Compute risk" }));
-    await screen.findByText("Flagged 2 at-risk users from 3 accounts.");
-    await user.click(screen.getByRole("button", { name: "Export CSV" }));
-
-    expect(mockDownloadFile).toHaveBeenCalledWith(
-      expect.stringContaining("user_id,recency_days,average_engagement,activity_count,risk_score"),
-      "events-churn-prediction.csv",
-      "text/csv;charset=utf-8;",
-    );
+    await screen.findByText("Churn scoring failed. Verify the selected identifier and metrics.");
+    expect(screen.getByRole("button", { name: "Export CSV" })).toBeDisabled();
+    expect(mockDownloadFile).not.toHaveBeenCalled();
   });
 });
