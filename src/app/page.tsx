@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Database,
@@ -28,6 +28,8 @@ import {
   RefreshCw,
   Share2,
   LayoutGrid,
+  Compass,
+  Eraser,
 } from "lucide-react";
 
 import { loadCSVIntoDB, runQuery, getTableRowCount } from "@/lib/duckdb/client";
@@ -109,6 +111,7 @@ import OnboardingTour from "@/components/ui/onboarding-tour";
 import DataQualityDashboard from "@/components/data/data-quality-dashboard";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import DataLineage from "@/components/data/data-lineage";
+import DataAlerts from "@/components/data/data-alerts";
 import DataStory from "@/components/data/data-story";
 import DataOverview from "@/components/data/data-overview";
 import DataProfilerSummary from "@/components/data/data-profiler-summary";
@@ -116,6 +119,7 @@ import ColumnProfilerAdvanced from "@/components/data/column-profiler-advanced";
 import QueryBuilder from "@/components/query/query-builder";
 import RelationshipExplorer from "@/components/data/relationship-explorer";
 import DataCleaner from "@/components/data/data-cleaner";
+import DataPipeline from "@/components/data/data-pipeline";
 import DashboardBuilder from "@/components/charts/dashboard-builder";
 import AiAssistant from "@/components/ai/ai-assistant";
 import ColumnCorrelator from "@/components/data/column-correlator";
@@ -123,6 +127,8 @@ import DataComparisonAdvanced from "@/components/data/data-comparison-advanced";
 import DataFaker from "@/components/data/data-faker";
 import SQLPlayground from "@/components/query/sql-playground";
 import RegexTester from "@/components/data/regex-tester";
+import StatisticalTests from "@/components/data/statistical-tests";
+import GeoChart from "@/components/charts/geo-chart";
 
 // ─────────────────────────────────────────────
 // Types
@@ -134,8 +140,10 @@ type AppTab =
   | "query"
   | "sql"
   | "charts"
+  | "explore"
   | "builder"
   | "transforms"
+  | "clean"
   | "analytics"
   | "reports"
   | "pivot"
@@ -165,6 +173,30 @@ function readSavedChartsFromStorage(): SavedChartSnapshot[] {
   }
 }
 
+function ToolSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="space-y-3">
+      <div>
+        <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+          {title}
+        </h3>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          {description}
+        </p>
+      </div>
+      {children}
+    </section>
+  );
+}
+
 // ─────────────────────────────────────────────
 // Tab config
 // ─────────────────────────────────────────────
@@ -175,8 +207,10 @@ const TABS: { id: AppTab; label: string; icon: typeof Database }[] = [
   { id: "query", label: "Ask AI", icon: MessageSquare },
   { id: "sql", label: "SQL Editor", icon: Code2 },
   { id: "charts", label: "Charts", icon: PieChart },
+  { id: "explore", label: "Explore", icon: Compass },
   { id: "builder", label: "Builder", icon: LayoutGrid },
   { id: "transforms", label: "Transforms", icon: Wand2 },
+  { id: "clean", label: "Clean", icon: Eraser },
   { id: "analytics", label: "Analytics", icon: GitMerge },
   { id: "compare", label: "Compare", icon: RefreshCw },
   { id: "pivot", label: "Pivot", icon: Table },
@@ -1661,6 +1695,13 @@ export default function Home() {
                     transition={{ duration: 0.2 }}
                     className="space-y-6"
                   >
+                    <ErrorBoundary>
+                      <DataAlerts
+                        tableName={tableName}
+                        columns={profileData}
+                        rowCount={activeDataset.rowCount}
+                      />
+                    </ErrorBoundary>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
@@ -1922,12 +1963,85 @@ export default function Home() {
                         />
                       </ErrorBoundary>
                       <ErrorBoundary>
+                        <GeoChart
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
                         <ScatterMatrix
                           tableName={tableName}
                           columns={profileData}
                         />
                       </ErrorBoundary>
                     </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "explore" && (
+                  <motion.div
+                    key="explore"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Explore Relationships
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        A curated set of tools for finding structure, patterns,
+                        anomalies, and multivariate relationships in your data.
+                      </p>
+                    </div>
+                    <ToolSection
+                      title="Relationship Explorer"
+                      description="Inspect column pairings and structural links to understand how fields move together."
+                    >
+                      <ErrorBoundary>
+                        <RelationshipExplorer
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Column Correlator"
+                      description="Surface high-signal numeric correlations and rank the strongest associations."
+                    >
+                      <ErrorBoundary>
+                        <ColumnCorrelator
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Anomaly Heatmap"
+                      description="Scan the dataset for unusual combinations, sparse regions, and suspicious concentrations."
+                    >
+                      <ErrorBoundary>
+                        <AnomalyHeatmap
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Scatter Matrix"
+                      description="Compare multiple numeric dimensions at once to reveal clusters, trends, and outliers."
+                    >
+                      <ErrorBoundary>
+                        <ScatterMatrix
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
                   </motion.div>
                 )}
 
@@ -1976,6 +2090,12 @@ export default function Home() {
                       </p>
                     </div>
                     <div className="space-y-6">
+                      <ErrorBoundary>
+                        <DataPipeline
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
                       <ErrorBoundary>
                         <DataCleaner
                           tableName={tableName}
@@ -2096,6 +2216,100 @@ export default function Home() {
                   </motion.div>
                 )}
 
+                {activeTab === "clean" && (
+                  <motion.div
+                    key="clean"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Data Cleaning
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Normalize, validate, and repair the active dataset with
+                        focused cleanup tools in one place.
+                      </p>
+                    </div>
+                    <ToolSection
+                      title="Cleaner"
+                      description="Run broad cleanup passes to standardize rows and remove common data quality issues."
+                    >
+                      <ErrorBoundary>
+                        <DataCleaner
+                          tableName={tableName}
+                          columns={profileData}
+                          onCleanComplete={() =>
+                            void refreshActiveDataset(
+                              "Cleaning complete",
+                              `Updated ${tableName} after cleaning operations.`
+                            )
+                          }
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Duplicate Finder"
+                      description="Detect repeated records and inspect likely duplicate clusters before taking action."
+                    >
+                      <ErrorBoundary>
+                        <DuplicateFinder
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Null Handling"
+                      description="Profile missing values and apply fill, drop, or imputation strategies by column."
+                    >
+                      <ErrorBoundary>
+                        <NullHandler
+                          tableName={tableName}
+                          columns={profileData}
+                          onComplete={() =>
+                            void refreshActiveDataset(
+                              "Null handling applied",
+                              `Updated null handling rules for ${tableName}.`
+                            )
+                          }
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Type Conversion"
+                      description="Convert columns to the right storage and semantic types before downstream analysis."
+                    >
+                      <ErrorBoundary>
+                        <TypeConverter
+                          tableName={tableName}
+                          columns={profileData}
+                          onConvert={() =>
+                            void refreshActiveDataset(
+                              "Types converted",
+                              `Column types were refreshed for ${tableName}.`
+                            )
+                          }
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Validation"
+                      description="Check business rules, schema assumptions, and inconsistent values before reporting."
+                    >
+                      <ErrorBoundary>
+                        <DataValidator
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                  </motion.div>
+                )}
+
                 {activeTab === "analytics" && (
                   <motion.div
                     key="analytics"
@@ -2132,6 +2346,13 @@ export default function Home() {
                       </ErrorBoundary>
                       <ErrorBoundary>
                         <ColumnCorrelator
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <StatisticalTests
                           tableName={tableName}
                           columns={profileData}
                           rowCount={activeDataset.rowCount}
@@ -2291,12 +2512,40 @@ export default function Home() {
                     exit={{ opacity: 0, x: 10 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ErrorBoundary>
-                      <ReportBuilder
-                        dataset={activeDataset}
-                        columns={profileData}
-                      />
-                    </ErrorBoundary>
+                    <div className="space-y-6">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                            Reports
+                          </h2>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
+                            Assemble narrative summaries, chart-backed stories,
+                            and reusable report outputs for the active dataset.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          disabled
+                          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-400 transition-colors disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500"
+                        >
+                          <FileText className="h-3.5 w-3.5" />
+                          Generate Full Report
+                        </button>
+                      </div>
+                      <ErrorBoundary>
+                        <ReportBuilder
+                          dataset={activeDataset}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <DataStory
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                    </div>
                   </motion.div>
                 )}
 

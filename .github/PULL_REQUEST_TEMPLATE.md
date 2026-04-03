@@ -1,22 +1,33 @@
-## Summary
+## Description
 
-Describe what changed and why.
+Describe the change clearly. Include the problem being solved, the approach taken, and any tradeoffs reviewers should know about.
 
-## Type of change
+## Related Issue
+
+Link the issue, discussion, or context that motivated this PR.
+
+## Type of Change
 
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Refactor
-- [ ] Docs
+- [ ] Performance improvement
 - [ ] Tests
+- [ ] Documentation
 
-## Testing
+## Verification
 
-- [ ] `npm run lint`
-- [ ] `npm test`
-- [ ] `npm run test:e2e` if applicable
-- [ ] Manual verification completed
+Describe how this change was verified.
 
-## Screenshots
+## Screenshots or Recordings
 
-If applicable, add screenshots or recordings that help reviewers verify the change.
+Add screenshots or recordings for visible UI changes.
+
+## Checklist
+
+- [ ] I ran `npm run lint`
+- [ ] I ran `npm test` or updated tests as needed
+- [ ] I ran `npx tsc --noEmit`
+- [ ] I ran `npm run test:e2e` when the change affected end-to-end flows
+- [ ] I updated documentation when behavior or setup changed
+- [ ] I verified dark mode and responsive behavior for UI changes

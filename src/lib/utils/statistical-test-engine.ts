@@ -44,11 +44,11 @@ export interface AnovaConfig {
 }
 
 function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
+  return `"${value.replace(/"/g, '""')}"`;
 }
 
 function quoteLiteral(value: string) {
-  return `'${value.replaceAll("'", "''")}'`;
+  return `'${value.replace(/'/g, "''")}'`;
 }
 
 function makeId() {
@@ -89,7 +89,7 @@ function normalCdf(value: number) {
   return 0.5 * (1 + erf(value / Math.SQRT2));
 }
 
-function logGamma(value: number) {
+function logGamma(value: number): number {
   const coeffs = [676.5203681218851, -1259.1392167224028, 771.3234287776531, -176.6150291621406, 12.507343278686905, -0.13857109526572012, 9.984369578019572e-6, 1.5056327351493116e-7];
   if (value < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * value)) - logGamma(1 - value);
   let x = 0.9999999999998099;

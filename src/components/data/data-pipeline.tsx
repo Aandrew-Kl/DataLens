@@ -66,6 +66,122 @@ function makeId() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function EmptyPipelineState() {
+  return (
+    <div className="rounded-[26px] border border-dashed border-slate-300/80 bg-slate-50/80 p-8 text-center dark:border-slate-700 dark:bg-slate-950/30">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
+        <WandSparkles className="h-5 w-5" />
+      </div>
+      <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">No steps yet</h3>
+      <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">Start by adding a filter, sort, aggregation, or join card. The builder compiles them into a single DuckDB query in execution order.</p>
+    </div>
+  );
+}
+
+function PipelineGuide() {
+  return (
+    <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/75 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+      <p className="text-sm font-semibold text-slate-900 dark:text-white">Pipeline guide</p>
+      <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+        <li>Filter and sort steps are row-preserving and work well near the top of the flow.</li>
+        <li>Group and aggregate steps reshape the dataset, so later rename or cast steps operate on the new schema.</li>
+        <li>Join steps assume the right-side table already exists in DuckDB and lets you choose which columns to project.</li>
+        <li>Sampling is usually best at the end when you want a cheaper preview of the final pipeline.</li>
+      </ul>
+    </div>
+  );
+}
+
+function PreviewSummary({
+  stepCount,
+  previewCount,
+  previewColumns,
+}: {
+  stepCount: number;
+  previewCount: number;
+  previewColumns: string[];
+}) {
+  const items = [
+    { label: "Steps", value: String(stepCount) },
+    { label: "Output rows", value: formatNumber(previewCount) },
+    { label: "Output columns", value: String(previewColumns.length) },
+  ];
+  return (
+    <div className="grid gap-3 md:grid-cols-3">
+      {items.map((item) => <div key={item.label} className="rounded-2xl border border-slate-200/70 bg-slate-50/80 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/30"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">{item.label}</p><p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">{item.value}</p></div>)}
+    </div>
+  );
+}
+
+function PipelineStatusStrip({ steps, savedCount }: { steps: number; savedCount: number }) {
+  return (
+    <div className="flex flex-wrap gap-2 text-xs font-medium">
+      <span className="rounded-full bg-cyan-500/10 px-3 py-1.5 text-cyan-700 dark:text-cyan-300">{steps} active steps</span>
+      <span className="rounded-full bg-slate-900/5 px-3 py-1.5 text-slate-700 dark:bg-white/5 dark:text-slate-300">{savedCount} saved flows</span>
+    </div>
+  );
+}
+
+function SQLNotes() {
+  const notes = [
+    "Each step compiles into a named CTE, which keeps the exported SQL readable and debuggable.",
+    "The preview query wraps the same compiled SQL and applies only a final `LIMIT 100` for display.",
+    "Join steps assume the referenced right-side table already exists in DuckDB under the exact name you provide.",
+    "Rename, cast, and add-column steps are schema-shaping operations, so they influence all downstream step pickers conceptually even though this lightweight builder still shows the original column list.",
+    "If a preview fails, inspect the SQL panel first. It is the exact statement executed by the preview and run actions.",
+  ];
+
+  return (
+    <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+      <p className="text-sm font-semibold text-slate-900 dark:text-white">Execution notes</p>
+      <div className="mt-3 space-y-3">
+        {notes.map((note, index) => (
+          <div key={note} className="flex gap-3">
+            <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500/10 text-xs font-semibold text-cyan-700 dark:text-cyan-300">{index + 1}</div>
+            <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">{note}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PipelinePatterns() {
+  const patterns = [
+    { title: "Clean then aggregate", detail: "Start with filter, cast, and rename steps before grouping so the aggregate runs on normalized data." },
+    { title: "Join late", detail: "If the right table is wide, aggregate or reduce the left side first so the join happens on fewer rows." },
+    { title: "Preview often", detail: "Because the SQL panel is always current, failed previews give you a direct statement to inspect and copy into the SQL editor." },
+    { title: "Sample last", detail: "Place sampling near the end of the flow when you want a cheap preview of the final result instead of altering upstream logic." },
+  ];
+  return (
+    <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/75 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+      <p className="text-sm font-semibold text-slate-900 dark:text-white">Common patterns</p>
+      <div className="mt-3 space-y-3">
+        {patterns.map((pattern) => (
+          <div key={pattern.title} className="rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/40">
+            <p className="text-sm font-medium text-slate-900 dark:text-white">{pattern.title}</p>
+            <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{pattern.detail}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StorageNotes() {
+  return (
+    <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+      <p className="text-sm font-semibold text-slate-900 dark:text-white">Persistence behavior</p>
+      <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+        <li>Saved pipelines are scoped to the current table name in localStorage.</li>
+        <li>Loading a saved pipeline replaces the in-memory step list immediately.</li>
+        <li>The SQL export always reflects the current builder state, not the most recently saved snapshot.</li>
+        <li>Preview rows are transient and are not stored with the saved pipeline definition.</li>
+      </ul>
+    </div>
+  );
+}
+
 function StepCard({
   step,
   index,
@@ -288,6 +404,7 @@ export default function DataPipeline({ tableName, columns }: DataPipelineProps) 
             <AnimatePresence>
               {steps.map((step, index) => <StepCard key={step.id} step={step} index={index} total={steps.length} columns={columnNames} onUpdate={(patch) => updateStep(step.id, patch)} onMove={(direction) => moveStep(step.id, direction)} onRemove={() => setSteps((current) => current.filter((item) => item.id !== step.id))} />)}
             </AnimatePresence>
+            {steps.length === 0 && <EmptyPipelineState />}
           </div>
 
           <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/75 p-5 dark:border-slate-800 dark:bg-slate-950/35">
@@ -299,6 +416,7 @@ export default function DataPipeline({ tableName, columns }: DataPipelineProps) 
               {savedPipelines.length === 0 ? <p className="text-sm text-slate-500 dark:text-slate-400">No saved pipelines yet.</p> : savedPipelines.map((pipeline) => <div key={pipeline.id} className="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-4 dark:border-slate-800 dark:bg-slate-950/45 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-sm font-medium text-slate-900 dark:text-white">{pipeline.name}</p><p className="text-xs text-slate-500 dark:text-slate-400">{pipeline.steps.length} steps · {new Date(pipeline.savedAt).toLocaleString()}</p></div><div className="flex gap-2"><button type="button" onClick={() => setSteps(pipeline.steps)} className="rounded-xl border border-cyan-400/40 px-3 py-2 text-sm text-cyan-700 transition hover:bg-cyan-500/10 dark:text-cyan-300">Load</button><button type="button" onClick={() => { const next = savedPipelines.filter((item) => item.id !== pipeline.id); setSavedPipelines(next); writePipelines(tableName, next); }} className="rounded-xl border border-rose-300/60 px-3 py-2 text-sm text-rose-700 transition hover:bg-rose-500/10 dark:text-rose-300">Delete</button></div></div>)}
             </div>
           </div>
+          <PipelineGuide />
         </div>
 
         <div className="space-y-4">
@@ -306,6 +424,8 @@ export default function DataPipeline({ tableName, columns }: DataPipelineProps) 
 
           <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800 dark:bg-slate-950/40">
             <div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-900 dark:text-white">Live preview</p><p className="text-xs text-slate-500 dark:text-slate-400">First 100 rows from the compiled query · {formatNumber(previewCount)} total rows</p></div>{loadingPreview && <Loader2 className="h-4 w-4 animate-spin text-cyan-500" />}</div>
+            <div className="mt-4"><PreviewSummary stepCount={steps.length} previewCount={previewCount} previewColumns={previewColumns} /></div>
+            <div className="mt-4"><PipelineStatusStrip steps={steps.length} savedCount={savedPipelines.length} /></div>
             <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800">
               <div className="max-h-[420px] overflow-auto">
                 <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
@@ -320,6 +440,9 @@ export default function DataPipeline({ tableName, columns }: DataPipelineProps) 
             <p className="text-sm font-semibold text-slate-900 dark:text-white">Compiled SQL</p>
             <textarea readOnly value={compiled.sql} className="mt-3 h-72 w-full rounded-2xl border border-slate-200/70 bg-slate-950 px-4 py-3 font-mono text-xs text-slate-100 outline-none dark:border-slate-700" />
           </div>
+          <SQLNotes />
+          <PipelinePatterns />
+          <StorageNotes />
         </div>
       </div>
     </motion.section>

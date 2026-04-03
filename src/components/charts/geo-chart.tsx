@@ -46,12 +46,16 @@ const USA_MAP = "datalens-usa-frame";
 const WORLD_FRAME = {
   type: "FeatureCollection",
   features: [{ type: "Feature", properties: { name: "World" }, geometry: { type: "Polygon", coordinates: [[[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]]] } }],
-};
+} as unknown as Parameters<typeof echarts.registerMap>[1];
 
 const USA_FRAME = {
   type: "FeatureCollection",
   features: [{ type: "Feature", properties: { name: "United States" }, geometry: { type: "Polygon", coordinates: [[[-125, 24], [-66, 24], [-66, 50], [-125, 50], [-125, 24]]] } }],
-};
+} as unknown as Parameters<typeof echarts.registerMap>[1];
+
+function quoteIdentifier(value: string) {
+  return `"${value.replace(/"/g, '""')}"`;
+}
 
 function parseCentroids(value: string) {
   return Object.fromEntries(
@@ -148,6 +152,52 @@ function buildOption(points: GeoPoint[], mode: GeoMode, aggregation: Aggregation
   };
 }
 
+function DetectionSummary({
+  mode,
+  aggregation,
+  valueColumn,
+  points,
+}: {
+  mode: Exclude<GeoMode, null>;
+  aggregation: Aggregation;
+  valueColumn: string;
+  points: GeoPoint[];
+}) {
+  const lines =
+    mode.kind === "coordinates"
+      ? [`Latitude: ${mode.latitudeColumn}`, `Longitude: ${mode.longitudeColumn}`, `Grouped points: ${formatNumber(points.length)}`]
+      : [`Location key: ${mode.locationColumn}`, `Metric: ${aggregation}${valueColumn && aggregation !== "COUNT" ? `(${valueColumn})` : ""}`, `Mapped regions: ${formatNumber(points.length)}`];
+  return (
+    <div className="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-900 dark:text-cyan-200">
+      <p className="font-semibold">{mode.kind === "coordinates" ? "Coordinate scatter" : "Region intensity map"}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {lines.map((line) => <span key={line} className="rounded-full bg-white/65 px-2.5 py-1 text-xs font-medium text-cyan-800 dark:bg-slate-950/45 dark:text-cyan-200">{line}</span>)}
+      </div>
+    </div>
+  );
+}
+
+function TopLocations({ points }: { points: GeoPoint[] }) {
+  const topPoints = [...points].sort((left, right) => right.value - left.value).slice(0, 5);
+  return (
+    <div className="rounded-2xl border border-slate-200/70 bg-slate-50/80 px-4 py-4 dark:border-slate-800 dark:bg-slate-900/30">
+      <p className="text-sm font-semibold text-slate-900 dark:text-white">Top plotted locations</p>
+      <div className="mt-3 space-y-2">
+        {topPoints.length === 0 ? <p className="text-sm text-slate-500 dark:text-slate-400">No mapped points yet.</p> : topPoints.map((point) => <div key={point.name} className="flex items-center justify-between gap-3 text-sm"><span className="truncate text-slate-700 dark:text-slate-200">{point.name}</span><span className="shrink-0 text-slate-500 dark:text-slate-400">{formatNumber(point.value)}</span></div>)}
+      </div>
+    </div>
+  );
+}
+
+function MapNotes() {
+  return (
+    <div className="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-4 dark:border-slate-800 dark:bg-slate-950/35">
+      <p className="text-sm font-semibold text-slate-900 dark:text-white">Map notes</p>
+      <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">This component is intentionally offline-safe, so it renders on compact built-in geo frames and projects region values to centroids when full polygon packs are not available in the bundle.</p>
+    </div>
+  );
+}
+
 export default function GeoChart({ tableName, columns }: GeoChartProps) {
   const [dark, setDark] = useState(false);
   const numericColumns = useMemo(() => columns.filter((column) => column.type === "number"), [columns]);
@@ -179,6 +229,7 @@ export default function GeoChart({ tableName, columns }: GeoChartProps) {
       setMessage("No geographic columns detected. Add a country, state, or latitude/longitude pair to render a map.");
       return;
     }
+    const activeMode = mode as Exclude<GeoMode, null>;
     let cancelled = false;
 
     async function loadData() {
@@ -187,12 +238,12 @@ export default function GeoChart({ tableName, columns }: GeoChartProps) {
       try {
         const metric = aggregation === "COUNT" || !valueColumn ? "COUNT(*)" : `${aggregation}(CAST(${quoteIdentifier(valueColumn)} AS DOUBLE))`;
         const rows =
-          mode.kind === "coordinates"
-            ? await runQuery(`SELECT CAST(${quoteIdentifier(mode.longitudeColumn)} AS DOUBLE) AS longitude, CAST(${quoteIdentifier(mode.latitudeColumn)} AS DOUBLE) AS latitude, ${metric} AS metric_value FROM ${quoteIdentifier(tableName)} WHERE ${quoteIdentifier(mode.latitudeColumn)} IS NOT NULL AND ${quoteIdentifier(mode.longitudeColumn)} IS NOT NULL GROUP BY 1, 2 ORDER BY metric_value DESC LIMIT 500`)
-            : await runQuery(`SELECT CAST(${quoteIdentifier(mode.locationColumn)} AS VARCHAR) AS location_name, ${metric} AS metric_value FROM ${quoteIdentifier(tableName)} WHERE ${quoteIdentifier(mode.locationColumn)} IS NOT NULL GROUP BY 1 ORDER BY metric_value DESC LIMIT 250`);
+          activeMode.kind === "coordinates"
+            ? await runQuery(`SELECT CAST(${quoteIdentifier(activeMode.longitudeColumn)} AS DOUBLE) AS longitude, CAST(${quoteIdentifier(activeMode.latitudeColumn)} AS DOUBLE) AS latitude, ${metric} AS metric_value FROM ${quoteIdentifier(tableName)} WHERE ${quoteIdentifier(activeMode.latitudeColumn)} IS NOT NULL AND ${quoteIdentifier(activeMode.longitudeColumn)} IS NOT NULL GROUP BY 1, 2 ORDER BY metric_value DESC LIMIT 500`)
+            : await runQuery(`SELECT CAST(${quoteIdentifier(activeMode.locationColumn)} AS VARCHAR) AS location_name, ${metric} AS metric_value FROM ${quoteIdentifier(tableName)} WHERE ${quoteIdentifier(activeMode.locationColumn)} IS NOT NULL GROUP BY 1 ORDER BY metric_value DESC LIMIT 250`);
 
         const geoRows =
-          mode.kind === "coordinates"
+          activeMode.kind === "coordinates"
             ? rows.map((row) => ({
                 name: `${Number(row.latitude ?? 0).toFixed(3)}, ${Number(row.longitude ?? 0).toFixed(3)}`,
                 latitude: Number(row.latitude ?? 0),
@@ -201,13 +252,13 @@ export default function GeoChart({ tableName, columns }: GeoChartProps) {
               }))
             : rows.flatMap((row) => {
                 const name = String(row.location_name ?? "");
-                const lookup = mode.kind === "country" ? COUNTRY_CENTROIDS[normalizeGeoName(name)] : STATE_CENTROIDS[normalizeGeoName(name)];
+                const lookup = activeMode.kind === "country" ? COUNTRY_CENTROIDS[normalizeGeoName(name)] : STATE_CENTROIDS[normalizeGeoName(name)];
                 return lookup ? [{ name, latitude: lookup.latitude, longitude: lookup.longitude, value: Number(row.metric_value ?? 0) }] : [];
               });
 
         if (cancelled) return;
         setPoints(geoRows);
-        if (!geoRows.length) setMessage(mode.kind === "country" || mode.kind === "state" ? "Geographic column detected, but none of the sampled values matched the built-in location reference used by this offline map." : "No coordinate rows were available after filtering null latitude and longitude values.");
+        if (!geoRows.length) setMessage(activeMode.kind === "country" || activeMode.kind === "state" ? "Geographic column detected, but none of the sampled values matched the built-in location reference used by this offline map." : "No coordinate rows were available after filtering null latitude and longitude values.");
       } catch (cause) {
         if (cancelled) return;
         setPoints([]);
@@ -265,12 +316,11 @@ export default function GeoChart({ tableName, columns }: GeoChartProps) {
             {numericColumns.length ? numericColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>) : <option value="">No numeric value column</option>}
           </select>
 
-          <div className="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-900 dark:text-cyan-200">
-            <p className="font-semibold">{detectedMode.kind === "coordinates" ? "Coordinate scatter" : "Region intensity map"}</p>
-            <p className="mt-1 text-xs leading-5">{detectedMode.kind === "coordinates" ? `Plotting ${detectedMode.latitudeColumn} and ${detectedMode.longitudeColumn}.` : `Using ${detectedMode.locationColumn} as the geographic key and ${aggregation} as the metric.`}</p>
-          </div>
+          <DetectionSummary mode={(mode ?? detectedMode) as Exclude<GeoMode, null>} aggregation={aggregation} valueColumn={valueColumn} points={points} />
 
           {message && <div className="rounded-2xl border border-amber-400/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">{message}</div>}
+          <TopLocations points={points} />
+          <MapNotes />
 
           <div className="rounded-2xl border border-slate-200/70 bg-slate-50/80 px-4 py-4 dark:border-slate-800 dark:bg-slate-900/30">
             <p className="text-sm font-semibold text-slate-900 dark:text-white">Requirements</p>

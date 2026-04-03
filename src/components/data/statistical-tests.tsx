@@ -52,6 +52,18 @@ const TEST_META: Record<TestType, { label: string; hint: string }> = {
   "kolmogorov-smirnov": { label: "Kolmogorov-Smirnov", hint: "Compare the full distributions of two groups." },
 };
 
+const CONFIDENCE_OPTIONS = [
+  { value: 0.9, label: "90% confidence" },
+  { value: 0.95, label: "95% confidence" },
+  { value: 0.99, label: "99% confidence" },
+];
+
+const ALTERNATIVE_OPTIONS: Array<{ value: Alternative; label: string }> = [
+  { value: "two-sided", label: "Two-sided" },
+  { value: "greater", label: "Greater" },
+  { value: "less", label: "Less" },
+];
+
 function formatMetric(value: number | null, digits = 4) {
   if (value == null || Number.isNaN(value)) return "n/a";
   if (Math.abs(value) >= 1000) return formatNumber(value);
@@ -96,6 +108,101 @@ function ResultCards({ result }: { result: TestResult }) {
         {result.details.map((detail) => <div key={detail.label} className="rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/30"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{detail.label}</p><p className="mt-2 text-sm font-medium text-slate-900 dark:text-white">{detail.value}</p></div>)}
       </div>
     </>
+  );
+}
+
+function ParameterSummary({
+  title,
+  items,
+}: {
+  title: string;
+  items: string[];
+}) {
+  return (
+    <div className="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-900 dark:text-cyan-200">
+      <p className="font-semibold">{title}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {items.filter(Boolean).map((item) => <span key={item} className="rounded-full bg-white/65 px-2.5 py-1 text-xs font-medium text-cyan-800 dark:bg-slate-950/45 dark:text-cyan-200">{item}</span>)}
+      </div>
+    </div>
+  );
+}
+
+function TestChecklist({ type }: { type: TestType }) {
+  const tips =
+    type === "chi-square"
+      ? ["Use low-cardinality columns", "Expected counts should repeat", "Best for category-vs-category checks"]
+      : type === "anova"
+        ? ["Measure must be numeric", "Grouping column should be categorical", "Use when you have 3+ groups"]
+        : type === "kolmogorov-smirnov"
+          ? ["Compares full distributions", "Good for shape shifts and tails", "Most useful with moderate sample sizes"]
+          : ["Works with exactly two groups", "Numeric measure required", "Confidence interval is shown for the mean gap"];
+
+  return (
+    <div className="rounded-2xl border border-slate-200/70 bg-slate-50/80 px-4 py-4 dark:border-slate-800 dark:bg-slate-900/25">
+      <p className="text-sm font-semibold text-slate-900 dark:text-white">Before you run</p>
+      <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+        {tips.map((tip) => <li key={tip}>{tip}</li>)}
+      </ul>
+    </div>
+  );
+}
+
+function EmptyResultState() {
+  return (
+    <div className="rounded-[26px] border border-dashed border-slate-300/80 bg-slate-50/80 p-8 text-center dark:border-slate-700 dark:bg-slate-950/30">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
+        <FlaskConical className="h-5 w-5" />
+      </div>
+      <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">No test result yet</h3>
+      <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">Pick a test, confirm the columns and groups, then run it to generate a DuckDB-backed result card and a reusable history entry.</p>
+    </div>
+  );
+}
+
+function AnalysisNotes() {
+  const notes = [
+    "A small p-value says the observed difference would be unusual under the null hypothesis.",
+    "Effect size answers a different question: how large the difference or association is in practice.",
+    "Confidence intervals are shown only where the current test returns a stable interval estimate in this panel.",
+    "These results are fast exploratory checks, so they are best used to guide follow-up analysis rather than replace it.",
+  ];
+
+  return (
+    <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/70 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+      <p className="text-sm font-semibold text-slate-900 dark:text-white">How to read the output</p>
+      <div className="mt-3 space-y-3">
+        {notes.map((note, index) => (
+          <div key={note} className="flex gap-3">
+            <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500/10 text-xs font-semibold text-cyan-700 dark:text-cyan-300">{index + 1}</div>
+            <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">{note}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CaveatsCard() {
+  return (
+    <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+      <p className="text-sm font-semibold text-slate-900 dark:text-white">Interpretation caveats</p>
+      <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+        <li>Large samples can make tiny differences look significant, so always read the effect size alongside the p-value.</li>
+        <li>Low-cardinality grouping columns usually produce more stable comparisons than free-text dimensions.</li>
+        <li>If you need publication-grade inference, validate assumptions and rerun the analysis in a dedicated statistics workflow.</li>
+        <li>For distribution-heavy questions, the Kolmogorov-Smirnov test is usually a better fit than focusing on group means alone.</li>
+      </ul>
+    </div>
+  );
+}
+
+function ResultLegend() {
+  return (
+    <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/70 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+      <p className="text-sm font-semibold text-slate-900 dark:text-white">Result legend</p>
+      <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">Green badges highlight tests where the selected confidence threshold was met. Amber badges mean the observed signal was too weak for the current settings or sample.</p>
+    </div>
   );
 }
 
@@ -216,35 +323,45 @@ export default function StatisticalTests({ tableName, columns, rowCount }: Stati
 
           <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800/80 dark:bg-slate-950/40">
             {(testType === "t-test" || testType === "mann-whitney" || testType === "kolmogorov-smirnov") && (
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
                 <select value={activeConfig.measure} onChange={(event) => (testType === "t-test" ? setTTest({ ...tTest, measure: event.target.value }) : testType === "mann-whitney" ? setMannWhitney({ ...mannWhitney, measure: event.target.value }) : setKsTest({ ...ksTest, measure: event.target.value }))} className={fieldClass}>{numericColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}</select>
                 <select value={activeConfig.group} onChange={(event) => (testType === "t-test" ? setTTest({ ...tTest, group: event.target.value }) : testType === "mann-whitney" ? setMannWhitney({ ...mannWhitney, group: event.target.value }) : setKsTest({ ...ksTest, group: event.target.value }))} className={fieldClass}>{groupingColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}</select>
                 <select value={activeConfig.groupA} onChange={(event) => (testType === "t-test" ? setTTest({ ...tTest, groupA: event.target.value }) : testType === "mann-whitney" ? setMannWhitney({ ...mannWhitney, groupA: event.target.value }) : setKsTest({ ...ksTest, groupA: event.target.value }))} className={fieldClass}>{(groupOptions[activeConfig.group] ?? []).map((value) => <option key={value} value={value}>{value}</option>)}</select>
                 <select value={activeConfig.groupB} onChange={(event) => (testType === "t-test" ? setTTest({ ...tTest, groupB: event.target.value }) : testType === "mann-whitney" ? setMannWhitney({ ...mannWhitney, groupB: event.target.value }) : setKsTest({ ...ksTest, groupB: event.target.value }))} className={fieldClass}>{(groupOptions[activeConfig.group] ?? []).map((value) => <option key={value} value={value}>{value}</option>)}</select>
-                <select value={activeConfig.alternative} onChange={(event) => (testType === "t-test" ? setTTest({ ...tTest, alternative: event.target.value as Alternative }) : testType === "mann-whitney" ? setMannWhitney({ ...mannWhitney, alternative: event.target.value as Alternative }) : setKsTest({ ...ksTest, alternative: event.target.value as Alternative }))} className={fieldClass}><option value="two-sided">Two-sided</option><option value="greater">Greater</option><option value="less">Less</option></select>
-                <select value={String(activeConfig.confidence)} onChange={(event) => (testType === "t-test" ? setTTest({ ...tTest, confidence: Number(event.target.value) }) : testType === "mann-whitney" ? setMannWhitney({ ...mannWhitney, confidence: Number(event.target.value) }) : setKsTest({ ...ksTest, confidence: Number(event.target.value) }))} className={fieldClass}><option value="0.9">90% confidence</option><option value="0.95">95% confidence</option><option value="0.99">99% confidence</option></select>
+                <select value={activeConfig.alternative} onChange={(event) => (testType === "t-test" ? setTTest({ ...tTest, alternative: event.target.value as Alternative }) : testType === "mann-whitney" ? setMannWhitney({ ...mannWhitney, alternative: event.target.value as Alternative }) : setKsTest({ ...ksTest, alternative: event.target.value as Alternative }))} className={fieldClass}>{ALTERNATIVE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
+                <select value={String(activeConfig.confidence)} onChange={(event) => (testType === "t-test" ? setTTest({ ...tTest, confidence: Number(event.target.value) }) : testType === "mann-whitney" ? setMannWhitney({ ...mannWhitney, confidence: Number(event.target.value) }) : setKsTest({ ...ksTest, confidence: Number(event.target.value) }))} className={fieldClass}>{CONFIDENCE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
+                </div>
+                <ParameterSummary title="Current selection" items={[`Measure: ${activeConfig.measure || "none"}`, `Grouping: ${activeConfig.group || "none"}`, `${activeConfig.groupA || "?"} vs ${activeConfig.groupB || "?"}`, `Loaded groups: ${(groupOptions[activeConfig.group] ?? []).length}`]} />
               </div>
             )}
 
             {testType === "chi-square" && (
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
                 <select value={chiSquare.left} onChange={(event) => setChiSquare({ ...chiSquare, left: event.target.value })} className={fieldClass}>{categoricalColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}</select>
                 <select value={chiSquare.right} onChange={(event) => setChiSquare({ ...chiSquare, right: event.target.value })} className={fieldClass}>{categoricalColumns.filter((column) => column.name !== chiSquare.left).map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}</select>
-                <select value={String(chiSquare.confidence)} onChange={(event) => setChiSquare({ ...chiSquare, confidence: Number(event.target.value) })} className={fieldClass}><option value="0.9">90% confidence</option><option value="0.95">95% confidence</option><option value="0.99">99% confidence</option></select>
+                <select value={String(chiSquare.confidence)} onChange={(event) => setChiSquare({ ...chiSquare, confidence: Number(event.target.value) })} className={fieldClass}>{CONFIDENCE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
+                </div>
+                <ParameterSummary title="Current selection" items={[`Left column: ${chiSquare.left || "none"}`, `Right column: ${chiSquare.right || "none"}`, `Confidence: ${Math.round(chiSquare.confidence * 100)}%`]} />
               </div>
             )}
 
             {testType === "anova" && (
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
                 <select value={anova.measure} onChange={(event) => setAnova({ ...anova, measure: event.target.value })} className={fieldClass}>{numericColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}</select>
                 <select value={anova.group} onChange={(event) => setAnova({ ...anova, group: event.target.value })} className={fieldClass}>{groupingColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}</select>
                 <label className="space-y-2 text-sm text-slate-600 dark:text-slate-300"><span className="font-medium">Max groups: {anova.maxGroups}</span><input type="range" min={2} max={12} value={anova.maxGroups} onChange={(event) => setAnova({ ...anova, maxGroups: Number(event.target.value) })} className="w-full accent-cyan-500" /></label>
-                <select value={String(anova.confidence)} onChange={(event) => setAnova({ ...anova, confidence: Number(event.target.value) })} className={fieldClass}><option value="0.9">90% confidence</option><option value="0.95">95% confidence</option><option value="0.99">99% confidence</option></select>
+                <select value={String(anova.confidence)} onChange={(event) => setAnova({ ...anova, confidence: Number(event.target.value) })} className={fieldClass}>{CONFIDENCE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
+                </div>
+                <ParameterSummary title="Current selection" items={[`Measure: ${anova.measure || "none"}`, `Grouping: ${anova.group || "none"}`, `Max groups: ${anova.maxGroups}`, `Confidence: ${Math.round(anova.confidence * 100)}%`]} />
               </div>
             )}
           </div>
 
           {notice && <div className={`rounded-2xl border px-4 py-3 text-sm ${notice.tone === "error" ? "border-rose-400/40 bg-rose-500/10 text-rose-700 dark:text-rose-300" : "border-cyan-400/40 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300"}`}>{notice.message}</div>}
+          <TestChecklist type={testType} />
 
           <AnimatePresence mode="wait">
             {result && (
@@ -257,6 +374,7 @@ export default function StatisticalTests({ tableName, columns, rowCount }: Stati
               </motion.div>
             )}
           </AnimatePresence>
+          {!result && <EmptyResultState />}
         </div>
 
         <div className="space-y-4">
@@ -277,6 +395,9 @@ export default function StatisticalTests({ tableName, columns, rowCount }: Stati
             </ul>
             {(groupOptions[activeConfig.group] ?? []).length > 0 && <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-xs text-cyan-800 dark:text-cyan-200">Loaded group values for {activeConfig.group}: {(groupOptions[activeConfig.group] ?? []).slice(0, 6).join(", ")}</div>}
           </div>
+          <AnalysisNotes />
+          <CaveatsCard />
+          <ResultLegend />
         </div>
       </div>
     </motion.section>

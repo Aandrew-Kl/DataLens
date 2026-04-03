@@ -1,63 +1,90 @@
 name: Bug report
-description: Report a reproducible problem in DataLens
+description: Report a reproducible issue in DataLens
 title: "[Bug]: "
 labels:
   - bug
+  - triage
 body:
-  - type: textarea
-    id: description
+  - type: markdown
     attributes:
-      label: Description
-      description: Describe the bug and what part of the app is affected.
-      placeholder: A clear and concise description of the issue.
+      value: |
+        Thanks for reporting a bug. Please provide enough detail for someone else to reproduce it quickly.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Bug summary
+      description: Describe the issue in one or two clear sentences.
+      placeholder: DataLens crashes when I run a SQL query after importing a JSON file.
     validations:
       required: true
 
   - type: textarea
-    id: steps_to_reproduce
+    id: steps
     attributes:
       label: Steps to reproduce
-      description: List the exact steps needed to reproduce the problem.
+      description: List the exact steps required to trigger the bug.
       placeholder: |
-        1. Go to ...
-        2. Upload or click ...
-        3. Run ...
-        4. Observe ...
+        1. Open DataLens
+        2. Upload ...
+        3. Click ...
+        4. Run ...
+        5. Observe ...
     validations:
       required: true
 
   - type: textarea
-    id: expected_behavior
+    id: expected
     attributes:
       label: Expected behavior
-      description: Describe what you expected to happen instead.
-      placeholder: The app should...
+      placeholder: The query should complete and render a result table.
     validations:
       required: true
 
   - type: textarea
-    id: actual_behavior
+    id: actual
     attributes:
       label: Actual behavior
-      description: Describe what actually happened.
-      placeholder: Instead, the app...
+      placeholder: The page shows an error boundary with "Failed to generate query".
     validations:
       required: true
 
-  - type: input
-    id: browser_os
+  - type: textarea
+    id: dataset_context
     attributes:
-      label: Browser / OS
-      description: Include browser version and operating system.
-      placeholder: Chrome 135 on macOS 15.4
+      label: Dataset and context
+      description: Share file type, approximate size, column shape, and whether Ollama was enabled.
+      placeholder: CSV, 25 MB, 14 columns, Ollama running with llama3.2.
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include browser, OS, DataLens version or commit, and Docker/local setup if relevant.
+      placeholder: |
+        Browser: Chrome 135
+        OS: macOS 15.4
+        DataLens: main@abcdef1
+        Setup: npm run dev
     validations:
       required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error messages or logs
+      description: Paste console output, terminal logs, stack traces, or screenshots of errors.
+      placeholder: Paste any useful logs here.
+      render: shell
+    validations:
+      required: false
 
   - type: textarea
     id: screenshots
     attributes:
-      label: Screenshots
-      description: Add screenshots, recordings, or pasted error output if helpful.
-      placeholder: Drag images here or paste links/logs.
+      label: Screenshots or recordings
+      description: Drag images here or paste links to recordings if they help explain the issue.
     validations:
       required: false
