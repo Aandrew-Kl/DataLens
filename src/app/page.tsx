@@ -10,6 +10,7 @@ import {
 } from "react";
 import type ReactEChartsCore from "echarts-for-react/lib/core";
 import * as echarts from "echarts/core";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BrainCircuit,
@@ -45,6 +46,8 @@ import {
   GitBranch,
   Search,
   FlaskConical,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 
 import { loadCSVIntoDB, runQuery, getTableRowCount } from "@/lib/duckdb/client";
@@ -228,6 +231,56 @@ import {
   SkeletonTable,
 } from "@/components/ui/skeleton";
 import { ToastProvider, useToast } from "@/components/ui/toast";
+
+// Dynamic chart imports (orphaned chart components)
+const BoxPlot = dynamic(() => import("@/components/charts/box-plot"), { ssr: false });
+const BubbleChartDyn = dynamic(() => import("@/components/charts/bubble-chart"), { ssr: false });
+const CandlestickChart = dynamic(() => import("@/components/charts/candlestick-chart"), { ssr: false });
+const ComboChart = dynamic(() => import("@/components/charts/combo-chart"), { ssr: false });
+const DivergingBarChart = dynamic(() => import("@/components/charts/diverging-bar-chart"), { ssr: false });
+const DotPlot = dynamic(() => import("@/components/charts/dot-plot"), { ssr: false });
+const DumbbellChart = dynamic(() => import("@/components/charts/dumbbell-chart"), { ssr: false });
+const HeatCalendar = dynamic(() => import("@/components/charts/heat-calendar"), { ssr: false });
+const HistogramChart = dynamic(() => import("@/components/charts/histogram-chart"), { ssr: false });
+const LollipopChart = dynamic(() => import("@/components/charts/lollipop-chart"), { ssr: false });
+const NetworkGraph = dynamic(() => import("@/components/charts/network-graph"), { ssr: false });
+const PictorialBar = dynamic(() => import("@/components/charts/pictorial-bar"), { ssr: false });
+const PolarChart = dynamic(() => import("@/components/charts/polar-chart"), { ssr: false });
+const SankeyDiagram = dynamic(() => import("@/components/charts/sankey-diagram"), { ssr: false });
+const SlopeChart = dynamic(() => import("@/components/charts/slope-chart"), { ssr: false });
+const StackedBarChart = dynamic(() => import("@/components/charts/stacked-bar-chart"), { ssr: false });
+const SteppedLineChart = dynamic(() => import("@/components/charts/stepped-line-chart"), { ssr: false });
+const SunburstChart = dynamic(() => import("@/components/charts/sunburst-chart"), { ssr: false });
+const ViolinPlot = dynamic(() => import("@/components/charts/violin-plot"), { ssr: false });
+const Scatter3D = dynamic(() => import("@/components/charts/3d-scatter"), { ssr: false });
+
+// Dynamic ML imports (orphaned ML components)
+const MLAnomalyDetector = dynamic(() => import("@/components/ml/anomaly-detector"), { ssr: false });
+const AssociationRules = dynamic(() => import("@/components/ml/association-rules"), { ssr: false });
+const DecisionTreeView = dynamic(() => import("@/components/ml/decision-tree-view"), { ssr: false });
+const FeatureEngineering = dynamic(() => import("@/components/ml/feature-engineering"), { ssr: false });
+const KnnView = dynamic(() => import("@/components/ml/knn-view"), { ssr: false });
+const LogisticRegressionView = dynamic(() => import("@/components/ml/logistic-regression-view"), { ssr: false });
+const ModelComparison = dynamic(() => import("@/components/ml/model-comparison"), { ssr: false });
+const ModelTrainingLog = dynamic(() => import("@/components/ml/model-training-log"), { ssr: false });
+const NaiveBayesView = dynamic(() => import("@/components/ml/naive-bayes-view"), { ssr: false });
+const PcaView = dynamic(() => import("@/components/ml/pca-view"), { ssr: false });
+const SurvivalAnalysis = dynamic(() => import("@/components/ml/survival-analysis"), { ssr: false });
+const TimeSeriesClassifier = dynamic(() => import("@/components/ml/time-series-classifier"), { ssr: false });
+
+// Dynamic Analytics imports (orphaned analytics components)
+const AbTestAnalyzer = dynamic(() => import("@/components/analytics/ab-test-analyzer"), { ssr: false });
+const ChurnPredictor = dynamic(() => import("@/components/analytics/churn-predictor"), { ssr: false });
+const CohortRetention = dynamic(() => import("@/components/analytics/cohort-retention"), { ssr: false });
+const CustomerLifetimeValue = dynamic(() => import("@/components/analytics/customer-lifetime-value"), { ssr: false });
+const EngagementMetrics = dynamic(() => import("@/components/analytics/engagement-metrics"), { ssr: false });
+const FunnelAnalysis = dynamic(() => import("@/components/analytics/funnel-analysis"), { ssr: false });
+const GeographicAnalysis = dynamic(() => import("@/components/analytics/geographic-analysis"), { ssr: false });
+const MarketBasketAnalysis = dynamic(() => import("@/components/analytics/market-basket-analysis"), { ssr: false });
+const RevenueAnalysis = dynamic(() => import("@/components/analytics/revenue-analysis"), { ssr: false });
+const RfmAnalysis = dynamic(() => import("@/components/analytics/rfm-analysis"), { ssr: false });
+const SeasonalDecomposition = dynamic(() => import("@/components/analytics/seasonal-decomposition"), { ssr: false });
+const SentimentAnalyzer = dynamic(() => import("@/components/analytics/sentiment-analyzer"), { ssr: false });
 
 // ─────────────────────────────────────────────
 // Types
@@ -986,7 +1039,10 @@ export default function Home() {
   const [showSharePanel, setShowSharePanel] = useState(false);
   const [previewRows, setPreviewRows] = useState<Record<string, unknown>[]>([]);
   const [showColumnDetail, setShowColumnDetail] = useState(false);
+  const [showMoreCharts, setShowMoreCharts] = useState(false);
   const [columnSearch, setColumnSearch] = useState("");
+  const [showAdvancedML, setShowAdvancedML] = useState(false);
+  const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
   const [selectedPreviewRow, setSelectedPreviewRow] = useState<Record<string, unknown> | null>(null);
   const [selectedPreviewRowIndex, setSelectedPreviewRowIndex] = useState<number | null>(null);
   const [analyticsColumnName, setAnalyticsColumnName] = useState("");
@@ -2902,6 +2958,153 @@ export default function Home() {
                         </ErrorBoundary>
                       </ToolSection>
                     </div>
+                    <div className="mt-6">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowMoreCharts(!showMoreCharts)
+                        }
+                        className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-sky-600"
+                      >
+                        {showMoreCharts ? "\u25BE" : "\u25B8"} More
+                        Charts (20 available)
+                      </button>
+                      {showMoreCharts && (
+                        <div className="mt-4 grid gap-6">
+                          <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+                            Statistical Charts
+                          </h3>
+                          <ErrorBoundary>
+                            <BoxPlot
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <HistogramChart
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <ViolinPlot
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DotPlot
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <Scatter3D
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <BubbleChartDyn
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <HeatCalendar
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+
+                          <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+                            Comparison Charts
+                          </h3>
+                          <ErrorBoundary>
+                            <StackedBarChart
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DivergingBarChart
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DumbbellChart
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <LollipopChart
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <SlopeChart
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <ComboChart
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <SteppedLineChart
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+
+                          <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+                            Specialty Charts
+                          </h3>
+                          <ErrorBoundary>
+                            <CandlestickChart
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <SankeyDiagram
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <SunburstChart
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <NetworkGraph
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <PolarChart
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <PictorialBar
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                        </div>
+                      )}
+                    </div>
                   </motion.div>
                 )}
 
@@ -2994,6 +3197,96 @@ export default function Home() {
                         />
                       </ErrorBoundary>
                     </ToolSection>
+
+                    {/* Advanced Models – collapsible */}
+                    <div className="border border-slate-200/70 dark:border-slate-800/80 rounded-2xl overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setShowAdvancedML(!showAdvancedML)}
+                        className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left bg-slate-50/80 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
+                      >
+                        <div>
+                          <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+                            Advanced Models
+                          </h3>
+                          <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                            Supervised &amp; unsupervised learners, feature tools, and model utilities
+                          </p>
+                        </div>
+                        {showAdvancedML ? (
+                          <ChevronDown className="h-5 w-5 shrink-0 text-slate-400" />
+                        ) : (
+                          <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
+                        )}
+                      </button>
+
+                      {showAdvancedML && (
+                        <div className="space-y-6 p-4">
+                          {/* ── Supervised Learning ── */}
+                          <ToolSection
+                            title="Supervised Learning"
+                            description="Train and evaluate models with labeled target variables."
+                          >
+                            <div className="space-y-4">
+                              <ErrorBoundary>
+                                <KnnView tableName={tableName} columns={profileData} />
+                              </ErrorBoundary>
+                              <ErrorBoundary>
+                                <NaiveBayesView tableName={tableName} columns={profileData} />
+                              </ErrorBoundary>
+                              <ErrorBoundary>
+                                <LogisticRegressionView tableName={tableName} columns={profileData} />
+                              </ErrorBoundary>
+                              <ErrorBoundary>
+                                <DecisionTreeView tableName={tableName} columns={profileData} />
+                              </ErrorBoundary>
+                              <ErrorBoundary>
+                                <SurvivalAnalysis tableName={tableName} columns={profileData} />
+                              </ErrorBoundary>
+                            </div>
+                          </ToolSection>
+
+                          {/* ── Unsupervised Learning ── */}
+                          <ToolSection
+                            title="Unsupervised Learning"
+                            description="Discover hidden structure and patterns without labeled data."
+                          >
+                            <div className="space-y-4">
+                              <ErrorBoundary>
+                                <MLAnomalyDetector tableName={tableName} columns={profileData} />
+                              </ErrorBoundary>
+                              <ErrorBoundary>
+                                <PcaView tableName={tableName} columns={profileData} />
+                              </ErrorBoundary>
+                              <ErrorBoundary>
+                                <AssociationRules tableName={tableName} columns={profileData} />
+                              </ErrorBoundary>
+                              <ErrorBoundary>
+                                <TimeSeriesClassifier tableName={tableName} columns={profileData} />
+                              </ErrorBoundary>
+                            </div>
+                          </ToolSection>
+
+                          {/* ── Model Tools ── */}
+                          <ToolSection
+                            title="Model Tools"
+                            description="Feature pipelines, model comparison, and training diagnostics."
+                          >
+                            <div className="space-y-4">
+                              <ErrorBoundary>
+                                <FeatureEngineering tableName={tableName} columns={profileData} />
+                              </ErrorBoundary>
+                              <ErrorBoundary>
+                                <ModelComparison tableName={tableName} columns={profileData} />
+                              </ErrorBoundary>
+                              <ErrorBoundary>
+                                <ModelTrainingLog tableName={tableName} columns={profileData} />
+                              </ErrorBoundary>
+                            </div>
+                          </ToolSection>
+                        </div>
+                      )}
+                    </div>
                   </motion.div>
                 )}
 
@@ -3650,6 +3943,96 @@ export default function Home() {
                           />
                         </ErrorBoundary>
                       </ToolSection>
+
+                      {/* Advanced Analytics – collapsible */}
+                      <div className="border border-slate-200/70 dark:border-slate-800/80 rounded-2xl overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setShowAdvancedAnalytics(!showAdvancedAnalytics)}
+                          className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left bg-slate-50/80 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
+                        >
+                          <div>
+                            <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+                              Advanced Analytics
+                            </h3>
+                            <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                              Customer, business, and statistical analysis tools
+                            </p>
+                          </div>
+                          {showAdvancedAnalytics ? (
+                            <ChevronDown className="h-5 w-5 shrink-0 text-slate-400" />
+                          ) : (
+                            <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
+                          )}
+                        </button>
+
+                        {showAdvancedAnalytics && (
+                          <div className="space-y-6 p-4">
+                            {/* ── Customer Analytics ── */}
+                            <ToolSection
+                              title="Customer Analytics"
+                              description="Predict churn, measure lifetime value, and segment users by behavior."
+                            >
+                              <div className="space-y-4">
+                                <ErrorBoundary>
+                                  <ChurnPredictor tableName={tableName} columns={profileData} />
+                                </ErrorBoundary>
+                                <ErrorBoundary>
+                                  <CustomerLifetimeValue tableName={tableName} columns={profileData} />
+                                </ErrorBoundary>
+                                <ErrorBoundary>
+                                  <CohortRetention tableName={tableName} columns={profileData} />
+                                </ErrorBoundary>
+                                <ErrorBoundary>
+                                  <RfmAnalysis tableName={tableName} columns={profileData} />
+                                </ErrorBoundary>
+                                <ErrorBoundary>
+                                  <EngagementMetrics tableName={tableName} columns={profileData} />
+                                </ErrorBoundary>
+                              </div>
+                            </ToolSection>
+
+                            {/* ── Business Analytics ── */}
+                            <ToolSection
+                              title="Business Analytics"
+                              description="A/B testing, funnels, revenue breakdowns, and market basket analysis."
+                            >
+                              <div className="space-y-4">
+                                <ErrorBoundary>
+                                  <AbTestAnalyzer tableName={tableName} columns={profileData} />
+                                </ErrorBoundary>
+                                <ErrorBoundary>
+                                  <FunnelAnalysis tableName={tableName} columns={profileData} />
+                                </ErrorBoundary>
+                                <ErrorBoundary>
+                                  <RevenueAnalysis tableName={tableName} columns={profileData} />
+                                </ErrorBoundary>
+                                <ErrorBoundary>
+                                  <MarketBasketAnalysis tableName={tableName} columns={profileData} />
+                                </ErrorBoundary>
+                              </div>
+                            </ToolSection>
+
+                            {/* ── Statistical Analysis ── */}
+                            <ToolSection
+                              title="Statistical Analysis"
+                              description="Seasonal patterns, geographic distributions, and text sentiment."
+                            >
+                              <div className="space-y-4">
+                                <ErrorBoundary>
+                                  <SeasonalDecomposition tableName={tableName} columns={profileData} />
+                                </ErrorBoundary>
+                                <ErrorBoundary>
+                                  <GeographicAnalysis tableName={tableName} columns={profileData} />
+                                </ErrorBoundary>
+                                <ErrorBoundary>
+                                  <SentimentAnalyzer tableName={tableName} columns={profileData} />
+                                </ErrorBoundary>
+                              </div>
+                            </ToolSection>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
                 )}
