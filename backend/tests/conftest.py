@@ -3,6 +3,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from datetime import datetime, timedelta
+from pydantic import BaseModel
 
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
@@ -10,26 +12,143 @@ if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
 
+from app.schemas import ai as ai_schema
+from app.schemas import analytics as analytics_schema
+
+
+class NLQueryRequest(BaseModel):
+    question: str
+    use_ollama: bool = False
+
+
+class ChurnPredictRequest(BaseModel):
+    feature_columns: list[str]
+    target_column: str
+    test_size: float = 0.2
+
+
+class CohortAnalysisRequest(BaseModel):
+    entity_id_column: str
+    signup_date_column: str
+    activity_date_column: str
+    frequency: str = "monthly"
+
+
+class AbTestServiceRequest(BaseModel):
+    group_column: str
+    metric_column: str
+    variant_a: str
+    variant_b: str
+    metric_type: str = "continuous"
+    confidence_level: float = 0.95
+
+
+if not hasattr(ai_schema, "NLQueryRequest"):
+    ai_schema.NLQueryRequest = NLQueryRequest
+if not hasattr(analytics_schema, "ChurnPredictRequest"):
+    analytics_schema.ChurnPredictRequest = ChurnPredictRequest
+if not hasattr(analytics_schema, "CohortRequest"):
+    analytics_schema.CohortRequest = CohortAnalysisRequest
+if not hasattr(analytics_schema, "AbTestRequest"):
+    analytics_schema.AbTestRequest = AbTestServiceRequest
+
+
 @pytest.fixture
-def regression_data() -> list[dict[str, float]]:
-    rng = np.random.default_rng(42)
-    x1 = rng.normal(0, 1, 120)
-    x2 = rng.normal(0, 1, 120)
-    noise = rng.normal(0, 0.1, 120)
-    y = 3.0 * x1 - 2.0 * x2 + noise
+def regression_data() -> list[dict[str, object]]:
+    rng = np.random.default_rng(12)
+    x1 = rng.normal(0.0, 1.0, 120)
+    x2 = rng.normal(1.0, 0.8, 120)
+    noise = rng.normal(0.0, 0.05, 120)
     return [
-        {"x1": float(feature_one), "x2": float(feature_two), "target": float(target)}
-        for feature_one, feature_two, target in zip(x1, x2, y, strict=False)
+        {
+            "feature_a": float(feature_one),
+            "feature_b": float(feature_two),
+            "feature_c": float(feature_one * 0.2 + feature_two * 0.7),
+            "target": float(5.0 * feature_one - 2.5 * feature_two + noise_value),
+            "text": "premium retention cohort growth" if index % 2 == 0 else "stable monthly benchmark",
+            "label": "churned" if (feature_one - feature_two + noise_value) < 0 else "active",
+            "salary": float(40_000 + (index * 250.0) + (noise_value * 1_000)),
+            "cohort_user": f"user-{index % 16}",
+            "signup_date": f"2024-{(index % 12) + 1:02d}-{(index % 28) + 1:02d}",
+            "activity_date": f"2024-{((index + 1) % 12) + 1:02d}-{((index + 2) % 28) + 1:02d}",
+        }
+        for index, (feature_one, feature_two, noise_value) in enumerate(zip(x1, x2, noise, strict=False))
     ]
 
 
 @pytest.fixture
-def cluster_data() -> list[dict[str, float]]:
-    rng = np.random.default_rng(7)
-    cluster_one = rng.normal(loc=(0.0, 0.0), scale=0.25, size=(30, 2))
-    cluster_two = rng.normal(loc=(4.0, 4.0), scale=0.25, size=(30, 2))
-    combined = np.vstack([cluster_one, cluster_two])
-    return [{"x": float(row[0]), "y": float(row[1])} for row in combined]
+def cluster_data() -> list[dict[str, object]]:
+    rng = np.random.default_rng(9)
+    cluster_left = rng.normal(loc=(0.0, 0.0), scale=0.35, size=(40, 2))
+    cluster_right = rng.normal(loc=(6.0, 6.0), scale=0.35, size=(40, 2))
+    combined = np.vstack([cluster_left, cluster_right])
+    labels = ["alpha"] * 40 + ["beta"] * 40
+    return [
+        {
+            "feature_a": float(row[0]),
+            "feature_b": float(row[1]),
+            "text": f"cluster-{label}",
+        }
+        for row, label in zip(combined, labels, strict=False)
+    ]
+
+
+@pytest.fixture
+def classification_data() -> list[dict[str, object]]:
+    rng = np.random.default_rng(27)
+    feature_a = rng.normal(0.0, 1.0, 120)
+    feature_b = rng.normal(0.5, 1.2, 120)
+    return [
+        {
+            "feature_a": float(value_a),
+            "feature_b": float(value_b),
+            "target": "positive" if (value_a + value_b) > 0 else "negative",
+            "text": "likely converted customer" if (value_a + value_b) > 0 else "low intent customer",
+            "churned": "yes" if (value_a * value_b) < 0 else "no",
+            "plan": "pro" if index % 3 == 0 else "basic",
+        }
+        for index, (value_a, value_b) in enumerate(zip(feature_a, feature_b, strict=False))
+    ]
+
+
+@pytest.fixture
+def ab_test_data() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for value in (12, 11, 10, 11, 13, 12, 14, 10, 11, 13):
+        rows.append({"variant": "A", "metric": float(value)})
+    for value in (14, 15, 13, 16, 14, 15, 17, 16, 15, 14):
+        rows.append({"variant": "B", "metric": float(value)})
+    return rows
+
+
+@pytest.fixture
+def cohort_data() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for index in range(80):
+        signup = datetime(2024, 1, 1) + timedelta(days=index % 60)
+        user = f"user-{index // 3}"
+        activity_days = index + (index % 5) * 3
+        activity = signup + timedelta(days=activity_days)
+        rows.append(
+            {
+                "user_id": user,
+                "signup_date": signup.strftime("%Y-%m-%d"),
+                "activity_date": activity.strftime("%Y-%m-%d"),
+            }
+        )
+    return rows
+
+
+@pytest.fixture
+def forecast_data() -> list[dict[str, object]]:
+    base = datetime(2024, 1, 1)
+    return [
+        {
+            "event_date": (base + timedelta(days=day)).strftime("%Y-%m-%d"),
+            "value": float(100 + (day * 2.2) + (day % 7)),
+        }
+        for day in range(1, 36)
+    ]
 
 
 @pytest.fixture

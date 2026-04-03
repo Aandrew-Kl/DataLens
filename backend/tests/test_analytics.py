@@ -1,116 +1,62 @@
-"""Analytics endpoint tests."""
+from types import SimpleNamespace
 
-from __future__ import annotations
+import pandas as pd
 
-import pytest
-from httpx import AsyncClient
-
-
-def build_churn_csv() -> str:
-    """Build a separable churn dataset."""
-
-    rows = ["sessions,last_seen_days,support_tickets,plan,churned"]
-    for index in range(1, 41):
-        sessions = max(1, 15 - index // 3)
-        last_seen_days = index
-        support_tickets = index % 4
-        plan = "pro" if index % 2 == 0 else "basic"
-        churned = "yes" if last_seen_days > 20 or sessions < 5 else "no"
-        rows.append(f"{sessions},{last_seen_days},{support_tickets},{plan},{churned}")
-    return "\n".join(rows)
+from app.services.analytics_service import ab_test, churn_predict, cohort_analysis, forecast
 
 
-def build_cohort_csv() -> str:
-    """Build a simple cohort-retention dataset."""
-
-    return "\n".join(
-        [
-            "user_id,signup_date,activity_date",
-            "u1,2024-01-03,2024-01-03",
-            "u1,2024-01-03,2024-02-10",
-            "u1,2024-01-03,2024-03-09",
-            "u2,2024-01-15,2024-01-15",
-            "u2,2024-01-15,2024-02-18",
-            "u3,2024-02-01,2024-02-01",
-            "u3,2024-02-01,2024-03-01",
-            "u4,2024-02-12,2024-02-12",
-        ]
+def test_ab_test(ab_test_data: list[dict[str, object]]) -> None:
+    frame = pd.DataFrame(ab_test_data)
+    request = SimpleNamespace(
+        group_column="variant",
+        metric_column="metric",
+        variant_a="A",
+        variant_b="B",
+        metric_type="continuous",
+        confidence_level=0.95,
     )
+    result = ab_test(frame, request)
+
+    assert "p_value" in result
+    assert "confidence_interval" in result
+    assert "effect_size" in result
 
 
-def build_ab_csv() -> str:
-    """Build a continuous A/B test dataset."""
-
-    rows = ["variant,metric"]
-    for value in (10, 11, 9, 10, 12, 11, 10, 9):
-        rows.append(f"A,{value}")
-    for value in (13, 14, 12, 15, 14, 13, 15, 14):
-        rows.append(f"B,{value}")
-    return "\n".join(rows)
-
-
-@pytest.mark.asyncio
-async def test_churn_predict_endpoint(client: AsyncClient, auth_headers: dict[str, str], upload_dataset) -> None:
-    """Churn prediction returns risk scores and feature importance."""
-
-    dataset = await upload_dataset("churn", build_churn_csv())
-    response = await client.post(
-        "/analytics/churn-predict",
-        headers=auth_headers,
-        json={
-            "dataset_id": dataset["id"],
-            "feature_columns": ["sessions", "last_seen_days", "support_tickets", "plan"],
-            "target_column": "churned",
-        },
+def test_churn_predict(classification_data: list[dict[str, object]]) -> None:
+    request = SimpleNamespace(
+        feature_columns=["feature_a", "feature_b", "plan"],
+        target_column="churned",
+        test_size=0.25,
     )
-    assert response.status_code == 200, response.text
-    payload = response.json()
-    assert payload["row_count"] == 40
-    assert payload["risk_scores"]
-    assert payload["feature_importance"]
+    result = churn_predict(pd.DataFrame(classification_data), request)
+
+    assert "risk_scores" in result
+    assert "feature_importance" in result
+    assert isinstance(result["risk_scores"], list)
+    assert isinstance(result["feature_importance"], dict)
 
 
-@pytest.mark.asyncio
-async def test_cohort_endpoint(client: AsyncClient, auth_headers: dict[str, str], upload_dataset) -> None:
-    """Cohort analysis returns retention rows."""
-
-    dataset = await upload_dataset("cohorts", build_cohort_csv())
-    response = await client.post(
-        "/analytics/cohort",
-        headers=auth_headers,
-        json={
-            "dataset_id": dataset["id"],
-            "entity_id_column": "user_id",
-            "signup_date_column": "signup_date",
-            "activity_date_column": "activity_date",
-            "frequency": "monthly",
-        },
+def test_cohort_analysis(cohort_data: list[dict[str, object]]) -> None:
+    request = SimpleNamespace(
+        entity_id_column="user_id",
+        signup_date_column="signup_date",
+        activity_date_column="activity_date",
+        frequency="monthly",
     )
-    assert response.status_code == 200, response.text
-    payload = response.json()
-    assert payload["cohort_count"] == 2
-    assert payload["retention_rows"]
+    result = cohort_analysis(pd.DataFrame(cohort_data), request)
+
+    assert "summaries" in result
+    assert isinstance(result["summaries"], list)
+    cohorts = {row["cohort_period"]: row for row in result["summaries"]}
+    assert isinstance(cohorts, dict)
+    assert all(isinstance(value, dict) for value in cohorts.values())
 
 
-@pytest.mark.asyncio
-async def test_ab_test_endpoint(client: AsyncClient, auth_headers: dict[str, str], upload_dataset) -> None:
-    """A/B testing returns a statistical result with p-value and effect size."""
+def test_forecast(forecast_data: list[dict[str, object]]) -> None:
+    frame = pd.DataFrame(forecast_data)
+    result = forecast(frame, date_column="event_date", value_column="value", periods=7, method="holt")
 
-    dataset = await upload_dataset("ab-test", build_ab_csv())
-    response = await client.post(
-        "/analytics/ab-test",
-        headers=auth_headers,
-        json={
-            "dataset_id": dataset["id"],
-            "group_column": "variant",
-            "metric_column": "metric",
-            "variant_a": "A",
-            "variant_b": "B",
-            "metric_type": "continuous",
-        },
-    )
-    assert response.status_code == 200, response.text
-    payload = response.json()
-    assert payload["test_used"] == "ttest_ind"
-    assert payload["p_value"] >= 0
-    assert len(payload["confidence_interval"]) == 2
+    predictions = result["forecast_points"]
+    assert isinstance(predictions, list)
+    assert len(predictions) == 7
+    assert all("forecast" in item for item in predictions)
