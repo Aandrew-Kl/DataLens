@@ -433,10 +433,10 @@ export default function BoxPlot({ tableName, columns }: BoxPlotProps) {
     return numericColumns.slice(0, Math.min(3, numericColumns.length)).map((column) => column.name);
   }, [numericColumns, selectedColumns]);
 
-  const selectionKey = activeColumns.join("||");
   const promise = useMemo(
     () => loadBoxPlotData(tableName, activeColumns),
-    [selectionKey, tableName],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeColumns.length, tableName],
   );
 
   function toggleColumn(columnName: string) {

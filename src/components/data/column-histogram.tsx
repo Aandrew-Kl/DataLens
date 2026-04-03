@@ -249,6 +249,8 @@ export default function ColumnHistogram({ tableName, columns }: ColumnHistogramP
     [columns, selectedColumn],
   );
 
+  const option = useMemo(() => buildOption(result, dark), [dark, result]);
+
   if (columns.length === 0) {
     return (
       <section className={`${GLASS_PANEL_CLASS} p-6`}>
@@ -341,8 +343,6 @@ export default function ColumnHistogram({ tableName, columns }: ColumnHistogramP
     const { bytes, mimeType } = dataUrlToBytes(dataUrl);
     downloadFile(bytes, `${tableName}-${result.column}-histogram.png`, mimeType);
   }
-
-  const option = useMemo(() => buildOption(result, dark), [dark, result]);
 
   return (
     <motion.section

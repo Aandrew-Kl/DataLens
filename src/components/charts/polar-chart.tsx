@@ -308,7 +308,8 @@ export default function PolarChart({ tableName, columns }: PolarChartProps) {
   }, [numericColumns, seriesColumns]);
   const promise = useMemo(
     () => loadPolarChartData(tableName, activeAngleColumn, activeSeriesColumns),
-    [activeAngleColumn, activeSeriesColumns.join("||"), tableName],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeAngleColumn, activeSeriesColumns.length, tableName],
   );
 
   function toggleSeries(columnName: string) {

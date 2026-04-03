@@ -198,7 +198,7 @@ export default function MetricDashboard({
 
           <button
             type="button"
-            onClick={() => void triggerRefresh()}
+            onClick={() => { onRefresh?.(); }}
             disabled={!onRefresh || isRefreshing}
             className="inline-flex items-center gap-2 rounded-2xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:bg-slate-400"
           >

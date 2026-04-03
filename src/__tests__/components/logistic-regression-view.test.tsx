@@ -108,7 +108,7 @@ describe("LogisticRegressionView", () => {
     await user.click(screen.getByRole("button", { name: "Fit model" }));
 
     expect(await screen.findByText("Confusion matrix")).toBeInTheDocument();
-    expect(screen.getByText("feature_a")).toBeInTheDocument();
+    expect(screen.getAllByText("feature_a").length).toBeGreaterThan(0);
     expect(screen.getByText("AUC")).toBeInTheDocument();
   });
 

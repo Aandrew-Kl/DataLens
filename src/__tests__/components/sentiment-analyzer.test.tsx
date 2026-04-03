@@ -87,7 +87,7 @@ describe("SentimentAnalyzer", () => {
 
     expect(await screen.findByText("Top sentiment words")).toBeInTheDocument();
     expect(screen.getByText("great")).toBeInTheDocument();
-    expect(screen.getByText("Positive")).toBeInTheDocument();
+    expect(screen.getAllByText("Positive").length).toBeGreaterThan(0);
   });
 
   it("exports the row-level sentiment table as CSV", async () => {

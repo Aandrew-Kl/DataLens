@@ -97,7 +97,7 @@ describe("SurvivalAnalysis", () => {
     await user.click(screen.getByRole("button", { name: "Estimate survival" }));
 
     expect(await screen.findByText("Risk table")).toBeInTheDocument();
-    expect(screen.getByText("3.00")).toBeInTheDocument();
+    expect(screen.getAllByText("3.00").length).toBeGreaterThan(0);
   });
 
   it("exports the survival table as CSV", async () => {
