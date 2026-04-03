@@ -27,6 +27,7 @@ import {
   GitMerge,
   RefreshCw,
   Share2,
+  LayoutGrid,
 } from "lucide-react";
 
 import { loadCSVIntoDB, runQuery, getTableRowCount } from "@/lib/duckdb/client";
@@ -49,7 +50,6 @@ import DataTable from "@/components/data/data-table";
 import DashboardView from "@/components/data/dashboard-view";
 import ChatInterface from "@/components/query/chat-interface";
 import SQLEditor from "@/components/query/sql-editor";
-import ColumnDetail from "@/components/data/column-detail";
 import SettingsPanel from "@/components/settings/settings-panel";
 import CommandPalette from "@/components/layout/command-palette";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -105,12 +105,36 @@ import DataQualityDashboard from "@/components/data/data-quality-dashboard";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import DataLineage from "@/components/data/data-lineage";
 import DataStory from "@/components/data/data-story";
+import DataOverview from "@/components/data/data-overview";
+import DataProfilerSummary from "@/components/data/data-profiler-summary";
+import ColumnProfilerAdvanced from "@/components/data/column-profiler-advanced";
+import QueryBuilder from "@/components/query/query-builder";
+import RelationshipExplorer from "@/components/data/relationship-explorer";
+import DataCleaner from "@/components/data/data-cleaner";
+import DashboardBuilder from "@/components/charts/dashboard-builder";
+import AiAssistant from "@/components/ai/ai-assistant";
+import ColumnCorrelator from "@/components/data/column-correlator";
+import DataComparisonAdvanced from "@/components/data/data-comparison-advanced";
+import DataFaker from "@/components/data/data-faker";
+import SQLPlayground from "@/components/query/sql-playground";
+import RegexTester from "@/components/data/regex-tester";
 
 // ─────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────
 
-type AppTab = "profile" | "dashboard" | "query" | "sql" | "charts" | "transforms" | "analytics" | "reports" | "pivot" | "compare";
+type AppTab =
+  | "profile"
+  | "dashboard"
+  | "query"
+  | "sql"
+  | "charts"
+  | "builder"
+  | "transforms"
+  | "analytics"
+  | "reports"
+  | "pivot"
+  | "compare";
 
 interface FileDropResult {
   fileName: string;
@@ -146,8 +170,10 @@ const TABS: { id: AppTab; label: string; icon: typeof Database }[] = [
   { id: "query", label: "Ask AI", icon: MessageSquare },
   { id: "sql", label: "SQL Editor", icon: Code2 },
   { id: "charts", label: "Charts", icon: PieChart },
+  { id: "builder", label: "Builder", icon: LayoutGrid },
   { id: "transforms", label: "Transforms", icon: Wand2 },
   { id: "analytics", label: "Analytics", icon: GitMerge },
+  { id: "compare", label: "Compare", icon: RefreshCw },
   { id: "pivot", label: "Pivot", icon: Table },
   { id: "reports", label: "Reports", icon: FileText },
 ];
@@ -444,12 +470,18 @@ function TablePreview({
 // SQL Editor Wrapper
 // ─────────────────────────────────────────────
 
+function buildDefaultSQL(tableName: string) {
+  return `SELECT *\nFROM "${tableName}"\nLIMIT 100;`;
+}
+
 function SQLEditorTab({
   tableName,
   columns,
+  datasetId,
 }: {
   tableName: string;
   columns: ColumnProfile[];
+  datasetId: string;
 }) {
   const [lastResult, setLastResult] = useState<{
     data: Record<string, unknown>[];
@@ -457,41 +489,140 @@ function SQLEditorTab({
     sql: string;
     executionTimeMs: number;
   } | null>(null);
+  const [editorDefaultSQL, setEditorDefaultSQL] = useState(() =>
+    buildDefaultSQL(tableName)
+  );
+  const [editorInstanceKey, setEditorInstanceKey] = useState(0);
+  const [showQueryBuilder, setShowQueryBuilder] = useState(true);
+  const [showPlayground, setShowPlayground] = useState(false);
+
+  const handleSelectSQL = useCallback((sql: string) => {
+    setEditorDefaultSQL(sql);
+    setEditorInstanceKey((current) => current + 1);
+    setLastResult(null);
+    setShowPlayground(false);
+  }, []);
 
   return (
-    <div className="space-y-6">
-      <SQLEditor
-        tableName={tableName}
-        columns={columns}
-        defaultSQL={`SELECT * FROM "${tableName}" LIMIT 100`}
-        onQueryResult={setLastResult}
-      />
-
-      {lastResult && lastResult.data.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-              Results
-            </h3>
-            <span className="text-xs text-slate-400">
-              {lastResult.data.length} rows &middot;{" "}
-              {lastResult.executionTimeMs.toFixed(1)}ms
-            </span>
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
+      <div className="space-y-6 lg:col-span-3">
+        <div className="rounded-xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                Query Composer
+              </h3>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                Build SQL visually, then switch between the classic editor and
+                the multi-tab playground.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setShowQueryBuilder((current) => !current)}
+                className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              >
+                {showQueryBuilder ? "Hide Builder" : "Show Builder"}
+              </button>
+              <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-slate-800">
+                <button
+                  onClick={() => setShowPlayground(false)}
+                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                    showPlayground
+                      ? "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                      : "bg-indigo-500 text-white shadow-sm"
+                  }`}
+                >
+                  SQL Editor
+                </button>
+                <button
+                  onClick={() => setShowPlayground(true)}
+                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                    showPlayground
+                      ? "bg-indigo-500 text-white shadow-sm"
+                      : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                  }`}
+                >
+                  SQL Playground
+                </button>
+              </div>
+            </div>
           </div>
-          <DataTable
-            data={lastResult.data}
-            columns={lastResult.columns}
-            pageSize={50}
-            searchable
-            sortable
-            exportable
+        </div>
+
+        <AnimatePresence initial={false}>
+          {showQueryBuilder && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+            >
+              <QueryBuilder
+                tableName={tableName}
+                columns={columns}
+                onQueryGenerated={handleSelectSQL}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className={showPlayground ? "hidden" : "space-y-6"}>
+          <SQLEditor
+            key={`${tableName}-${editorInstanceKey}`}
+            tableName={tableName}
+            columns={columns}
+            defaultSQL={editorDefaultSQL}
+            onQueryResult={setLastResult}
           />
-        </motion.div>
-      )}
+
+          {lastResult && lastResult.data.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                  Results
+                </h3>
+                <span className="text-xs text-slate-400">
+                  {lastResult.data.length} rows &middot;{" "}
+                  {lastResult.executionTimeMs.toFixed(1)}ms
+                </span>
+              </div>
+              <DataTable
+                data={lastResult.data}
+                columns={lastResult.columns}
+                pageSize={50}
+                searchable
+                sortable
+                exportable
+              />
+            </motion.div>
+          )}
+        </div>
+
+        <div className={showPlayground ? "block" : "hidden"}>
+          <SQLPlayground tableName={tableName} columns={columns} />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <ErrorBoundary>
+          <TemplatePicker
+            tableName={tableName}
+            columns={columns}
+            onSelectSQL={handleSelectSQL}
+          />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <QueryHistory datasetId={datasetId} onSelectQuery={handleSelectSQL} />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <SavedQueries onSelectQuery={handleSelectSQL} />
+        </ErrorBoundary>
+      </div>
     </div>
   );
 }
@@ -524,7 +655,8 @@ export default function Home() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showUploader, setShowUploader] = useState(false);
-  const [selectedColumn, setSelectedColumn] = useState<ColumnProfile | null>(null);
+  const [selectedAdvancedColumn, setSelectedAdvancedColumn] =
+    useState<ColumnProfile | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
@@ -588,7 +720,7 @@ export default function Home() {
       } else if (e.key === "Escape") {
         setShowCommandPalette(false);
         setShowSettings(false);
-        setSelectedColumn(null);
+        setSelectedAdvancedColumn(null);
         setShowUploader(false);
         setShowKeyboardShortcuts(false);
         setShowSharePanel(false);
@@ -677,6 +809,17 @@ export default function Home() {
     [addDataset, addNotification]
   );
 
+  const handleGeneratedData = useCallback(
+    (csvContent: string, fileName: string) => {
+      void handleFileLoaded({
+        fileName,
+        csvContent,
+        sizeBytes: new Blob([csvContent]).size,
+      });
+    },
+    [handleFileLoaded]
+  );
+
   // Update profile data when active dataset changes
   useEffect(() => {
     if (activeDataset) {
@@ -701,6 +844,7 @@ export default function Home() {
 
   useEffect(() => {
     setPreviewRows([]);
+    setSelectedAdvancedColumn(null);
     setSelectedPreviewRow(null);
     setSelectedPreviewRowIndex(null);
   }, [activeDataset?.id]);
@@ -1179,6 +1323,17 @@ export default function Home() {
               </div>
             </motion.div>
 
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="w-full max-w-6xl px-4 pt-10"
+            >
+              <ErrorBoundary>
+                <DataFaker onDataGenerated={handleGeneratedData} />
+              </ErrorBoundary>
+            </motion.div>
+
             {/* Feature cards below */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -1479,10 +1634,26 @@ export default function Home() {
                       </button>
                     </div>
                     <ErrorBoundary>
+                      <DataOverview
+                        tableName={tableName}
+                        columns={profileData}
+                        rowCount={activeDataset.rowCount}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <DataProfilerSummary
+                        tableName={tableName}
+                        columns={profileData}
+                        rowCount={activeDataset.rowCount}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
                       <DataProfiler
                         columns={profileData}
                         rowCount={activeDataset.rowCount}
-                        onColumnClick={(col) => setSelectedColumn(col)}
+                        onColumnClick={(col) =>
+                          setSelectedAdvancedColumn(col)
+                        }
                       />
                     </ErrorBoundary>
 
@@ -1636,34 +1807,14 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                      <div className="lg:col-span-3">
-                        <ErrorBoundary>
-                          <SQLEditorTab
-                            tableName={tableName}
-                            columns={profileData}
-                          />
-                        </ErrorBoundary>
-                      </div>
-                      <div className="space-y-4">
-                        <ErrorBoundary>
-                          <TemplatePicker
-                            tableName={tableName}
-                            columns={profileData}
-                            onSelectSQL={() => {}}
-                          />
-                        </ErrorBoundary>
-                        <ErrorBoundary>
-                          <QueryHistory
-                            datasetId={activeDataset.id}
-                            onSelectQuery={() => {}}
-                          />
-                        </ErrorBoundary>
-                        <ErrorBoundary>
-                          <SavedQueries onSelectQuery={() => {}} />
-                        </ErrorBoundary>
-                      </div>
-                    </div>
+                    <ErrorBoundary>
+                      <SQLEditorTab
+                        key={tableName}
+                        tableName={tableName}
+                        columns={profileData}
+                        datasetId={activeDataset.id}
+                      />
+                    </ErrorBoundary>
                   </motion.div>
                 )}
 
@@ -1722,6 +1873,33 @@ export default function Home() {
                   </motion.div>
                 )}
 
+                {activeTab === "builder" && (
+                  <motion.div
+                    key="builder"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="mb-4">
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Dashboard Builder
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Compose a custom dashboard layout with charts, tables,
+                        KPI cards, and notes.
+                      </p>
+                    </div>
+                    <ErrorBoundary>
+                      <DashboardBuilder
+                        tableName={tableName}
+                        columns={profileData}
+                        rowCount={activeDataset.rowCount}
+                      />
+                    </ErrorBoundary>
+                  </motion.div>
+                )}
+
                 {activeTab === "transforms" && (
                   <motion.div
                     key="transforms"
@@ -1739,34 +1917,46 @@ export default function Home() {
                         your data
                       </p>
                     </div>
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <div className="space-y-6">
                       <ErrorBoundary>
-                        <TransformPanel
+                        <DataCleaner
                           tableName={tableName}
                           columns={profileData}
-                          onTransformComplete={() =>
+                          onCleanComplete={() =>
                             void refreshActiveDataset(
-                              "Transform complete",
-                              `Updated ${tableName} after the transform run.`
+                              "Cleaning complete",
+                              `Updated ${tableName} after cleaning operations.`
                             )
                           }
                         />
                       </ErrorBoundary>
-                      {datasets.length > 1 && (
+                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         <ErrorBoundary>
-                          <JoinBuilder
-                            datasets={datasets}
-                            onJoinComplete={() =>
+                          <TransformPanel
+                            tableName={tableName}
+                            columns={profileData}
+                            onTransformComplete={() =>
                               void refreshActiveDataset(
-                                "Join complete",
-                                `Re-profiled ${tableName} after the join finished.`
+                                "Transform complete",
+                                `Updated ${tableName} after the transform run.`
                               )
                             }
                           />
                         </ErrorBoundary>
-                      )}
-                    </div>
-                    <div className="space-y-6">
+                        {datasets.length > 1 && (
+                          <ErrorBoundary>
+                            <JoinBuilder
+                              datasets={datasets}
+                              onJoinComplete={() =>
+                                void refreshActiveDataset(
+                                  "Join complete",
+                                  `Re-profiled ${tableName} after the join finished.`
+                                )
+                              }
+                            />
+                          </ErrorBoundary>
+                        )}
+                      </div>
                       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         <ErrorBoundary>
                           <ColumnRenamer
@@ -1827,6 +2017,12 @@ export default function Home() {
                           onSave={handleFormulaSave}
                         />
                       </ErrorBoundary>
+                      <ErrorBoundary>
+                        <RegexTester
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
                     </div>
                   </motion.div>
                 )}
@@ -1857,6 +2053,20 @@ export default function Home() {
                       </ErrorBoundary>
                       <ErrorBoundary>
                         <DataLineage tableName={tableName} />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <RelationshipExplorer
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <ColumnCorrelator
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
+                        />
                       </ErrorBoundary>
                       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         <ErrorBoundary>
@@ -1967,6 +2177,43 @@ export default function Home() {
                   </motion.div>
                 )}
 
+                {activeTab === "compare" && (
+                  <motion.div
+                    key="compare"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-4"
+                  >
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Dataset Comparison
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Compare loaded datasets side by side for schema, quality,
+                        and distribution differences.
+                      </p>
+                    </div>
+                    {datasets.length < 2 && (
+                      <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300">
+                        Load at least one more dataset for the most useful
+                        comparisons. Until then, you can still inspect the
+                        current dataset against itself.
+                      </div>
+                    )}
+                    <ErrorBoundary>
+                      <DataComparisonAdvanced
+                        datasets={datasets.map((dataset) => ({
+                          tableName: dataset.name,
+                          columns: dataset.columns,
+                          rowCount: dataset.rowCount,
+                        }))}
+                      />
+                    </ErrorBoundary>
+                  </motion.div>
+                )}
+
                 {activeTab === "reports" && (
                   <motion.div
                     key="reports"
@@ -2013,13 +2260,12 @@ export default function Home() {
           </main>
         </div>
 
-        {/* Column detail slide-in panel */}
-        {activeDataset && (
-          <ColumnDetail
-            column={selectedColumn!}
+        {activeDataset && selectedAdvancedColumn && (
+          <ColumnProfilerAdvanced
             tableName={tableName}
-            open={selectedColumn !== null}
-            onClose={() => setSelectedColumn(null)}
+            column={selectedAdvancedColumn}
+            rowCount={activeDataset.rowCount}
+            onClose={() => setSelectedAdvancedColumn(null)}
           />
         )}
 
@@ -2090,6 +2336,14 @@ export default function Home() {
           rowIndex={selectedPreviewRowIndex ?? undefined}
           totalRows={previewRows.length || undefined}
         />
+
+        {activeDataset && (
+          <AiAssistant
+            tableName={tableName}
+            columns={profileData}
+            rowCount={activeDataset.rowCount}
+          />
+        )}
 
         <NotificationCenter
           notifications={notifications}

@@ -58,3 +58,51 @@ export function AnimatePresence({
 export function useReducedMotion() {
   return false;
 }
+
+type MotionValueListener = (value: number) => void;
+
+interface MockMotionValue {
+  get: () => number;
+  set: (value: number) => void;
+  on: (event: string, listener: MotionValueListener) => () => void;
+}
+
+export function useMotionValue(initialValue: number): MockMotionValue {
+  const valueRef = React.useRef(initialValue);
+  const listenersRef = React.useRef(new Set<MotionValueListener>());
+
+  return React.useMemo(
+    () => ({
+      get: () => valueRef.current,
+      set: (value: number) => {
+        valueRef.current = value;
+        listenersRef.current.forEach((listener) => listener(value));
+      },
+      on: (_event: string, listener: MotionValueListener) => {
+        listenersRef.current.add(listener);
+        return () => {
+          listenersRef.current.delete(listener);
+        };
+      },
+    }),
+    [],
+  );
+}
+
+export function useMotionValueEvent(
+  motionValue: MockMotionValue,
+  event: string,
+  listener: MotionValueListener,
+) {
+  React.useEffect(() => motionValue.on(event, listener), [event, listener, motionValue]);
+}
+
+export function animate(
+  motionValue: MockMotionValue,
+  value: number,
+) {
+  motionValue.set(value);
+  return {
+    stop() {},
+  };
+}
