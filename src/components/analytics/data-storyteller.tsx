@@ -609,13 +609,11 @@ function DataStorytellerReady({
   const result = use(resultPromise);
 
   function toggleFinding(id: string) {
-    startTransition(() => {
-      setOpenIds((current) =>
-        current.includes(id)
-          ? current.filter((item) => item !== id)
-          : [...current, id],
-      );
-    });
+    setOpenIds((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id],
+    );
   }
 
   function exportStory() {

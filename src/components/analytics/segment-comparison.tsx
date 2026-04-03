@@ -95,6 +95,8 @@ interface SegmentResult {
   error: string | null;
 }
 
+const segmentComparisonCache = new Map<string, Promise<SegmentResult>>();
+
 function SummaryCard({
   label,
   value,
@@ -416,6 +418,20 @@ async function loadSegmentComparison(
   return { metrics, error: null };
 }
 
+function getCachedSegmentComparison(
+  cacheKey: string,
+  load: () => Promise<SegmentResult>,
+) {
+  const cached = segmentComparisonCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  const request = load();
+  segmentComparisonCache.set(cacheKey, request);
+  return request;
+}
+
 function SegmentComparisonReady({
   tableName,
   columns,
@@ -451,21 +467,42 @@ function SegmentComparisonReady({
       }),
     [availableColumns, segments],
   );
+  const queryKey = useMemo(
+    () =>
+      JSON.stringify({
+        tableName,
+        metric: safeMetricColumn,
+        aggregation,
+        segments: safeSegments.map((segment) => ({
+          id: segment.id,
+          name: segment.name,
+          column: segment.column,
+          operator: segment.operator,
+          value: segment.value,
+          secondValue: segment.secondValue,
+        })),
+      }),
+    [aggregation, safeMetricColumn, safeSegments, tableName],
+  );
 
   const resultPromise = useMemo(
     () =>
-      loadSegmentComparison(
-        tableName,
-        safeSegments,
-        columns,
-        safeMetricColumn,
-        aggregation,
-      ).catch((error) => ({
-        metrics: [],
-        error:
-          error instanceof Error ? error.message : "Unable to compare segments.",
-      })),
-    [aggregation, columns, safeMetricColumn, safeSegments, tableName],
+      getCachedSegmentComparison(queryKey, () =>
+        loadSegmentComparison(
+          tableName,
+          safeSegments,
+          columns,
+          safeMetricColumn,
+          aggregation,
+        ).catch((error) => ({
+          metrics: [],
+          error:
+            error instanceof Error
+              ? error.message
+              : "Unable to compare segments.",
+        })),
+      ),
+    [aggregation, columns, queryKey, safeMetricColumn, safeSegments, tableName],
   );
 
   const result = use(resultPromise);
