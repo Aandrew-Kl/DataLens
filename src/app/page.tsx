@@ -45,6 +45,8 @@ import type { DatasetMeta, ColumnProfile } from "@/types/dataset";
 
 // Components
 import FileDropzone from "@/components/data/file-dropzone";
+import DataBookmarks from "@/components/data/data-bookmarks";
+import DataChangelog from "@/components/data/data-changelog";
 import DataProfiler from "@/components/data/data-profiler";
 import DataTable from "@/components/data/data-table";
 import DashboardView from "@/components/data/dashboard-view";
@@ -63,6 +65,7 @@ import CorrelationMatrix from "@/components/data/correlation-matrix";
 import OutlierDetector from "@/components/data/outlier-detector";
 import MissingDataMap from "@/components/data/missing-data-map";
 import ReportBuilder from "@/components/report/report-builder";
+import ColumnGrouper from "@/components/data/column-grouper";
 import JoinBuilder from "@/components/data/join-builder";
 import QueryHistory from "@/components/query/query-history";
 import SavedQueries from "@/components/query/saved-queries";
@@ -70,6 +73,7 @@ import DataSummary from "@/components/data/data-summary";
 import SampleDatasets from "@/components/data/sample-datasets";
 import KeyboardShortcutsDialog from "@/components/ui/keyboard-shortcuts-dialog";
 import PivotTable from "@/components/data/pivot-table";
+import PivotTableAdvanced from "@/components/data/pivot-table-advanced";
 import SchemaViewer from "@/components/data/schema-viewer";
 import ExportWizard from "@/components/data/export-wizard";
 import TemplatePicker from "@/components/query/template-picker";
@@ -87,6 +91,7 @@ import FrequencyTable from "@/components/data/frequency-table";
 import TimeSeriesAnalyzer from "@/components/data/time-series-analyzer";
 import DataValidator from "@/components/data/data-validator";
 import AnomalyHeatmap from "@/components/data/anomaly-heatmap";
+import ChartAnnotator from "@/components/charts/chart-annotator";
 import ChartRecommendations from "@/components/charts/chart-recommendations";
 import ChartGallery from "@/components/charts/chart-gallery";
 import SparklineGrid from "@/components/charts/sparkline-grid";
@@ -667,6 +672,7 @@ export default function Home() {
   const [selectedPreviewRowIndex, setSelectedPreviewRowIndex] = useState<number | null>(null);
   const [analyticsColumnName, setAnalyticsColumnName] = useState("");
   const [savedCharts, setSavedCharts] = useState<SavedChartSnapshot[]>([]);
+  const [pivotView, setPivotView] = useState<"standard" | "advanced">("standard");
   const queryTabRef = useRef<HTMLDivElement>(null);
   const datasets = useDatasetStore((s) => s.datasets);
 
@@ -949,6 +955,44 @@ export default function Home() {
     },
     [activeDataset, addNotification, tableName]
   );
+
+  useEffect(() => {
+    if (!activeDataset) {
+      return;
+    }
+
+    const handleComputedColumnCreated = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{
+          tableName?: string;
+          columnName?: string;
+        }>
+      ).detail;
+
+      if (detail?.tableName !== tableName) {
+        return;
+      }
+
+      void refreshActiveDataset(
+        "Computed column created",
+        detail.columnName
+          ? `Updated ${tableName} after adding ${detail.columnName}.`
+          : `Updated ${tableName} after creating a computed column.`
+      );
+    };
+
+    window.addEventListener(
+      "datalens:computed-column-created",
+      handleComputedColumnCreated as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "datalens:computed-column-created",
+        handleComputedColumnCreated as EventListener
+      );
+    };
+  }, [activeDataset, refreshActiveDataset, tableName]);
 
   const submitNaturalLanguageQuestion = useCallback(
     (question: string) => {
@@ -1541,6 +1585,14 @@ export default function Home() {
 
           {/* Tab content */}
           <main className="flex-1 px-4 sm:px-6 py-6">
+            {activeDataset && (
+              <div className="mb-6">
+                <ErrorBoundary>
+                  <DataBookmarks tableName={tableName} columns={profileData} />
+                </ErrorBoundary>
+              </div>
+            )}
+
             {/* Upload modal overlay */}
             {showUploader && (
               <motion.div
@@ -1843,6 +1895,12 @@ export default function Home() {
                     </ErrorBoundary>
                     <div className="mt-6 space-y-6">
                       <ErrorBoundary>
+                        <ChartAnnotator
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
                         <ChartRecommendations
                           tableName={tableName}
                           columns={profileData}
@@ -2001,6 +2059,17 @@ export default function Home() {
                             tableName={tableName}
                             columns={profileData}
                           />
+                        </ErrorBoundary>
+                      </div>
+                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <ErrorBoundary>
+                          <ColumnGrouper
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <DataChangelog tableName={tableName} />
                         </ErrorBoundary>
                       </div>
                       <ErrorBoundary>
@@ -2240,18 +2309,53 @@ export default function Home() {
                     transition={{ duration: 0.2 }}
                   >
                     <div className="mb-4">
-                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
-                        Pivot Table
-                      </h2>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
-                        Cross-tabulate your data with custom aggregations and heatmap formatting
-                      </p>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                            Pivot Table
+                          </h2>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
+                            Cross-tabulate your data with custom aggregations
+                            and switch between the standard and advanced pivot
+                            builders.
+                          </p>
+                        </div>
+                        <div className="inline-flex w-fit rounded-xl border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-slate-800">
+                          <button
+                            onClick={() => setPivotView("standard")}
+                            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                              pivotView === "standard"
+                                ? "bg-indigo-500 text-white"
+                                : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
+                            }`}
+                          >
+                            Standard
+                          </button>
+                          <button
+                            onClick={() => setPivotView("advanced")}
+                            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                              pivotView === "advanced"
+                                ? "bg-indigo-500 text-white"
+                                : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
+                            }`}
+                          >
+                            Advanced
+                          </button>
+                        </div>
+                      </div>
                     </div>
                     <ErrorBoundary>
-                      <PivotTable
-                        tableName={tableName}
-                        columns={profileData}
-                      />
+                      {pivotView === "advanced" ? (
+                        <PivotTableAdvanced
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      ) : (
+                        <PivotTable
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      )}
                     </ErrorBoundary>
                   </motion.div>
                 )}
