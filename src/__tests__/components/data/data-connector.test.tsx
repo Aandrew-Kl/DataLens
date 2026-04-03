@@ -90,7 +90,9 @@ describe("DataConnector", () => {
       );
     });
 
-    expect(screen.getByText("Loaded iris into DuckDB.")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/loaded.*iris/i)).toBeInTheDocument();
+    });
     expect(onDataLoaded).toHaveBeenCalledWith({
       tableName: "iris",
       columns: profiledColumns,

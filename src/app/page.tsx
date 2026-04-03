@@ -101,6 +101,10 @@ import ChartAnnotator from "@/components/charts/chart-annotator";
 import ChartRecommendations from "@/components/charts/chart-recommendations";
 import ChartGallery from "@/components/charts/chart-gallery";
 import ChartExport from "@/components/charts/chart-export";
+import WaterfallChart from "@/components/charts/waterfall-chart";
+import FunnelChart from "@/components/charts/funnel-chart";
+import TreemapChart from "@/components/charts/treemap-chart";
+import ChartTemplates from "@/components/charts/chart-templates";
 import SparklineGrid from "@/components/charts/sparkline-grid";
 import ScatterMatrix from "@/components/charts/scatter-matrix";
 import ClusteringView from "@/components/ml/clustering-view";
@@ -129,8 +133,10 @@ import DataCleaner from "@/components/data/data-cleaner";
 import DataComparison from "@/components/data/data-comparison";
 import DataConnector from "@/components/data/data-connector";
 import DataJoinWizard from "@/components/data/data-join-wizard";
+import MergeDatasets from "@/components/data/merge-datasets";
 import DataPipeline from "@/components/data/data-pipeline";
 import DataScheduler from "@/components/data/data-scheduler";
+import DataVersioning from "@/components/data/data-versioning";
 import DashboardBuilder from "@/components/charts/dashboard-builder";
 import AiAssistant from "@/components/ai/ai-assistant";
 import ColumnCorrelator from "@/components/data/column-correlator";
@@ -141,6 +147,12 @@ import SQLPlayground from "@/components/query/sql-playground";
 import RegexTester from "@/components/data/regex-tester";
 import StatisticalTests from "@/components/data/statistical-tests";
 import GeoChart from "@/components/charts/geo-chart";
+import SmartFilter from "@/components/data/smart-filter";
+import DataQualityRules from "@/components/data/data-quality-rules";
+import AnomalyDetector from "@/components/data/anomaly-detector";
+import DataCatalog from "@/components/data/data-catalog";
+import DataProfilerAI from "@/components/data/data-profiler-ai";
+import AccessibilityPanel from "@/components/ui/accessibility-panel";
 import ThemeCustomizer from "@/components/layout/theme-customizer";
 
 // ─────────────────────────────────────────────
@@ -1870,6 +1882,13 @@ export default function Home() {
                       />
                     </ErrorBoundary>
                     <ErrorBoundary>
+                      <DataProfilerAI
+                        tableName={tableName}
+                        columns={profileData}
+                        rowCount={activeDataset.rowCount}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
                       <DataProfiler
                         columns={profileData}
                         rowCount={activeDataset.rowCount}
@@ -1998,6 +2017,32 @@ export default function Home() {
                     >
                       <ErrorBoundary>
                         <DataConnector onDataLoaded={handleConnectorDataLoaded} />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Merge Datasets"
+                      description="Append, union, or join multiple loaded sources into a new dataset without leaving the import workspace."
+                    >
+                      <ErrorBoundary>
+                        <MergeDatasets
+                          onMergeComplete={(nextTableName) =>
+                            void registerDerivedDataset({
+                              tableName: sanitizeTableName(nextTableName),
+                              fileName: nextTableName,
+                              nextTab: "profile",
+                              notificationTitle: "Merged dataset ready",
+                              notificationMessage: `${nextTableName} was materialized from the merge workspace and is ready to explore.`,
+                            })
+                          }
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Catalog"
+                      description="Inspect every loaded DuckDB relation, browse schema details, and manage table-level metadata from one place."
+                    >
+                      <ErrorBoundary>
+                        <DataCatalog />
                       </ErrorBoundary>
                     </ToolSection>
                   </motion.div>
@@ -2134,6 +2179,19 @@ export default function Home() {
                         columns={profileData}
                       />
                     </ErrorBoundary>
+                    <div className="mt-6">
+                      <ToolSection
+                        title="Chart Templates"
+                        description="Start from reusable visual patterns with auto-mapped fields and saved template presets."
+                      >
+                        <ErrorBoundary>
+                          <ChartTemplates
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                    </div>
                     <details className="group mt-6 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
                       <summary className="cursor-pointer list-none">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -2200,6 +2258,39 @@ export default function Home() {
                           columns={profileData}
                         />
                       </ErrorBoundary>
+                      <ToolSection
+                        title="Waterfall Chart"
+                        description="Track additive and subtractive contributions across ordered categories and export the result as a polished narrative chart."
+                      >
+                        <ErrorBoundary>
+                          <WaterfallChart
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                      <ToolSection
+                        title="Funnel Chart"
+                        description="Visualize stage conversion, identify the largest drop-offs, and inspect throughput between each step."
+                      >
+                        <ErrorBoundary>
+                          <FunnelChart
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                      <ToolSection
+                        title="Treemap Chart"
+                        description="Compare hierarchical category share with an area-based layout that works well for dense breakdowns."
+                      >
+                        <ErrorBoundary>
+                          <TreemapChart
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
                     </div>
                   </motion.div>
                 )}
@@ -2371,6 +2462,17 @@ export default function Home() {
                           columns={profileData}
                         />
                       </ErrorBoundary>
+                      <ToolSection
+                        title="Smart Filters"
+                        description="Build reusable multi-condition filter logic and turn it into SQL-ready predicates for downstream analysis."
+                      >
+                        <ErrorBoundary>
+                          <SmartFilter
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
                       <ErrorBoundary>
                         <DataCleaner
                           tableName={tableName}
@@ -2487,6 +2589,28 @@ export default function Home() {
                           columns={profileData}
                         />
                       </ErrorBoundary>
+                      <ToolSection
+                        title="Data Quality Rules"
+                        description="Define validation rules, persist reusable rule sets, and quantify violations before publishing downstream assets."
+                      >
+                        <ErrorBoundary>
+                          <DataQualityRules
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                      <ToolSection
+                        title="Anomaly Detector"
+                        description="Run statistical anomaly detection with multiple methods to surface unexpected records and time-series spikes."
+                      >
+                        <ErrorBoundary>
+                          <AnomalyDetector
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
                     </div>
                   </motion.div>
                 )}
@@ -2749,6 +2873,18 @@ export default function Home() {
                           />
                         </ErrorBoundary>
                       </ToolSection>
+                      <ToolSection
+                        title="Dataset Versioning"
+                        description="Capture named snapshots, branch working states, and compare row-level differences before major transformations."
+                      >
+                        <ErrorBoundary>
+                          <DataVersioning
+                            tableName={tableName}
+                            columns={profileData}
+                            rowCount={activeDataset.rowCount}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
                     </div>
                   </motion.div>
                 )}
@@ -3002,6 +3138,10 @@ export default function Home() {
             rowCount={activeDataset.rowCount}
           />
         )}
+
+        <ErrorBoundary>
+          <AccessibilityPanel />
+        </ErrorBoundary>
 
         <NotificationCenter
           notifications={notifications}
