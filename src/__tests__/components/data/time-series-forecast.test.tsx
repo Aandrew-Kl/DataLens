@@ -7,6 +7,7 @@ import { downloadFile } from "@/lib/utils/export";
 import type { ColumnProfile } from "@/types/dataset";
 
 jest.mock("framer-motion");
+jest.mock("@/lib/hooks/use-dark-mode", () => ({ useDarkMode: jest.fn().mockReturnValue(false) }));
 jest.mock("@/lib/duckdb/client", () => ({ runQuery: jest.fn().mockResolvedValue([]) }));
 jest.mock("@/lib/utils/export", () => ({ downloadFile: jest.fn() }));
 jest.mock("@/lib/api/analytics", () => ({ forecast: jest.fn().mockRejectedValue(new Error("not available")) }));
