@@ -636,6 +636,7 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
               Cohort date
             </label>
             <select
+              aria-label="Cohort date"
               value={safeDateColumn}
               onChange={(event) =>
                 startTransition(() => setDateColumn(event.target.value))
@@ -654,6 +655,7 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
               Metric
             </label>
             <select
+              aria-label="Metric"
               value={safeMetricColumn}
               onChange={(event) =>
                 startTransition(() => setMetricColumn(event.target.value))
@@ -673,6 +675,7 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
               Granularity
             </label>
             <select
+              aria-label="Granularity"
               value={granularity}
               onChange={(event) =>
                 startTransition(() =>
@@ -690,6 +693,7 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
               Aggregation
             </label>
             <select
+              aria-label="Aggregation"
               value={safeAggregation}
               onChange={(event) =>
                 startTransition(() =>

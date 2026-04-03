@@ -513,6 +513,7 @@ function DistributionAnalyzerReady({
               Numeric column
             </label>
             <select
+              aria-label="Numeric column"
               value={safeColumn}
               onChange={(event) =>
                 startTransition(() => setColumnName(event.target.value))
@@ -554,6 +555,7 @@ function DistributionAnalyzerReady({
               View
             </label>
             <select
+              aria-label="View"
               value={view}
               onChange={(event) =>
                 startTransition(() =>

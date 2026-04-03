@@ -574,6 +574,7 @@ function SegmentComparisonReady({
               Metric column
             </label>
             <select
+              aria-label="Metric column"
               value={safeMetricColumn}
               onChange={(event) =>
                 startTransition(() => setMetricColumn(event.target.value))
@@ -592,6 +593,7 @@ function SegmentComparisonReady({
               Aggregation
             </label>
             <select
+              aria-label="Aggregation"
               value={aggregation}
               onChange={(event) =>
                 startTransition(() =>
@@ -610,6 +612,7 @@ function SegmentComparisonReady({
               View
             </label>
             <select
+              aria-label="View"
               value={view}
               onChange={(event) =>
                 startTransition(() =>

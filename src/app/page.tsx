@@ -44,6 +44,7 @@ import {
   Wrench,
   GitBranch,
   Search,
+  FlaskConical,
 } from "lucide-react";
 
 import { loadCSVIntoDB, runQuery, getTableRowCount } from "@/lib/duckdb/client";
@@ -179,6 +180,9 @@ import GaugeChart from "@/components/charts/gauge-chart";
 import HeatmapChart from "@/components/charts/heatmap-chart";
 import ParallelCoordinates from "@/components/charts/parallel-coordinates";
 import CohortAnalysis from "@/components/data/cohort-analysis";
+import DistributionAnalyzer from "@/components/data/distribution-analyzer";
+import TextColumnAnalyzer from "@/components/data/text-column-analyzer";
+import DateExplorer from "@/components/data/date-explorer";
 import CorrelationFinder from "@/components/data/correlation-finder";
 import DataLineageGraph from "@/components/data/data-lineage-graph";
 import DataNarrator from "@/components/data/data-narrator";
@@ -186,6 +190,7 @@ import DataPreview from "@/components/data/data-preview";
 import DataSummarizer from "@/components/data/data-summarizer";
 import DataWrangler from "@/components/data/data-wrangler";
 import PivotConfigurator from "@/components/data/pivot-configurator";
+import SegmentComparison from "@/components/analytics/segment-comparison";
 import Breadcrumb from "@/components/layout/breadcrumb";
 import NotFoundPage from "@/components/layout/not-found";
 import WorkspaceTabs from "@/components/layout/workspace-tabs";
@@ -225,6 +230,7 @@ type AppTab =
   | "lineage"
   | "quality"
   | "clean"
+  | "advanced"
   | "analytics"
   | "reports"
   | "pivot"
@@ -463,6 +469,7 @@ const TABS: { id: AppTab; label: string; icon: typeof Database }[] = [
   { id: "transforms", label: "Transforms", icon: Wand2 },
   { id: "quality", label: "Quality", icon: Shield },
   { id: "clean", label: "Clean", icon: Eraser },
+  { id: "advanced", label: "Advanced", icon: FlaskConical },
   { id: "analytics", label: "Analytics", icon: GitMerge },
   { id: "compare", label: "Compare", icon: RefreshCw },
   { id: "pivot", label: "Pivot", icon: Table },
@@ -3580,6 +3587,42 @@ export default function Home() {
                         </ErrorBoundary>
                       </ToolSection>
                     </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "advanced" && (
+                  <motion.div
+                    key="advanced"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <ErrorBoundary>
+                      <CohortAnalysis tableName={tableName} columns={profileData} />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <DistributionAnalyzer
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <TextColumnAnalyzer
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <DateExplorer tableName={tableName} columns={profileData} />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <SegmentComparison
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
                   </motion.div>
                 )}
 

@@ -404,6 +404,7 @@ function TextColumnAnalyzerReady({
               Text column
             </label>
             <select
+              aria-label="Text column"
               value={safeColumn}
               onChange={(event) =>
                 startTransition(() => setColumnName(event.target.value))

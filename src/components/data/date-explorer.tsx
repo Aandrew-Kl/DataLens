@@ -485,6 +485,7 @@ function DateExplorerReady({ tableName, columns }: DateExplorerProps) {
               Date column
             </label>
             <select
+              aria-label="Date column"
               value={safeColumn}
               onChange={(event) =>
                 startTransition(() => setColumnName(event.target.value))
