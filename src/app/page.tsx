@@ -70,6 +70,8 @@ import DashboardView from "@/components/data/dashboard-view";
 import ChatInterface from "@/components/query/chat-interface";
 import SQLEditor from "@/components/query/sql-editor";
 import SettingsPanel from "@/components/settings/settings-panel";
+import OllamaSettings from "@/components/settings/ollama-settings";
+import WorkspaceSettings from "@/components/settings/workspace-settings";
 import CommandPalette from "@/components/layout/command-palette";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import ChartBuilder, {
@@ -173,6 +175,8 @@ import DataCatalog from "@/components/data/data-catalog";
 import DataProfilerAI from "@/components/data/data-profiler-ai";
 import AccessibilityPanel from "@/components/ui/accessibility-panel";
 import ThemeCustomizer from "@/components/layout/theme-customizer";
+import AiPlayground from "@/components/ai/ai-playground";
+import AiSchemaAnalyzer from "@/components/ai/ai-schema-analyzer";
 import AreaChart from "@/components/charts/area-chart";
 import BoxplotChart from "@/components/charts/boxplot-chart";
 import DonutChart from "@/components/charts/donut-chart";
@@ -199,7 +203,14 @@ import PercentileExplorer from "@/components/data/percentile-explorer";
 import TimeSeriesDecomposer from "@/components/data/time-series-decomposer";
 import CrossTabulation from "@/components/data/cross-tabulation";
 import BinAnalyzer from "@/components/data/bin-analyzer";
+import DataStoryteller from "@/components/analytics/data-storyteller";
 import SegmentComparison from "@/components/analytics/segment-comparison";
+import TrendAnalyzer from "@/components/analytics/trend-analyzer";
+import ClassificationView from "@/components/ml/classification-view";
+import FeatureImportance from "@/components/ml/feature-importance";
+import ReportHistory from "@/components/report/report-history";
+import ReportScheduler from "@/components/report/report-scheduler";
+import ReportTemplates from "@/components/report/report-templates";
 import Breadcrumb from "@/components/layout/breadcrumb";
 import NotFoundPage from "@/components/layout/not-found";
 import WorkspaceTabs from "@/components/layout/workspace-tabs";
@@ -243,7 +254,8 @@ type AppTab =
   | "analytics"
   | "reports"
   | "pivot"
-  | "compare";
+  | "compare"
+  | "settings";
 
 interface FileDropResult {
   fileName: string;
@@ -485,6 +497,7 @@ const TABS: { id: AppTab; label: string; icon: typeof Database }[] = [
   { id: "wrangler", label: "Wrangler", icon: Wrench },
   { id: "lineage", label: "Lineage", icon: GitBranch },
   { id: "reports", label: "Reports", icon: FileText },
+  { id: "settings", label: "Settings", icon: Settings },
 ];
 
 // ─────────────────────────────────────────────
@@ -2556,6 +2569,15 @@ export default function Home() {
                           columns={profileData}
                         />
                       </ErrorBoundary>
+                      <ErrorBoundary>
+                        <AiSchemaAnalyzer
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <AiPlayground />
+                      </ErrorBoundary>
                     </div>
                   </motion.div>
                 )}
@@ -2945,6 +2967,28 @@ export default function Home() {
                     >
                       <ErrorBoundary>
                         <RegressionView
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Classification"
+                      description="Train a KNN classifier against categorical targets and review confusion, precision, and recall for the active dataset."
+                    >
+                      <ErrorBoundary>
+                        <ClassificationView
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Feature Importance"
+                      description="Rank numeric predictors with a permutation-style importance pass to see which features matter most before deeper modeling."
+                    >
+                      <ErrorBoundary>
+                        <FeatureImportance
                           tableName={tableName}
                           columns={profileData}
                         />
@@ -3535,6 +3579,12 @@ export default function Home() {
                           columns={profileData}
                         />
                       </ErrorBoundary>
+                      <ErrorBoundary>
+                        <TrendAnalyzer
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
                       <ToolSection
                         title="Cohort Analysis"
                         description="Measure retention and repeat behavior by cohort over time using weekly or monthly buckets and heatmap-driven summaries."
@@ -3569,6 +3619,12 @@ export default function Home() {
                           tableName={tableName}
                           columns={profileData}
                           rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <DataStoryteller
+                          tableName={tableName}
+                          columns={profileData}
                         />
                       </ErrorBoundary>
                       <ToolSection
@@ -3872,6 +3928,15 @@ export default function Home() {
                           columns={profileData}
                         />
                       </ErrorBoundary>
+                      <ErrorBoundary>
+                        <ReportTemplates />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <ReportHistory />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <ReportScheduler />
+                      </ErrorBoundary>
                       <ToolSection
                         title="Dataset Summarizer"
                         description="Generate concise written summaries, key findings, and recommendation exports for the current table in one pass."
@@ -3977,6 +4042,33 @@ export default function Home() {
                         </ErrorBoundary>
                       </ToolSection>
                     </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "settings" && (
+                  <motion.div
+                    key="settings"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Workspace Settings
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Configure local workspace defaults and the Ollama
+                        endpoint used by DataLens AI features.
+                      </p>
+                    </div>
+                    <ErrorBoundary>
+                      <WorkspaceSettings />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <OllamaSettings />
+                    </ErrorBoundary>
                   </motion.div>
                 )}
               </AnimatePresence>
