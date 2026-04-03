@@ -14,7 +14,7 @@ jest.mock("@/lib/utils/export", () => ({
   downloadFile: jest.fn(),
 }));
 jest.mock("echarts-for-react/lib/core", () => {
-  const React = jest.requireActual<typeof import("react")>("react");
+  const React = jest.requireActual("react");
   return {
     __esModule: true,
     default: React.forwardRef(function MockChart(
