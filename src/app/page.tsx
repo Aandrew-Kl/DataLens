@@ -268,6 +268,64 @@ const PcaView = dynamic(() => import("@/components/ml/pca-view"), { ssr: false }
 const SurvivalAnalysis = dynamic(() => import("@/components/ml/survival-analysis"), { ssr: false });
 const TimeSeriesClassifier = dynamic(() => import("@/components/ml/time-series-classifier"), { ssr: false });
 
+// Dynamic DATA imports (orphaned data components)
+// -- explore tab
+const ColumnHistogram = dynamic(() => import("@/components/data/column-histogram"), { ssr: false });
+const ColumnStatistics = dynamic(() => import("@/components/data/column-statistics"), { ssr: false });
+const ColumnDependencyGraph = dynamic(() => import("@/components/data/column-dependency-graph"), { ssr: false });
+const ColumnProfiler = dynamic(() => import("@/components/data/column-profiler"), { ssr: false });
+const CorrelationExplorer = dynamic(() => import("@/components/data/correlation-explorer"), { ssr: false });
+const ValueFrequency = dynamic(() => import("@/components/data/value-frequency"), { ssr: false });
+const NumericSummary = dynamic(() => import("@/components/data/numeric-summary"), { ssr: false });
+const StringAnalyzer = dynamic(() => import("@/components/data/string-analyzer"), { ssr: false });
+const DateAnalyzer = dynamic(() => import("@/components/data/date-analyzer"), { ssr: false });
+const DataTypeOverview = dynamic(() => import("@/components/data/data-type-overview"), { ssr: false });
+const NullPatternAnalyzer = dynamic(() => import("@/components/data/null-pattern-analyzer"), { ssr: false });
+const OutlierExplorer = dynamic(() => import("@/components/data/outlier-explorer"), { ssr: false });
+const DataQualityScore = dynamic(() => import("@/components/data/data-quality-score"), { ssr: false });
+// -- transforms tab
+const ColumnSplitter = dynamic(() => import("@/components/data/column-splitter"), { ssr: false });
+const ColumnRenameTool = dynamic(() => import("@/components/data/column-rename-tool"), { ssr: false });
+const DataTransposeTool = dynamic(() => import("@/components/data/data-transpose-tool"), { ssr: false });
+const DataStandardizer = dynamic(() => import("@/components/data/data-standardizer"), { ssr: false });
+const TypeCastTool = dynamic(() => import("@/components/data/type-cast-tool"), { ssr: false });
+const EncodingDetector = dynamic(() => import("@/components/data/encoding-detector"), { ssr: false });
+const ExpressionCalculator = dynamic(() => import("@/components/data/expression-calculator"), { ssr: false });
+const ConditionalFormatter = dynamic(() => import("@/components/data/conditional-formatter"), { ssr: false });
+const MissingValueImputer = dynamic(() => import("@/components/data/missing-value-imputer"), { ssr: false });
+const ConstraintChecker = dynamic(() => import("@/components/data/constraint-checker"), { ssr: false });
+const RegexToolDyn = dynamic(() => import("@/components/data/regex-tool"), { ssr: false });
+const DataMaskingTool = dynamic(() => import("@/components/data/data-masking-tool"), { ssr: false });
+const DataAggregator = dynamic(() => import("@/components/data/data-aggregator"), { ssr: false });
+const OutlierRemoval = dynamic(() => import("@/components/data/outlier-removal"), { ssr: false });
+// -- builder tab
+const GroupByBuilder = dynamic(() => import("@/components/data/group-by-builder"), { ssr: false });
+const WindowFunctionBuilder = dynamic(() => import("@/components/data/window-function-builder"), { ssr: false });
+const PivotTableBuilder = dynamic(() => import("@/components/data/pivot-table-builder"), { ssr: false });
+const PivotChartCombo = dynamic(() => import("@/components/data/pivot-chart-combo"), { ssr: false });
+const SmartFilterBuilder = dynamic(() => import("@/components/data/smart-filter-builder"), { ssr: false });
+// -- wrangler tab
+const RowEditor = dynamic(() => import("@/components/data/row-editor"), { ssr: false });
+const RowSamplerAdvanced = dynamic(() => import("@/components/data/row-sampler-advanced"), { ssr: false });
+const DataSamplerStratified = dynamic(() => import("@/components/data/data-sampler-stratified"), { ssr: false });
+const DataRecipeBuilder = dynamic(() => import("@/components/data/data-recipe-builder"), { ssr: false });
+const TextMiningTool = dynamic(() => import("@/components/data/text-mining-tool"), { ssr: false });
+const DataEnrichTool = dynamic(() => import("@/components/data/data-enrich-tool"), { ssr: false });
+const DataMergeTool = dynamic(() => import("@/components/data/data-merge-tool"), { ssr: false });
+// -- lineage tab
+const DataLineageView = dynamic(() => import("@/components/data/data-lineage-view"), { ssr: false });
+const SchemaEvolution = dynamic(() => import("@/components/data/schema-evolution"), { ssr: false });
+const DataSnapshotManager = dynamic(() => import("@/components/data/data-snapshot-manager"), { ssr: false });
+// -- quality tab
+const DataProfilerLite = dynamic(() => import("@/components/data/data-profiler-lite"), { ssr: false });
+const DataImportPreview = dynamic(() => import("@/components/data/data-import-preview"), { ssr: false });
+const DataExportWizard = dynamic(() => import("@/components/data/data-export-wizard"), { ssr: false });
+const DataCatalogBrowser = dynamic(() => import("@/components/data/data-catalog-browser"), { ssr: false });
+const DataPipelineBuilder = dynamic(() => import("@/components/data/data-pipeline-builder"), { ssr: false });
+const DataBookmarkManager = dynamic(() => import("@/components/data/data-bookmark-manager"), { ssr: false });
+// -- forecast tab
+const TimeSeriesForecast = dynamic(() => import("@/components/data/time-series-forecast"), { ssr: false });
+
 // Dynamic Analytics imports (orphaned analytics components)
 const AbTestAnalyzer = dynamic(() => import("@/components/analytics/ab-test-analyzer"), { ssr: false });
 const ChurnPredictor = dynamic(() => import("@/components/analytics/churn-predictor"), { ssr: false });
@@ -281,6 +339,40 @@ const RevenueAnalysis = dynamic(() => import("@/components/analytics/revenue-ana
 const RfmAnalysis = dynamic(() => import("@/components/analytics/rfm-analysis"), { ssr: false });
 const SeasonalDecomposition = dynamic(() => import("@/components/analytics/seasonal-decomposition"), { ssr: false });
 const SentimentAnalyzer = dynamic(() => import("@/components/analytics/sentiment-analyzer"), { ssr: false });
+
+// Dynamic Query imports (orphaned query components)
+const QueryDebugger = dynamic(() => import("@/components/query/query-debugger"), { ssr: false });
+const QueryDiff = dynamic(() => import("@/components/query/query-diff"), { ssr: false });
+const QueryExplainViewer = dynamic(() => import("@/components/query/query-explain-viewer"), { ssr: false });
+const QueryOptimizer = dynamic(() => import("@/components/query/query-optimizer"), { ssr: false });
+const QuerySchedulerDyn = dynamic(() => import("@/components/query/query-scheduler"), { ssr: false });
+const QueryTemplateBuilderDyn = dynamic(() => import("@/components/query/query-template-builder"), { ssr: false });
+const SavedQueryManager = dynamic(() => import("@/components/query/saved-query-manager"), { ssr: false });
+
+// Dynamic Report imports (orphaned report components)
+const ReportAnnotations = dynamic(() => import("@/components/report/report-annotations"), { ssr: false });
+const ReportChartInserter = dynamic(() => import("@/components/report/report-chart-inserter"), { ssr: false });
+const ReportDesigner = dynamic(() => import("@/components/report/report-designer"), { ssr: false });
+const ReportExportPanel = dynamic(() => import("@/components/report/report-export-panel"), { ssr: false });
+const ReportNarrativeBuilder = dynamic(() => import("@/components/report/report-narrative-builder"), { ssr: false });
+
+// Dynamic Settings imports (orphaned settings components)
+const AccessibilitySettingsDyn = dynamic(() => import("@/components/settings/accessibility-settings"), { ssr: false });
+const DataSourceSettings = dynamic(() => import("@/components/settings/data-source-settings"), { ssr: false });
+const ExportSettingsDyn = dynamic(() => import("@/components/settings/export-settings"), { ssr: false });
+const NotificationSettingsDyn = dynamic(() => import("@/components/settings/notification-settings"), { ssr: false });
+const PerformanceSettingsDyn = dynamic(() => import("@/components/settings/performance-settings"), { ssr: false });
+const ShortcutSettingsDyn = dynamic(() => import("@/components/settings/shortcut-settings"), { ssr: false });
+const ThemeSettingsDyn = dynamic(() => import("@/components/settings/theme-settings"), { ssr: false });
+
+// Dynamic AI imports (orphaned AI components)
+const AIAnomalyExplainer = dynamic(() => import("@/components/ai/ai-anomaly-explainer"), { ssr: false });
+const AIChartRecommender = dynamic(() => import("@/components/ai/ai-chart-recommender"), { ssr: false });
+const AIDataCleaner = dynamic(() => import("@/components/ai/ai-data-cleaner"), { ssr: false });
+const AIDataNarrator = dynamic(() => import("@/components/ai/ai-data-narrator"), { ssr: false });
+const AIInsightGenerator = dynamic(() => import("@/components/ai/ai-insight-generator"), { ssr: false });
+const AIPromptLibrary = dynamic(() => import("@/components/ai/ai-prompt-library"), { ssr: false });
+const AIQueryGenerator = dynamic(() => import("@/components/ai/ai-query-generator"), { ssr: false });
 
 // ─────────────────────────────────────────────
 // Types
@@ -1043,6 +1135,13 @@ export default function Home() {
   const [columnSearch, setColumnSearch] = useState("");
   const [showAdvancedML, setShowAdvancedML] = useState(false);
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
+  const [showMoreExplore, setShowMoreExplore] = useState(false);
+  const [showMoreTransforms, setShowMoreTransforms] = useState(false);
+  const [showMoreBuilder, setShowMoreBuilder] = useState(false);
+  const [showMoreWrangler, setShowMoreWrangler] = useState(false);
+  const [showMoreLineage, setShowMoreLineage] = useState(false);
+  const [showMoreQuality, setShowMoreQuality] = useState(false);
+  const [showMoreForecast, setShowMoreForecast] = useState(false);
   const [selectedPreviewRow, setSelectedPreviewRow] = useState<Record<string, unknown> | null>(null);
   const [selectedPreviewRowIndex, setSelectedPreviewRowIndex] = useState<number | null>(null);
   const [analyticsColumnName, setAnalyticsColumnName] = useState("");
@@ -2634,6 +2733,46 @@ export default function Home() {
                       <ErrorBoundary>
                         <AiPlayground />
                       </ErrorBoundary>
+                      <details className="group mt-2 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+                        <summary className="cursor-pointer list-none">
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                                AI Assistant
+                              </h3>
+                              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                Anomaly explanations, chart recommendations, data cleaning, narration, insights, prompt library, and query generation.
+                              </p>
+                            </div>
+                            <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                              Expand
+                            </span>
+                          </div>
+                        </summary>
+                        <div className="mt-4 space-y-6">
+                          <ErrorBoundary>
+                            <AIAnomalyExplainer tableName={tableName} columns={profileData} />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <AIChartRecommender tableName={tableName} columns={profileData} />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <AIDataCleaner tableName={tableName} columns={profileData} />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <AIDataNarrator tableName={tableName} columns={profileData} />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <AIInsightGenerator tableName={tableName} columns={profileData} />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <AIPromptLibrary tableName={tableName} columns={profileData} />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <AIQueryGenerator tableName={tableName} columns={profileData} />
+                          </ErrorBoundary>
+                        </div>
+                      </details>
                     </div>
                   </motion.div>
                 )}
@@ -2706,6 +2845,46 @@ export default function Home() {
                             wizard.
                           </div>
                         )}
+                      </div>
+                    </details>
+                    <details className="group mt-6 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+                      <summary className="cursor-pointer list-none">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                              SQL Tools
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                              Debug, diff, explain, optimize, schedule, and manage SQL queries with advanced tooling.
+                            </p>
+                          </div>
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                            Expand
+                          </span>
+                        </div>
+                      </summary>
+                      <div className="mt-4 space-y-6">
+                        <ErrorBoundary>
+                          <QueryDebugger tableName={tableName} columns={profileData} />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <QueryDiff tableName={tableName} columns={profileData} />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <QueryExplainViewer tableName={tableName} columns={profileData} />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <QueryOptimizer tableName={tableName} columns={profileData} />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <QuerySchedulerDyn tableName={tableName} columns={profileData} />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <QueryTemplateBuilderDyn tableName={tableName} columns={profileData} />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <SavedQueryManager tableName={tableName} columns={profileData} />
+                        </ErrorBoundary>
                       </div>
                     </details>
                   </motion.div>
@@ -3132,6 +3311,28 @@ export default function Home() {
                         columns={profileData}
                       />
                     </ErrorBoundary>
+                    <div className="mt-6">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowMoreForecast(!showMoreForecast)
+                        }
+                        className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-sky-600"
+                      >
+                        {showMoreForecast ? "▾" : "▸"} More
+                        Forecast Tools (1 available)
+                      </button>
+                      {showMoreForecast && (
+                        <div className="mt-4 grid gap-6">
+                          <ErrorBoundary>
+                            <TimeSeriesForecast
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                        </div>
+                      )}
+                    </div>
                   </motion.div>
                 )}
 
@@ -3365,6 +3566,100 @@ export default function Home() {
                         />
                       </ErrorBoundary>
                     </ToolSection>
+                    <div className="mt-6">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowMoreExplore(!showMoreExplore)
+                        }
+                        className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-sky-600"
+                      >
+                        {showMoreExplore ? "▾" : "▸"} More
+                        Explore Tools (13 available)
+                      </button>
+                      {showMoreExplore && (
+                        <div className="mt-4 grid gap-6">
+                          <ErrorBoundary>
+                            <ColumnHistogram
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <ColumnStatistics
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <ColumnDependencyGraph
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <ColumnProfiler
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <CorrelationExplorer
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <ValueFrequency
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <NumericSummary
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <StringAnalyzer
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DateAnalyzer
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DataTypeOverview
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <NullPatternAnalyzer
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <OutlierExplorer
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DataQualityScore
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                        </div>
+                      )}
+                    </div>
                   </motion.div>
                 )}
 
@@ -3405,6 +3700,52 @@ export default function Home() {
                           onExecuteCommand={handleCommandBarExecute}
                         />
                       </ToolSection>
+                    </div>
+                    <div className="mt-6">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowMoreBuilder(!showMoreBuilder)
+                        }
+                        className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-sky-600"
+                      >
+                        {showMoreBuilder ? "▾" : "▸"} More
+                        Builder Tools (5 available)
+                      </button>
+                      {showMoreBuilder && (
+                        <div className="mt-4 grid gap-6">
+                          <ErrorBoundary>
+                            <GroupByBuilder
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <WindowFunctionBuilder
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <PivotTableBuilder
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <PivotChartCombo
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <SmartFilterBuilder
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -3598,6 +3939,106 @@ export default function Home() {
                           />
                         </ErrorBoundary>
                       </ToolSection>
+                      <div className="mt-6">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowMoreTransforms(!showMoreTransforms)
+                          }
+                          className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-sky-600"
+                        >
+                          {showMoreTransforms ? "▾" : "▸"} More
+                          Transform Tools (14 available)
+                        </button>
+                        {showMoreTransforms && (
+                          <div className="mt-4 grid gap-6">
+                            <ErrorBoundary>
+                              <ColumnSplitter
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <ColumnRenameTool
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <DataTransposeTool
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <DataStandardizer
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <TypeCastTool
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <EncodingDetector
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <ExpressionCalculator
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <ConditionalFormatter
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <MissingValueImputer
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <ConstraintChecker
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <RegexToolDyn
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <DataMaskingTool
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <DataAggregator
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                            <ErrorBoundary>
+                              <OutlierRemoval
+                                tableName={tableName}
+                                columns={profileData}
+                              />
+                            </ErrorBoundary>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -3626,6 +4067,58 @@ export default function Home() {
                         columns={profileData}
                       />
                     </ErrorBoundary>
+                    <div className="mt-6">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowMoreQuality(!showMoreQuality)
+                        }
+                        className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-sky-600"
+                      >
+                        {showMoreQuality ? "▾" : "▸"} More
+                        Quality Tools (6 available)
+                      </button>
+                      {showMoreQuality && (
+                        <div className="mt-4 grid gap-6">
+                          <ErrorBoundary>
+                            <DataProfilerLite
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DataImportPreview
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DataExportWizard
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DataCatalogBrowser
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DataPipelineBuilder
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DataBookmarkManager
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                        </div>
+                      )}
+                    </div>
                   </motion.div>
                 )}
 
@@ -4192,6 +4685,64 @@ export default function Home() {
                         columns={profileData}
                       />
                     </ErrorBoundary>
+                    <div className="mt-6">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowMoreWrangler(!showMoreWrangler)
+                        }
+                        className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-sky-600"
+                      >
+                        {showMoreWrangler ? "▾" : "▸"} More
+                        Wrangler Tools (7 available)
+                      </button>
+                      {showMoreWrangler && (
+                        <div className="mt-4 grid gap-6">
+                          <ErrorBoundary>
+                            <RowEditor
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <RowSamplerAdvanced
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DataSamplerStratified
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DataRecipeBuilder
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <TextMiningTool
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DataEnrichTool
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DataMergeTool
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                        </div>
+                      )}
+                    </div>
                   </motion.div>
                 )}
 
@@ -4223,6 +4774,40 @@ export default function Home() {
                         rowCount={activeDataset.rowCount}
                       />
                     </ErrorBoundary>
+                    <div className="mt-6">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowMoreLineage(!showMoreLineage)
+                        }
+                        className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-sky-600"
+                      >
+                        {showMoreLineage ? "▾" : "▸"} More
+                        Lineage Tools (3 available)
+                      </button>
+                      {showMoreLineage && (
+                        <div className="mt-4 grid gap-6">
+                          <ErrorBoundary>
+                            <DataLineageView
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <SchemaEvolution
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <DataSnapshotManager
+                              tableName={tableName}
+                              columns={profileData}
+                            />
+                          </ErrorBoundary>
+                        </div>
+                      )}
+                    </div>
                   </motion.div>
                 )}
 
@@ -4351,6 +4936,40 @@ export default function Home() {
                           rowCount={activeDataset.rowCount}
                         />
                       </ErrorBoundary>
+                      <details className="group mt-6 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+                        <summary className="cursor-pointer list-none">
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                                Report Tools
+                              </h3>
+                              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                Annotate, design, insert charts, export, and build narratives for polished reports.
+                              </p>
+                            </div>
+                            <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                              Expand
+                            </span>
+                          </div>
+                        </summary>
+                        <div className="mt-4 space-y-6">
+                          <ErrorBoundary>
+                            <ReportAnnotations tableName={tableName} columns={profileData} />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <ReportChartInserter tableName={tableName} columns={profileData} />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <ReportDesigner tableName={tableName} columns={profileData} />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <ReportExportPanel tableName={tableName} columns={profileData} />
+                          </ErrorBoundary>
+                          <ErrorBoundary>
+                            <ReportNarrativeBuilder tableName={tableName} columns={profileData} />
+                          </ErrorBoundary>
+                        </div>
+                      </details>
                     </div>
                   </motion.div>
                 )}
@@ -4452,6 +5071,103 @@ export default function Home() {
                     <ErrorBoundary>
                       <OllamaSettings />
                     </ErrorBoundary>
+                    <details className="group rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+                      <summary className="cursor-pointer list-none">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                              Appearance
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                              Theme customization and accessibility preferences.
+                            </p>
+                          </div>
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                            Expand
+                          </span>
+                        </div>
+                      </summary>
+                      <div className="mt-4 space-y-6">
+                        <ErrorBoundary>
+                          <ThemeSettingsDyn />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <AccessibilitySettingsDyn tableName={tableName} columns={profileData} />
+                        </ErrorBoundary>
+                      </div>
+                    </details>
+                    <details className="group rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+                      <summary className="cursor-pointer list-none">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                              Data &amp; Export
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                              Data source connections and export format preferences.
+                            </p>
+                          </div>
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                            Expand
+                          </span>
+                        </div>
+                      </summary>
+                      <div className="mt-4 space-y-6">
+                        <ErrorBoundary>
+                          <DataSourceSettings />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <ExportSettingsDyn />
+                        </ErrorBoundary>
+                      </div>
+                    </details>
+                    <details className="group rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+                      <summary className="cursor-pointer list-none">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                              Notifications &amp; Shortcuts
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                              Alert preferences and keyboard shortcut bindings.
+                            </p>
+                          </div>
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                            Expand
+                          </span>
+                        </div>
+                      </summary>
+                      <div className="mt-4 space-y-6">
+                        <ErrorBoundary>
+                          <NotificationSettingsDyn tableName={tableName} columns={profileData} />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                          <ShortcutSettingsDyn tableName={tableName} columns={profileData} />
+                        </ErrorBoundary>
+                      </div>
+                    </details>
+                    <details className="group rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+                      <summary className="cursor-pointer list-none">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                              Performance
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                              Rendering, caching, and memory optimization settings.
+                            </p>
+                          </div>
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                            Expand
+                          </span>
+                        </div>
+                      </summary>
+                      <div className="mt-4 space-y-6">
+                        <ErrorBoundary>
+                          <PerformanceSettingsDyn />
+                        </ErrorBoundary>
+                      </div>
+                    </details>
                   </motion.div>
                 )}
               </AnimatePresence>
