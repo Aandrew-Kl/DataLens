@@ -58,11 +58,12 @@ function collectHeaders(data: Record<string, unknown>[]): string[] {
  * @param mimeType - MIME type for the Blob, e.g. `"text/csv"`.
  */
 export function downloadFile(
-  content: string,
+  content: BlobPart | BlobPart[],
   filename: string,
   mimeType: string,
 ): void {
-  const blob = new Blob([content], { type: mimeType });
+  const parts = Array.isArray(content) ? content : [content];
+  const blob = new Blob(parts, { type: mimeType });
   const url = URL.createObjectURL(blob);
 
   const anchor = document.createElement("a");

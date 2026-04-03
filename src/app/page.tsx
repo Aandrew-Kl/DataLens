@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  type ReactNode,
+} from "react";
 import type ReactEChartsCore from "echarts-for-react/lib/core";
 import * as echarts from "echarts/core";
 import { AnimatePresence, motion } from "framer-motion";
@@ -34,6 +41,9 @@ import {
   Compass,
   Eraser,
   Plug,
+  Wrench,
+  GitBranch,
+  Search,
 } from "lucide-react";
 
 import { loadCSVIntoDB, runQuery, getTableRowCount } from "@/lib/duckdb/client";
@@ -162,6 +172,37 @@ import DataCatalog from "@/components/data/data-catalog";
 import DataProfilerAI from "@/components/data/data-profiler-ai";
 import AccessibilityPanel from "@/components/ui/accessibility-panel";
 import ThemeCustomizer from "@/components/layout/theme-customizer";
+import AreaChart from "@/components/charts/area-chart";
+import BoxplotChart from "@/components/charts/boxplot-chart";
+import DonutChart from "@/components/charts/donut-chart";
+import GaugeChart from "@/components/charts/gauge-chart";
+import HeatmapChart from "@/components/charts/heatmap-chart";
+import ParallelCoordinates from "@/components/charts/parallel-coordinates";
+import CohortAnalysis from "@/components/data/cohort-analysis";
+import CorrelationFinder from "@/components/data/correlation-finder";
+import DataLineageGraph from "@/components/data/data-lineage-graph";
+import DataNarrator from "@/components/data/data-narrator";
+import DataPreview from "@/components/data/data-preview";
+import DataSummarizer from "@/components/data/data-summarizer";
+import DataWrangler from "@/components/data/data-wrangler";
+import PivotConfigurator from "@/components/data/pivot-configurator";
+import Breadcrumb from "@/components/layout/breadcrumb";
+import NotFoundPage from "@/components/layout/not-found";
+import WorkspaceTabs from "@/components/layout/workspace-tabs";
+import CommandBar, {
+  type Command as CommandBarCommand,
+} from "@/components/ui/command-bar";
+import DataTour from "@/components/ui/data-tour";
+import Dropdown from "@/components/ui/dropdown";
+import EmptyState from "@/components/ui/empty-state";
+import SearchInput from "@/components/ui/search-input";
+import ShortcutOverlay from "@/components/ui/shortcut-overlay";
+import {
+  SkeletonCard,
+  SkeletonChart,
+  SkeletonTable,
+} from "@/components/ui/skeleton";
+import { ToastProvider, useToast } from "@/components/ui/toast";
 
 // ─────────────────────────────────────────────
 // Types
@@ -180,6 +221,8 @@ type AppTab =
   | "explore"
   | "builder"
   | "transforms"
+  | "wrangler"
+  | "lineage"
   | "quality"
   | "clean"
   | "analytics"
@@ -235,6 +278,172 @@ function ToolSection({
   );
 }
 
+function WorkspacePolishLab({
+  activeTab,
+  onTabChange,
+  tabs,
+  commands,
+  onExecuteCommand,
+}: {
+  activeTab: AppTab;
+  onTabChange: (tab: AppTab) => void;
+  tabs: Array<{
+    id: AppTab;
+    label: string;
+    icon: typeof Database;
+    badge?: number | string;
+  }>;
+  commands: CommandBarCommand[];
+  onExecuteCommand: (command: CommandBarCommand) => void;
+}) {
+  const { toast } = useToast();
+  const [showCommandBar, setShowCommandBar] = useState(false);
+
+  const dropdownItems = useMemo(
+    () => [
+      {
+        label: "Jump to Profile",
+        icon: Table,
+        onClick: () => onTabChange("profile"),
+      },
+      {
+        label: "Jump to Charts",
+        icon: PieChart,
+        onClick: () => onTabChange("charts"),
+      },
+      {
+        label: showCommandBar ? "Hide Command Bar" : "Show Command Bar",
+        icon: Code2,
+        onClick: () => setShowCommandBar((current) => !current),
+      },
+      { type: "separator" as const },
+      {
+        label: "Preview Success Toast",
+        icon: Sparkles,
+        onClick: () =>
+          toast("Workspace polish preview is ready.", "success", 3200),
+      },
+      {
+        label: "Preview Warning Toast",
+        icon: Shield,
+        onClick: () =>
+          toast(
+            "Review the route and empty states before shipping the shell.",
+            "warning",
+            3600
+          ),
+      },
+    ],
+    [onTabChange, showCommandBar, toast]
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center gap-3">
+        <ErrorBoundary>
+          <Dropdown
+            trigger={
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+              >
+                <Menu className="h-4 w-4" />
+                Quick Menu
+              </button>
+            }
+            items={dropdownItems}
+          />
+        </ErrorBoundary>
+        <button
+          type="button"
+          onClick={() => toast("Builder tab controls are connected.", "info", 2600)}
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+        >
+          <Sparkles className="h-4 w-4" />
+          Fire Toast
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowCommandBar((current) => !current)}
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+        >
+          <Code2 className="h-4 w-4" />
+          {showCommandBar ? "Hide Command Bar" : "Show Command Bar"}
+        </button>
+      </div>
+
+      <ErrorBoundary>
+        <WorkspaceTabs
+          tabs={tabs}
+          activeTab={activeTab}
+          onChange={(id) => onTabChange(id as AppTab)}
+        />
+      </ErrorBoundary>
+
+      {showCommandBar ? (
+        <ErrorBoundary>
+          <CommandBar commands={commands} onExecute={onExecuteCommand} />
+        </ErrorBoundary>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-slate-200 bg-white/70 px-4 py-4 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-400">
+          Enable the advanced command bar to preview the richer search-driven
+          command surface without replacing the existing command palette.
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <ErrorBoundary>
+          <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-2 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <EmptyState
+              icon={LayoutGrid}
+              title="No preview selected"
+              description="Use the workspace tabs or quick menu to jump to a feature area from this builder-side lab."
+              action={{
+                label: "Go to Profile",
+                onClick: () => onTabChange("profile"),
+              }}
+            />
+          </div>
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <SkeletonCard className="h-full" />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <SkeletonChart className="h-full" />
+        </ErrorBoundary>
+      </div>
+
+      <ErrorBoundary>
+        <SkeletonTable rows={4} columns={5} />
+      </ErrorBoundary>
+
+      <details className="group rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+        <summary className="cursor-pointer list-none">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                Route Fallback Preview
+              </h3>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                Preview the shared not-found experience inside the builder lab
+                without changing the active route.
+              </p>
+            </div>
+            <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+              Expand
+            </span>
+          </div>
+        </summary>
+        <div className="mt-4 max-h-[36rem] overflow-auto rounded-[1.75rem] border border-slate-200/70 bg-slate-50 dark:border-slate-700/60 dark:bg-slate-950/70">
+          <ErrorBoundary>
+            <NotFoundPage />
+          </ErrorBoundary>
+        </div>
+      </details>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────
 // Tab config
 // ─────────────────────────────────────────────
@@ -257,6 +466,8 @@ const TABS: { id: AppTab; label: string; icon: typeof Database }[] = [
   { id: "analytics", label: "Analytics", icon: GitMerge },
   { id: "compare", label: "Compare", icon: RefreshCw },
   { id: "pivot", label: "Pivot", icon: Table },
+  { id: "wrangler", label: "Wrangler", icon: Wrench },
+  { id: "lineage", label: "Lineage", icon: GitBranch },
   { id: "reports", label: "Reports", icon: FileText },
 ];
 
@@ -746,6 +957,7 @@ export default function Home() {
   const [showSharePanel, setShowSharePanel] = useState(false);
   const [previewRows, setPreviewRows] = useState<Record<string, unknown>[]>([]);
   const [showColumnDetail, setShowColumnDetail] = useState(false);
+  const [columnSearch, setColumnSearch] = useState("");
   const [selectedPreviewRow, setSelectedPreviewRow] = useState<Record<string, unknown> | null>(null);
   const [selectedPreviewRowIndex, setSelectedPreviewRowIndex] = useState<number | null>(null);
   const [analyticsColumnName, setAnalyticsColumnName] = useState("");
@@ -944,7 +1156,8 @@ export default function Home() {
     setShowColumnDetail(false);
     setSelectedPreviewRow(null);
     setSelectedPreviewRowIndex(null);
-  }, [activeDataset?.id]);
+    setColumnSearch("");
+  }, [activeDataset?.id, setColumnSearch]);
 
   useEffect(() => {
     if (activeTab !== "analytics") {
@@ -1433,13 +1646,14 @@ export default function Home() {
 
   if (!activeDataset && !showUploader) {
     return (
-      <ErrorBoundary>
-        <LoadingOverlay
-          visible={isLoading}
-          message="Loading and profiling dataset..."
-        />
-        <OnboardingTour />
-        <div className="flex flex-1 flex-col min-h-screen">
+      <ToastProvider>
+        <ErrorBoundary>
+          <LoadingOverlay
+            visible={isLoading}
+            message="Loading and profiling dataset..."
+          />
+          <OnboardingTour />
+          <div className="flex flex-1 flex-col min-h-screen">
           {/* Top bar */}
           <header className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-2">
@@ -1619,8 +1833,9 @@ export default function Home() {
               MIT License &middot; Star on GitHub
             </a>
           </footer>
-        </div>
-      </ErrorBoundary>
+          </div>
+        </ErrorBoundary>
+      </ToastProvider>
     );
   }
 
@@ -1643,15 +1858,104 @@ export default function Home() {
   const savedChartData = Object.fromEntries(
     savedCharts.map((chart) => [chart.config.id, chart.data])
   );
+  const columnSearchQuery = columnSearch.trim().toLowerCase();
+  const matchingColumns = profileData.filter((column) => {
+    if (!columnSearchQuery) {
+      return true;
+    }
+
+    const haystack = [
+      column.name,
+      column.type,
+      ...column.sampleValues.map((value) => String(value ?? "")),
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(columnSearchQuery);
+  });
+  const currentTabLabel =
+    TABS.find((tab) => tab.id === activeTab)?.label ?? "Workspace";
+  const workspaceTabItems = TABS.map((tab) => ({
+    ...tab,
+    badge:
+      tab.id === "charts"
+        ? savedCharts.length || undefined
+        : tab.id === "catalog"
+          ? datasetCount
+          : tab.id === "quality"
+            ? profileData.filter((column) => column.nullCount > 0).length ||
+              undefined
+            : undefined,
+  }));
+  const commandBarCommands: CommandBarCommand[] = [
+    {
+      id: "new-dataset",
+      label: "Upload dataset",
+      category: "File",
+      description: "Load a new file into the current workspace.",
+      keywords: ["import", "csv", "dataset", "file"],
+      icon: Upload,
+    },
+    {
+      id: "settings",
+      label: "Open settings",
+      category: "Edit",
+      description: "Adjust theme and workspace preferences.",
+      keywords: ["preferences", "theme"],
+      icon: Settings,
+    },
+    {
+      id: "export-csv",
+      label: "Export CSV",
+      category: "Export",
+      description: "Download the current dataset as CSV.",
+      keywords: ["download", "csv", "export"],
+      icon: Upload,
+    },
+    {
+      id: "export-json",
+      label: "Export JSON",
+      category: "Export",
+      description: "Download the current dataset as JSON.",
+      keywords: ["download", "json", "export"],
+      icon: FileText,
+    },
+    {
+      id: "github",
+      label: "Open GitHub",
+      category: "View",
+      description: "Open the DataLens repository.",
+      keywords: ["repo", "source", "issues"],
+      icon: GithubIcon,
+    },
+    ...TABS.map((tab) => ({
+      id: `tab:${tab.id}`,
+      label: `Open ${tab.label}`,
+      category: "View" as const,
+      description: `Jump to the ${tab.label.toLowerCase()} workspace.`,
+      keywords: [tab.id, tab.label.toLowerCase(), "workspace"],
+      icon: tab.icon,
+    })),
+  ];
+  const handleCommandBarExecute = (command: CommandBarCommand) => {
+    if (command.id.startsWith("tab:")) {
+      setActiveTab(command.id.replace("tab:", "") as AppTab);
+      return;
+    }
+
+    handleCommandAction(command.id);
+  };
 
   return (
-    <ErrorBoundary>
-      <LoadingOverlay
-        visible={isLoading}
-        message="Loading and profiling dataset..."
-      />
-      <OnboardingTour />
-      <div className="flex min-h-screen">
+    <ToastProvider>
+      <ErrorBoundary>
+        <LoadingOverlay
+          visible={isLoading}
+          message="Loading and profiling dataset..."
+        />
+        <OnboardingTour />
+        <div className="flex min-h-screen">
         {/* Sidebar */}
         <AnimatePresence>
           {datasetCount > 0 && (
@@ -1782,6 +2086,23 @@ export default function Home() {
 
           {/* Tab content */}
           <main className="flex-1 px-4 sm:px-6 py-6">
+            {activeDataset && (
+              <div className="mb-4">
+                <ErrorBoundary>
+                  <Breadcrumb
+                    items={[
+                      {
+                        label: "Workspace",
+                        onClick: () => setActiveTab("profile"),
+                      },
+                      { label: activeDataset.fileName },
+                      { label: currentTabLabel },
+                    ]}
+                  />
+                </ErrorBoundary>
+              </div>
+            )}
+
             {activeDataset && (
               <div className="mb-6">
                 <ErrorBoundary>
@@ -1931,6 +2252,62 @@ export default function Home() {
                         />
                       </ErrorBoundary>
                     </ToolSection>
+                    <ToolSection
+                      title="Guided Data Tour"
+                      description="Walk through the dataset shape, strongest signals, missingness hotspots, and recommended next steps in a narrative-first tour."
+                    >
+                      <ErrorBoundary>
+                        <DataTour
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Column Finder"
+                      description="Search the active schema by name, type, or sampled values, then jump straight into the detailed column drawer."
+                    >
+                      <ErrorBoundary>
+                        <div className="space-y-4 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+                          <SearchInput
+                            value={columnSearch}
+                            onChange={setColumnSearch}
+                            placeholder="Search columns, types, or sampled values..."
+                            debounceMs={120}
+                          />
+                          {columnSearchQuery && matchingColumns.length === 0 ? (
+                            <EmptyState
+                              icon={Search}
+                              title="No matching columns"
+                              description="Try a broader search or clear the current filter to browse the full schema."
+                              action={{
+                                label: "Clear Search",
+                                onClick: () => setColumnSearch(""),
+                              }}
+                            />
+                          ) : (
+                            <div className="flex flex-wrap gap-2">
+                              {(columnSearchQuery
+                                ? matchingColumns
+                                : profileData.slice(0, 12)
+                              ).map((column) => (
+                                <button
+                                  key={column.name}
+                                  type="button"
+                                  onClick={() => setSelectedAdvancedColumn(column)}
+                                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                                >
+                                  <span>{column.name}</span>
+                                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                                    {column.type}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </ErrorBoundary>
+                    </ToolSection>
 
                     <div className="pt-4">
                       <div className="flex items-center justify-between mb-1">
@@ -1957,6 +2334,18 @@ export default function Home() {
                         />
                       </ErrorBoundary>
                     </div>
+                    <ToolSection
+                      title="Interactive Preview"
+                      description="Browse a paginated preview with sortable headers, inline filtering, and column-level quick stats beyond the first 200 rows."
+                    >
+                      <ErrorBoundary>
+                        <DataPreview
+                          tableName={tableName}
+                          columns={profileData}
+                          previewRows={previewRows}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
 
                     <div className="pt-4">
                       <ErrorBoundary>
@@ -1982,6 +2371,20 @@ export default function Home() {
                         emoji="💾"
                       />
                     </div>
+                    <ToolSection
+                      title="Readiness Gauge"
+                      description="Track dataset completeness as a single operational KPI before you pivot into cleaning, reporting, or modeling work."
+                    >
+                      <ErrorBoundary>
+                        <GaugeChart
+                          value={Math.max(0, Math.min(100, completenessPct))}
+                          min={0}
+                          max={100}
+                          title={`${activeDataset.fileName} completeness`}
+                          thresholds={{ green: 75, yellow: 90, red: 100 }}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
 
                     <ErrorBoundary>
                       <DataDictionary
@@ -2338,6 +2741,61 @@ export default function Home() {
                         />
                       </ErrorBoundary>
                       <ToolSection
+                        title="Area Chart"
+                        description="Layer aggregate trends over time or category buckets and compare grouped series with a stacked or standard area view."
+                      >
+                        <ErrorBoundary>
+                          <AreaChart
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                      <ToolSection
+                        title="Donut Chart"
+                        description="Summarize categorical composition with configurable labels, top-slice grouping, and share-driven narrative cues."
+                      >
+                        <ErrorBoundary>
+                          <DonutChart
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                      <ToolSection
+                        title="Heatmap Chart"
+                        description="Compare density and magnitude across paired dimensions with color-driven matrix views that work well for compact dashboards."
+                      >
+                        <ErrorBoundary>
+                          <HeatmapChart
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                      <ToolSection
+                        title="Parallel Coordinates"
+                        description="Inspect multi-metric record shape, filter by grouped cohorts, and reveal cluster separation across many axes at once."
+                      >
+                        <ErrorBoundary>
+                          <ParallelCoordinates
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                      <ToolSection
+                        title="Box Plot"
+                        description="Review quartiles, whiskers, and outlier points for one or more numeric columns before publishing summary statistics."
+                      >
+                        <ErrorBoundary>
+                          <BoxplotChart
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                      <ToolSection
                         title="Waterfall Chart"
                         description="Track additive and subtractive contributions across ordered categories and export the result as a polished narrative chart."
                       >
@@ -2389,6 +2847,19 @@ export default function Home() {
                           <SankeyChart
                             tableName={tableName}
                             columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                      <ToolSection
+                        title="Chart Completeness Gauge"
+                        description="Keep a single KPI-style readout of dataset completeness inside the charting workspace."
+                      >
+                        <ErrorBoundary>
+                          <GaugeChart
+                            value={completenessPct}
+                            min={0}
+                            max={100}
+                            title="Dataset completeness"
                           />
                         </ErrorBoundary>
                       </ToolSection>
@@ -2509,6 +2980,17 @@ export default function Home() {
                       </ErrorBoundary>
                     </ToolSection>
                     <ToolSection
+                      title="Correlation Finder"
+                      description="Drill into numeric pairings with ranked correlation scans, a matrix heatmap, and a scatter preview for the strongest relationships."
+                    >
+                      <ErrorBoundary>
+                        <CorrelationFinder
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
                       title="Anomaly Heatmap"
                       description="Scan the dataset for unusual combinations, sparse regions, and suspicious concentrations."
                     >
@@ -2557,6 +3039,20 @@ export default function Home() {
                         rowCount={activeDataset.rowCount}
                       />
                     </ErrorBoundary>
+                    <div className="mt-6">
+                      <ToolSection
+                        title="Workspace Polish Lab"
+                        description="Exercise shared navigation, command, state, and fallback primitives from a contained builder-side integration surface."
+                      >
+                        <WorkspacePolishLab
+                          activeTab={activeTab}
+                          onTabChange={setActiveTab}
+                          tabs={workspaceTabItems}
+                          commands={commandBarCommands}
+                          onExecuteCommand={handleCommandBarExecute}
+                        />
+                      </ToolSection>
+                    </div>
                   </motion.div>
                 )}
 
@@ -2902,6 +3398,14 @@ export default function Home() {
                       <ErrorBoundary>
                         <DataLineage tableName={tableName} />
                       </ErrorBoundary>
+                      <ToolSection
+                        title="Lineage Graph"
+                        description="Trace uploads, joins, transforms, and query steps in a graph-oriented lineage view with exportable session history."
+                      >
+                        <ErrorBoundary>
+                          <DataLineageGraph tableName={tableName} />
+                        </ErrorBoundary>
+                      </ToolSection>
                       <ErrorBoundary>
                         <RelationshipExplorer
                           tableName={tableName}
@@ -2914,6 +3418,12 @@ export default function Home() {
                           tableName={tableName}
                           columns={profileData}
                           rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <CorrelationFinder
+                          tableName={tableName}
+                          columns={profileData}
                         />
                       </ErrorBoundary>
                       <ErrorBoundary>
@@ -3010,6 +3520,17 @@ export default function Home() {
                           columns={profileData}
                         />
                       </ErrorBoundary>
+                      <ToolSection
+                        title="Cohort Analysis"
+                        description="Measure retention and repeat behavior by cohort over time using weekly or monthly buckets and heatmap-driven summaries."
+                      >
+                        <ErrorBoundary>
+                          <CohortAnalysis
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
                       <ErrorBoundary>
                         <DataValidator
                           tableName={tableName}
@@ -3059,6 +3580,99 @@ export default function Home() {
                         </ErrorBoundary>
                       </ToolSection>
                     </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "wrangler" && (
+                  <motion.div
+                    key="wrangler"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                          Data Wrangler
+                        </h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          Reshape, summarize, preview, and configure pivots for
+                          the active dataset from one focused workspace.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void refreshActiveDataset(
+                            "Wrangler metadata refreshed",
+                            `Re-profiled ${tableName} after wrangling changes.`
+                          )
+                        }
+                        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        Refresh Metadata
+                      </button>
+                    </div>
+                    <ErrorBoundary>
+                      <DataWrangler
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <DataSummarizer
+                        tableName={tableName}
+                        columns={profileData}
+                        rowCount={activeDataset.rowCount}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <DataPreview
+                        tableName={tableName}
+                        columns={profileData}
+                        previewRows={previewRows}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <PivotConfigurator
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                  </motion.div>
+                )}
+
+                {activeTab === "lineage" && (
+                  <motion.div
+                    key="lineage"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Data Lineage
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Trace transformations and generate narrative context for
+                        the active dataset.
+                      </p>
+                    </div>
+                    <ErrorBoundary>
+                      <DataLineageGraph tableName={tableName} />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <DataNarrator
+                        tableName={tableName}
+                        columns={profileData}
+                        rowCount={activeDataset.rowCount}
+                      />
+                    </ErrorBoundary>
                   </motion.div>
                 )}
 
@@ -3147,6 +3761,30 @@ export default function Home() {
                           columns={profileData}
                         />
                       </ErrorBoundary>
+                      <ToolSection
+                        title="Dataset Summarizer"
+                        description="Generate concise written summaries, key findings, and recommendation exports for the current table in one pass."
+                      >
+                        <ErrorBoundary>
+                          <DataSummarizer
+                            tableName={tableName}
+                            columns={profileData}
+                            rowCount={activeDataset.rowCount}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                      <ToolSection
+                        title="Narrative Report"
+                        description="Turn statistical readouts into a richer narrative with chart-backed sections covering distributions, correlations, and recommendations."
+                      >
+                        <ErrorBoundary>
+                          <DataNarrator
+                            tableName={tableName}
+                            columns={profileData}
+                            rowCount={activeDataset.rowCount}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
                       <ErrorBoundary>
                         <DataStory
                           tableName={tableName}
@@ -3215,6 +3853,19 @@ export default function Home() {
                         />
                       )}
                     </ErrorBoundary>
+                    <div className="mt-6">
+                      <ToolSection
+                        title="Pivot Configurator"
+                        description="Build saved pivot recipes with drag-and-drop rows, columns, measures, filters, calculated fields, and conditional formatting."
+                      >
+                        <ErrorBoundary>
+                          <PivotConfigurator
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -3335,6 +3986,10 @@ export default function Home() {
         )}
 
         <ErrorBoundary>
+          <ShortcutOverlay />
+        </ErrorBoundary>
+
+        <ErrorBoundary>
           <AccessibilityPanel />
         </ErrorBoundary>
 
@@ -3344,6 +3999,7 @@ export default function Home() {
           clearAll={clearAll}
         />
       </div>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </ToastProvider>
   );
 }
