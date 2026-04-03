@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlarmClock,
@@ -57,11 +57,11 @@ const RULES_KEY = "datalens:alert-rules";
 const EVENTS_KEY = "datalens:alert-events";
 
 function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
+  return `"${value.replace(/"/g, '""')}"`;
 }
 
 function quoteLiteral(value: string) {
-  return `'${value.replaceAll("'", "''")}'`;
+  return `'${value.replace(/'/g, "''")}'`;
 }
 
 function makeId() {
@@ -146,11 +146,11 @@ export default function DataAlerts({ tableName, columns, rowCount }: DataAlertsP
     [events],
   );
 
-  async function evaluateRules() {
+  const evaluateRules = useCallback(async () => {
     setLoading(true);
     setNotice(null);
     try {
-      const nextEvents = [...events];
+      const nextEvents = [...readStorage<AlertEvent[]>(`${EVENTS_KEY}:${tableName}`, [])];
       for (const rule of rules) {
         const column = columns.find((item) => item.name === rule.column);
         if (!column) continue;
@@ -212,12 +212,12 @@ export default function DataAlerts({ tableName, columns, rowCount }: DataAlertsP
     } finally {
       setLoading(false);
     }
-  }
+  }, [columns, rowCount, rules, tableName]);
 
   useEffect(() => {
     if (!rules.length) return;
     void evaluateRules();
-  }, [rowCount, rules]);
+  }, [evaluateRules, rules]);
 
   async function handleCreateRule() {
     const column = columns.find((item) => item.name === draft.column);
