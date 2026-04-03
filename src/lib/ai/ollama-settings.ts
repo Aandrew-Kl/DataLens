@@ -14,6 +14,12 @@ export interface OllamaConnectionState {
   message: string;
 }
 
+export interface OllamaConnectionCheckResult {
+  kind: "connected" | "error";
+  message: string;
+  models: string[];
+}
+
 interface OllamaTagsResponse {
   models: Array<{ name: string }>;
 }
@@ -177,7 +183,9 @@ export async function fetchOllamaModels(baseUrl: string): Promise<string[]> {
   return payload.models.map((model) => model.name);
 }
 
-export async function checkOllamaConnection(baseUrl: string) {
+export async function checkOllamaConnection(
+  baseUrl: string,
+): Promise<OllamaConnectionCheckResult> {
   try {
     const models = await fetchOllamaModels(baseUrl);
     return {
@@ -186,14 +194,14 @@ export async function checkOllamaConnection(baseUrl: string) {
         ? `Connected. ${models.length} model${models.length === 1 ? "" : "s"} available.`
         : "Connected, but no models were returned.",
       models,
-    } as const;
+    };
   } catch (error) {
     return {
       kind: "error",
       message:
         error instanceof Error ? error.message : "Unable to reach the Ollama server.",
       models: [],
-    } as const;
+    };
   }
 }
 
