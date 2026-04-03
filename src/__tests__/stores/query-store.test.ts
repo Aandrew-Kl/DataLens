@@ -1,0 +1,96 @@
+import { useQueryStore } from "@/stores/query-store";
+import type { QueryResult, SavedQuery } from "@/types/query";
+
+function makeSavedQuery(
+  index: number,
+  overrides: Partial<SavedQuery> = {},
+): SavedQuery {
+  return {
+    id: `query-${index}`,
+    question: `Question ${index}`,
+    sql: `SELECT ${index}`,
+    datasetId: "dataset-1",
+    createdAt: 1_700_000_000_000 + index,
+    ...overrides,
+  };
+}
+
+function makeResult(overrides: Partial<QueryResult> = {}): QueryResult {
+  return {
+    sql: 'SELECT * FROM "orders"',
+    data: [{ id: 1 }],
+    columns: ["id"],
+    rowCount: 1,
+    executionTimeMs: 12,
+    ...overrides,
+  };
+}
+
+describe("useQueryStore", () => {
+  beforeEach(() => {
+    useQueryStore.setState({
+      history: [],
+      lastResult: null,
+      isQuerying: false,
+    });
+  });
+
+  it("prepends new history entries so the newest query is first", () => {
+    useQueryStore.getState().addToHistory(makeSavedQuery(1));
+    useQueryStore.getState().addToHistory(makeSavedQuery(2));
+
+    expect(useQueryStore.getState().history.map((query) => query.id)).toEqual([
+      "query-2",
+      "query-1",
+    ]);
+  });
+
+  it("keeps only the latest fifty history entries", () => {
+    for (let index = 0; index < 60; index += 1) {
+      useQueryStore.getState().addToHistory(makeSavedQuery(index));
+    }
+
+    const history = useQueryStore.getState().history;
+
+    expect(history).toHaveLength(50);
+    expect(history[0]?.id).toBe("query-59");
+    expect(history[49]?.id).toBe("query-10");
+  });
+
+  it("stores and clears the last query result", () => {
+    const result = makeResult();
+
+    useQueryStore.getState().setLastResult(result);
+    expect(useQueryStore.getState().lastResult).toEqual(result);
+
+    useQueryStore.getState().setLastResult(null);
+    expect(useQueryStore.getState().lastResult).toBeNull();
+  });
+
+  it("tracks whether a query is currently running", () => {
+    useQueryStore.getState().setIsQuerying(true);
+    expect(useQueryStore.getState().isQuerying).toBe(true);
+
+    useQueryStore.getState().setIsQuerying(false);
+    expect(useQueryStore.getState().isQuerying).toBe(false);
+  });
+
+  it("clears history without resetting other query state", () => {
+    const lastResult = makeResult({
+      sql: "SELECT COUNT(*)",
+      rowCount: 42,
+    });
+
+    useQueryStore.setState({
+      history: [makeSavedQuery(1)],
+      lastResult,
+      isQuerying: true,
+    });
+
+    useQueryStore.getState().clearHistory();
+
+    expect(useQueryStore.getState().history).toEqual([]);
+    expect(useQueryStore.getState().lastResult).toEqual(lastResult);
+    expect(useQueryStore.getState().isQuerying).toBe(true);
+  });
+});
