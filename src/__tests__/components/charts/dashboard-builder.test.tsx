@@ -119,8 +119,12 @@ describe("DashboardBuilder", () => {
 
     await user.click(screen.getByRole("button", { name: /load dashboard/i }));
 
-    expect(await screen.findByText("Loaded note")).toBeInTheDocument();
-    expect(screen.getAllByText("Loaded from storage.").length).toBeGreaterThan(0);
+    await waitFor(() => {
+      expect(screen.getByText("Loaded note")).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(screen.getAllByText("Loaded from storage.").length).toBeGreaterThan(0);
+    });
 
     await user.click(screen.getByRole("button", { name: /export dashboard/i }));
 
