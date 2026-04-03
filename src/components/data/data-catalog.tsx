@@ -70,6 +70,11 @@ const FIELD_CLASS =
 const TAGS_STORAGE_KEY = "datalens:data-catalog:tags";
 const catalogListeners = new Set<() => void>();
 const tagListeners = new Set<() => void>();
+const EMPTY_TAG_MAP: Record<string, string[]> = {};
+let cachedTagMap: { raw: string | null; parsed: Record<string, string[]> } = {
+  raw: null,
+  parsed: EMPTY_TAG_MAP,
+};
 
 let catalogSnapshot: CatalogSnapshot = {
   status: "idle",
@@ -138,18 +143,26 @@ function buildJoinSuggestions(leftColumns: CatalogColumn[], rightColumns: Catalo
 }
 
 function readTagMap() {
-  if (typeof window === "undefined") return {} as Record<string, string[]>;
+  if (typeof window === "undefined") return EMPTY_TAG_MAP;
   try {
     const raw = window.localStorage.getItem(TAGS_STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Record<string, string[]>) : {};
+    if (cachedTagMap.raw === raw) {
+      return cachedTagMap.parsed;
+    }
+    const parsed = raw ? (JSON.parse(raw) as Record<string, string[]>) : EMPTY_TAG_MAP;
+    cachedTagMap = { raw, parsed };
+    return parsed;
   } catch {
-    return {};
+    cachedTagMap = { raw: null, parsed: EMPTY_TAG_MAP };
+    return EMPTY_TAG_MAP;
   }
 }
 
 function writeTagMap(nextMap: Record<string, string[]>) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(TAGS_STORAGE_KEY, JSON.stringify(nextMap));
+  const raw = JSON.stringify(nextMap);
+  window.localStorage.setItem(TAGS_STORAGE_KEY, raw);
+  cachedTagMap = { raw, parsed: nextMap };
   tagListeners.forEach((listener) => listener());
 }
 

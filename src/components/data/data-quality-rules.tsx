@@ -84,6 +84,8 @@ const FIELD_CLASS =
   "rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950/45 dark:text-slate-100";
 const STORAGE_PREFIX = "datalens:data-quality-rules";
 const storageListeners = new Set<() => void>();
+const EMPTY_RULE_SETS: SavedRuleSet[] = [];
+const ruleSetCache = new Map<string, { raw: string | null; parsed: SavedRuleSet[] }>();
 
 const OPERATOR_OPTIONS: Array<{
   value: RuleOperator;
@@ -129,18 +131,29 @@ function emitStorageChange() {
 }
 
 function readRuleSets(tableName: string) {
-  if (typeof window === "undefined") return [] as SavedRuleSet[];
+  if (typeof window === "undefined") return EMPTY_RULE_SETS;
+  const key = storageKey(tableName);
   try {
-    const raw = window.localStorage.getItem(storageKey(tableName));
-    return raw ? (JSON.parse(raw) as SavedRuleSet[]) : [];
+    const raw = window.localStorage.getItem(key);
+    const cached = ruleSetCache.get(key);
+    if (cached && cached.raw === raw) {
+      return cached.parsed;
+    }
+    const parsed = raw ? (JSON.parse(raw) as SavedRuleSet[]) : EMPTY_RULE_SETS;
+    ruleSetCache.set(key, { raw, parsed });
+    return parsed;
   } catch {
-    return [];
+    ruleSetCache.set(key, { raw: null, parsed: EMPTY_RULE_SETS });
+    return EMPTY_RULE_SETS;
   }
 }
 
 function writeRuleSets(tableName: string, ruleSets: SavedRuleSet[]) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(storageKey(tableName), JSON.stringify(ruleSets));
+  const key = storageKey(tableName);
+  const raw = JSON.stringify(ruleSets);
+  window.localStorage.setItem(key, raw);
+  ruleSetCache.set(key, { raw, parsed: ruleSets });
   emitStorageChange();
 }
 
@@ -641,7 +654,7 @@ export default function DataQualityRules({ tableName, columns }: DataQualityRule
   const savedRuleSets = useSyncExternalStore(
     subscribeRuleSets,
     () => readRuleSets(tableName),
-    () => [],
+    () => EMPTY_RULE_SETS,
   );
   const [rules, setRules] = useState<QualityRule[]>(() => [createRule(columns)]);
   const [ruleSetName, setRuleSetName] = useState("");

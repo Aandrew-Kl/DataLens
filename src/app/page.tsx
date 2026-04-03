@@ -66,6 +66,7 @@ import ChartBuilder, {
   SAVED_CHARTS_STORAGE_KEY,
   type SavedChartSnapshot,
 } from "@/components/charts/chart-builder";
+import ChartRenderer from "@/components/charts/chart-renderer";
 import TransformPanel from "@/components/data/transform-panel";
 import CorrelationMatrix from "@/components/data/correlation-matrix";
 import OutlierDetector from "@/components/data/outlier-detector";
@@ -103,11 +104,14 @@ import ChartGallery from "@/components/charts/chart-gallery";
 import ChartExport from "@/components/charts/chart-export";
 import WaterfallChart from "@/components/charts/waterfall-chart";
 import FunnelChart from "@/components/charts/funnel-chart";
+import RadarChart from "@/components/charts/radar-chart";
+import SankeyChart from "@/components/charts/sankey-chart";
 import TreemapChart from "@/components/charts/treemap-chart";
 import ChartTemplates from "@/components/charts/chart-templates";
 import SparklineGrid from "@/components/charts/sparkline-grid";
 import ScatterMatrix from "@/components/charts/scatter-matrix";
 import ClusteringView from "@/components/ml/clustering-view";
+import ColumnDetail from "@/components/data/column-detail";
 import DataDictionary from "@/components/data/data-dictionary";
 import VirtualDataGrid from "@/components/data/virtual-data-grid";
 import MetricCard from "@/components/data/metric-card";
@@ -123,8 +127,12 @@ import LoadingOverlay from "@/components/ui/loading-overlay";
 import DataLineage from "@/components/data/data-lineage";
 import DataAlerts from "@/components/data/data-alerts";
 import DataStory from "@/components/data/data-story";
+import DataDiff from "@/components/data/data-diff";
+import DataEnrichment from "@/components/data/data-enrichment";
+import DataForecast from "@/components/data/data-forecast";
 import DataOverview from "@/components/data/data-overview";
 import DataProfilerSummary from "@/components/data/data-profiler-summary";
+import DataProfilerFull from "@/components/data/data-profiler-full";
 import ColumnProfilerAdvanced from "@/components/data/column-profiler-advanced";
 import ColumnTransformer from "@/components/data/column-transformer";
 import QueryBuilder from "@/components/query/query-builder";
@@ -163,13 +171,16 @@ type AppTab =
   | "profile"
   | "dashboard"
   | "connectors"
+  | "catalog"
   | "query"
   | "sql"
   | "charts"
+  | "forecast"
   | "ml"
   | "explore"
   | "builder"
   | "transforms"
+  | "quality"
   | "clean"
   | "analytics"
   | "reports"
@@ -232,13 +243,16 @@ const TABS: { id: AppTab; label: string; icon: typeof Database }[] = [
   { id: "profile", label: "Profile", icon: Table },
   { id: "dashboard", label: "Dashboard", icon: BarChart3 },
   { id: "connectors", label: "Connectors", icon: Plug },
+  { id: "catalog", label: "Catalog", icon: Database },
   { id: "query", label: "Ask AI", icon: MessageSquare },
   { id: "sql", label: "SQL Editor", icon: Code2 },
   { id: "charts", label: "Charts", icon: PieChart },
+  { id: "forecast", label: "Forecast", icon: RefreshCw },
   { id: "ml", label: "ML", icon: BrainCircuit },
   { id: "explore", label: "Explore", icon: Compass },
   { id: "builder", label: "Builder", icon: LayoutGrid },
   { id: "transforms", label: "Transforms", icon: Wand2 },
+  { id: "quality", label: "Quality", icon: Shield },
   { id: "clean", label: "Clean", icon: Eraser },
   { id: "analytics", label: "Analytics", icon: GitMerge },
   { id: "compare", label: "Compare", icon: RefreshCw },
@@ -731,6 +745,7 @@ export default function Home() {
   const [showExportWizard, setShowExportWizard] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
   const [previewRows, setPreviewRows] = useState<Record<string, unknown>[]>([]);
+  const [showColumnDetail, setShowColumnDetail] = useState(false);
   const [selectedPreviewRow, setSelectedPreviewRow] = useState<Record<string, unknown> | null>(null);
   const [selectedPreviewRowIndex, setSelectedPreviewRowIndex] = useState<number | null>(null);
   const [analyticsColumnName, setAnalyticsColumnName] = useState("");
@@ -926,9 +941,16 @@ export default function Home() {
   useEffect(() => {
     setPreviewRows([]);
     setSelectedAdvancedColumn(null);
+    setShowColumnDetail(false);
     setSelectedPreviewRow(null);
     setSelectedPreviewRowIndex(null);
   }, [activeDataset?.id]);
+
+  useEffect(() => {
+    if (activeTab !== "analytics") {
+      setShowColumnDetail(false);
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     if (!activeDataset) {
@@ -1897,6 +1919,18 @@ export default function Home() {
                         }
                       />
                     </ErrorBoundary>
+                    <ToolSection
+                      title="Full Profile Report"
+                      description="Run a broader profiling pass with quality scoring, missingness heatmaps, and export-ready dataset diagnostics."
+                    >
+                      <ErrorBoundary>
+                        <DataProfilerFull
+                          tableName={tableName}
+                          columns={profileData}
+                          rowCount={activeDataset.rowCount}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
 
                     <div className="pt-4">
                       <div className="flex items-center justify-between mb-1">
@@ -2045,6 +2079,30 @@ export default function Home() {
                         <DataCatalog />
                       </ErrorBoundary>
                     </ToolSection>
+                  </motion.div>
+                )}
+
+                {activeTab === "catalog" && (
+                  <motion.div
+                    key="catalog"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Dataset Catalog
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Browse loaded DuckDB relations, inspect schema metadata,
+                        and manage the active workspace inventory from one tab.
+                      </p>
+                    </div>
+                    <ErrorBoundary>
+                      <DataCatalog />
+                    </ErrorBoundary>
                   </motion.div>
                 )}
 
@@ -2240,6 +2298,27 @@ export default function Home() {
                           onEdit={handleSavedChartEdit}
                         />
                       </ErrorBoundary>
+                      <ToolSection
+                        title="Standalone Renderer"
+                        description="Preview the shared chart renderer against a saved chart configuration without leaving the charts workspace."
+                      >
+                        <ErrorBoundary>
+                          {savedCharts[0] ? (
+                            <ChartRenderer
+                              config={savedCharts[0].config}
+                              data={
+                                savedChartData[savedCharts[0].config.id] ??
+                                savedCharts[0].data
+                              }
+                            />
+                          ) : (
+                            <div className="rounded-xl border border-dashed border-slate-200 bg-white/70 px-4 py-5 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-400">
+                              Save a chart from the builder to preview it in the
+                              standalone renderer.
+                            </div>
+                          )}
+                        </ErrorBoundary>
+                      </ToolSection>
                       <ErrorBoundary>
                         <SparklineGrid
                           tableName={tableName}
@@ -2291,7 +2370,56 @@ export default function Home() {
                           />
                         </ErrorBoundary>
                       </ToolSection>
+                      <ToolSection
+                        title="Radar Chart"
+                        description="Overlay normalized metric performance across multiple axes to compare segments or the whole dataset at a glance."
+                      >
+                        <ErrorBoundary>
+                          <RadarChart
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
+                      <ToolSection
+                        title="Sankey Chart"
+                        description="Aggregate flow between source and target dimensions to understand movement, drop-off, and throughput across categories."
+                      >
+                        <ErrorBoundary>
+                          <SankeyChart
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
                     </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "forecast" && (
+                  <motion.div
+                    key="forecast"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Forecasting
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Project future values from time-series columns with
+                        confidence bands and exportable forecast outputs.
+                      </p>
+                    </div>
+                    <ErrorBoundary>
+                      <DataForecast
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
                   </motion.div>
                 )}
 
@@ -2583,6 +2711,17 @@ export default function Home() {
                           onSave={handleFormulaSave}
                         />
                       </ErrorBoundary>
+                      <ToolSection
+                        title="Data Enrichment"
+                        description="Generate derived fields with date parts, ranking, lag/lead, binning, and running aggregates before downstream analysis."
+                      >
+                        <ErrorBoundary>
+                          <DataEnrichment
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
                       <ErrorBoundary>
                         <RegexTester
                           tableName={tableName}
@@ -2612,6 +2751,33 @@ export default function Home() {
                         </ErrorBoundary>
                       </ToolSection>
                     </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "quality" && (
+                  <motion.div
+                    key="quality"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Data Quality Rules
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Define reusable validation rules, quantify failures,
+                        and track dataset quality from a dedicated workspace.
+                      </p>
+                    </div>
+                    <ErrorBoundary>
+                      <DataQualityRules
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
                   </motion.div>
                 )}
 
@@ -2809,6 +2975,13 @@ export default function Home() {
                                 </option>
                               ))}
                             </select>
+                            <button
+                              type="button"
+                              onClick={() => setShowColumnDetail(true)}
+                              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                            >
+                              Open detail drawer
+                            </button>
                           </div>
                           <ErrorBoundary>
                             <ColumnStats
@@ -2926,6 +3099,17 @@ export default function Home() {
                         }))}
                       />
                     </ErrorBoundary>
+                    <ToolSection
+                      title="Snapshot Diff"
+                      description="Compare the active table against snapshots or sibling relations to surface added, removed, and modified rows."
+                    >
+                      <ErrorBoundary>
+                        <DataDiff
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
                   </motion.div>
                 )}
 
@@ -3045,6 +3229,17 @@ export default function Home() {
             rowCount={activeDataset.rowCount}
             onClose={() => setSelectedAdvancedColumn(null)}
           />
+        )}
+
+        {activeDataset && analyticsColumn && (
+          <ErrorBoundary>
+            <ColumnDetail
+              column={analyticsColumn}
+              tableName={tableName}
+              open={showColumnDetail}
+              onClose={() => setShowColumnDetail(false)}
+            />
+          </ErrorBoundary>
         )}
 
         <AnimatePresence>
