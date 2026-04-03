@@ -1,180 +1,361 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import type { ChangeEvent } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Database,
+  Check,
   Eye,
   GitMerge,
   Layers3,
   Link2,
   Loader2,
   Plus,
-  RefreshCw,
   Save,
+  Upload,
 } from "lucide-react";
-import { runQuery } from "@/lib/duckdb/client";
-import { formatNumber } from "@/lib/utils/formatters";
-import type { ColumnProfile } from "@/types/dataset";
+import {
+  getTableRowCount,
+  loadCSVIntoDB,
+  loadJSONIntoDB,
+  runQuery,
+} from "@/lib/duckdb/client";
+import { profileTable } from "@/lib/duckdb/profiler";
+import { parseExcel } from "@/lib/parsers/excel-parser";
+import { parseJSON } from "@/lib/parsers/json-parser";
+import { formatNumber, generateId, getFileExtension, sanitizeTableName } from "@/lib/utils/formatters";
+import { useDatasetStore } from "@/stores/dataset-store";
+import type { DatasetMeta, ColumnProfile, ColumnType } from "@/types/dataset";
 
 interface MergeDatasetsProps {
-  datasets: Array<{ tableName: string; columns: ColumnProfile[]; rowCount: number }>;
-  onMergeComplete?: (tableName: string) => void;
+  onMergeComplete: (tableName: string) => void;
 }
 
-type MergeType =
-  | "UNION ALL"
-  | "UNION"
-  | "INNER JOIN"
-  | "LEFT JOIN"
-  | "RIGHT JOIN"
-  | "FULL OUTER JOIN"
-  | "CROSS JOIN";
+type MergeStep = 0 | 1 | 2 | 3;
+type MergeStrategy = "append-rows" | "join-by-column" | "union-all";
+type ConflictResolution = "keep-first" | "keep-last" | "keep-both";
+type BusyState = "upload" | "preview" | "save" | null;
 
-interface UnionMapping {
-  targetName: string;
-  leftColumn: string;
-  rightColumn: string;
-  outputType: ColumnProfile["type"];
+interface SelectedDataset {
+  tableName: string;
+  fileName: string;
+  rowCount: number;
+  columns: ColumnProfile[];
 }
 
-interface JoinCondition {
+interface SchemaMapping {
   id: string;
-  leftColumn: string;
-  operator: "=" | "!=" | ">" | "<" | ">=" | "<=";
-  rightColumn: string;
+  targetName: string;
+  outputType: ColumnType;
+  sourceColumns: Record<string, string>;
 }
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-const STORAGE_CARD = "rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45";
-const MERGE_TYPES: MergeType[] = ["UNION ALL", "UNION", "INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "FULL OUTER JOIN", "CROSS JOIN"];
+interface MergePlan {
+  sql: string;
+  outputColumns: string[];
+}
 
-function quoteId(value: string): string {
+interface MergeStats {
+  rowCount: number;
+  columnCount: number;
+  nullFillRate: number;
+}
+
+const EASE = [0.22, 1, 0.36, 1] as const;
+const STEPS: Array<{ id: MergeStep; label: string }> = [
+  { id: 0, label: "Sources" },
+  { id: 1, label: "Strategy" },
+  { id: 2, label: "Mapping" },
+  { id: 3, label: "Preview" },
+];
+
+function quoteIdentifier(value: string): string {
   return `"${value.replaceAll('"', '""')}"`;
 }
 
-function sanitizeName(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 48) || "merged_dataset";
+function readNumber(value: unknown): number {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  if (typeof value === "bigint") {
+    return Number(value);
+  }
+
+  const numeric = Number(value ?? 0);
+  return Number.isFinite(numeric) ? numeric : 0;
 }
 
 function normalize(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
-function createId(): string {
-  return Math.random().toString(36).slice(2, 9);
-}
+function duckType(columnType: ColumnType): string {
+  if (columnType === "number") {
+    return "DOUBLE";
+  }
 
-function duckLiteralType(type: ColumnProfile["type"]): string {
-  if (type === "number") return "DOUBLE";
-  if (type === "date") return "TIMESTAMP";
-  if (type === "boolean") return "BOOLEAN";
+  if (columnType === "date") {
+    return "TIMESTAMP";
+  }
+
+  if (columnType === "boolean") {
+    return "BOOLEAN";
+  }
+
   return "VARCHAR";
 }
 
-function readNumber(value: unknown): number {
-  if (typeof value === "number") return value;
-  if (typeof value === "bigint") return Number(value);
-  if (typeof value === "string" && value.trim()) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : 0;
+function buildDefaultMergedName(datasets: SelectedDataset[], strategy: MergeStrategy): string {
+  const fragment = datasets.slice(0, 3).map((dataset) => sanitizeTableName(dataset.tableName)).join("_");
+  return `${fragment || "merged"}_${strategy.replaceAll("-", "_")}`;
+}
+
+function suggestJoinColumn(dataset: SelectedDataset, preferredName?: string): string {
+  if (preferredName) {
+    const exact = dataset.columns.find((column) => normalize(column.name) === normalize(preferredName));
+    if (exact) {
+      return exact.name;
+    }
   }
-  return 0;
+
+  const identifierLike = dataset.columns.find((column) => /(^id$|_id$|key$|code$)/i.test(column.name));
+  return identifierLike?.name ?? dataset.columns[0]?.name ?? "";
 }
 
-function buildUnionMappings(
-  left: MergeDatasetsProps["datasets"][number] | undefined,
-  right: MergeDatasetsProps["datasets"][number] | undefined,
-): UnionMapping[] {
-  if (!left || !right) return [];
-  const usedRight = new Set<string>();
-  const mappings: UnionMapping[] = left.columns.map((column) => {
-    const match = right.columns.find((candidate) => !usedRight.has(candidate.name) && normalize(candidate.name) === normalize(column.name));
-    if (match) usedRight.add(match.name);
-    return {
-      targetName: column.name,
-      leftColumn: column.name,
-      rightColumn: match?.name ?? "",
-      outputType: match && match.type === column.type ? column.type : "string",
-    };
+function buildSchemaMappings(datasets: SelectedDataset[]): SchemaMapping[] {
+  const mappingByKey = new Map<string, SchemaMapping>();
+
+  datasets.forEach((dataset) => {
+    dataset.columns.forEach((column) => {
+      const key = normalize(column.name);
+      const existing = mappingByKey.get(key);
+
+      if (!existing) {
+        mappingByKey.set(key, {
+          id: createId(),
+          targetName: column.name,
+          outputType: column.type,
+          sourceColumns: {
+            [dataset.tableName]: column.name,
+          },
+        });
+        return;
+      }
+
+      existing.sourceColumns[dataset.tableName] = column.name;
+      if (existing.outputType !== column.type) {
+        existing.outputType = "string";
+      }
+    });
   });
-  right.columns
-    .filter((column) => !usedRight.has(column.name))
-    .forEach((column) =>
-      mappings.push({ targetName: column.name, leftColumn: "", rightColumn: column.name, outputType: column.type }),
-    );
-  return mappings;
+
+  return Array.from(mappingByKey.values());
 }
 
-function buildUnionSql(
-  left: MergeDatasetsProps["datasets"][number],
-  right: MergeDatasetsProps["datasets"][number],
-  mergeType: MergeType,
-  mappings: UnionMapping[],
-): string {
-  const project = (side: "left" | "right") =>
-    mappings
-      .map((mapping) => {
-        const selected = side === "left" ? mapping.leftColumn : mapping.rightColumn;
-        const expression = selected
-          ? `CAST(${quoteId(selected)} AS ${duckLiteralType(mapping.outputType)})`
-          : `CAST(NULL AS ${duckLiteralType(mapping.outputType)})`;
-        return `${expression} AS ${quoteId(mapping.targetName)}`;
-      })
-      .join(",\n  ");
-
-  return [
-    `SELECT ${project("left")} FROM ${quoteId(left.tableName)}`,
-    mergeType === "UNION ALL" ? "UNION ALL" : "UNION",
-    `SELECT ${project("right")} FROM ${quoteId(right.tableName)}`,
-  ].join("\n");
+function createId(): string {
+  return Math.random().toString(36).slice(2, 10);
 }
 
-function buildJoinSql(
-  left: MergeDatasetsProps["datasets"][number],
-  right: MergeDatasetsProps["datasets"][number],
-  mergeType: MergeType,
-  conditions: JoinCondition[],
-): string {
-  const leftNormalized = new Set(left.columns.map((column) => normalize(column.name)));
-  const selectList = [
-    ...left.columns.map((column) => `l.${quoteId(column.name)} AS ${quoteId(column.name)}`),
-    ...right.columns.map((column) => {
-      const alias = leftNormalized.has(normalize(column.name)) ? `${right.tableName}__${column.name}` : column.name;
-      return `r.${quoteId(column.name)} AS ${quoteId(alias)}`;
-    }),
-  ];
-  const onClause = mergeType === "CROSS JOIN"
-    ? ""
-    : conditions
-        .filter((condition) => condition.leftColumn && condition.rightColumn)
-        .map((condition) => `l.${quoteId(condition.leftColumn)} ${condition.operator} r.${quoteId(condition.rightColumn)}`)
-        .join(" AND ");
-  return [
-    `SELECT ${selectList.join(",\n  ")}`,
-    `FROM ${quoteId(left.tableName)} l`,
-    `${mergeType} ${quoteId(right.tableName)} r`,
-    mergeType === "CROSS JOIN" ? "" : `ON ${onClause || "1 = 1"}`,
-  ]
-    .filter(Boolean)
-    .join("\n");
+function buildStackPlan(
+  datasets: SelectedDataset[],
+  mappings: SchemaMapping[],
+  strategy: MergeStrategy,
+): MergePlan {
+  const operator = strategy === "append-rows" ? "UNION" : "UNION ALL";
+  const outputColumns = mappings.map((mapping) => mapping.targetName);
+  const sql = datasets
+    .map((dataset) => {
+      const selectList = mappings
+        .map((mapping) => {
+          const sourceColumn = mapping.sourceColumns[dataset.tableName];
+          const expression = sourceColumn
+            ? `CAST(${quoteIdentifier(sourceColumn)} AS ${duckType(mapping.outputType)})`
+            : `CAST(NULL AS ${duckType(mapping.outputType)})`;
+
+          return `${expression} AS ${quoteIdentifier(mapping.targetName)}`;
+        })
+        .join(",\n  ");
+
+      return `SELECT
+  ${selectList}
+FROM ${quoteIdentifier(dataset.tableName)}`;
+    })
+    .join(`\n${operator}\n`);
+
+  return { sql, outputColumns };
+}
+
+function buildJoinPlan(
+  datasets: SelectedDataset[],
+  joinColumns: Record<string, string>,
+  conflictResolution: ConflictResolution,
+): MergePlan {
+  const occurrences = new Map<
+    string,
+    Array<{ tableIndex: number; tableName: string; columnName: string }>
+  >();
+
+  datasets.forEach((dataset, tableIndex) => {
+    dataset.columns.forEach((column) => {
+      const key = normalize(column.name);
+      const current = occurrences.get(key) ?? [];
+      current.push({
+        tableIndex,
+        tableName: dataset.tableName,
+        columnName: column.name,
+      });
+      occurrences.set(key, current);
+    });
+  });
+
+  const selectList: string[] = [];
+  const outputColumns: string[] = [];
+
+  occurrences.forEach((items) => {
+    const targetName = items[0]?.columnName ?? "column";
+    if (conflictResolution === "keep-both" && items.length > 1) {
+      items.forEach((item, itemIndex) => {
+        const alias = itemIndex === 0 ? targetName : `${item.tableName}__${item.columnName}`;
+        selectList.push(`t${item.tableIndex}.${quoteIdentifier(item.columnName)} AS ${quoteIdentifier(alias)}`);
+        outputColumns.push(alias);
+      });
+      return;
+    }
+
+    const orderedItems = conflictResolution === "keep-last" ? [...items].reverse() : items;
+    const coalesced = orderedItems
+      .map((item) => `t${item.tableIndex}.${quoteIdentifier(item.columnName)}`)
+      .join(", ");
+
+    selectList.push(`COALESCE(${coalesced}) AS ${quoteIdentifier(targetName)}`);
+    outputColumns.push(targetName);
+  });
+
+  const fromLines = datasets.flatMap((dataset, index) => {
+    if (index === 0) {
+      return [`FROM ${quoteIdentifier(dataset.tableName)} t0`];
+    }
+
+    return [
+      `LEFT JOIN ${quoteIdentifier(dataset.tableName)} t${index}`,
+      `  ON t0.${quoteIdentifier(joinColumns[datasets[0].tableName] ?? "")} = t${index}.${quoteIdentifier(joinColumns[dataset.tableName] ?? "")}`,
+    ];
+  });
+
+  return {
+    sql: `SELECT
+  ${selectList.join(",\n  ")}
+${fromLines.join("\n")}`,
+    outputColumns,
+  };
+}
+
+function makeUniqueTableName(baseName: string, existingNames: Set<string>): string {
+  let nextName = baseName || "dataset";
+  let index = 1;
+
+  while (existingNames.has(nextName)) {
+    nextName = `${baseName}_${index}`;
+    index += 1;
+  }
+
+  return nextName;
+}
+
+function previousStep(step: MergeStep): MergeStep {
+  if (step === 0) {
+    return 0;
+  }
+
+  if (step === 1) {
+    return 0;
+  }
+
+  if (step === 2) {
+    return 1;
+  }
+
+  return 2;
+}
+
+function nextStep(step: MergeStep): MergeStep {
+  if (step === 0) {
+    return 1;
+  }
+
+  if (step === 1) {
+    return 2;
+  }
+
+  if (step === 2) {
+    return 3;
+  }
+
+  return 3;
+}
+
+function StepIndicator({ step }: { step: MergeStep }) {
+  return (
+    <div className="mb-6 flex items-center gap-2">
+      {STEPS.map((item, index) => {
+        const active = item.id === step;
+        const completed = item.id < step;
+        return (
+          <div key={item.id} className="flex flex-1 items-center gap-2">
+            <div
+              className={`flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold ${
+                completed
+                  ? "border-emerald-400/30 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                  : active
+                    ? "border-sky-400/30 bg-sky-500/15 text-sky-700 dark:text-sky-300"
+                    : "border-white/10 bg-white/10 text-slate-500 dark:text-slate-400"
+              }`}
+            >
+              {completed ? <Check className="h-4 w-4" /> : index + 1}
+            </div>
+            <span className={`text-sm ${active ? "text-slate-900 dark:text-slate-100" : "text-slate-500 dark:text-slate-400"}`}>
+              {item.label}
+            </span>
+            {index < STEPS.length - 1 ? <div className="h-px flex-1 bg-white/10" /> : null}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 function PreviewTable({ rows }: { rows: Record<string, unknown>[] }) {
-  if (!rows.length) {
-    return <div className="flex h-48 items-center justify-center text-sm text-slate-500 dark:text-slate-400">No preview rows returned.</div>;
+  if (rows.length === 0) {
+    return (
+      <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-white/10 text-sm text-slate-500 dark:text-slate-400">
+        Preview the merge to inspect the first 50 rows.
+      </div>
+    );
   }
-  const headers = Object.keys(rows[0]);
+
+  const headers = Object.keys(rows[0] ?? {});
+
   return (
-    <div className="overflow-auto">
+    <div className="overflow-auto rounded-2xl border border-white/10">
       <table className="min-w-full text-left text-sm">
-        <thead className="sticky top-0 bg-white/70 dark:bg-slate-950/70">
-          <tr>{headers.map((header) => <th key={header} className="px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">{header}</th>)}</tr>
+        <thead className="sticky top-0 bg-white/75 dark:bg-slate-950/80">
+          <tr>
+            {headers.map((header) => (
+              <th key={header} className="whitespace-nowrap px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">
+                {header}
+              </th>
+            ))}
+          </tr>
         </thead>
         <tbody>
-          {rows.map((row, index) => (
-            <tr key={index} className="border-t border-white/10">
-              {headers.map((header) => <td key={header} className="max-w-56 truncate px-3 py-2 text-slate-600 dark:text-slate-300">{String(row[header] ?? "null")}</td>)}
+          {rows.map((row, rowIndex) => (
+            <tr key={`preview-row-${rowIndex}`} className="border-t border-white/10">
+              {headers.map((header) => (
+                <td key={`${rowIndex}-${header}`} className="max-w-56 truncate px-3 py-2 text-slate-600 dark:text-slate-300">
+                  {String(row[header] ?? "null")}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>
@@ -183,66 +364,208 @@ function PreviewTable({ rows }: { rows: Record<string, unknown>[] }) {
   );
 }
 
-export default function MergeDatasets({ datasets, onMergeComplete }: MergeDatasetsProps) {
-  const [leftTable, setLeftTable] = useState(datasets[0]?.tableName ?? "");
-  const [rightTable, setRightTable] = useState(datasets[1]?.tableName ?? datasets[0]?.tableName ?? "");
-  const [mergeType, setMergeType] = useState<MergeType>("UNION ALL");
-  const [unionMappings, setUnionMappings] = useState<UnionMapping[]>([]);
-  const [conditions, setConditions] = useState<JoinCondition[]>([{ id: createId(), leftColumn: "", operator: "=", rightColumn: "" }]);
-  const [previewRows, setPreviewRows] = useState<Record<string, unknown>[]>([]);
-  const [rowImpact, setRowImpact] = useState<number | null>(null);
-  const [targetTableName, setTargetTableName] = useState("merged_dataset");
-  const [busy, setBusy] = useState<"preview" | "save" | null>(null);
+export default function MergeDatasets({ onMergeComplete }: MergeDatasetsProps) {
+  const datasets = useDatasetStore((state) => state.datasets);
+  const addDataset = useDatasetStore((state) => state.addDataset);
+
+  const [step, setStep] = useState<MergeStep>(0);
+  const [selectedTableNames, setSelectedTableNames] = useState<string[]>([]);
+  const [mergeStrategy, setMergeStrategy] = useState<MergeStrategy>("append-rows");
+  const [conflictResolution, setConflictResolution] = useState<ConflictResolution>("keep-first");
+  const [mappingOverrides, setMappingOverrides] = useState<Record<string, string>>({});
+  const [joinSelections, setJoinSelections] = useState<Record<string, string>>({});
+  const [mergedTableName, setMergedTableName] = useState("");
+  const [busy, setBusy] = useState<BusyState>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [previewRows, setPreviewRows] = useState<Record<string, unknown>[]>([]);
+  const [stats, setStats] = useState<MergeStats | null>(null);
 
-  const leftDataset = useMemo(() => datasets.find((dataset) => dataset.tableName === leftTable), [datasets, leftTable]);
-  const rightDataset = useMemo(() => datasets.find((dataset) => dataset.tableName === rightTable), [datasets, rightTable]);
-  const isUnion = mergeType === "UNION" || mergeType === "UNION ALL";
-  const sql = useMemo(() => {
-    if (!leftDataset || !rightDataset) return "";
-    return isUnion
-      ? buildUnionSql(leftDataset, rightDataset, mergeType, unionMappings)
-      : buildJoinSql(leftDataset, rightDataset, mergeType, conditions);
-  }, [conditions, isUnion, leftDataset, mergeType, rightDataset, unionMappings]);
+  const datasetOptions = useMemo<SelectedDataset[]>(
+    () =>
+      datasets.map((dataset) => ({
+        tableName: dataset.name,
+        fileName: dataset.fileName,
+        rowCount: dataset.rowCount,
+        columns: dataset.columns,
+      })),
+    [datasets],
+  );
 
-  useEffect(() => {
-    if (!leftDataset || !rightDataset) return;
-    setUnionMappings(buildUnionMappings(leftDataset, rightDataset));
-    setTargetTableName(`${sanitizeName(leftDataset.tableName)}_${sanitizeName(rightDataset.tableName)}_${sanitizeName(mergeType)}`);
-    setConditions((current) => {
-      if (current[0]?.leftColumn) return current;
-      const leftJoin = leftDataset.columns.find((column) => /(_id|id|key)$/i.test(column.name)) ?? leftDataset.columns[0];
-      const rightJoin = rightDataset.columns.find((column) => normalize(column.name) === normalize(leftJoin?.name ?? "")) ?? rightDataset.columns[0];
-      return [{ id: createId(), leftColumn: leftJoin?.name ?? "", operator: "=", rightColumn: rightJoin?.name ?? "" }];
-    });
-  }, [leftDataset, rightDataset, mergeType]);
+  const effectiveSelectedNames = selectedTableNames.length > 0
+    ? selectedTableNames
+    : datasetOptions.slice(0, 2).map((dataset) => dataset.tableName);
 
-  async function runPreview() {
-    if (!sql) return;
-    setBusy("preview");
+  const selectedDatasets = useMemo(
+    () =>
+      effectiveSelectedNames
+        .map((tableName) => datasetOptions.find((dataset) => dataset.tableName === tableName))
+        .filter((dataset): dataset is SelectedDataset => Boolean(dataset)),
+    [datasetOptions, effectiveSelectedNames],
+  );
+
+  const baseMappings = useMemo(() => buildSchemaMappings(selectedDatasets), [selectedDatasets]);
+
+  const resolvedMappings = useMemo(
+    () =>
+      baseMappings.map((mapping) => ({
+        ...mapping,
+        sourceColumns: selectedDatasets.reduce<Record<string, string>>((accumulator, dataset) => {
+          const overrideKey = `${mapping.targetName}::${dataset.tableName}`;
+          accumulator[dataset.tableName] = mappingOverrides[overrideKey] ?? mapping.sourceColumns[dataset.tableName] ?? "";
+          return accumulator;
+        }, {}),
+      })),
+    [baseMappings, mappingOverrides, selectedDatasets],
+  );
+
+  const resolvedJoinColumns = useMemo(() => {
+    const baseDataset = selectedDatasets[0];
+    const baseJoin = baseDataset
+      ? joinSelections[baseDataset.tableName] ?? suggestJoinColumn(baseDataset)
+      : "";
+
+    return selectedDatasets.reduce<Record<string, string>>((accumulator, dataset, index) => {
+      accumulator[dataset.tableName] =
+        joinSelections[dataset.tableName] ??
+        suggestJoinColumn(dataset, index === 0 ? undefined : baseJoin);
+      return accumulator;
+    }, {});
+  }, [joinSelections, selectedDatasets]);
+
+  const mergePlan = useMemo<MergePlan | null>(() => {
+    if (selectedDatasets.length < 2) {
+      return null;
+    }
+
+    if (mergeStrategy === "join-by-column") {
+      return buildJoinPlan(selectedDatasets, resolvedJoinColumns, conflictResolution);
+    }
+
+    return buildStackPlan(selectedDatasets, resolvedMappings, mergeStrategy);
+  }, [conflictResolution, mergeStrategy, resolvedJoinColumns, resolvedMappings, selectedDatasets]);
+
+  const effectiveMergedName = mergedTableName.trim() || buildDefaultMergedName(selectedDatasets, mergeStrategy);
+
+  const canAdvance =
+    (step === 0 && selectedDatasets.length >= 2) ||
+    step === 1 ||
+    step === 2 ||
+    step === 3;
+
+  async function handleUpload(event: ChangeEvent<HTMLInputElement>): Promise<void> {
+    const files = Array.from(event.target.files ?? []);
+    if (files.length === 0) {
+      return;
+    }
+
+    event.target.value = "";
+    setBusy("upload");
     setNotice(null);
+
     try {
-      const [rows, countRows] = await Promise.all([
-        runQuery(`SELECT * FROM (${sql}) AS merged_preview LIMIT 100`),
-        runQuery(`SELECT COUNT(*) AS result_count FROM (${sql}) AS merged_count`),
-      ]);
-      setPreviewRows(rows);
-      setRowImpact(readNumber(countRows[0]?.result_count));
+      const existingNames = new Set(datasetOptions.map((dataset) => dataset.tableName));
+      const createdNames: string[] = [];
+
+      for (const file of files) {
+        const extension = getFileExtension(file.name);
+        const baseName = sanitizeTableName(file.name);
+        const tableName = makeUniqueTableName(baseName, existingNames);
+        existingNames.add(tableName);
+
+        if (extension === "json") {
+          const jsonContent = await parseJSON(file);
+          await loadJSONIntoDB(tableName, jsonContent);
+        } else if (extension === "xlsx" || extension === "xls") {
+          const csvContent = await parseExcel(file);
+          await loadCSVIntoDB(tableName, csvContent);
+        } else {
+          const content = await file.text();
+          await loadCSVIntoDB(tableName, content);
+        }
+
+        const [columns, rowCount] = await Promise.all([
+          profileTable(tableName),
+          getTableRowCount(tableName),
+        ]);
+
+        const meta: DatasetMeta = {
+          id: generateId(),
+          name: tableName,
+          fileName: file.name,
+          rowCount,
+          columnCount: columns.length,
+          columns,
+          uploadedAt: Date.now(),
+          sizeBytes: file.size,
+        };
+
+        addDataset(meta);
+        createdNames.push(tableName);
+      }
+
+      setSelectedTableNames((current) => Array.from(new Set([...current, ...createdNames])));
+      setNotice(`Loaded ${createdNames.length} dataset${createdNames.length === 1 ? "" : "s"} for merging.`);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Preview failed.");
+      setNotice(error instanceof Error ? error.message : "Dataset upload failed.");
     } finally {
       setBusy(null);
     }
   }
 
-  async function materializeMerge() {
-    if (!sql || !targetTableName.trim()) return;
+  async function previewMerge(): Promise<void> {
+    if (!mergePlan) {
+      return;
+    }
+
+    setBusy("preview");
+    setNotice(null);
+
+    try {
+      const nullFillExpression =
+        mergePlan.outputColumns.length > 0
+          ? mergePlan.outputColumns
+              .map((columnName) => `SUM(CASE WHEN ${quoteIdentifier(columnName)} IS NULL THEN 1 ELSE 0 END)`)
+              .join(" + ")
+          : "0";
+
+      const [rows, statRows] = await Promise.all([
+        runQuery(`SELECT * FROM (${mergePlan.sql}) AS merged_preview LIMIT 50`),
+        runQuery(`
+          SELECT
+            COUNT(*) AS row_count,
+            (${nullFillExpression}) / NULLIF(COUNT(*) * ${Math.max(mergePlan.outputColumns.length, 1)}, 0) AS null_fill_rate
+          FROM (${mergePlan.sql}) AS merged_stats
+        `),
+      ]);
+
+      const statRow = statRows[0] ?? {};
+      setPreviewRows(rows);
+      setStats({
+        rowCount: readNumber(statRow.row_count),
+        columnCount: mergePlan.outputColumns.length,
+        nullFillRate: readNumber(statRow.null_fill_rate),
+      });
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Preview failed.");
+      setPreviewRows([]);
+      setStats(null);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function materializeMerge(): Promise<void> {
+    if (!mergePlan) {
+      return;
+    }
+
     setBusy("save");
     setNotice(null);
+
     try {
-      await runQuery(`CREATE OR REPLACE TABLE ${quoteId(targetTableName.trim())} AS ${sql}`);
-      setNotice(`Created ${targetTableName.trim()} from the current merge plan.`);
-      onMergeComplete?.(targetTableName.trim());
+      await runQuery(`CREATE OR REPLACE TABLE ${quoteIdentifier(effectiveMergedName)} AS ${mergePlan.sql}`);
+      setNotice(`Created ${effectiveMergedName}.`);
+      onMergeComplete(effectiveMergedName);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Create table failed.");
     } finally {
@@ -257,138 +580,373 @@ export default function MergeDatasets({ datasets, onMergeComplete }: MergeDatase
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-700 dark:text-cyan-300">
               <GitMerge className="h-3.5 w-3.5" />
-              Dataset Merge Studio
+              Merge datasets
             </div>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950 dark:text-slate-50">Combine loaded DuckDB datasets</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-300">Preview union or join plans, inspect row-count impact, then materialize the result as a new table.</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950 dark:text-slate-50">
+              Step-by-step merge wizard
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+              Stack rows, union schemas, or join tables by a shared key. Uploaded inputs are immediately profiled and become reusable DataLens datasets.
+            </p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className={`${STORAGE_CARD} px-4 py-3`}><div className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Left</div><div className="mt-2 text-lg font-semibold text-slate-950 dark:text-slate-50">{leftDataset?.rowCount ? formatNumber(leftDataset.rowCount) : "0"}</div></div>
-            <div className={`${STORAGE_CARD} px-4 py-3`}><div className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Right</div><div className="mt-2 text-lg font-semibold text-slate-950 dark:text-slate-50">{rightDataset?.rowCount ? formatNumber(rightDataset.rowCount) : "0"}</div></div>
-            <div className={`${STORAGE_CARD} px-4 py-3`}><div className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Result</div><div className="mt-2 text-lg font-semibold text-slate-950 dark:text-slate-50">{rowImpact === null ? "—" : formatNumber(rowImpact)}</div></div>
-          </div>
+
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white/15 dark:bg-slate-950/40 dark:text-slate-200">
+            {busy === "upload" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+            Upload dataset
+            <input
+              type="file"
+              accept=".csv,.tsv,.json,.xlsx,.xls"
+              multiple
+              onChange={(event) => void handleUpload(event)}
+              className="hidden"
+            />
+          </label>
         </div>
       </div>
 
-      <div className="grid gap-5 px-6 py-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-5">
-          <div className={`${STORAGE_CARD} p-5`}>
-            <div className="grid gap-4 md:grid-cols-2">
-              <label className="text-sm">
-                <span className="mb-2 block font-medium text-slate-700 dark:text-slate-200">Left dataset</span>
-                <select value={leftTable} onChange={(event) => setLeftTable(event.target.value)} className="w-full rounded-2xl border border-white/15 bg-white/40 px-4 py-3 dark:bg-slate-950/40">
-                  {datasets.map((dataset) => <option key={dataset.tableName} value={dataset.tableName}>{dataset.tableName}</option>)}
-                </select>
-              </label>
-              <label className="text-sm">
-                <span className="mb-2 block font-medium text-slate-700 dark:text-slate-200">Right dataset</span>
-                <select value={rightTable} onChange={(event) => setRightTable(event.target.value)} className="w-full rounded-2xl border border-white/15 bg-white/40 px-4 py-3 dark:bg-slate-950/40">
-                  {datasets.map((dataset) => <option key={dataset.tableName} value={dataset.tableName}>{dataset.tableName}</option>)}
-                </select>
-              </label>
-            </div>
-            <div className="mt-4 grid gap-3 lg:grid-cols-4">
-              {MERGE_TYPES.map((type) => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => setMergeType(type)}
-                  className={`rounded-2xl border px-4 py-3 text-left text-sm transition ${mergeType === type ? "border-cyan-400/40 bg-cyan-500/10 text-cyan-800 dark:text-cyan-200" : "border-white/15 bg-white/5 text-slate-600 dark:text-slate-300"}`}
-                >
-                  <div className="font-semibold">{type}</div>
-                  <div className="mt-1 text-xs opacity-75">{type.includes("UNION") ? "Stack rows" : type === "CROSS JOIN" ? "Cartesian product" : "Match rows by keys"}</div>
-                </button>
-              ))}
-            </div>
-          </div>
+      <div className="px-6 py-6">
+        <StepIndicator step={step} />
 
-          {isUnion && leftDataset && rightDataset ? (
-            <div className={`${STORAGE_CARD} p-5`}>
-              <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100"><Layers3 className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />Union column mapping</div>
-              <div className="space-y-3">
-                {unionMappings.map((mapping, index) => (
-                  <div key={`${mapping.targetName}:${index}`} className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 md:grid-cols-[1fr_1fr_1fr]">
-                    <input value={mapping.targetName} onChange={(event) => setUnionMappings((current) => current.map((entry, currentIndex) => currentIndex === index ? { ...entry, targetName: event.target.value } : entry))} className="rounded-xl border border-white/10 bg-white/40 px-3 py-2 dark:bg-slate-950/40" />
-                    <select value={mapping.leftColumn} onChange={(event) => setUnionMappings((current) => current.map((entry, currentIndex) => currentIndex === index ? { ...entry, leftColumn: event.target.value } : entry))} className="rounded-xl border border-white/10 bg-white/40 px-3 py-2 dark:bg-slate-950/40">
-                      <option value="">NULL from left</option>
-                      {leftDataset.columns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
-                    </select>
-                    <select value={mapping.rightColumn} onChange={(event) => setUnionMappings((current) => current.map((entry, currentIndex) => currentIndex === index ? { ...entry, rightColumn: event.target.value } : entry))} className="rounded-xl border border-white/10 bg-white/40 px-3 py-2 dark:bg-slate-950/40">
-                      <option value="">NULL from right</option>
-                      {rightDataset.columns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
-                    </select>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.26, ease: EASE }}
+            className="space-y-5"
+          >
+            {step === 0 ? (
+              <div className="grid gap-4 lg:grid-cols-2">
+                {datasetOptions.map((dataset) => {
+                  const selected = effectiveSelectedNames.includes(dataset.tableName);
+                  return (
+                    <button
+                      key={dataset.tableName}
+                      type="button"
+                      onClick={() =>
+                        setSelectedTableNames((current) =>
+                          current.includes(dataset.tableName)
+                            ? current.filter((name) => name !== dataset.tableName)
+                            : [...current, dataset.tableName],
+                        )
+                      }
+                      className={`rounded-3xl border p-5 text-left transition ${
+                        selected
+                          ? "border-cyan-400/30 bg-cyan-500/10"
+                          : "border-white/10 bg-white/10 hover:border-cyan-400/20 dark:bg-slate-950/35"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-lg font-semibold text-slate-950 dark:text-slate-50">{dataset.tableName}</p>
+                          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{dataset.fileName}</p>
+                        </div>
+                        {selected ? (
+                          <span className="rounded-full border border-cyan-400/30 bg-cyan-500/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-700 dark:text-cyan-200">
+                            Selected
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                        <div className="rounded-2xl border border-white/10 bg-white/10 px-3 py-2.5 dark:bg-slate-950/35">
+                          <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Rows</div>
+                          <div className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{formatNumber(dataset.rowCount)}</div>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-white/10 px-3 py-2.5 dark:bg-slate-950/35">
+                          <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Columns</div>
+                          <div className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{dataset.columns.length}</div>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-white/10 px-3 py-2.5 dark:bg-slate-950/35">
+                          <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Profile</div>
+                          <div className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{dataset.columns.map((column) => column.type).filter(Boolean).slice(0, 2).join(", ")}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            {step === 1 ? (
+              <div className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
+                <div className="rounded-3xl border border-white/10 bg-white/10 p-5 dark:bg-slate-950/35">
+                  <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100">
+                    <Layers3 className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
+                    Merge strategy
                   </div>
-                ))}
-              </div>
-            </div>
-          ) : leftDataset && rightDataset ? (
-            <div className={`${STORAGE_CARD} p-5`}>
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100"><Link2 className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />ON condition builder</div>
-                {mergeType !== "CROSS JOIN" ? (
-                  <button type="button" onClick={() => setConditions((current) => [...current, { id: createId(), leftColumn: "", operator: "=", rightColumn: "" }])} className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-sm text-slate-600 dark:text-slate-300">
-                    <Plus className="h-4 w-4" />Add clause
-                  </button>
-                ) : null}
-              </div>
-              <div className="space-y-3">
-                {conditions.map((condition) => (
-                  <div key={condition.id} className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 md:grid-cols-[1fr_auto_1fr]">
-                    <select value={condition.leftColumn} onChange={(event) => setConditions((current) => current.map((entry) => entry.id === condition.id ? { ...entry, leftColumn: event.target.value } : entry))} className="rounded-xl border border-white/10 bg-white/40 px-3 py-2 dark:bg-slate-950/40">
-                      {leftDataset.columns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
-                    </select>
-                    <div className="flex gap-2">
-                      <select value={condition.operator} onChange={(event) => setConditions((current) => current.map((entry) => entry.id === condition.id ? { ...entry, operator: event.target.value as JoinCondition["operator"] } : entry))} className="rounded-xl border border-white/10 bg-white/40 px-3 py-2 dark:bg-slate-950/40">
-                        {["=", "!=", ">", "<", ">=", "<="].map((operator) => <option key={operator} value={operator}>{operator}</option>)}
-                      </select>
+                  <div className="space-y-3">
+                    {(
+                      [
+                        ["append-rows", "Append rows", "Align columns, then remove exact duplicates across inputs."],
+                        ["union-all", "Union all", "Align columns and keep every row exactly as provided."],
+                        ["join-by-column", "Join by column", "Use the first selected table as the left-side join anchor."],
+                      ] as const
+                    ).map(([value, label, description]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setMergeStrategy(value)}
+                        className={`w-full rounded-2xl border px-4 py-4 text-left transition ${
+                          mergeStrategy === value
+                            ? "border-cyan-400/30 bg-cyan-500/10"
+                            : "border-white/10 bg-white/10 hover:border-cyan-400/20 dark:bg-slate-950/35"
+                        }`}
+                      >
+                        <div className="text-sm font-semibold text-slate-950 dark:text-slate-50">{label}</div>
+                        <div className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{description}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-5">
+                  <div className="rounded-3xl border border-white/10 bg-white/10 p-5 dark:bg-slate-950/35">
+                    <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100">
+                      <Link2 className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
+                      Conflict resolution
                     </div>
-                    <select value={condition.rightColumn} onChange={(event) => setConditions((current) => current.map((entry) => entry.id === condition.id ? { ...entry, rightColumn: event.target.value } : entry))} className="rounded-xl border border-white/10 bg-white/40 px-3 py-2 dark:bg-slate-950/40">
-                      {rightDataset.columns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
-                    </select>
+                    <div className="grid gap-3 md:grid-cols-3">
+                      {(
+                        [
+                          ["keep-first", "Keep first"],
+                          ["keep-last", "Keep last"],
+                          ["keep-both", "Keep both"],
+                        ] as const
+                      ).map(([value, label]) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => setConflictResolution(value)}
+                          className={`rounded-2xl border px-4 py-3 text-sm transition ${
+                            conflictResolution === value
+                              ? "border-amber-400/30 bg-amber-500/10 text-amber-800 dark:text-amber-200"
+                              : "border-white/10 bg-white/10 text-slate-600 hover:border-amber-400/20 dark:bg-slate-950/35 dark:text-slate-300"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                ))}
+
+                  {mergeStrategy === "join-by-column" ? (
+                    <div className="rounded-3xl border border-white/10 bg-white/10 p-5 dark:bg-slate-950/35">
+                      <div className="mb-4 text-sm font-semibold text-slate-900 dark:text-slate-100">Join keys</div>
+                      <div className="space-y-3">
+                        {selectedDatasets.map((dataset) => (
+                          <label key={dataset.tableName} className="block text-sm text-slate-600 dark:text-slate-300">
+                            <span className="mb-2 block font-medium text-slate-900 dark:text-slate-100">{dataset.tableName}</span>
+                            <select
+                              value={resolvedJoinColumns[dataset.tableName] ?? ""}
+                              onChange={(event) =>
+                                setJoinSelections((current) => ({
+                                  ...current,
+                                  [dataset.tableName]: event.target.value,
+                                }))
+                              }
+                              className="w-full rounded-2xl border border-white/10 bg-white/50 px-3 py-2.5 outline-none dark:bg-slate-950/45"
+                            >
+                              {dataset.columns.map((column) => (
+                                <option key={column.name} value={column.name}>
+                                  {column.name}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
               </div>
-            </div>
-          ) : null}
+            ) : null}
+
+            {step === 2 ? (
+              <div className="rounded-3xl border border-white/10 bg-white/10 p-5 dark:bg-slate-950/35">
+                <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100">
+                  <Layers3 className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
+                  {mergeStrategy === "join-by-column" ? "Join projection" : "Column mapping"}
+                </div>
+
+                {mergeStrategy === "join-by-column" ? (
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {selectedDatasets.map((dataset) => (
+                      <div
+                        key={dataset.tableName}
+                        className="rounded-2xl border border-white/10 bg-white/10 px-4 py-4 dark:bg-slate-950/35"
+                      >
+                        <div className="text-sm font-semibold text-slate-950 dark:text-slate-50">{dataset.tableName}</div>
+                        <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                          Joining on <span className="font-mono">{resolvedJoinColumns[dataset.tableName]}</span> with{" "}
+                          <span className="font-mono">{conflictResolution}</span> collision handling.
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="overflow-auto rounded-2xl border border-white/10">
+                    <table className="min-w-full text-left text-sm">
+                      <thead className="bg-white/75 dark:bg-slate-950/80">
+                        <tr>
+                          <th className="px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">Output column</th>
+                          {selectedDatasets.map((dataset) => (
+                            <th key={dataset.tableName} className="px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">
+                              {dataset.tableName}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {resolvedMappings.map((mapping) => (
+                          <tr key={mapping.id} className="border-t border-white/10">
+                            <td className="px-3 py-2 text-slate-700 dark:text-slate-200">{mapping.targetName}</td>
+                            {selectedDatasets.map((dataset) => {
+                              const overrideKey = `${mapping.targetName}::${dataset.tableName}`;
+                              return (
+                                <td key={overrideKey} className="px-3 py-2">
+                                  <select
+                                    value={mapping.sourceColumns[dataset.tableName] ?? ""}
+                                    onChange={(event) =>
+                                      setMappingOverrides((current) => ({
+                                        ...current,
+                                        [overrideKey]: event.target.value,
+                                      }))
+                                    }
+                                    className="w-full rounded-2xl border border-white/10 bg-white/50 px-3 py-2 outline-none dark:bg-slate-950/45"
+                                  >
+                                    <option value="">No column</option>
+                                    {dataset.columns.map((column) => (
+                                      <option key={column.name} value={column.name}>
+                                        {column.name}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {step === 3 ? (
+              <div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+                <div className="space-y-5">
+                  <div className="rounded-3xl border border-white/10 bg-white/10 p-5 dark:bg-slate-950/35">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
+                        <Eye className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
+                        Result preview
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => void previewMerge()}
+                        className="inline-flex items-center gap-2 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-2.5 text-sm font-medium text-cyan-800 dark:text-cyan-200"
+                      >
+                        {busy === "preview" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
+                        Preview 50 rows
+                      </button>
+                    </div>
+                    <PreviewTable rows={previewRows} />
+                  </div>
+
+                  <div className="rounded-3xl border border-white/10 bg-white/10 p-5 dark:bg-slate-950/35">
+                    <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100">
+                      <Layers3 className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
+                      Merge SQL
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-slate-950/85 p-4 text-xs leading-6 text-cyan-200">
+                      {mergePlan?.sql ?? "-- Select at least two datasets to build the merge plan."}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-5">
+                  <div className="rounded-3xl border border-white/10 bg-white/10 p-5 dark:bg-slate-950/35">
+                    <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100">
+                      <Save className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
+                      Materialize merged table
+                    </div>
+                    <label className="block text-sm text-slate-600 dark:text-slate-300">
+                      <span className="mb-2 block font-medium text-slate-900 dark:text-slate-100">Table name</span>
+                      <input
+                        value={mergedTableName}
+                        onChange={(event) => setMergedTableName(event.target.value)}
+                        placeholder={effectiveMergedName}
+                        className="w-full rounded-2xl border border-white/10 bg-white/50 px-3 py-2.5 outline-none dark:bg-slate-950/45"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => void materializeMerge()}
+                      disabled={!mergePlan || busy === "save"}
+                      className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-800 disabled:opacity-60 dark:text-emerald-200"
+                    >
+                      {busy === "save" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                      Create merged table
+                    </button>
+                  </div>
+
+                  <div className="rounded-3xl border border-white/10 bg-white/10 p-5 dark:bg-slate-950/35">
+                    <div className="mb-4 text-sm font-semibold text-slate-900 dark:text-slate-100">Result statistics</div>
+                    <div className="grid gap-3 md:grid-cols-3">
+                      <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 dark:bg-slate-950/35">
+                        <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Rows</div>
+                        <div className="mt-2 text-xl font-semibold text-slate-950 dark:text-slate-50">
+                          {stats ? formatNumber(stats.rowCount) : "—"}
+                        </div>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 dark:bg-slate-950/35">
+                        <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Columns</div>
+                        <div className="mt-2 text-xl font-semibold text-slate-950 dark:text-slate-50">
+                          {stats ? stats.columnCount : "—"}
+                        </div>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 dark:bg-slate-950/35">
+                        <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Null fill rate</div>
+                        <div className="mt-2 text-xl font-semibold text-slate-950 dark:text-slate-50">
+                          {stats ? `${(stats.nullFillRate * 100).toFixed(1)}%` : "—"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setStep((current) => previousStep(current))}
+            disabled={step === 0}
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-slate-700 transition disabled:opacity-50 dark:bg-slate-950/35 dark:text-slate-200"
+          >
+            Previous
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setStep((current) => nextStep(current))}
+            disabled={!canAdvance || step === 3}
+            className="inline-flex items-center gap-2 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm font-medium text-cyan-800 transition disabled:opacity-50 dark:text-cyan-200"
+          >
+            {step === 2 ? "Review preview" : "Next step"}
+            <Plus className="h-4 w-4" />
+          </button>
         </div>
 
-        <div className="space-y-5">
-          <div className={`${STORAGE_CARD} p-5`}>
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100"><Eye className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />Merge SQL preview</div>
-              <button type="button" onClick={() => void runPreview()} disabled={busy !== null || !sql} className="inline-flex items-center gap-2 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-800 disabled:opacity-60 dark:text-cyan-200">
-                {busy === "preview" ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}Preview
-              </button>
-            </div>
-            <pre className="max-h-56 overflow-auto rounded-2xl border border-white/10 bg-slate-950/85 p-4 text-xs leading-6 text-cyan-200">{sql || "-- select tables to generate SQL"}</pre>
-            {rowImpact !== null ? <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">Result rows: <span className="font-semibold text-slate-900 dark:text-slate-100">{formatNumber(rowImpact)}</span>. Source totals: {formatNumber(leftDataset?.rowCount ?? 0)} + {formatNumber(rightDataset?.rowCount ?? 0)}.</p> : null}
+        {notice ? (
+          <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-800 dark:text-cyan-200">
+            {notice}
           </div>
-
-          <div className={`${STORAGE_CARD} overflow-hidden`}>
-            <div className="border-b border-white/10 px-5 py-4 text-sm font-semibold text-slate-900 dark:text-slate-100">First 100 merged rows</div>
-            <PreviewTable rows={previewRows} />
-          </div>
-
-          <div className={`${STORAGE_CARD} p-5`}>
-            <label className="text-sm">
-              <span className="mb-2 block font-medium text-slate-700 dark:text-slate-200">New table name</span>
-              <input value={targetTableName} onChange={(event) => setTargetTableName(event.target.value)} className="w-full rounded-2xl border border-white/15 bg-white/40 px-4 py-3 dark:bg-slate-950/40" />
-            </label>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <button type="button" onClick={() => void materializeMerge()} disabled={busy !== null || !sql || !targetTableName.trim()} className="inline-flex items-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-800 disabled:opacity-60 dark:text-emerald-200">
-                {busy === "save" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}Create merged table
-              </button>
-              <div className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-600 dark:text-slate-300"><Database className="h-4 w-4" />DuckDB materialization uses <span className="font-mono">CREATE OR REPLACE TABLE</span>.</div>
-            </div>
-            <AnimatePresence>
-              {notice ? (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2, ease: EASE }} className="mt-4 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-800 dark:text-cyan-200">
-                  {notice}
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
-          </div>
-        </div>
+        ) : null}
       </div>
     </section>
   );

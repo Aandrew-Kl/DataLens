@@ -215,6 +215,7 @@ export default function DataJoinWizard({
 
   const activeSql = useMemo(() => {
     if (selectedTables.length < 2) return "";
+    if (joinType !== "CROSS" && joinPairs.length < selectedTables.length - 1) return "";
     return buildJoinSql(selectedTables, joinPairs, joinType, includedColumns);
   }, [includedColumns, joinPairs, joinType, selectedTables]);
 
@@ -331,6 +332,11 @@ export default function DataJoinWizard({
       return;
     }
 
+    if (!activeSql) {
+      setError("Refresh schemas before previewing the join.");
+      return;
+    }
+
     if (joinType !== "CROSS" && joinPairs.some((pair) => !pair.leftColumn || !pair.rightColumn)) {
       setError("Each join needs left and right key columns.");
       return;
@@ -354,6 +360,11 @@ export default function DataJoinWizard({
   async function materializeJoin() {
     if (!resultTableName.trim()) {
       setError("Provide a result table name.");
+      return;
+    }
+
+    if (!activeSql) {
+      setError("Preview the join after refreshing schemas before creating a table.");
       return;
     }
 

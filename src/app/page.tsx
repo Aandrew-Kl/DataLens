@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
+import type ReactEChartsCore from "echarts-for-react/lib/core";
+import * as echarts from "echarts/core";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  BrainCircuit,
   Database,
   Table,
   BarChart3,
@@ -30,6 +33,7 @@ import {
   LayoutGrid,
   Compass,
   Eraser,
+  Plug,
 } from "lucide-react";
 
 import { loadCSVIntoDB, runQuery, getTableRowCount } from "@/lib/duckdb/client";
@@ -96,8 +100,10 @@ import AnomalyHeatmap from "@/components/data/anomaly-heatmap";
 import ChartAnnotator from "@/components/charts/chart-annotator";
 import ChartRecommendations from "@/components/charts/chart-recommendations";
 import ChartGallery from "@/components/charts/chart-gallery";
+import ChartExport from "@/components/charts/chart-export";
 import SparklineGrid from "@/components/charts/sparkline-grid";
 import ScatterMatrix from "@/components/charts/scatter-matrix";
+import ClusteringView from "@/components/ml/clustering-view";
 import DataDictionary from "@/components/data/data-dictionary";
 import VirtualDataGrid from "@/components/data/virtual-data-grid";
 import MetricCard from "@/components/data/metric-card";
@@ -116,19 +122,26 @@ import DataStory from "@/components/data/data-story";
 import DataOverview from "@/components/data/data-overview";
 import DataProfilerSummary from "@/components/data/data-profiler-summary";
 import ColumnProfilerAdvanced from "@/components/data/column-profiler-advanced";
+import ColumnTransformer from "@/components/data/column-transformer";
 import QueryBuilder from "@/components/query/query-builder";
 import RelationshipExplorer from "@/components/data/relationship-explorer";
 import DataCleaner from "@/components/data/data-cleaner";
+import DataComparison from "@/components/data/data-comparison";
+import DataConnector from "@/components/data/data-connector";
+import DataJoinWizard from "@/components/data/data-join-wizard";
 import DataPipeline from "@/components/data/data-pipeline";
+import DataScheduler from "@/components/data/data-scheduler";
 import DashboardBuilder from "@/components/charts/dashboard-builder";
 import AiAssistant from "@/components/ai/ai-assistant";
 import ColumnCorrelator from "@/components/data/column-correlator";
 import DataComparisonAdvanced from "@/components/data/data-comparison-advanced";
 import DataFaker from "@/components/data/data-faker";
+import RegressionView from "@/components/ml/regression-view";
 import SQLPlayground from "@/components/query/sql-playground";
 import RegexTester from "@/components/data/regex-tester";
 import StatisticalTests from "@/components/data/statistical-tests";
 import GeoChart from "@/components/charts/geo-chart";
+import ThemeCustomizer from "@/components/layout/theme-customizer";
 
 // ─────────────────────────────────────────────
 // Types
@@ -137,9 +150,11 @@ import GeoChart from "@/components/charts/geo-chart";
 type AppTab =
   | "profile"
   | "dashboard"
+  | "connectors"
   | "query"
   | "sql"
   | "charts"
+  | "ml"
   | "explore"
   | "builder"
   | "transforms"
@@ -204,9 +219,11 @@ function ToolSection({
 const TABS: { id: AppTab; label: string; icon: typeof Database }[] = [
   { id: "profile", label: "Profile", icon: Table },
   { id: "dashboard", label: "Dashboard", icon: BarChart3 },
+  { id: "connectors", label: "Connectors", icon: Plug },
   { id: "query", label: "Ask AI", icon: MessageSquare },
   { id: "sql", label: "SQL Editor", icon: Code2 },
   { id: "charts", label: "Charts", icon: PieChart },
+  { id: "ml", label: "ML", icon: BrainCircuit },
   { id: "explore", label: "Explore", icon: Compass },
   { id: "builder", label: "Builder", icon: LayoutGrid },
   { id: "transforms", label: "Transforms", icon: Wand2 },
@@ -708,6 +725,18 @@ export default function Home() {
   const [savedCharts, setSavedCharts] = useState<SavedChartSnapshot[]>([]);
   const [pivotView, setPivotView] = useState<"standard" | "advanced">("standard");
   const queryTabRef = useRef<HTMLDivElement>(null);
+  const chartExportProxyRef = useRef<ReactEChartsCore | null>(
+    {
+      getEchartsInstance: () => {
+        if (typeof document === "undefined") {
+          return null;
+        }
+
+        const chartHost = document.querySelector<HTMLElement>(".echarts-for-react");
+        return chartHost ? echarts.getInstanceByDom(chartHost) : null;
+      },
+    } as unknown as ReactEChartsCore
+  );
   const datasets = useDatasetStore((s) => s.datasets);
 
   // Initialize theme from system preference
@@ -988,6 +1017,106 @@ export default function Home() {
       }
     },
     [activeDataset, addNotification, tableName]
+  );
+
+  const registerDerivedDataset = useCallback(
+    async ({
+      tableName: nextTableName,
+      columns,
+      fileName = nextTableName,
+      nextTab = "profile",
+      notificationTitle,
+      notificationMessage,
+      sizeBytes,
+    }: {
+      tableName: string;
+      columns?: ColumnProfile[];
+      fileName?: string;
+      nextTab?: AppTab;
+      notificationTitle: string;
+      notificationMessage?: string;
+      sizeBytes?: number;
+    }) => {
+      try {
+        const [resolvedColumns, rowCount] = await Promise.all([
+          columns ? Promise.resolve(columns) : profileTable(nextTableName),
+          getTableRowCount(nextTableName),
+        ]);
+
+        const existingDataset = datasets.find(
+          (dataset) => sanitizeTableName(dataset.fileName) === nextTableName
+        );
+        const nextMeta: DatasetMeta = {
+          id: existingDataset?.id ?? generateId(),
+          name: nextTableName,
+          fileName,
+          rowCount,
+          columnCount: resolvedColumns.length,
+          columns: resolvedColumns,
+          uploadedAt: existingDataset?.uploadedAt ?? Date.now(),
+          sizeBytes: sizeBytes ?? existingDataset?.sizeBytes ?? 0,
+        };
+
+        if (existingDataset) {
+          useDatasetStore.setState((state) => ({
+            datasets: state.datasets.map((dataset) =>
+              dataset.id === existingDataset.id ? nextMeta : dataset
+            ),
+            activeDatasetId: existingDataset.id,
+          }));
+        } else {
+          addDataset(nextMeta);
+        }
+
+        setProfileData(resolvedColumns);
+        setActiveTab(nextTab);
+        addNotification({
+          type: "success",
+          title: notificationTitle,
+          message:
+            notificationMessage ??
+            `${fileName} is ready with ${formatNumber(rowCount)} rows and ${resolvedColumns.length} columns.`,
+        });
+      } catch (error) {
+        addNotification({
+          type: "error",
+          title: "Dataset registration failed",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Unable to register the imported dataset.",
+        });
+      }
+    },
+    [addDataset, addNotification, datasets]
+  );
+
+  const handleConnectorDataLoaded = useCallback(
+    (result: { tableName: string; columns: ColumnProfile[] }) => {
+      const nextTableName = sanitizeTableName(result.tableName);
+      void registerDerivedDataset({
+        tableName: nextTableName,
+        columns: result.columns,
+        fileName: result.tableName,
+        nextTab: "profile",
+        notificationTitle: "Connector dataset ready",
+        notificationMessage: `${result.tableName} was imported through the connectors workspace and is ready to explore.`,
+      });
+    },
+    [registerDerivedDataset]
+  );
+
+  const handleSqlJoinComplete = useCallback(
+    (result: { tableName: string; sql: string; columns: string[] }) => {
+      void registerDerivedDataset({
+        tableName: result.tableName,
+        fileName: result.tableName,
+        nextTab: "sql",
+        notificationTitle: "Join materialized",
+        notificationMessage: `${result.tableName} was created from the join wizard and is now available in the SQL workspace.`,
+      });
+    },
+    [registerDerivedDataset]
   );
 
   useEffect(() => {
@@ -1844,6 +1973,36 @@ export default function Home() {
                   </motion.div>
                 )}
 
+                {activeTab === "connectors" && (
+                  <motion.div
+                    key="connectors"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Data Connectors
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Import additional datasets from files, URLs, pasted
+                        content, and curated samples without leaving the active
+                        workspace.
+                      </p>
+                    </div>
+                    <ToolSection
+                      title="Connector Workspace"
+                      description="Bring in CSV, JSON, parquet, remote, and sample sources as new DataLens datasets."
+                    >
+                      <ErrorBoundary>
+                        <DataConnector onDataLoaded={handleConnectorDataLoaded} />
+                      </ErrorBoundary>
+                    </ToolSection>
+                  </motion.div>
+                )}
+
                 {activeTab === "query" && (
                   <motion.div
                     key="query"
@@ -1886,6 +2045,7 @@ export default function Home() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 10 }}
                     transition={{ duration: 0.2 }}
+                    className="space-y-6"
                   >
                     <div className="mb-4">
                       <div className="flex items-center justify-between">
@@ -1908,6 +2068,46 @@ export default function Home() {
                         datasetId={activeDataset.id}
                       />
                     </ErrorBoundary>
+                    <details className="group rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+                      <summary className="cursor-pointer list-none">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">
+                              <GitMerge className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                                Data Join Wizard
+                              </h3>
+                              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                Build and materialize multi-table joins in a
+                                guided workflow without leaving the SQL tab.
+                              </p>
+                            </div>
+                          </div>
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                            Expand
+                          </span>
+                        </div>
+                      </summary>
+                      <div className="mt-4">
+                        {datasets.length > 1 ? (
+                          <ErrorBoundary>
+                            <DataJoinWizard
+                              tables={datasets.map((dataset) =>
+                                sanitizeTableName(dataset.fileName)
+                              )}
+                              onJoinComplete={handleSqlJoinComplete}
+                            />
+                          </ErrorBoundary>
+                        ) : (
+                          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300">
+                            Load at least one more dataset to use the join
+                            wizard.
+                          </div>
+                        )}
+                      </div>
+                    </details>
                   </motion.div>
                 )}
 
@@ -1934,6 +2134,32 @@ export default function Home() {
                         columns={profileData}
                       />
                     </ErrorBoundary>
+                    <details className="group mt-6 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+                      <summary className="cursor-pointer list-none">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                              Chart Export Utility
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                              Export the current chart focus or batch-export
+                              every mounted chart from this workspace.
+                            </p>
+                          </div>
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                            Expand
+                          </span>
+                        </div>
+                      </summary>
+                      <div className="mt-4">
+                        <ErrorBoundary>
+                          <ChartExport
+                            chartRef={chartExportProxyRef}
+                            chartTitle={activeDataset.fileName}
+                          />
+                        </ErrorBoundary>
+                      </div>
+                    </details>
                     <div className="mt-6 space-y-6">
                       <ErrorBoundary>
                         <ChartAnnotator
@@ -1975,6 +2201,49 @@ export default function Home() {
                         />
                       </ErrorBoundary>
                     </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "ml" && (
+                  <motion.div
+                    key="ml"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                        Machine Learning
+                      </h2>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Explore unsupervised clustering and regression workflows
+                        directly against the active dataset.
+                      </p>
+                    </div>
+                    <ToolSection
+                      title="Clustering"
+                      description="Group similar records into data-driven segments and inspect cluster size, centroids, and variance."
+                    >
+                      <ErrorBoundary>
+                        <ClusteringView
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
+                    <ToolSection
+                      title="Regression"
+                      description="Fit regression models, inspect fitted curves, and review residual behavior from the same workspace."
+                    >
+                      <ErrorBoundary>
+                        <RegressionView
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                    </ToolSection>
                   </motion.div>
                 )}
 
@@ -2092,6 +2361,12 @@ export default function Home() {
                     <div className="space-y-6">
                       <ErrorBoundary>
                         <DataPipeline
+                          tableName={tableName}
+                          columns={profileData}
+                        />
+                      </ErrorBoundary>
+                      <ErrorBoundary>
+                        <ColumnTransformer
                           tableName={tableName}
                           columns={profileData}
                         />
@@ -2463,6 +2738,17 @@ export default function Home() {
                           rowCount={activeDataset.rowCount}
                         />
                       </ErrorBoundary>
+                      <ToolSection
+                        title="Automation Scheduler"
+                        description="Schedule refreshes, pipeline runs, report generation, and alert checks for the active dataset."
+                      >
+                        <ErrorBoundary>
+                          <DataScheduler
+                            tableName={tableName}
+                            columns={profileData}
+                          />
+                        </ErrorBoundary>
+                      </ToolSection>
                     </div>
                   </motion.div>
                 )}
@@ -2492,6 +2778,9 @@ export default function Home() {
                         current dataset against itself.
                       </div>
                     )}
+                    <ErrorBoundary>
+                      <DataComparison datasets={datasets} />
+                    </ErrorBoundary>
                     <ErrorBoundary>
                       <DataComparisonAdvanced
                         datasets={datasets.map((dataset) => ({
@@ -2621,6 +2910,22 @@ export default function Home() {
             onClose={() => setSelectedAdvancedColumn(null)}
           />
         )}
+
+        <AnimatePresence>
+          {showSettings && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-x-4 bottom-4 z-[80] max-h-[calc(100vh-6rem)] overflow-y-auto lg:left-20 lg:right-[26rem]"
+            >
+              <ErrorBoundary>
+                <ThemeCustomizer />
+              </ErrorBoundary>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Settings panel */}
         <SettingsPanel
