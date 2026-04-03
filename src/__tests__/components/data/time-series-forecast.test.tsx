@@ -49,6 +49,7 @@ async function renderAsync(targetColumns: ColumnProfile[]) {
 describe("TimeSeriesForecast", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockRunQuery.mockResolvedValue([]);
   });
 
   it("shows the empty guidance when compatible columns are missing", async () => {
