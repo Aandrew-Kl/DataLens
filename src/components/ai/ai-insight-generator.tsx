@@ -16,13 +16,16 @@ import {
   BUTTON_CLASS,
   GLASS_CARD_CLASS,
   GLASS_PANEL_CLASS,
+  quoteIdentifier,
 } from "@/lib/utils/advanced-analytics";
 import { formatNumber, formatPercent } from "@/lib/utils/formatters";
 import {
   generateOllamaText,
   loadOllamaSettings,
 } from "@/lib/ai/ollama-settings";
+import { summarize } from "@/lib/api/ai";
 import type { ColumnProfile } from "@/types/dataset";
+import type * as React from "react";
 
 interface AIInsightGeneratorProps {
   tableName: string;
@@ -175,6 +178,42 @@ function parseInsightSections(text: string): InsightSection[] {
   }));
 }
 
+function buildSectionsFromBackend(summaries: string[], keywords: string[]) {
+  const baseSections: InsightSection[] = (
+    Object.keys(CATEGORY_META) as InsightCategory[]
+  ).map((category) => ({
+    category,
+    title: CATEGORY_META[category].title,
+    bullets: [],
+  }));
+
+  const sectionMap = new Map(baseSections.map((section) => [section.category, section.bullets]));
+  const bulletPool = [...summaries, ...keywords];
+
+  if (bulletPool.length === 0) {
+    const fallback = "No backend summary data was returned.";
+    for (const section of baseSections) {
+      section.bullets = [fallback];
+    }
+    return baseSections;
+  }
+
+  bulletPool.forEach((bullet, index) => {
+    const category = (Object.keys(CATEGORY_META) as InsightCategory[])[
+      index % Object.keys(CATEGORY_META).length
+    ];
+    sectionMap.get(category)?.push(bullet);
+  });
+
+  return baseSections.map((section) => ({
+    ...section,
+    bullets:
+      section.bullets.length > 0
+        ? section.bullets.slice(0, 4)
+        : ["No backend summary data was returned for this section."],
+  }));
+}
+
 function SectionCard({ section }: { section: InsightSection }) {
   const meta = CATEGORY_META[section.category];
   const Icon = meta.icon;
@@ -194,13 +233,24 @@ function SectionCard({ section }: { section: InsightSection }) {
   );
 }
 
+type SummarizeResultFromBackend = {
+  summaries: string[];
+  keywords: string[];
+};
+
 export default function AIInsightGenerator({
   tableName,
   columns,
-}: AIInsightGeneratorProps) {
+}: AIInsightGeneratorProps): React.ReactNode {
   const [sections, setSections] = useState<InsightSection[]>([]);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const [useBackend, setUseBackend] = useState(true);
+  const [backendFailed, setBackendFailed] = useState(false);
+  const textColumn = useMemo(
+    () => columns.find((column) => column.type === "string")?.name || columns[0]?.name || "",
+    [columns],
+  );
 
   const overallCompleteness = useMemo(() => {
     const syntheticRowCount = Math.max(
@@ -220,6 +270,43 @@ export default function AIInsightGenerator({
     setStatus(null);
 
     try {
+      if (useBackend && !backendFailed && textColumn) {
+        try {
+          const data = await runQuery(`
+            SELECT CAST(${quoteIdentifier(textColumn)} AS VARCHAR) AS ${quoteIdentifier(textColumn)}
+            FROM ${quoteIdentifier(tableName)}
+            LIMIT 2500
+          `);
+          const result = await summarize(data as Record<string, unknown>[], [textColumn]);
+          startTransition(() => {
+            const backendSections: InsightSection[] = [];
+            if (result.summary) {
+              backendSections.push({
+                category: "trends",
+                title: "Summary",
+                bullets: [result.summary],
+              });
+            }
+            if (result.top_terms.length > 0) {
+              backendSections.push({
+                category: "correlations",
+                title: "Key Terms",
+                bullets: result.top_terms.map(
+                  (t) => `${t.term} (score: ${t.score.toFixed(2)})`,
+                ),
+              });
+            }
+            setSections(backendSections);
+            setStatus(`Backend summary completed using ${textColumn} (${data.length} values).`);
+          });
+          return;
+        } catch {
+          startTransition(() => {
+            setBackendFailed(true);
+          });
+        }
+      }
+
       const rowCountRows = await runQuery(
         `SELECT COUNT(*) AS row_count FROM ${JSON.stringify(tableName).replace(/^"|"$/g, "")}`,
       );
@@ -293,6 +380,20 @@ export default function AIInsightGenerator({
               <Sparkles className="h-4 w-4" />
             )}
             Generate insights
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const nextValue = !useBackend;
+              setUseBackend(nextValue);
+              if (nextValue) {
+                setBackendFailed(false);
+              }
+            }}
+            className={`${BUTTON_CLASS} px-2 py-1 text-xs`}
+            disabled={columns.length === 0}
+          >
+            {useBackend ? "Backend: on" : "Backend: off"}
           </button>
           <button
             type="button"

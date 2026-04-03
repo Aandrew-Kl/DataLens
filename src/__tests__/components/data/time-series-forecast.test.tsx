@@ -9,6 +9,7 @@ import type { ColumnProfile } from "@/types/dataset";
 jest.mock("framer-motion");
 jest.mock("@/lib/duckdb/client", () => ({ runQuery: jest.fn().mockResolvedValue([]) }));
 jest.mock("@/lib/utils/export", () => ({ downloadFile: jest.fn() }));
+jest.mock("@/lib/api/analytics", () => ({ forecast: jest.fn().mockRejectedValue(new Error("not available")) }));
 jest.mock("echarts-for-react/lib/core");
 jest.mock("echarts/core", () => ({ use: jest.fn() }));
 jest.mock("echarts/charts", () => ({ LineChart: {} }));

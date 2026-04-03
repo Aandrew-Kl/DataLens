@@ -1,8 +1,10 @@
 "use client";
 
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import type * as React from "react";
+import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Bot, Copy, History, Loader2, Play, Sparkles } from "lucide-react";
+import { generateQuery } from "@/lib/api/ai";
 import { generateSQL } from "@/lib/ai/sql-generator";
 import { runQuery } from "@/lib/duckdb/client";
 import {
@@ -58,14 +60,22 @@ function readHistory() {
 export default function AIQueryGenerator({
   tableName,
   columns,
-}: AIQueryGeneratorProps) {
+}: AIQueryGeneratorProps): React.ReactNode {
   const [prompt, setPrompt] = useState("");
   const [generatedSql, setGeneratedSql] = useState("");
   const [history, setHistory] = useState<QueryHistoryItem[]>(() => readHistory());
   const [loading, setLoading] = useState(false);
   const [executing, setExecuting] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const [useBackend, setUseBackend] = useState(true);
+  const [backendFailed, setBackendFailed] = useState(false);
   const deferredPrompt = useDeferredValue(prompt);
+  const schemaContext = useMemo(() => {
+    const columnSchema = columns
+      .map((column) => `${column.name} (${column.type})`)
+      .join(", ");
+    return `${tableName} (${columnSchema})`;
+  }, [columns, tableName]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -93,6 +103,32 @@ export default function AIQueryGenerator({
     setStatus(null);
 
     try {
+      if (useBackend && !backendFailed) {
+        try {
+          const result = await generateQuery(
+            question,
+            tableName,
+            columns.map((c) => ({ name: c.name, type: c.type })),
+          );
+          const nextItem: QueryHistoryItem = {
+            id: generateId(),
+            prompt: question,
+            sql: result.sql,
+            createdAt: Date.now(),
+            rowCount: null,
+          };
+
+          setGeneratedSql(result.sql);
+          setHistory((current) => [nextItem, ...current].slice(0, 12));
+          setStatus(result.explanation);
+          return;
+        } catch {
+          startTransition(() => {
+            setBackendFailed(true);
+          });
+        }
+      }
+
       const sql = await generateSQL(question, tableName, columns);
       const nextItem: QueryHistoryItem = {
         id: generateId(),
@@ -157,6 +193,14 @@ export default function AIQueryGenerator({
         </div>
 
         <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setUseBackend((value) => !value)}
+            disabled={loading}
+            className={`${BUTTON_CLASS} ${useBackend ? "border-cyan-300/70 text-cyan-900 dark:text-cyan-200" : "border-white/40 text-slate-600 dark:text-slate-300"}`}
+          >
+            {useBackend ? "Backend: ON" : "Backend: OFF"}
+          </button>
           <button
             type="button"
             onClick={() => void handleGenerate()}
