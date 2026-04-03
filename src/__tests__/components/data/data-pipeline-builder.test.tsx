@@ -6,26 +6,7 @@ import { runQuery } from "@/lib/duckdb/client";
 import { downloadFile } from "@/lib/utils/export";
 import type { ColumnProfile } from "@/types/dataset";
 
-jest.mock("framer-motion", () => {
-  const React = jest.requireActual<typeof import("react")>("react");
-  return {
-    __esModule: true,
-    motion: new Proxy(
-      {},
-      {
-        get: (_target, tag) =>
-          React.forwardRef(function MockMotion(
-            props: Record<string, unknown> & { children?: React.ReactNode },
-            ref: React.Ref<Element>,
-          ) {
-            return React.createElement(String(tag), { ...props, ref }, props.children);
-          }),
-      },
-    ),
-    AnimatePresence: ({ children }: { children?: React.ReactNode }) =>
-      React.createElement(React.Fragment, null, children),
-  };
-});
+jest.mock("framer-motion");
 jest.mock("@/lib/duckdb/client", () => ({
   runQuery: jest.fn().mockResolvedValue([]),
 }));

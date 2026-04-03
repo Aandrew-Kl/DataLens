@@ -14,50 +14,7 @@ jest.mock("@/lib/utils/export", () => ({
   downloadFile: jest.fn(),
 }));
 
-jest.mock("framer-motion", () => {
-  const React = jest.requireActual<typeof import("react")>("react");
-  const motion = new Proxy(
-    {},
-    {
-      get: (_target, prop: string) =>
-        React.forwardRef(function MockMotion(
-          props: Record<string, unknown>,
-          ref: React.ForwardedRef<HTMLElement>,
-        ) {
-          const {
-            animate,
-            children,
-            exit,
-            initial,
-            layout,
-            layoutId,
-            transition,
-            whileHover,
-            whileTap,
-            ...rest
-          } = props;
-          void animate;
-          void exit;
-          void initial;
-          void layout;
-          void layoutId;
-          void transition;
-          void whileHover;
-          void whileTap;
-          return React.createElement(
-            String(prop),
-            { ...rest, ref },
-            children as React.ReactNode,
-          );
-        }),
-    },
-  );
-
-  return {
-    __esModule: true,
-    motion,
-  };
-});
+jest.mock("framer-motion");
 
 const mockRunQuery = jest.mocked(runQuery);
 const mockDownloadFile = jest.mocked(downloadFile);
