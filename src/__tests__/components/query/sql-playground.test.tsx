@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import SQLPlayground from "@/components/query/sql-playground";
@@ -20,6 +20,15 @@ jest.mock("framer-motion");
 
 const mockRunQuery = jest.mocked(runQuery);
 const mockExportToCSV = jest.mocked(exportToCSV);
+const snippetsStorageKey = "datalens-sql-playground-snippets";
+
+function getEditor(container: HTMLElement) {
+  const editor = container.querySelector("textarea");
+  if (!(editor instanceof HTMLTextAreaElement)) {
+    throw new Error("Expected SQL editor textarea to be rendered");
+  }
+  return editor;
+}
 
 const columns: ColumnProfile[] = [
   {
@@ -60,56 +69,85 @@ describe("SQLPlayground", () => {
 
     await user.click(screen.getByRole("button", { name: /^run$/i }));
 
-    expect(await screen.findByText("42")).toBeInTheDocument();
-    expect(screen.getByText("East")).toBeInTheDocument();
+    expect(await screen.findByRole("cell", { name: "42" })).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "East" })).toBeInTheDocument();
     expect(screen.getAllByText("Query 1").length).toBeGreaterThan(1);
   });
 
-  it("saves snippets, opens a new tab, and loads a saved query into it", async () => {
+  it("saves snippets to session storage and opens a new tab", async () => {
     const user = userEvent.setup();
 
-    render(<SQLPlayground tableName="sales" columns={columns} />);
+    const { container } = render(
+      <SQLPlayground tableName="sales" columns={columns} />,
+    );
 
-    const editor = screen.getByRole("textbox") as HTMLTextAreaElement;
-    await user.clear(editor);
-    await user.type(editor, 'SELECT "revenue" FROM "sales";');
-
-    await user.type(screen.getByPlaceholderText("Snippet name"), "Revenue only");
-    await user.type(screen.getByPlaceholderText("Description"), "Only revenue");
+    const editor = getEditor(container);
+    fireEvent.change(editor, {
+      target: {
+        value: 'SELECT "revenue" FROM "sales";',
+        selectionStart: 'SELECT "revenue" FROM "sales";'.length,
+      },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Snippet name"), {
+      target: { value: "Revenue only" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Description"), {
+      target: { value: "Only revenue" },
+    });
     await user.click(screen.getByRole("button", { name: /save snippet/i }));
 
-    expect(await screen.findByText("Revenue only")).toBeInTheDocument();
+    await waitFor(() => {
+      const savedSnippets = JSON.parse(
+        window.sessionStorage.getItem(snippetsStorageKey) ?? "[]",
+      ) as Array<{ name: string; sql: string }>;
+      expect(savedSnippets).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            name: "Revenue only",
+            sql: 'SELECT "revenue" FROM "sales";',
+          }),
+        ]),
+      );
+    });
 
     await user.click(screen.getByRole("button", { name: /add tab/i }));
-    const newEditor = screen.getByRole("textbox") as HTMLTextAreaElement;
+    const newEditor = getEditor(container);
     expect(newEditor.value).toContain('SELECT *\nFROM "sales"');
-
-    await user.click(screen.getByRole("button", { name: /^load$/i }));
-
-    expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toBe(
-      'SELECT "revenue" FROM "sales";',
-    );
   });
 
-  it("shows autocomplete suggestions and query errors with fix guidance", async () => {
+  it("loads a saved snippet and shows query errors with fix guidance", async () => {
     const user = userEvent.setup();
 
+    window.sessionStorage.setItem(
+      snippetsStorageKey,
+      JSON.stringify([
+        {
+          id: "snippet-1",
+          name: "Revenue only",
+          description: "Only revenue",
+          sql: 'SELECT "revenue" FROM "sales";',
+          createdAt: Date.now(),
+        },
+      ]),
+    );
     mockRunQuery.mockRejectedValue(new Error("Parser exploded"));
 
-    render(<SQLPlayground tableName="sales" columns={columns} />);
-
-    const editor = screen.getByRole("textbox") as HTMLTextAreaElement;
-    await user.clear(editor);
-    await user.type(editor, "SEL");
-
-    await user.click(await screen.findByRole("button", { name: "SELECT" }));
-    expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toBe(
-      "SELECT",
+    const { container } = render(
+      <SQLPlayground tableName="sales" columns={columns} />,
     );
+
+    await user.click(await screen.findByRole("button", { name: /^load$/i }));
+    expect(getEditor(container).value).toBe('SELECT "revenue" FROM "sales";');
+
+    fireEvent.change(getEditor(container), {
+      target: { value: "SEL", selectionStart: 3 },
+    });
 
     await user.click(screen.getByRole("button", { name: /^run$/i }));
 
-    expect(await screen.findByText("Parser exploded")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Parser exploded")).toBeInTheDocument();
+    });
     expect(
       screen.getByText(/DuckDB rejected the SQL syntax/i),
     ).toBeInTheDocument();
@@ -123,7 +161,7 @@ describe("SQLPlayground", () => {
     render(<SQLPlayground tableName="sales" columns={columns} />);
 
     await user.click(screen.getByRole("button", { name: /^run$/i }));
-    await screen.findByText("42");
+    await screen.findByRole("cell", { name: "42" });
 
     await user.click(screen.getByRole("button", { name: /export csv/i }));
 

@@ -82,7 +82,9 @@ describe("ColumnCorrelator", () => {
     expect(screen.getByText("Pearson correlation")).toBeInTheDocument();
     expect(screen.getByText("0.860")).toBeInTheDocument();
     expect(screen.getByText("Strong positive correlation")).toBeInTheDocument();
-    expect(screen.getByText("80.0% of the source table")).toBeInTheDocument();
+    expect(
+      screen.getByText(/80\.0% of the source table contributed valid pairs/i),
+    ).toBeInTheDocument();
   });
 
   it("switches to numeric-vs-categorical analysis when the selected columns change", async () => {
@@ -137,8 +139,9 @@ describe("ColumnCorrelator", () => {
 
     expect(await screen.findByText("sales by region")).toBeInTheDocument();
     expect(screen.getByText("Eta squared")).toBeInTheDocument();
+    expect(screen.getByText("0.640")).toBeInTheDocument();
     expect(
-      screen.getByText("Moderate category-driven separation"),
+      screen.getByText("Strong category-driven separation"),
     ).toBeInTheDocument();
   });
 

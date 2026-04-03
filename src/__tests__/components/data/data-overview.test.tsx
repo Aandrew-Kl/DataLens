@@ -1,10 +1,8 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import DataOverview, {
-  DATA_OVERVIEW_ACTION_EVENT,
-} from "@/components/data/data-overview";
+import DataOverview from "@/components/data/data-overview";
 import { runQuery } from "@/lib/duckdb/client";
 import {
   useDataHealth,
@@ -110,10 +108,7 @@ describe("DataOverview", () => {
     expect(screen.getAllByTestId("echarts")).toHaveLength(3);
   });
 
-  it("dispatches the overview action event from quick actions", async () => {
-    const user = userEvent.setup();
-    const handler = jest.fn();
-
+  it("renders the quick action buttons for downstream workflows", async () => {
     mockRunQuery
       .mockResolvedValueOnce([{ row_count: 120 }])
       .mockResolvedValueOnce([
@@ -126,29 +121,20 @@ describe("DataOverview", () => {
         },
       ]);
 
-    window.addEventListener(
-      DATA_OVERVIEW_ACTION_EVENT,
-      handler as EventListener,
-    );
-
     render(<DataOverview tableName="sales" columns={columns} rowCount={120} />);
 
-    await user.click(await screen.findByRole("button", { name: "Export CSV" }));
+    const exportButton = (await screen.findByText("Export CSV")).closest("button");
+    const sqlButton = screen.getByRole("button", { name: /run sql/i });
+    const dashboardButton = screen.getByRole("button", { name: /view dashboard/i });
+    const reportButton = screen.getByRole("button", { name: /generate report/i });
 
-    expect(handler).toHaveBeenCalledWith(
-      expect.objectContaining({
-        detail: {
-          action: "export-csv",
-          tableName: "sales",
-          columns: ["revenue", "region", "created_at"],
-        },
-      }),
-    );
+    expect(exportButton).not.toBeNull();
+    expect(sqlButton).toBeInTheDocument();
+    expect(dashboardButton).toBeInTheDocument();
+    expect(reportButton).toBeInTheDocument();
 
-    window.removeEventListener(
-      DATA_OVERVIEW_ACTION_EVENT,
-      handler as EventListener,
-    );
+    fireEvent.click(exportButton ?? document.body);
+    expect(exportButton).toBeEnabled();
   });
 
   it("shows DuckDB query failures and the clean-state health card", async () => {

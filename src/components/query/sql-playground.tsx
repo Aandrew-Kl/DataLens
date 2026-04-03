@@ -47,25 +47,38 @@ interface HistoryEntry {
 const ease = [0.16, 1, 0.3, 1] as const;
 const SNIPPETS_KEY = "datalens-sql-playground-snippets";
 const HISTORY_KEY = "datalens-sql-playground-history";
+const EMPTY_SNIPPETS: SavedSnippet[] = [];
+const EMPTY_HISTORY: HistoryEntry[] = [];
 const panelClass =
   "overflow-hidden rounded-[28px] border border-white/20 bg-white/70 shadow-[0_24px_90px_-48px_rgba(15,23,42,0.7)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
 const fieldClass =
   "w-full rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950/60 dark:text-slate-100";
 const sessionListeners = new Map<string, Set<() => void>>();
+const sessionSnapshotCache = new Map<
+  string,
+  { raw: string | null; value: unknown }
+>();
 
 function readSessionValue<T>(key: string, fallback: T) {
   if (typeof window === "undefined") return fallback;
   try {
     const raw = window.sessionStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
+    const cached = sessionSnapshotCache.get(key);
+    if (cached && cached.raw === raw) return cached.value as T;
+    const value = raw ? (JSON.parse(raw) as T) : fallback;
+    sessionSnapshotCache.set(key, { raw, value });
+    return value;
   } catch {
+    sessionSnapshotCache.set(key, { raw: null, value: fallback });
     return fallback;
   }
 }
 
 function writeSessionValue<T>(key: string, value: T) {
   if (typeof window === "undefined") return;
-  window.sessionStorage.setItem(key, JSON.stringify(value));
+  const raw = JSON.stringify(value);
+  sessionSnapshotCache.set(key, { raw, value });
+  window.sessionStorage.setItem(key, raw);
   sessionListeners.get(key)?.forEach((listener) => listener());
 }
 
@@ -158,8 +171,14 @@ export default function SQLPlayground({ tableName, columns }: SQLPlaygroundProps
   const [snippetName, setSnippetName] = useState("");
   const [snippetDescription, setSnippetDescription] = useState("");
   const [copiedSnippetId, setCopiedSnippetId] = useState<string | null>(null);
-  const [snippets, setSnippets] = useSessionValue<SavedSnippet[]>(SNIPPETS_KEY, []);
-  const [history, setHistory] = useSessionValue<HistoryEntry[]>(HISTORY_KEY, []);
+  const [snippets, setSnippets] = useSessionValue<SavedSnippet[]>(
+    SNIPPETS_KEY,
+    EMPTY_SNIPPETS,
+  );
+  const [history, setHistory] = useSessionValue<HistoryEntry[]>(
+    HISTORY_KEY,
+    EMPTY_HISTORY,
+  );
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
   const deferredSql = useDeferredValue(activeTab?.sql ?? "");
   const templates = useMemo(() => buildTemplates(tableName, columns), [tableName, columns]);

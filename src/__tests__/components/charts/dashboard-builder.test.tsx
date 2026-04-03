@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import DashboardBuilder from "@/components/charts/dashboard-builder";
@@ -47,6 +47,7 @@ describe("DashboardBuilder", () => {
 
   it("adds a text widget and saves the dashboard to localStorage", async () => {
     const user = userEvent.setup();
+    const setItemSpy = jest.spyOn(Storage.prototype, "setItem");
 
     render(
       <DashboardBuilder tableName="sales" columns={columns} rowCount={120} />,
@@ -56,30 +57,34 @@ describe("DashboardBuilder", () => {
     await user.click(screen.getByRole("button", { name: /text widget/i }));
 
     const titleInput = screen.getByDisplayValue("Notes");
-    await user.clear(titleInput);
-    await user.type(titleInput, "Quarterly narrative");
+    fireEvent.change(titleInput, { target: { value: "Quarterly narrative" } });
 
     const textArea = screen.getByDisplayValue(
       "Use this space for notes, caveats, and next steps.",
     );
-    await user.clear(textArea);
-    await user.type(textArea, "Revenue is strongest in the East region.");
+    fireEvent.change(textArea, {
+      target: { value: "Revenue is strongest in the East region." },
+    });
 
-    expect(
-      await screen.findByText("Quarterly narrative"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Revenue is strongest in the East region."),
-    ).toBeInTheDocument();
+    expect(titleInput).toHaveValue("Quarterly narrative");
+    expect(textArea).toHaveValue("Revenue is strongest in the East region.");
 
-    await user.click(screen.getByRole("button", { name: /save dashboard/i }));
+    fireEvent.click(screen.getByRole("button", { name: /save dashboard/i }));
 
-    expect(
-      await screen.findByText("Saved 1 widgets for sales."),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(setItemSpy).toHaveBeenCalledWith(
+        "datalens-dashboard:sales",
+        expect.stringContaining("Quarterly narrative"),
+      );
+    });
     expect(window.localStorage.getItem("datalens-dashboard:sales")).toContain(
       "Quarterly narrative",
     );
+    expect(window.localStorage.getItem("datalens-dashboard:sales")).toContain(
+      "Revenue is strongest in the East region.",
+    );
+
+    setItemSpy.mockRestore();
   });
 
   it("loads a saved dashboard and exports it as standalone HTML", async () => {
@@ -115,7 +120,7 @@ describe("DashboardBuilder", () => {
     await user.click(screen.getByRole("button", { name: /load dashboard/i }));
 
     expect(await screen.findByText("Loaded note")).toBeInTheDocument();
-    expect(screen.getByText("Loaded from storage.")).toBeInTheDocument();
+    expect(screen.getAllByText("Loaded from storage.").length).toBeGreaterThan(0);
 
     await user.click(screen.getByRole("button", { name: /export dashboard/i }));
 

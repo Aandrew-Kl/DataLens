@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import ColumnProfilerAdvanced from "@/components/data/column-profiler-advanced";
@@ -45,6 +45,9 @@ describe("ColumnProfilerAdvanced", () => {
   it("renders numeric profiling details, copies statistics, and exports the column", async () => {
     const user = userEvent.setup();
     const onClose = jest.fn();
+    const writeTextSpy = jest
+      .spyOn(navigator.clipboard, "writeText")
+      .mockResolvedValue(undefined);
     const clickSpy = jest
       .spyOn(HTMLAnchorElement.prototype, "click")
       .mockImplementation(() => {});
@@ -119,9 +122,12 @@ describe("ColumnProfilerAdvanced", () => {
     expect(screen.getByText("Data Quality")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /copy statistics/i }));
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-      expect.stringContaining('"column": "revenue"'),
-    );
+    await waitFor(() => {
+      expect(writeTextSpy).toHaveBeenCalledWith(
+        expect.stringContaining('"column": "revenue"'),
+      );
+      expect(screen.getByRole("button", { name: "Copied" })).toBeInTheDocument();
+    });
 
     await user.click(screen.getByRole("button", { name: /export column/i }));
     expect(mockRunQuery).toHaveBeenCalledWith(

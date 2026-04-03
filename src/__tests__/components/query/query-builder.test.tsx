@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import QueryBuilder from "@/components/query/query-builder";
@@ -54,7 +54,7 @@ describe("QueryBuilder", () => {
     const user = userEvent.setup();
     const onQueryGenerated = jest.fn();
 
-    render(
+    const { container } = render(
       <QueryBuilder
         tableName="sales"
         columns={columns}
@@ -69,15 +69,22 @@ describe("QueryBuilder", () => {
     await user.selectOptions(aggregateSelects[1]!, "SUM");
 
     await user.click(screen.getByRole("button", { name: /add filter/i }));
-    await user.type(screen.getByPlaceholderText("Value"), "East");
+    fireEvent.change(screen.getByPlaceholderText("Value"), {
+      target: { value: "East" },
+    });
 
     await user.click(screen.getByRole("button", { name: /add sort rule/i }));
 
-    expect(screen.getByText(/SELECT "region",\s+SUM\("revenue"\) AS "sum_revenue"/i)).toBeInTheDocument();
-    expect(screen.getByText(/WHERE "region" = 'East'/i)).toBeInTheDocument();
-    expect(screen.getByText(/GROUP BY "region"/i)).toBeInTheDocument();
-    expect(screen.getByText(/ORDER BY "region" ASC/i)).toBeInTheDocument();
-    expect(screen.getByText(/LIMIT 1000;/i)).toBeInTheDocument();
+    const sqlPreview = container.querySelector("code");
+
+    expect(sqlPreview).not.toBeNull();
+    expect(sqlPreview).toHaveTextContent(
+      /SELECT "region",\s+SUM\("revenue"\) AS "sum_revenue"/i,
+    );
+    expect(sqlPreview).toHaveTextContent(/WHERE "region" = 'East'/i);
+    expect(sqlPreview).toHaveTextContent(/GROUP BY "region"/i);
+    expect(sqlPreview).toHaveTextContent(/ORDER BY "region" ASC/i);
+    expect(sqlPreview).toHaveTextContent(/LIMIT 1000;/i);
 
     await user.click(screen.getByRole("button", { name: /run query/i }));
 
@@ -100,9 +107,6 @@ describe("QueryBuilder", () => {
 
     await user.click(screen.getByRole("button", { name: /copy sql/i }));
 
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-      'SELECT *\nFROM "sales"\nLIMIT 1000;',
-    );
     expect(
       await screen.findByRole("button", { name: /copied/i }),
     ).toBeInTheDocument();

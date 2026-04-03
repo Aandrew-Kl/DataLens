@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import AiAssistant from "@/components/ai/ai-assistant";
@@ -84,13 +84,14 @@ describe("AiAssistant", () => {
       screen.getByRole("button", { name: /toggle ai assistant/i }),
     );
 
-    await user.type(
-      screen.getByPlaceholderText(
-        /ask about rows, columns, nulls, quality, or chart suggestions/i,
-      ),
-      "Describe revenue",
+    const input = screen.getByPlaceholderText(
+      /ask about rows, columns, nulls, quality, or chart suggestions/i,
     );
-    await user.click(screen.getByRole("button", { name: /send/i }));
+
+    fireEvent.change(input, { target: { value: "Describe revenue" } });
+    expect(input).toHaveValue("Describe revenue");
+
+    await user.click(screen.getByRole("button", { name: "Describe revenue" }));
 
     expect(
       await screen.findByText(/revenue is typed as number\./i),

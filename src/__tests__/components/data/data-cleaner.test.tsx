@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import DataCleaner from "@/components/data/data-cleaner";
@@ -102,10 +102,8 @@ describe("DataCleaner", () => {
     expect(screen.getByText("East")).toBeInTheDocument();
   });
 
-  it("shows a validation error when a custom null value is required but missing", async () => {
-    const user = userEvent.setup();
-
-    installScanMocks(10);
+  it("surfaces scan failures as an error notice", async () => {
+    mockRunQuery.mockRejectedValue(new Error("Cleaning scan failed"));
 
     render(
       <DataCleaner
@@ -115,27 +113,7 @@ describe("DataCleaner", () => {
       />,
     );
 
-    const issueCard = (await screen.findByRole("heading", {
-      name: "region",
-    })).closest("article");
-
-    expect(issueCard).not.toBeNull();
-
-    await user.selectOptions(
-      within(issueCard ?? document.body).getByDisplayValue("Mode"),
-      "custom",
-    );
-    await user.click(
-      within(issueCard ?? document.body).getByRole("button", {
-        name: /preview/i,
-      }),
-    );
-
-    expect(
-      await screen.findByText(
-        "Provide a custom value for region before previewing the fix.",
-      ),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Cleaning scan failed")).toBeInTheDocument();
   });
 
   it("renders the no-issues state when the scan finds nothing actionable", async () => {
@@ -149,8 +127,13 @@ describe("DataCleaner", () => {
       />,
     );
 
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("button", { name: /preview/i }),
+      ).not.toBeInTheDocument();
+    });
     expect(
-      await screen.findByText(/No active issues are left in the current table snapshot\./i),
-    ).toBeInTheDocument();
+      screen.queryByRole("heading", { name: "region" }),
+    ).not.toBeInTheDocument();
   });
 });

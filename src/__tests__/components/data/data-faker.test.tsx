@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import DataFaker from "@/components/data/data-faker";
@@ -76,18 +76,18 @@ describe("DataFaker", () => {
 
     render(<DataFaker onDataGenerated={jest.fn()} />);
 
-    await user.click(screen.getByRole("button", { name: /custom$/i }));
+    await user.click(screen.getByRole("button", { name: /^custom /i }));
     await user.click(screen.getByRole("button", { name: "Next" }));
     await user.click(screen.getByRole("button", { name: /add column/i }));
 
-    const columnInputs = screen.getAllByPlaceholderText("column_name");
-    await user.type(columnInputs[2]!, "status");
+    const newColumnInput = screen.getByDisplayValue("column_3");
+    fireEvent.change(newColumnInput, { target: { value: "status" } });
 
-    const row = columnInputs[2]!.closest("div");
-    expect(within(row ?? document.body).getByDisplayValue("status")).toBeInTheDocument();
+    const renamedInput = screen.getByDisplayValue("status");
+    const row = renamedInput.closest("div");
+    expect(renamedInput).toBeInTheDocument();
 
-    const removeButtons = screen.getAllByRole("button");
-    await user.click(removeButtons.find((button) => button.querySelector("svg")) ?? removeButtons[0]!);
+    await user.click(within(row ?? document.body).getByRole("button"));
 
     expect(screen.queryByDisplayValue("status")).not.toBeInTheDocument();
     expect(mockRunQuery).not.toHaveBeenCalled();

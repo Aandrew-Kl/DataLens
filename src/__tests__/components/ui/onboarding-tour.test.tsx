@@ -53,27 +53,24 @@ describe("OnboardingTour", () => {
   });
 
   it("renders and lets the user move forward and backward through the steps", async () => {
-    const user = userEvent.setup();
-
     renderTargets();
 
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Upload Data" })).toBeInTheDocument();
     expect(screen.getByText("Step 1 of 5")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /^next$/i }));
+    fireEvent.keyDown(window, { key: "ArrowRight" });
     expect(
       await screen.findByRole("heading", { name: "Explore Profile" }),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /back/i }));
+    fireEvent.keyDown(window, { key: "ArrowLeft" });
     expect(
       await screen.findByRole("heading", { name: "Upload Data" }),
     ).toBeInTheDocument();
   });
 
   it("persists completion and calls onComplete when the tour is skipped", async () => {
-    const user = userEvent.setup();
     const onComplete = jest.fn();
 
     render(
@@ -85,7 +82,7 @@ describe("OnboardingTour", () => {
       </div>,
     );
 
-    await user.click(await screen.findByRole("button", { name: /skip tour/i }));
+    fireEvent.click(await screen.findByRole("button", { name: /skip tour/i }));
 
     await waitFor(() => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();

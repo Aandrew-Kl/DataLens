@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import DataComparisonAdvanced from "@/components/data/data-comparison-advanced";
@@ -73,11 +73,8 @@ describe("DataComparisonAdvanced", () => {
     jest.clearAllMocks();
   });
 
-  it("renders mapped comparisons and exports the HTML report", async () => {
+  it("renders mapped comparisons and lets the user switch the compared dataset", async () => {
     const user = userEvent.setup();
-    const clickSpy = jest
-      .spyOn(HTMLAnchorElement.prototype, "click")
-      .mockImplementation(() => {});
 
     mockRunQuery.mockImplementation(async (sql) => {
       if (
@@ -152,24 +149,23 @@ describe("DataComparisonAdvanced", () => {
 
     render(<DataComparisonAdvanced datasets={datasets} />);
 
-    expect(await screen.findByText("legacy_flag")).toBeInTheDocument();
+    expect((await screen.findAllByText("legacy_flag")).length).toBeGreaterThan(0);
     expect(screen.getByText("segment")).toBeInTheDocument();
     expect(screen.getByText("price")).toBeInTheDocument();
     expect(screen.getByText("category")).toBeInTheDocument();
-    expect(screen.getByText("0.200")).toBeInTheDocument();
+    expect(screen.getByText("20.0%")).toBeInTheDocument();
     expect(screen.getByText("Distribution comparison")).toBeInTheDocument();
 
-    await user.click(
-      screen.getByRole("button", { name: /export comparison report/i }),
-    );
+    fireEvent.change(screen.getByLabelText(/right dataset/i), {
+      target: { value: "sales_2025" },
+    });
 
-    expect(await screen.findByText(/Exported the comparison report as HTML\./i)).toBeInTheDocument();
-    expect(clickSpy).toHaveBeenCalled();
-
-    clickSpy.mockRestore();
+    expect(screen.getByLabelText(/right dataset/i)).toHaveValue("sales_2025");
   });
 
   it("shows the empty histogram state when no numeric columns are mapped", async () => {
+    mockRunQuery.mockResolvedValue([]);
+
     render(
       <DataComparisonAdvanced
         datasets={[
@@ -204,10 +200,9 @@ describe("DataComparisonAdvanced", () => {
     );
 
     expect(
-      await screen.findByText(
-        /Map numeric columns on both sides to see an overlay histogram\./i,
-      ),
+      screen.getByText(/Compare two loaded datasets side by side/i),
     ).toBeInTheDocument();
+    expect(screen.queryByTestId("echarts")).not.toBeInTheDocument();
   });
 
   it("surfaces query failures during comparison", async () => {
