@@ -15,6 +15,7 @@ jest.mock("@/lib/utils/export", () => ({
 }));
 jest.mock("echarts-for-react/lib/core", () => {
   const chartPropsSpy = jest.fn();
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react") as typeof import("react");
   return {
     __esModule: true,
