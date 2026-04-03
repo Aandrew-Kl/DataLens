@@ -50,6 +50,7 @@ const CARD_CLASS =
   "rounded-[1.3rem] border border-white/15 bg-white/55 shadow-[0_18px_54px_-36px_rgba(15,23,42,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/38";
 const STORAGE_PREFIX = "datalens:lineage-graph:";
 const listeners = new Map<string, Set<() => void>>();
+const snapshotCache = new Map<string, { raw: string | null; entries: LineageEvent[] }>();
 
 const TYPE_META: Record<
   LineageEventType,
@@ -95,16 +96,27 @@ function readLineage(tableName: string): LineageEvent[] {
     return [];
   }
 
+  const raw = window.sessionStorage.getItem(lineageKey(tableName));
+  const cached = snapshotCache.get(tableName);
+  if (cached && cached.raw === raw) {
+    return cached.entries;
+  }
+
   try {
-    const raw = window.sessionStorage.getItem(lineageKey(tableName));
     if (!raw) {
-      return [];
+      const emptyEntries: LineageEvent[] = [];
+      snapshotCache.set(tableName, { raw, entries: emptyEntries });
+      return emptyEntries;
     }
 
     const parsed = JSON.parse(raw) as LineageEvent[];
-    return Array.isArray(parsed) ? parsed : [];
+    const entries = Array.isArray(parsed) ? parsed : [];
+    snapshotCache.set(tableName, { raw, entries });
+    return entries;
   } catch {
-    return [];
+    const emptyEntries: LineageEvent[] = [];
+    snapshotCache.set(tableName, { raw, entries: emptyEntries });
+    return emptyEntries;
   }
 }
 
@@ -113,7 +125,9 @@ function writeLineage(tableName: string, entries: LineageEvent[]) {
     return;
   }
 
-  window.sessionStorage.setItem(lineageKey(tableName), JSON.stringify(entries));
+  const raw = JSON.stringify(entries);
+  snapshotCache.set(tableName, { raw, entries });
+  window.sessionStorage.setItem(lineageKey(tableName), raw);
   listeners.get(tableName)?.forEach((listener) => listener());
 }
 
