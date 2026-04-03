@@ -190,6 +190,15 @@ import DataPreview from "@/components/data/data-preview";
 import DataSummarizer from "@/components/data/data-summarizer";
 import DataWrangler from "@/components/data/data-wrangler";
 import PivotConfigurator from "@/components/data/pivot-configurator";
+import ChangeImpactAnalyzer from "@/components/data/change-impact-analyzer";
+import ColumnDependencyFinder from "@/components/data/column-dependency-finder";
+import DataSnapshotCompare from "@/components/data/data-snapshot-compare";
+import OutlierReport from "@/components/data/outlier-report";
+import PivotAnalysis from "@/components/data/pivot-analysis";
+import PercentileExplorer from "@/components/data/percentile-explorer";
+import TimeSeriesDecomposer from "@/components/data/time-series-decomposer";
+import CrossTabulation from "@/components/data/cross-tabulation";
+import BinAnalyzer from "@/components/data/bin-analyzer";
 import SegmentComparison from "@/components/analytics/segment-comparison";
 import Breadcrumb from "@/components/layout/breadcrumb";
 import NotFoundPage from "@/components/layout/not-found";
@@ -3204,7 +3213,6 @@ export default function Home() {
                         <DataSampler
                           tableName={tableName}
                           columns={profileData}
-                          rowCount={activeDataset.rowCount}
                         />
                       </ErrorBoundary>
                       <ErrorBoundary>
@@ -3619,6 +3627,66 @@ export default function Home() {
                     </ErrorBoundary>
                     <ErrorBoundary>
                       <SegmentComparison
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <ChangeImpactAnalyzer
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <ColumnDependencyFinder
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <DataSnapshotCompare
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <OutlierReport
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <PivotAnalysis
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <PercentileExplorer
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <TimeSeriesDecomposer
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <CrossTabulation
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <DataSampler
+                        tableName={tableName}
+                        columns={profileData}
+                      />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      <BinAnalyzer
                         tableName={tableName}
                         columns={profileData}
                       />

@@ -1,158 +1,136 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+
 import DataSampler from "@/components/data/data-sampler";
 import { runQuery } from "@/lib/duckdb/client";
 import { downloadFile } from "@/lib/utils/export";
 import type { ColumnProfile } from "@/types/dataset";
 
 jest.mock("@/lib/duckdb/client", () => ({
-  runQuery: jest.fn(),
+  runQuery: jest.fn().mockResolvedValue([]),
 }));
 
 jest.mock("@/lib/utils/export", () => ({
   downloadFile: jest.fn(),
 }));
 
-const mockRunQuery = runQuery as jest.MockedFunction<typeof runQuery>;
-const mockDownloadFile = downloadFile as jest.MockedFunction<typeof downloadFile>;
+const mockRunQuery = jest.mocked(runQuery);
+const mockDownloadFile = jest.mocked(downloadFile);
 
-const samplerColumns: ColumnProfile[] = [
+const columns: ColumnProfile[] = [
   {
     name: "id",
     type: "number",
     nullCount: 0,
-    uniqueCount: 50,
+    uniqueCount: 100,
     sampleValues: [1, 2, 3],
-    min: 1,
-    max: 50,
-    mean: 25.5,
-    median: 25.5,
   },
   {
-    name: "category",
+    name: "segment",
     type: "string",
     nullCount: 0,
     uniqueCount: 3,
     sampleValues: ["A", "B", "C"],
   },
-  {
-    name: "score",
-    type: "number",
-    nullCount: 0,
-    uniqueCount: 50,
-    sampleValues: [10, 20, 30],
-    min: 10,
-    max: 100,
-    mean: 55,
-    median: 55,
-  },
 ];
+
+async function renderAsync(targetColumns = columns) {
+  await act(async () => {
+    render(<DataSampler tableName="orders" columns={targetColumns} />);
+  });
+
+  await waitFor(() => {
+    expect(
+      screen.queryByText("Loading sample preview…"),
+    ).not.toBeInTheDocument();
+  });
+}
 
 describe("DataSampler", () => {
   beforeEach(() => {
-    mockRunQuery.mockReset();
-    mockDownloadFile.mockReset();
+    jest.clearAllMocks();
   });
 
-  it("renders the initial state, refreshes a random preview, and downloads the sample as CSV", async () => {
-    const user = userEvent.setup();
-
-    mockRunQuery.mockImplementation(async (sql) => {
-      if (sql.includes("sample_preview")) {
-        return [
-          { id: 1, category: "A", score: 10 },
-          { id: 2, category: "B", score: 20 },
-        ];
-      }
-
-      if (sql.includes("sample_count")) {
-        return [{ cnt: 5 }];
-      }
-
-      if (sql === 'SELECT * FROM "orders" ORDER BY RANDOM() LIMIT 5') {
-        return [
-          { id: 1, category: "A", score: 10 },
-          { id: 2, category: "B", score: 20 },
-        ];
-      }
-
-      return [];
-    });
-
-    render(
-      <DataSampler tableName="orders" columns={samplerColumns} rowCount={50} />,
-    );
-
-    expect(screen.getByText(/run the sampling query/i)).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: /refresh preview/i }));
-
-    expect(await screen.findByText("A")).toBeInTheDocument();
-    expect(screen.getByText("Rows in sample")).toBeInTheDocument();
-    expect(screen.getByText("Preview size")).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: /download csv/i }));
-
-    expect(mockDownloadFile).toHaveBeenCalledWith(
-      "id,category,score\n1,A,10\n2,B,20",
-      "orders-random-sample.csv",
-      "text/csv;charset=utf-8;",
-    );
-  });
-
-  it("switches to top-n sampling and uses the chosen ranking column and count", async () => {
-    const user = userEvent.setup();
-
-    mockRunQuery.mockImplementation(async (sql) => {
-      if (sql.includes('ORDER BY "score" DESC NULLS LAST LIMIT 3') && sql.includes("sample_preview")) {
-        return [{ id: 50, category: "C", score: 100 }];
-      }
-
-      if (sql.includes('ORDER BY "score" DESC NULLS LAST LIMIT 3') && sql.includes("sample_count")) {
-        return [{ cnt: 3 }];
-      }
-
-      return [];
-    });
-
-    render(
-      <DataSampler tableName="orders" columns={samplerColumns} rowCount={50} />,
-    );
-
-    await user.click(screen.getByRole("button", { name: /top n/i }));
-    await user.selectOptions(screen.getAllByRole("combobox")[1], "score");
-
-    const [countInput] = screen.getAllByRole("spinbutton");
-    fireEvent.change(countInput, { target: { value: "3" } });
+  it("shows the empty state when there are no columns", () => {
+    render(<DataSampler tableName="orders" columns={[]} />);
 
     expect(
-      screen.getByText("Returning the top 3 rows by score."),
+      screen.getByText("Sampling requires at least one profiled column."),
     ).toBeInTheDocument();
+  });
 
-    await user.click(screen.getByRole("button", { name: /refresh preview/i }));
+  it("loads a seeded random preview", async () => {
+    mockRunQuery.mockImplementation(async (sql) => {
+      if (sql.includes("row_count")) {
+        return [{ row_count: 1000 }];
+      }
+      if (sql.includes("sample_count")) {
+        return [{ sample_count: 100 }];
+      }
+      if (sql.includes(`LIMIT 8`)) {
+        return [
+          { id: 1, segment: "A" },
+          { id: 2, segment: "B" },
+        ];
+      }
+      return [];
+    });
+
+    await renderAsync();
+
+    expect(
+      await screen.findByText("Seeded random sample with 100 rows."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Rows in dataset")).toBeInTheDocument();
+    expect(screen.getByText("A")).toBeInTheDocument();
+  });
+
+  it("exports the sampled CSV", async () => {
+    const user = userEvent.setup();
+
+    mockRunQuery.mockImplementation(async (sql) => {
+      if (sql.includes("row_count")) {
+        return [{ row_count: 1000 }];
+      }
+      if (sql.includes("sample_count")) {
+        return [{ sample_count: 100 }];
+      }
+      if (sql.includes(`LIMIT 8`)) {
+        return [{ id: 1, segment: "A" }];
+      }
+      return [
+        { id: 1, segment: "A" },
+        { id: 2, segment: "B" },
+      ];
+    });
+
+    await renderAsync();
+
+    await user.click(
+      screen.getByRole("button", { name: /Download sampled CSV/i }),
+    );
 
     await waitFor(() => {
-      expect(mockRunQuery).toHaveBeenCalledWith(
-        expect.stringContaining('ORDER BY "score" DESC NULLS LAST LIMIT 3'),
+      expect(mockDownloadFile).toHaveBeenCalledWith(
+        "id,segment\n1,A\n2,B",
+        "orders-random-sample.csv",
+        "text/csv;charset=utf-8;",
       );
     });
-
-    expect(await screen.findByText("100")).toBeInTheDocument();
   });
 
-  it("shows query errors when preview generation fails", async () => {
-    const user = userEvent.setup();
+  it("surfaces sampling failures", async () => {
+    mockRunQuery.mockRejectedValueOnce(new Error("Sampling query failed"));
 
-    mockRunQuery.mockRejectedValue(new Error("Sampling query failed badly"));
-
-    render(
-      <DataSampler tableName="orders" columns={samplerColumns} rowCount={50} />,
-    );
-
-    await user.click(screen.getByRole("button", { name: /refresh preview/i }));
+    await renderAsync();
 
     expect(
-      await screen.findByText("Sampling query failed badly"),
+      await screen.findByText("Sampling query failed"),
     ).toBeInTheDocument();
   });
 });
