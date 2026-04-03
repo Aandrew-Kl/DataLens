@@ -23,7 +23,6 @@ import {
   Activity,
   Download,
   EqualApproximately,
-  Sigma,
   SlidersHorizontal,
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";

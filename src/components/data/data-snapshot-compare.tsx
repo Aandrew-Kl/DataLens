@@ -598,19 +598,10 @@ function SnapshotCompareWorkspace({
   const [rightTable, setRightTable] = useState("");
   const [metricColumn, setMetricColumn] = useState("");
 
-  if (optionsResult.error) {
-    return <SnapshotEmptyState message={optionsResult.error} />;
-  }
-
-  if (options.length < 2) {
-    return (
-      <SnapshotEmptyState message="No snapshot tables available for comparison yet." />
-    );
-  }
-
-  const resolvedLeftTable = options.some((option) => option.name === leftTable)
-    ? leftTable
-    : options[0]?.name ?? "";
+  const resolvedLeftTable =
+    !optionsResult.error && options.length >= 2 && options.some((option) => option.name === leftTable)
+      ? leftTable
+      : options[0]?.name ?? "";
   const fallbackRightTable =
     options.find((option) => option.name !== resolvedLeftTable)?.name ?? "";
   const resolvedRightTable =
@@ -630,6 +621,16 @@ function SnapshotCompareWorkspace({
     [metricColumn, resolvedLeftTable, resolvedRightTable],
   );
   const comparisonResult = use(comparisonResource);
+
+  if (optionsResult.error) {
+    return <SnapshotEmptyState message={optionsResult.error} />;
+  }
+
+  if (options.length < 2) {
+    return (
+      <SnapshotEmptyState message="No snapshot tables available for comparison yet." />
+    );
+  }
 
   return (
     <section className="space-y-5">

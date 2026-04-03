@@ -24,7 +24,6 @@ import {
   Download,
   Plus,
   Rows4,
-  Sigma,
   Trash2,
   Users2,
 } from "lucide-react";

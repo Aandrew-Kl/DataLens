@@ -5,7 +5,7 @@ import {
   type UseKeyboardNavigationOptions,
 } from "@/hooks/use-keyboard-navigation";
 
-interface GridHarnessProps extends UseKeyboardNavigationOptions {}
+type GridHarnessProps = UseKeyboardNavigationOptions;
 
 function GridHarness(props: GridHarnessProps) {
   const navigation = useKeyboardNavigation(props);
