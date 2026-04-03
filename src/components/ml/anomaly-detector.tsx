@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useMemo, useState } from "react";
+import React, { startTransition, useMemo, useState } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import * as echarts from "echarts/core";
 import type { EChartsOption } from "echarts";
@@ -20,6 +20,7 @@ import {
   WandSparkles,
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
+import { anomalyDetect } from "@/lib/api/ml";
 import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import {
   ANALYTICS_EASE,
@@ -73,6 +74,15 @@ interface AnomalyResult {
   outliers: MetricRow[];
   distribution: DistributionBin[];
 }
+
+interface BackendSample {
+  rowId: number;
+  value: number;
+  features: number[];
+  row: Record<string, unknown>;
+}
+
+/* BackendAnomalyResult is imported as AnomalyResult from @/lib/api/types via @/lib/api/ml */
 
 interface SummaryCardProps {
   icon: typeof Table2;
@@ -302,7 +312,7 @@ function EmptyState({ message }: { message: string }) {
 export default function AnomalyDetector({
   tableName,
   columns,
-}: AnomalyDetectorProps) {
+}: AnomalyDetectorProps): React.ReactNode {
   const dark = useDarkMode();
   const numericColumns = useMemo(
     () => columns.filter((column) => column.type === "number"),
@@ -312,6 +322,8 @@ export default function AnomalyDetector({
   const [columnName, setColumnName] = useState(defaultColumn);
   const [sigmaThreshold, setSigmaThreshold] = useState("3");
   const [result, setResult] = useState<AnomalyResult | null>(null);
+  const [useBackend, setUseBackend] = useState(true);
+  const [backendFailed, setBackendFailed] = useState(false);
   const [status, setStatus] = useState(
     "Run anomaly detection to compare values against the selected z-score threshold.",
   );
@@ -340,6 +352,75 @@ export default function AnomalyDetector({
 
     setError(null);
     setStatus(`Calculating z-scores for ${activeColumn}.`);
+
+    if (useBackend && !backendFailed) {
+      try {
+        const rows = await runQuery(buildQuery(tableName, activeColumn));
+        const samples = rows.flatMap<BackendSample>((row) => {
+          const value = toNumber(row.__metric_value);
+
+          if (value === null) {
+            return [];
+          }
+
+          return [
+            {
+              rowId: Math.max(1, Math.round(toNumber(row.__row_id) ?? 0)),
+              value,
+              features: [value],
+              row,
+            },
+          ];
+        });
+
+        if (samples.length < 4) {
+          throw new Error(
+            "At least four numeric rows are required to detect anomalies.",
+          );
+        }
+
+        const recordData = samples.map((s) => ({ [activeColumn]: s.value }));
+        const backendResult = await anomalyDetect(recordData, [activeColumn]);
+        const scoredRows = samples.map<MetricRow>((sample, index) => {
+          const score = Number(backendResult.scores[index]);
+          const resolvedScore = Number.isFinite(score) ? Math.abs(score) : 0;
+
+          return {
+            rowId: sample.rowId,
+            value: sample.value,
+            zScore: resolvedScore,
+            isOutlier: backendResult.labels[index] === -1,
+            row: sample.row,
+          };
+        });
+
+        const sampleValues = samples.map((s) => s.value);
+        const nextResult: AnomalyResult = {
+          columnName: activeColumn,
+          rowCount: scoredRows.length,
+          meanValue: mean(sampleValues),
+          standardDeviationValue: standardDeviation(sampleValues),
+          threshold,
+          outliers: scoredRows
+            .filter((row) => row.isOutlier)
+            .sort((left, right) => right.zScore - left.zScore),
+          distribution: buildDistribution(scoredRows),
+        };
+
+        startTransition(() => {
+          setResult(nextResult);
+          setStatus(
+            `Backend flagged ${formatNumber(nextResult.outliers.length)} outliers at ${nextResult.threshold}σ in ${formatNumber(nextResult.rowCount)} sampled rows.`,
+          );
+        });
+
+        return;
+      } catch {
+        startTransition(() => {
+          setBackendFailed(true);
+        });
+      }
+    }
 
     try {
       const nextResult = await detectAnomalies(tableName, activeColumn, threshold);
@@ -466,6 +547,21 @@ export default function AnomalyDetector({
           </label>
 
           <div className="mt-5 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setUseBackend((previousMode) => {
+                  const nextMode = !previousMode;
+                  if (nextMode) {
+                    setBackendFailed(false);
+                  }
+                  return nextMode;
+                });
+              }}
+              className={`${BUTTON_CLASS} ${useBackend ? "bg-cyan-500 text-white" : "bg-white/20 text-slate-700 dark:bg-slate-900/50 dark:text-white"}`}
+            >
+              {useBackend ? "Backend" : "Client"}
+            </button>
             <button
               type="button"
               onClick={() => {

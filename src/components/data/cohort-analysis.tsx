@@ -3,7 +3,7 @@
 import {
   Suspense,
   startTransition,
-  use,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -35,6 +35,7 @@ import {
   FIELD_CLASS,
   GLASS_CARD_CLASS,
   GLASS_PANEL_CLASS,
+  isRecord,
   dataUrlToBytes,
   quoteIdentifier,
   toCount,
@@ -42,6 +43,7 @@ import {
 } from "@/lib/utils/advanced-analytics";
 import { formatNumber, formatPercent } from "@/lib/utils/formatters";
 import { runQuery } from "@/lib/duckdb/client";
+import { cohortAnalysis } from "@/lib/api/analytics";
 import type { ColumnProfile } from "@/types/dataset";
 
 echarts.use([
@@ -81,6 +83,169 @@ interface CohortResult {
   cohortCount: number;
   modeLabel: string;
   error: string | null;
+}
+
+type BackendCohortCell =
+  | number
+  | string
+  | {
+      cohort_size?: unknown;
+      active_entities?: unknown;
+      retention_rate?: unknown;
+      metric_value?: unknown;
+      metric?: unknown;
+      value?: unknown;
+    };
+
+interface BackendCohortResponse {
+  cohorts: Record<string, Record<string, BackendCohortCell>>;
+  periods: string[];
+}
+
+function buildCohortModeLabel(aggregation: CohortAggregation) {
+  return aggregation === "count"
+    ? "Retention"
+    : aggregation === "sum"
+      ? "Activity sum"
+      : "Activity average";
+}
+
+function buildBackendError(
+  entityColumn: string | null,
+  aggregation: CohortAggregation,
+  message: string,
+): CohortResult {
+  return {
+    entityColumn,
+    cells: [],
+    periods: [],
+    cohorts: [],
+    matrixMax: 0,
+    totalEntities: 0,
+    cohortCount: 0,
+    modeLabel: buildCohortModeLabel(aggregation),
+    error: message,
+  };
+}
+
+function toBackendNumber(value: unknown): number {
+  return toNumber(
+    isRecord(value)
+      ? value.retention_rate ?? value.metric_value ?? value.metric ?? value.value
+      : value,
+  ) ?? 0;
+}
+
+function toBackendActiveCount(value: unknown): number {
+  return toCount(
+    isRecord(value) ? value.active_entities ?? value.cohort_size : value,
+  );
+}
+
+function normalizeBackendResult(
+  response: BackendCohortResponse,
+  aggregation: CohortAggregation,
+  entityColumn: string | null,
+): CohortResult {
+  const periods = response.periods.filter((value) => typeof value === "string");
+  const cells = Object.entries(response.cohorts).flatMap((entry) => {
+    const [cohortBucket, periodValues] = entry;
+    const parsedCohortBucket = String(cohortBucket);
+
+    if (!parsedCohortBucket || !isRecord(periodValues)) {
+      return [];
+    }
+
+    return Object.entries(periodValues).flatMap(([periodKey, rawValue]) => {
+      const parsedPeriod = Number(periodKey);
+      const fallbackPeriod = Number(periodKey.replace(/\D+/g, ""));
+      const periodIndex = Number.isFinite(parsedPeriod)
+        ? parsedPeriod
+        : Number.isFinite(fallbackPeriod)
+          ? fallbackPeriod
+          : periods.indexOf(periodKey);
+
+      if (periodIndex < 0) {
+        return [];
+      }
+
+      const metricValue = toBackendNumber(rawValue);
+      const retentionRate =
+        aggregation === "count"
+          ? toBackendNumber(
+              isRecord(rawValue)
+                ? {
+                    retention_rate:
+                      rawValue.retention_rate ?? rawValue.value ?? rawValue.metric_value,
+                    metric_value: rawValue.metric_value,
+                    metric: rawValue.metric,
+                    value: rawValue.value,
+                  }
+                : metricValue,
+            )
+          : 0;
+      const active = toBackendActiveCount(rawValue);
+      const cohortSize = toBackendActiveCount(rawValue) || toBackendNumber(rawValue);
+
+      return {
+        cohortLabel: formatCohortLabel(parsedCohortBucket),
+        cohortBucket: parsedCohortBucket,
+        periodIndex,
+        periodLabel:
+          periods[periodIndex] ??
+          `${parsedPeriod >= 0 ? "Period" : "Offset"} ${periodIndex}`,
+        metricValue,
+        activeEntities: active,
+        cohortSize: Math.max(1, cohortSize),
+        retentionRate: aggregation === "count" ? retentionRate : 0,
+      };
+    });
+  });
+
+  const orderedCohorts = Array.from(new Set(cells.map((cell) => cell.cohortLabel))).sort(
+    (left, right) => right.localeCompare(left),
+  );
+  const orderedPeriods = Array.from(new Set(cells.map((cell) => cell.periodLabel))).sort(
+    (left, right) => {
+      const leftIndex = periods.indexOf(left);
+      const rightIndex = periods.indexOf(right);
+      if (leftIndex !== -1 && rightIndex !== -1) {
+        return leftIndex - rightIndex;
+      }
+
+      const parsePeriod = (value: string): number => {
+        const candidate = Number(value.replace(/\D+/g, ""));
+        return Number.isFinite(candidate) ? candidate : 0;
+      };
+
+      return parsePeriod(left) - parsePeriod(right);
+    },
+  );
+
+  const matrixMax = Math.max(
+    ...cells.map((cell) =>
+      aggregation === "count" ? cell.retentionRate : cell.metricValue,
+    ),
+    1,
+  );
+
+  return {
+    entityColumn,
+    cells,
+    periods: orderedPeriods,
+    cohorts: orderedCohorts,
+    matrixMax,
+    totalEntities: Array.from(
+      new Map(
+        cells
+          .filter((cell) => cell.periodIndex === 0)
+          .map((cell) => [cell.cohortBucket, cell.cohortSize]),
+      ).values(),
+    ).reduce((sum, value) => sum + value, 0),
+    cohortCount: orderedCohorts.length,
+    modeLabel: buildCohortModeLabel(aggregation),
+    error: cells.length === 0 ? "No cohort rows were returned from backend." : null,
+  };
 }
 
 const DATE_FORMAT = new Intl.DateTimeFormat("en-US", {
@@ -508,39 +673,142 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
       : numericColumns[0]?.name ?? "__active_users__";
   const safeAggregation =
     safeMetricColumn === "__active_users__" ? "count" : aggregation;
+  const [useBackend, setUseBackend] = useState(true);
+  const [backendFailed, setBackendFailed] = useState(false);
+  const [result, setResult] = useState<CohortResult>(() =>
+    buildBackendError(
+      inferEntityColumn(columns),
+      safeAggregation,
+      safeDateColumn
+        ? "No rows processed yet."
+        : "Choose a date column to generate cohorts.",
+    ),
+  );
 
-  const resultPromise = useMemo(
-    () =>
-      loadCohortResult(
+  async function analyze() {
+    const userIdColumn = inferEntityColumn(columns);
+    const timestampColumn = safeDateColumn;
+
+    if (!timestampColumn) {
+      startTransition(() => {
+        setResult(
+          buildBackendError(
+            userIdColumn,
+            safeAggregation,
+            "Choose a date column to generate cohorts.",
+          ),
+        );
+      });
+      return;
+    }
+
+    if (!userIdColumn) {
+      startTransition(() => {
+        setResult(
+          buildBackendError(
+            null,
+            safeAggregation,
+            "A stable entity column could not be inferred. Add an ID-like column to run cohort retention.",
+          ),
+        );
+      });
+      return;
+    }
+
+    try {
+      if (useBackend && !backendFailed) {
+        try {
+          const rows = await runQuery(`
+            SELECT
+              CAST(${quoteIdentifier(userIdColumn)} AS VARCHAR) AS user_id,
+              CAST(${quoteIdentifier(timestampColumn)} AS VARCHAR) AS timestamp
+            FROM ${quoteIdentifier(tableName)}
+            WHERE ${quoteIdentifier(userIdColumn)} IS NOT NULL AND ${quoteIdentifier(timestampColumn)} IS NOT NULL
+          `);
+          const data = rows.flatMap<{ userId: string; timestamp: string }>((row) => {
+            const userId = String(row.user_id ?? "");
+            const timestamp = String(row.timestamp ?? "");
+
+            if (!userId || !timestamp) {
+              return [];
+            }
+
+            return [{ userId, timestamp }];
+          });
+
+          if (data.length === 0) {
+            throw new Error("No valid rows were found for backend cohort analysis.");
+          }
+
+          const recordData = data.map((d) => ({
+            [userIdColumn ?? "user_id"]: d.userId,
+            [safeDateColumn]: d.timestamp,
+          }));
+          const response = await cohortAnalysis(
+            recordData,
+            safeDateColumn,
+            userIdColumn ?? "user_id",
+          );
+          // Convert API CohortResult to component CohortResult
+          const periods = Object.keys(
+            Object.values(response.cohorts)[0] ?? {},
+          ).sort();
+          const adaptedResponse: BackendCohortResponse = {
+            cohorts: response.cohorts,
+            periods,
+          };
+          const nextResult = normalizeBackendResult(
+            adaptedResponse,
+            safeAggregation,
+            userIdColumn ?? null,
+          );
+          startTransition(() => {
+            setResult(nextResult);
+          });
+          return;
+        } catch {
+          startTransition(() => {
+            setBackendFailed(true);
+          });
+        }
+      }
+
+      const nextResult = await loadCohortResult(
         tableName,
         columns,
         safeDateColumn,
         safeMetricColumn,
         granularity,
         safeAggregation,
-      ).catch((error) => ({
-        entityColumn: inferEntityColumn(columns),
-        cells: [],
-        periods: [],
-        cohorts: [],
-        matrixMax: 0,
-        totalEntities: 0,
-        cohortCount: 0,
-        modeLabel: "Retention",
-        error:
-          error instanceof Error ? error.message : "Failed to load cohort matrix.",
-      })),
-    [
-      columns,
-      granularity,
-      safeAggregation,
-      safeDateColumn,
-      safeMetricColumn,
-      tableName,
-    ],
-  );
+      ).catch((error) =>
+        buildBackendError(
+          userIdColumn,
+          safeAggregation,
+          error instanceof Error
+            ? error.message
+            : "Failed to load cohort matrix.",
+        ),
+      );
+      startTransition(() => {
+        setResult(nextResult);
+      });
+    } catch (error) {
+      startTransition(() => {
+        setResult(
+          buildBackendError(
+            userIdColumn,
+            safeAggregation,
+            error instanceof Error ? error.message : "Cohort analysis failed.",
+          ),
+        );
+      });
+    }
+  }
 
-  const result = use(resultPromise);
+  useEffect(() => {
+    void analyze();
+  }, [columns, safeAggregation, safeDateColumn, safeMetricColumn, granularity, tableName, useBackend, backendFailed]);
+
   const option = useMemo(
     () => buildHeatmapOption(result, dark, safeAggregation),
     [dark, result, safeAggregation],
@@ -611,6 +879,25 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() =>
+                setUseBackend((previous) => {
+                  if (!previous) {
+                    setBackendFailed(false);
+                  }
+                  return !previous;
+                })
+              }
+              className={`${BUTTON_CLASS} px-3 text-xs ${
+                useBackend && !backendFailed
+                  ? "bg-cyan-500/15 text-cyan-700 dark:text-cyan-300"
+                  : ""
+              }`}
+              title="Toggle backend cohort analysis"
+            >
+              Backend: {useBackend ? "On" : "Off"}
+            </button>
             <button
               type="button"
               onClick={exportPng}
@@ -757,7 +1044,9 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
   );
 }
 
-export default function CohortAnalysis(props: CohortAnalysisProps) {
+export default function CohortAnalysis(
+  props: CohortAnalysisProps,
+): React.ReactNode {
   return (
     <Suspense fallback={<CohortLoading />}>
       <CohortAnalysisReady {...props} />

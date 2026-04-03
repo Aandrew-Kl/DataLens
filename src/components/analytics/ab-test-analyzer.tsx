@@ -1,9 +1,10 @@
 "use client";
 
-import { startTransition, useMemo, useState } from "react";
+import { startTransition, useMemo, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Activity, Download, FlaskConical, Loader2, Percent } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
+import { abTest } from "@/lib/api/analytics";
 import { downloadFile } from "@/lib/utils/export";
 import {
   ANALYTICS_EASE,
@@ -12,9 +13,9 @@ import {
   GLASS_CARD_CLASS,
   GLASS_PANEL_CLASS,
   quoteIdentifier,
-  toNumber,
 } from "@/lib/utils/advanced-analytics";
 import { formatNumber, formatPercent } from "@/lib/utils/formatters";
+import type { ABTestResult as ApiAbTestResult } from "@/lib/api/types";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface AbTestAnalyzerProps {
@@ -35,6 +36,7 @@ interface AbTestResult {
   lift: number;
   pValue: number;
   zScore: number;
+  significant: boolean;
   confidenceInterval: readonly [number, number];
 }
 
@@ -108,30 +110,11 @@ function summarizeGroup(label: string, values: number[]): GroupMetricSummary {
 }
 
 function computeAbTestResult(
-  rows: Record<string, unknown>[],
+  controlValues: number[],
+  treatmentValues: number[],
   controlLabel: string,
   treatmentLabel: string,
 ): AbTestResult | null {
-  const controlValues: number[] = [];
-  const treatmentValues: number[] = [];
-
-  for (const row of rows) {
-    const group = typeof row.experiment_group === "string" ? row.experiment_group : "";
-    const metricValue = toNumber(row.metric_value);
-
-    if (!group || metricValue === null) {
-      continue;
-    }
-
-    if (group === controlLabel) {
-      controlValues.push(metricValue);
-    }
-
-    if (group === treatmentLabel) {
-      treatmentValues.push(metricValue);
-    }
-  }
-
   if (controlValues.length < 2 || treatmentValues.length < 2) {
     return null;
   }
@@ -152,7 +135,29 @@ function computeAbTestResult(
     lift: control.mean === 0 ? 0 : difference / control.mean,
     pValue,
     zScore,
+    significant: pValue < 0.05,
     confidenceInterval: [difference - margin, difference + margin] as const,
+  };
+}
+
+function buildAbTestResultFromBackend(
+  backendResult: ApiAbTestResult,
+  controlValues: number[],
+  treatmentValues: number[],
+  controlValue: string,
+  treatmentValue: string,
+): AbTestResult {
+  const control = summarizeGroup(controlValue, controlValues);
+  const treatment = summarizeGroup(treatmentValue, treatmentValues);
+
+  return {
+    control,
+    treatment,
+    lift: backendResult.effect_size,
+    pValue: backendResult.p_value,
+    zScore: backendResult.effect_size / (backendResult.p_value > 0 ? backendResult.p_value : 1),
+    significant: backendResult.significant,
+    confidenceInterval: backendResult.confidence_interval,
   };
 }
 
@@ -183,7 +188,10 @@ function buildResultCsv(result: AbTestResult) {
   return [header.join(","), row.map(csvEscape).join(",")].join("\n");
 }
 
-export default function AbTestAnalyzer({ tableName, columns }: AbTestAnalyzerProps) {
+export default function AbTestAnalyzer({
+  tableName,
+  columns,
+}: AbTestAnalyzerProps): ReactNode {
   const groupColumns = useMemo(
     () => columns.filter((column) => column.type === "string" || column.type === "boolean"),
     [columns],
@@ -206,6 +214,8 @@ export default function AbTestAnalyzer({ tableName, columns }: AbTestAnalyzerPro
   const [status, setStatus] = useState(
     "Choose a test split and a metric to estimate lift and significance.",
   );
+  const [useBackend, setUseBackend] = useState(true);
+  const [backendFailed, setBackendFailed] = useState(false);
 
   const availableGroupValues = useMemo(() => {
     const currentColumn = columns.find((column) => column.name === groupColumn);
@@ -229,7 +239,59 @@ export default function AbTestAnalyzer({ tableName, columns }: AbTestAnalyzerPro
 
     try {
       const rows = await runQuery(buildQuery(tableName, groupColumn, metricColumn));
-      const nextResult = computeAbTestResult(rows, controlValue, treatmentValue);
+      const controlGroup = rows.filter((row) => row.experiment_group === controlValue);
+      const treatmentGroup = rows.filter((row) => row.experiment_group === treatmentValue);
+      const controlValues = controlGroup
+        .map((row) =>
+          Number(
+            (row as Record<string, unknown>)[metricColumn] ??
+              (row as Record<string, unknown>).metric_value ??
+              "",
+          ),
+        )
+        .filter((value) => Number.isFinite(value));
+      const treatmentValues = treatmentGroup
+        .map((row) =>
+          Number(
+            (row as Record<string, unknown>)[metricColumn] ??
+              (row as Record<string, unknown>).metric_value ??
+              "",
+          ),
+        )
+        .filter((value) => Number.isFinite(value));
+
+      if (useBackend && !backendFailed) {
+        try {
+          const result = await abTest(controlValues, treatmentValues);
+
+          startTransition(() => {
+            setResult(
+              buildAbTestResultFromBackend(
+                result,
+                controlValues,
+                treatmentValues,
+                controlValue,
+                treatmentValue,
+              ),
+            );
+            setStatus(
+              `Backend analysis: Treatment improves ${metricColumn} by ${formatRate(result.effect_size)} with p=${result.p_value.toFixed(3)}.`,
+            );
+          });
+          return;
+        } catch {
+          startTransition(() => {
+            setBackendFailed(true);
+          });
+        }
+      }
+
+      const nextResult = computeAbTestResult(
+        controlValues,
+        treatmentValues,
+        controlValue,
+        treatmentValue,
+      );
 
       if (!nextResult) {
         setStatus("Need at least two observations in both control and treatment groups.");
@@ -394,6 +456,20 @@ export default function AbTestAnalyzer({ tableName, columns }: AbTestAnalyzerPro
             </button>
             <button
               type="button"
+              onClick={() => {
+                const nextValue = !useBackend;
+                setUseBackend(nextValue);
+                if (nextValue) {
+                  setBackendFailed(false);
+                }
+              }}
+              className={`${BUTTON_CLASS} px-2 py-1 text-xs`}
+              disabled={!hasColumns}
+            >
+              {useBackend ? "Backend: on" : "Backend: off"}
+            </button>
+            <button
+              type="button"
               onClick={handleExport}
               className={BUTTON_CLASS}
               disabled={!result}
@@ -493,7 +569,7 @@ export default function AbTestAnalyzer({ tableName, columns }: AbTestAnalyzerPro
               <p>
                 Significance:{" "}
                 <span className="font-medium text-slate-950 dark:text-white">
-                  {result.pValue < 0.05 ? "Statistically significant" : "Not statistically significant"}
+                  {result.significant ? "Statistically significant" : "Not statistically significant"}
                 </span>
               </p>
             </div>

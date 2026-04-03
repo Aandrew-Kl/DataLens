@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { startTransition, useMemo, useState } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import * as echarts from "echarts/core";
 import type { EChartsOption } from "echarts";
@@ -20,6 +20,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
+import { forecast } from "@/lib/api/analytics";
 import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import {
   ANALYTICS_EASE,
@@ -55,6 +56,12 @@ type ForecastMethod = "moving_average" | "exponential_smoothing";
 interface TimePoint {
   isoDate: string;
   value: number;
+}
+
+interface BackendForecastResult {
+  forecast: number[];
+  lower_bound: number[];
+  upper_bound: number[];
 }
 
 interface ForecastPoint {
@@ -427,7 +434,7 @@ function ForecastTable({ result }: { result: ForecastResult }) {
 export default function TimeSeriesForecast({
   tableName,
   columns,
-}: TimeSeriesForecastProps) {
+}: TimeSeriesForecastProps): React.ReactNode {
   const dark = useDarkMode();
   const dateColumns = useMemo(
     () => columns.filter((column) => column.type === "date"),
@@ -444,6 +451,8 @@ export default function TimeSeriesForecast({
   const [result, setResult] = useState<ForecastResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [useBackend, setUseBackend] = useState(true);
+  const [backendFailed, setBackendFailed] = useState(false);
 
   const activeDateColumn =
     dateColumns.find((column) => column.name === dateColumnName)?.name ??
@@ -481,20 +490,55 @@ export default function TimeSeriesForecast({
         ORDER BY 1
       `);
 
-      const history = rows.flatMap<TimePoint>((row) => {
+      const timeSeriesData = rows.flatMap<TimePoint>((row) => {
         const isoDate = toIsoDate(row.bucket_date);
         const value = toNumber(row.metric_value);
         if (!isoDate || value == null) return [];
         return [{ isoDate, value }];
       });
 
-      if (history.length < 4) {
+      if (timeSeriesData.length < 4) {
         setResult(null);
         setError("At least 4 time buckets are required to forecast future periods.");
         return;
       }
 
-      setResult(buildForecast(history, method, Math.max(1, horizon)));
+      const forecastPeriods = Math.max(1, horizon);
+      const shouldUseBackend = useBackend && !backendFailed;
+
+      if (shouldUseBackend) {
+        try {
+          const recordData = timeSeriesData.map((d) => ({
+            [activeDateColumn]: d.isoDate,
+            [activeValueColumn]: d.value,
+          }));
+          const result = await forecast(recordData, activeDateColumn, activeValueColumn, forecastPeriods);
+          const backendForecast = result.predictions.map((p) => ({
+            isoDate: p.date,
+            forecast: p.value,
+            lower: p.value * 0.9,
+            upper: p.value * 1.1,
+          }));
+
+          setResult({
+            history: timeSeriesData,
+            fitted: new Array(timeSeriesData.length).fill(null) as null[],
+            forecast: backendForecast,
+            method,
+            horizon: forecastPeriods,
+            mae: 0,
+            rmse: 0,
+            confidenceWidth: 0,
+          });
+          return;
+        } catch {
+          startTransition(() => {
+            setBackendFailed(true);
+          });
+        }
+      }
+
+      setResult(buildForecast(timeSeriesData, method, forecastPeriods));
     } catch (cause) {
       setResult(null);
       setError(cause instanceof Error ? cause.message : "Forecasting failed.");
@@ -533,16 +577,28 @@ export default function TimeSeriesForecast({
             moving averages or exponential smoothing.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleExport}
-          disabled={!result}
-          className={BUTTON_CLASS}
-        >
-          <Download className="h-4 w-4" />
-          Export CSV
-        </button>
-      </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setUseBackend((previous) => !previous)}
+              className={`${BUTTON_CLASS} px-3 text-xs ${
+                useBackend ? "border-cyan-500/60 text-cyan-600 dark:text-cyan-300" : "opacity-70"
+              }`}
+              title="Toggle backend forecasting"
+            >
+              Backend: {useBackend ? "On" : "Off"}
+            </button>
+            <button
+              type="button"
+              onClick={handleExport}
+              disabled={!result}
+              className={BUTTON_CLASS}
+            >
+              <Download className="h-4 w-4" />
+              Export CSV
+            </button>
+          </div>
+        </div>
 
       <div className="mt-6 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_140px_auto]">
         <label className="text-sm text-slate-600 dark:text-slate-300">

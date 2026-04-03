@@ -1,6 +1,7 @@
 "use client";
 
 import { startTransition, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import * as echarts from "echarts/core";
 import type { EChartsOption } from "echarts";
@@ -10,6 +11,7 @@ import { CanvasRenderer } from "echarts/renderers";
 import { motion } from "framer-motion";
 import { Download, Loader2, Orbit, Sigma, Sparkles } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
+import { pca } from "@/lib/api/ml";
 import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import {
   ANALYTICS_EASE,
@@ -44,6 +46,12 @@ interface PCAResult {
   varianceRatios: number[];
   scores: Array<{ rowIndex: number; pc1: number; pc2: number }>;
   loadings: Array<{ column: string; pc1: number; pc2: number }>;
+}
+
+/* API PCAResult: { explained_variance: number[]; loadings: number[][]; transformed: number[][] } */
+
+interface PCASample {
+  [key: string]: unknown;
 }
 
 interface MetricCardProps {
@@ -229,7 +237,7 @@ function buildScatterOption(result: PCAResult, dark: boolean): EChartsOption {
   };
 }
 
-async function runPCAAnalysis(tableName: string, selectedColumns: string[]): Promise<PCAResult> {
+async function fetchPCASamples(tableName: string, selectedColumns: string[]): Promise<PCASample[]> {
   const query = `
     SELECT
       ${selectedColumns
@@ -245,9 +253,12 @@ async function runPCAAnalysis(tableName: string, selectedColumns: string[]): Pro
     LIMIT ${SAMPLE_LIMIT}
   `;
 
-  const rows = await runQuery(query);
-  const matrix = rows.flatMap<number[]>((row) => {
-    const values = selectedColumns.map((column) => toNumber(row[column]));
+  return runQuery(query);
+}
+
+async function runPCAAnalysis(samples: PCASample[], selectedColumns: string[]): Promise<PCAResult> {
+  const matrix = samples.flatMap<number[]>((sample) => {
+    const values = selectedColumns.map((column) => toNumber(sample[column]));
     if (values.some((value) => value === null)) {
       return [];
     }
@@ -298,7 +309,7 @@ async function runPCAAnalysis(tableName: string, selectedColumns: string[]): Pro
   };
 }
 
-export default function PCAView({ tableName, columns }: PCAViewProps) {
+export default function PCAView({ tableName, columns }: PCAViewProps): ReactNode {
   const dark = useDarkMode();
   const numericColumns = useMemo(
     () => columns.filter((column) => column.type === "number"),
@@ -311,6 +322,8 @@ export default function PCAView({ tableName, columns }: PCAViewProps) {
   const [result, setResult] = useState<PCAResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [useBackend, setUseBackend] = useState(true);
+  const [backendFailed, setBackendFailed] = useState(false);
 
   function toggleColumn(name: string) {
     setSelectedColumns((current) =>
@@ -330,7 +343,57 @@ export default function PCAView({ tableName, columns }: PCAViewProps) {
     setError(null);
 
     try {
-      const nextResult = await runPCAAnalysis(tableName, selectedColumns);
+      const samples = await fetchPCASamples(tableName, selectedColumns);
+      const numericFeatures = selectedColumns;
+      const nComponents = 2;
+
+      if (useBackend && !backendFailed) {
+        try {
+          const numericData = samples.flatMap<number[]>((sample) => {
+            const values = numericFeatures.map((feature) => toNumber(sample[feature]));
+            if (values.some((value) => value === null)) {
+              return [];
+            }
+            return [values as number[]];
+          });
+
+          const recordData = samples.map((s) => {
+            const record: Record<string, unknown> = {};
+            for (const f of numericFeatures) {
+              record[f] = s[f];
+            }
+            return record;
+          });
+          const result = await pca(recordData, numericFeatures, nComponents);
+          const nextResult: PCAResult = {
+            rowCount: recordData.length,
+            selectedColumns: numericFeatures,
+            varianceRatios: result.explained_variance,
+            scores: result.transformed.map((row, rowIndex) => ({
+              rowIndex: rowIndex + 1,
+              pc1: row[0] ?? 0,
+              pc2: row[1] ?? 0,
+            })),
+            loadings: numericFeatures.map((column, index) => ({
+              column,
+              pc1: result.loadings[0]?.[index] ?? 0,
+              pc2: result.loadings[1]?.[index] ?? 0,
+            })),
+          };
+
+          startTransition(() => {
+            setResult(nextResult);
+          });
+
+          return;
+        } catch {
+          startTransition(() => {
+            setBackendFailed(true);
+          });
+        }
+      }
+
+      const nextResult = await runPCAAnalysis(samples, selectedColumns);
       startTransition(() => {
         setResult(nextResult);
       });
@@ -393,6 +456,14 @@ export default function PCAView({ tableName, columns }: PCAViewProps) {
         </div>
 
         <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setUseBackend((previous) => !previous)}
+            disabled={loading}
+            className={`${BUTTON_CLASS} ${useBackend ? "border-cyan-400/40 bg-cyan-500/10" : ""}`}
+          >
+            {useBackend ? "Backend ON" : "Backend OFF"}
+          </button>
           <button
             type="button"
             onClick={() => void handleRun()}
