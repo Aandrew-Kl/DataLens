@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.router import api_router
 from app.database import Base, engine
 from app.logging_config import setup_logging
-from app.models import analysis, dataset, user  # noqa: F401
+from app.models import analysis, dataset, query_history, user  # noqa: F401
 
 
 setup_logging()
