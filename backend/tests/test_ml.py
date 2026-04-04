@@ -107,6 +107,7 @@ def test_anomaly_isolation_forest(regression_data: list[dict[str, object]]) -> N
 def test_pca(cluster_data: list[dict[str, object]]) -> None:
     frame = pd.DataFrame(cluster_data)
     request = SimpleNamespace(
+        algorithm="pca",
         feature_columns=["feature_a", "feature_b"],
         n_components=2,
     )

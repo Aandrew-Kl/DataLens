@@ -116,3 +116,21 @@ def sentiment_texts() -> list[str]:
         "This is the worst customer experience I have had in months.",
         "The release shipped today.",
     ]
+
+
+@pytest.fixture
+async def client():
+    """Async HTTP client wired to the FastAPI application."""
+    from httpx import ASGITransport, AsyncClient
+    from app.main import app
+    from app.database import Base, engine
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test/api") as ac:
+        yield ac
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)

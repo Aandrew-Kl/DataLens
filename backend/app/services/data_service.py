@@ -159,7 +159,7 @@ def profile_dataset(frame: pd.DataFrame) -> dict:
 
     logger.info("Profiling dataset: %d rows, %d columns", frame.shape[0], frame.shape[1])
 
-    describe_frame = frame.describe(include="all", datetime_is_numeric=True).transpose()
+    describe_frame = frame.describe(include="all").transpose()
     describe = to_native(
         describe_frame.replace([np.inf, -np.inf], np.nan).where(pd.notna(describe_frame), None).to_dict(orient="index")
     )
