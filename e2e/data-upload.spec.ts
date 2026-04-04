@@ -1,33 +1,67 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Data Upload Flow', () => {
-  test('shows upload area on explore page', async ({ page }) => {
-    await page.goto('/explore');
-    await expect(page.locator('body')).toBeVisible();
+import {
+  openLandingPage,
+  openWorkspaceTab,
+  uploadInlineCsv,
+} from "./support";
+
+test.use({ colorScheme: "light" });
+
+test.describe("Data Upload Flow", () => {
+  test("uploads inline CSV and shows column profiles", async ({ page }) => {
+    test.slow();
+
+    await openLandingPage(page);
+    await uploadInlineCsv(page, { fileName: "sales_fixture.csv" });
+
+    await expect(
+      page.getByRole("heading", { name: "Column Profiles" }),
+    ).toBeVisible({ timeout: 60_000 });
+
+    for (const columnName of ["region", "category", "amount", "profit", "date"]) {
+      await expect(page.getByText(columnName, { exact: true }).first()).toBeVisible({
+        timeout: 60_000,
+      });
+    }
+
+    await expect(page.getByText(/4 rows/i).first()).toBeVisible({
+      timeout: 60_000,
+    });
   });
 
-  test('charts page loads correctly', async ({ page }) => {
-    await page.goto('/charts');
-    await expect(page.locator('body')).toBeVisible();
+  test("data table shows uploaded rows", async ({ page }) => {
+    test.slow();
+
+    await openLandingPage(page);
+    await uploadInlineCsv(page, { fileName: "sales_fixture.csv" });
+
+    await expect(page.getByRole("heading", { name: "Data Preview" })).toBeVisible({
+      timeout: 60_000,
+    });
+
+    const previewTable = page.getByRole("table").first();
+    await expect(previewTable).toBeVisible({ timeout: 60_000 });
+    await expect(previewTable).toContainText("East");
+    await expect(previewTable).toContainText("West");
+    await expect(previewTable).toContainText("Hardware");
+    await expect(previewTable).toContainText("Software");
   });
 
-  test('ML page loads correctly', async ({ page }) => {
-    await page.goto('/ml');
-    await expect(page.locator('body')).toBeVisible();
-  });
+  test("workspace tabs are navigable after upload", async ({ page }) => {
+    test.slow();
 
-  test('analytics page loads correctly', async ({ page }) => {
-    await page.goto('/analytics');
-    await expect(page.locator('body')).toBeVisible();
-  });
+    await openLandingPage(page);
+    await uploadInlineCsv(page, { fileName: "sales_fixture.csv" });
 
-  test('reports page loads correctly', async ({ page }) => {
-    await page.goto('/reports');
-    await expect(page.locator('body')).toBeVisible();
-  });
+    await openWorkspaceTab(page, "SQL Editor");
+    await expect(
+      page.getByRole("heading", { name: "SQL Editor" }),
+    ).toBeVisible({ timeout: 60_000 });
 
-  test('quality page loads correctly', async ({ page }) => {
-    await page.goto('/quality');
-    await expect(page.locator('body')).toBeVisible();
+    await openWorkspaceTab(page, "Profile");
+    await expect(
+      page.getByRole("heading", { name: "Column Profiles" }),
+    ).toBeVisible({ timeout: 60_000 });
   });
 });
