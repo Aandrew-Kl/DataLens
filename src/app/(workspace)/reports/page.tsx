@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 
 import { useDatasetStore } from "@/stores/dataset-store";
 
@@ -114,28 +114,66 @@ export default function ReportsPage() {
   const [runDay, setRunDay] = useState("Monday");
   const [history, setHistory] = useState<SavedReport[]>([]);
   const [schedules, setSchedules] = useState<ScheduledReport[]>([]);
+  const initialPersistSnapshot = useRef<{
+    history: SavedReport[];
+    schedules: ScheduledReport[];
+  } | null>(null);
+  const skipInitialPersist = useRef(true);
 
   useEffect(() => {
+    let nextHistory: SavedReport[] | null = null;
     const savedHistory = window.localStorage.getItem(historyStorageKey);
     if (savedHistory) {
       try {
-        setHistory(JSON.parse(savedHistory) as SavedReport[]);
+        nextHistory = JSON.parse(savedHistory) as SavedReport[];
       } catch {
         // Ignore invalid cache data.
       }
     }
 
+    let nextSchedules: ScheduledReport[] | null = null;
     const savedSchedules = window.localStorage.getItem(scheduleStorageKey);
     if (savedSchedules) {
       try {
-        setSchedules(JSON.parse(savedSchedules) as ScheduledReport[]);
+        nextSchedules = JSON.parse(savedSchedules) as ScheduledReport[];
       } catch {
         // Ignore invalid cache data.
       }
     }
+
+    initialPersistSnapshot.current = {
+      history: nextHistory ?? [],
+      schedules: nextSchedules ?? [],
+    };
+
+    if (nextHistory === null && nextSchedules === null) {
+      return;
+    }
+
+    startTransition(() => {
+      if (nextHistory !== null) {
+        setHistory(nextHistory);
+      }
+      if (nextSchedules !== null) {
+        setSchedules(nextSchedules);
+      }
+    });
   }, []);
 
   useEffect(() => {
+    if (skipInitialPersist.current) {
+      skipInitialPersist.current = false;
+      window.localStorage.setItem(
+        historyStorageKey,
+        JSON.stringify(initialPersistSnapshot.current?.history ?? history),
+      );
+      window.localStorage.setItem(
+        scheduleStorageKey,
+        JSON.stringify(initialPersistSnapshot.current?.schedules ?? schedules),
+      );
+      return;
+    }
+
     window.localStorage.setItem(historyStorageKey, JSON.stringify(history));
     window.localStorage.setItem(scheduleStorageKey, JSON.stringify(schedules));
   }, [history, schedules]);

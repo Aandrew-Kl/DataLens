@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { startTransition, type FormEvent, useEffect, useMemo, useState } from "react";
 import { FIELD_CLASS, GLASS_PANEL_CLASS } from "@/lib/utils/advanced-analytics";
 import {
   generateId,
@@ -81,18 +81,27 @@ export default function TransformsPage() {
     if (!activePipeline?.id) {
       return;
     }
-    setPipelineName(activePipeline.name);
+
+    startTransition(() => {
+      setPipelineName((current) =>
+        current === activePipeline.name ? current : activePipeline.name,
+      );
+    });
   }, [activePipeline]);
 
   useEffect(() => {
-    if (activeId && !pipelines.find((pipeline) => pipeline.id === activeId)) {
-      setActiveId(pipelines[0]?.id ?? null);
+    const nextActiveId =
+      activeId && pipelines.find((pipeline) => pipeline.id === activeId)
+        ? activeId
+        : pipelines[0]?.id ?? null;
+
+    if (nextActiveId === activeId) {
       return;
     }
 
-    if (!activeId && pipelines.length > 0) {
-      setActiveId(pipelines[0].id);
-    }
+    startTransition(() => {
+      setActiveId(nextActiveId);
+    });
   }, [activeId, pipelines]);
 
   function createNewPipeline() {

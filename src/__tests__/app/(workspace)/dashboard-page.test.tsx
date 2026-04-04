@@ -110,7 +110,7 @@ let datasetState = {
   getActiveDataset: jest.fn(),
 };
 
-let queryStoreState = {
+const queryStoreState = {
   history: [],
   lastResult: null,
   isQuerying: false,

@@ -1,6 +1,6 @@
 "use client";
 
-import { type DragEvent, useEffect, useMemo, useState } from "react";
+import { startTransition, type DragEvent, useEffect, useMemo, useState } from "react";
 
 import { useDatasetStore } from "@/stores/dataset-store";
 import type { ColumnProfile } from "@/types/dataset";
@@ -21,6 +21,10 @@ const aggregateLabels: Record<AggregateType, string> = {
 
 function dedupe(values: string[]) {
   return Array.from(new Set(values));
+}
+
+function sameFields(left: string[], right: string[]) {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
 }
 
 function toColumn(dataset: { columns: ColumnProfile[] } | undefined | null, field: string) {
@@ -61,6 +65,10 @@ export default function PivotPage() {
     state.datasets.find((dataset) => dataset.id === state.activeDatasetId),
   );
   const activeColumns = useMemo(() => activeDataset?.columns ?? [], [activeDataset?.columns]);
+  const activeColumnNames = useMemo(
+    () => activeDataset?.columns.map((column) => column.name) ?? [],
+    [activeDataset?.columns],
+  );
   const [draggedField, setDraggedField] = useState("");
   const [rowFields, setRowFields] = useState<string[]>([]);
   const [columnFields, setColumnFields] = useState<string[]>([]);
@@ -68,18 +76,16 @@ export default function PivotPage() {
   const [aggregate, setAggregate] = useState<AggregateType>("count");
 
   useEffect(() => {
-    if (!activeDataset) {
-      setRowFields([]);
-      setColumnFields([]);
-      setValueFields([]);
-      return;
-    }
+    const nextRowFields = activeColumnNames.slice(0, 1);
+    const nextColumnFields = activeColumnNames.slice(1, 2);
+    const nextValueFields = activeColumnNames.slice(2, 3);
 
-    const names = activeDataset.columns.map((column) => column.name);
-    setRowFields(names.slice(0, 1));
-    setColumnFields(names.slice(1, 2));
-    setValueFields(names.slice(2, 3));
-  }, [activeDataset?.id, activeDataset?.columns.length]);
+    startTransition(() => {
+      setRowFields((current) => (sameFields(current, nextRowFields) ? current : nextRowFields));
+      setColumnFields((current) => (sameFields(current, nextColumnFields) ? current : nextColumnFields));
+      setValueFields((current) => (sameFields(current, nextValueFields) ? current : nextValueFields));
+    });
+  }, [activeDataset?.id, activeColumnNames]);
 
   const unassignedColumns = useMemo(() => {
     return activeColumns.filter(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 
 import { useUIStore } from "@/stores/ui-store";
 
@@ -93,6 +93,8 @@ export default function SettingsPage() {
   const theme = useUIStore((state) => state.theme);
   const setTheme = useUIStore((state) => state.setTheme);
   const [settings, setSettings] = useState<SettingsState>(defaultSettings);
+  const initialPersistPayload = useRef<string | null>(null);
+  const skipInitialPersist = useRef(true);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(storageKey);
@@ -102,13 +104,26 @@ export default function SettingsPage() {
 
     try {
       const parsed = JSON.parse(stored) as unknown;
-      setSettings(mergeSettings(parsed));
+      const mergedSettings = mergeSettings(parsed);
+      initialPersistPayload.current = JSON.stringify(mergedSettings);
+      startTransition(() => {
+        setSettings(mergedSettings);
+      });
     } catch {
       // Keep defaults on malformed cache payload.
     }
   }, []);
 
   useEffect(() => {
+    if (skipInitialPersist.current) {
+      skipInitialPersist.current = false;
+      window.localStorage.setItem(
+        storageKey,
+        initialPersistPayload.current ?? JSON.stringify(settings),
+      );
+      return;
+    }
+
     window.localStorage.setItem(storageKey, JSON.stringify(settings));
   }, [settings]);
 
