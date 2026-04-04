@@ -123,10 +123,11 @@ def sentiment_texts() -> list[str]:
 async def client():
     """Async HTTP client wired to the FastAPI application."""
     from httpx import ASGITransport, AsyncClient
-    from app.main import app, rate_limiter
+    from app.main import app, rate_limiter, request_metrics
     from app.database import Base, engine
 
     rate_limiter.clear()
+    await request_metrics.reset()
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -136,6 +137,7 @@ async def client():
         yield ac
 
     rate_limiter.clear()
+    await request_metrics.reset()
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)

@@ -18,6 +18,9 @@ async def test_healthcheck_reports_application_and_database_status(client: Async
         "version": settings.APP_VERSION,
         "database": {"status": "ok"},
     }
+    assert response.headers["x-ratelimit-limit"] == "100"
+    assert response.headers["x-ratelimit-remaining"] == "99"
+    assert response.headers["x-ratelimit-reset"].isdigit()
 
 
 @pytest.mark.asyncio
@@ -47,6 +50,9 @@ async def test_rate_limiter_returns_429_after_100_requests(client: AsyncClient) 
 
     assert response.status_code == 429
     assert response.json() == {"detail": "Rate limit exceeded. Please retry later."}
+    assert response.headers["x-ratelimit-limit"] == "100"
+    assert response.headers["x-ratelimit-remaining"] == "0"
+    assert response.headers["x-ratelimit-reset"].isdigit()
 
 
 @pytest.mark.asyncio
@@ -113,6 +119,9 @@ async def test_request_size_limit_returns_413_for_large_payloads(
 
     assert response.status_code == 413
     assert response.json() == {"detail": "Request body too large."}
+    assert response.headers["x-ratelimit-limit"] == "100"
+    assert response.headers["x-ratelimit-remaining"].isdigit()
+    assert response.headers["x-ratelimit-reset"].isdigit()
 
 
 @pytest.mark.asyncio
@@ -133,3 +142,35 @@ async def test_unhandled_exception_handler_returns_generic_500(client: AsyncClie
     assert response.status_code == 500
     assert response.json() == {"detail": "Internal server error"}
     assert "secret stack trace detail" not in response.text
+
+
+@pytest.mark.asyncio
+async def test_metrics_endpoint_reports_request_totals_and_status_buckets(client: AsyncClient) -> None:
+    route_path = f"/api/test-metrics-error-{uuid4()}"
+
+    async def raise_error() -> None:
+        raise RuntimeError("metrics failure")
+
+    app.add_api_route(route_path, raise_error, methods=["GET"])
+    added_route = app.router.routes[-1]
+
+    try:
+        ok_response = await client.get("/v1/health", headers={"x-forwarded-for": "metrics-ok"})
+        not_found_response = await client.get("/missing-route", headers={"x-forwarded-for": "metrics-404"})
+        error_response = await client.get(route_path.removeprefix("/api"), headers={"x-forwarded-for": "metrics-500"})
+        metrics_response = await client.get("/metrics", headers={"x-forwarded-for": "metrics-endpoint"})
+    finally:
+        app.router.routes.remove(added_route)
+
+    assert ok_response.status_code == 200
+    assert not_found_response.status_code == 404
+    assert error_response.status_code == 500
+    assert metrics_response.status_code == 200
+    payload = metrics_response.json()
+    assert payload == {
+        "total_requests": 3,
+        "status_codes": {"2xx": 1, "4xx": 1, "5xx": 1},
+        "uptime_seconds": payload["uptime_seconds"],
+    }
+    assert isinstance(payload["uptime_seconds"], int)
+    assert payload["uptime_seconds"] >= 0
