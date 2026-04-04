@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useEffect } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 
 import DataTableSection from "@/components/home/DataTableSection";
@@ -134,10 +135,9 @@ jest.mock("@/components/home/workspace-shared", () => ({
     onRowsLoaded?: (rows: Record<string, unknown>[]) => void;
     onRowClick?: (row: Record<string, unknown>) => void;
   }) => {
-    const React = require("react") as typeof import("react");
     const rows = [{ region: "East", revenue: 100 }];
 
-    React.useEffect(() => {
+    useEffect(() => {
       onRowsLoaded?.(rows);
     }, [onRowsLoaded]);
 

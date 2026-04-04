@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -101,7 +101,7 @@ export default function AnalyticsSection({
   const [showColumnDetail, setShowColumnDetail] = useState(false);
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
 
-  const derivedColumnName = useMemo(() => {
+  const effectiveColumnName = useMemo(() => {
     if (!columns.length) return "";
     if (columns.some((column) => column.name === analyticsColumnName)) {
       return analyticsColumnName;
@@ -113,19 +113,13 @@ export default function AnalyticsSection({
     );
   }, [analyticsColumnName, columns]);
 
-  useEffect(() => {
-    if (derivedColumnName !== analyticsColumnName) {
-      setAnalyticsColumnName(derivedColumnName);
-    }
-  }, [derivedColumnName, analyticsColumnName]);
-
   const analyticsColumn = useMemo(
     () =>
-      columns.find((column) => column.name === analyticsColumnName) ??
+      columns.find((column) => column.name === effectiveColumnName) ??
       columns.find((column) => column.type === "number") ??
       columns[0] ??
       null,
-    [analyticsColumnName, columns],
+    [effectiveColumnName, columns],
   );
 
   return (
