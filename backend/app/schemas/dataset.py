@@ -9,6 +9,12 @@ class DatasetUpload(BaseModel):
     name: str | None = None
 
 
+class DatasetCreate(BaseModel):
+    filename: str
+    content_base64: str
+    format: str | None = None
+
+
 class DatasetResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -25,4 +31,6 @@ class ColumnInfo(BaseModel):
     name: str
     dtype: str
     nullable: bool
+    null_count: int = 0
+    unique_count: int = 0
     sample_values: list[Any]
