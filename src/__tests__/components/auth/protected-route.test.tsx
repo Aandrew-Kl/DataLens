@@ -9,24 +9,30 @@ jest.mock("@/components/auth/auth-provider", () => ({
 
 jest.mock("@/components/auth/login-form", () => ({
   __esModule: true,
-  default: () => <div data-testid="login-form">Login</div>,
+  default: () => <div data-testid="login-form">Login form</div>,
 }));
 
 const mockUseAuth = jest.mocked(useAuth);
 
 describe("ProtectedRoute", () => {
   beforeEach(() => {
+    mockUseAuth.mockReset();
+  });
+
+  it("renders children when authenticated", () => {
     mockUseAuth.mockReturnValue({
-      user: { id: "1", email: "test@test.com", created_at: "2024-01-01T00:00:00Z" },
+      user: {
+        id: "user-1",
+        email: "test@example.com",
+        created_at: "2024-01-01T00:00:00Z",
+      },
       isAuthenticated: true,
       isLoading: false,
       login: jest.fn(),
       logout: jest.fn(),
       register: jest.fn(),
     });
-  });
 
-  it("renders children when authenticated", () => {
     render(
       <ProtectedRoute>
         <div>Protected content</div>
@@ -37,7 +43,7 @@ describe("ProtectedRoute", () => {
     expect(screen.queryByTestId("login-form")).not.toBeInTheDocument();
   });
 
-  it("renders login form when unauthenticated", () => {
+  it("renders the login form when not authenticated", () => {
     mockUseAuth.mockReturnValue({
       user: null,
       isAuthenticated: false,

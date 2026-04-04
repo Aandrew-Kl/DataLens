@@ -1,54 +1,60 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useRouter } from "next/navigation";
 
 import RegisterForm from "@/components/auth/register-form";
 import { register } from "@/lib/api/auth";
+
+jest.mock("next/navigation", () => ({
+  useRouter: jest.fn(),
+}));
 
 jest.mock("@/lib/api/auth", () => ({
   register: jest.fn(),
 }));
 
-const pushMock = jest.fn();
-
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: pushMock }),
-}));
-
-jest.mock("framer-motion");
-
 const mockRegister = jest.mocked(register);
+const mockUseRouter = jest.mocked(useRouter);
+const pushMock = jest.fn();
 
 describe("RegisterForm", () => {
   beforeEach(() => {
     mockRegister.mockReset();
     pushMock.mockReset();
+    mockUseRouter.mockReturnValue({
+      push: pushMock,
+    } as unknown as ReturnType<typeof useRouter>);
   });
 
-  it("renders email, password, and confirm password inputs", () => {
+  it("renders the registration form fields and login link", () => {
     render(<RegisterForm />);
 
-    expect(screen.getByPlaceholderText("you@example.com")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Minimum 8 characters")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Repeat your password")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Create your account" })).toBeInTheDocument();
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /create account/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /login/i })).toHaveAttribute("href", "/login");
   });
 
-  it("shows validation error when passwords do not match", async () => {
+  it("shows an error when register fails", async () => {
     const user = userEvent.setup();
+    mockRegister.mockRejectedValue(new Error("Email already exists"));
 
     render(<RegisterForm />);
 
-    await user.type(screen.getByPlaceholderText("you@example.com"), "new-user@example.com");
-    await user.type(screen.getByPlaceholderText("Minimum 8 characters"), "long-password");
-    await user.type(screen.getByPlaceholderText("Repeat your password"), "different-password");
+    await user.type(screen.getByLabelText(/email/i), "new-user@example.com");
+    await user.type(screen.getByLabelText(/^password$/i), "long-password");
+    await user.type(screen.getByLabelText(/confirm password/i), "long-password");
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent("Passwords do not match.");
-      expect(mockRegister).not.toHaveBeenCalled();
+      expect(mockRegister).toHaveBeenCalledWith("new-user@example.com", "long-password");
+      expect(screen.getByRole("alert")).toHaveTextContent("Email already exists");
     });
   });
 
-  it("calls register() with valid form input", async () => {
+  it("calls register() and redirects on submit", async () => {
     const user = userEvent.setup();
     mockRegister.mockResolvedValue({
       access_token: "token-123",
@@ -57,9 +63,9 @@ describe("RegisterForm", () => {
 
     render(<RegisterForm />);
 
-    await user.type(screen.getByPlaceholderText("you@example.com"), "new-user@example.com");
-    await user.type(screen.getByPlaceholderText("Minimum 8 characters"), "long-password");
-    await user.type(screen.getByPlaceholderText("Repeat your password"), "long-password");
+    await user.type(screen.getByLabelText(/email/i), "new-user@example.com");
+    await user.type(screen.getByLabelText(/^password$/i), "long-password");
+    await user.type(screen.getByLabelText(/confirm password/i), "long-password");
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
