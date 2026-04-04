@@ -1,134 +1,178 @@
-# DataLens — AI-Powered Data Explorer
+# DataLens
 
-An open-source, AI-powered data exploration platform built with Next.js 16, React 19, and Python FastAPI.
+AI-powered open-source data explorer
+
+DataLens is a full-stack analytics workspace for exploring, transforming, and modeling data with a browser-first experience. It combines DuckDB-WASM for in-browser SQL, a Next.js frontend for interactive analysis, and a FastAPI backend for AI, machine learning, real-time streaming, and persistence.
 
 ## Features
-- **Data Import**: CSV, JSON, XLSX upload with auto-profiling
-- **SQL Editor**: Full SQL support via DuckDB WASM (in-browser)
-- **Interactive Charts**: 42+ chart types powered by ECharts
-- **Machine Learning**: Real scikit-learn models (regression, clustering, classification, anomaly detection, PCA)
-- **AI Features**: Sentiment analysis, NL-to-SQL, data summarization
-- **Analytics**: A/B testing, cohort analysis, churn prediction, forecasting
-- **Real-time**: WebSocket streaming for live data
-- **293+ Components**: Data tools, ML views, analytics dashboards
-- **Dark Mode**: Glass UI design with Tailwind CSS v4
+
+- DuckDB-WASM for client-side SQL queries
+  Run SQL directly in the browser for fast local exploration, profiling, previews, and ad hoc analysis without shipping every query to the server.
+- AI-powered data analysis
+  Generate SQL from natural language, summarize datasets and query results, and run sentiment analysis workflows from the app.
+- Machine learning
+  Train and inspect regression, clustering, classification, anomaly detection, PCA, and decision tree workflows backed by scikit-learn.
+- Real-time data streaming via WebSocket
+  Stream query progress and live updates into the UI for interactive, near-real-time analysis experiences.
+- Interactive charts and pivot tables
+  Build dashboards, pivot views, chart combinations, and visual drill-downs on top of active datasets.
+- Data pipeline builder with 11 transform types
+  Compose reusable transformations, preview stages, and export pipeline definitions for repeatable data preparation.
+- Report generation with export
+  Build narrative reports and analytical summaries with export workflows for PDF-style outputs and Excel datasets.
 
 ## Tech Stack
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 16, React 19, TypeScript |
-| Styling | Tailwind CSS v4, Glass UI |
-| Charts | ECharts 6, echarts-for-react |
-| State | Zustand |
-| Client DB | DuckDB WASM |
-| Backend | Python FastAPI |
-| ML/AI | scikit-learn, TextBlob, scipy, statsmodels |
-| Database | PostgreSQL (async via SQLAlchemy 2) |
-| Auth | JWT (python-jose + bcrypt) |
-| Testing | Jest + RTL (frontend), pytest (backend) |
-| Deployment | Docker + docker-compose |
+
+- Frontend: Next.js 16, React 19, TypeScript, Tailwind CSS v4
+- Backend: FastAPI, PostgreSQL
+- Analytics engine: DuckDB-WASM
 
 ## Quick Start
 
-### Frontend only (no backend required)
+The simplest way to run DataLens is with Docker Compose.
+
+### Prerequisites
+
+- Docker
+- Docker Compose
+
+### Run with Docker Compose
+
 ```bash
-npm install
-npm run dev
-# Open http://localhost:3000
+cp .env.example .env
+docker compose up --build
 ```
 
-### Full stack (with Python backend)
-```bash
-# Terminal 1: Frontend
-npm install
-npm run dev
+Open:
 
-# Terminal 2: Backend
+- App: `http://localhost:3000`
+- API: `http://localhost:8000`
+- API docs: `http://localhost:8000/docs`
+
+The root `docker-compose.yml` starts:
+
+- `frontend` on port `3000`
+- `backend` on port `8000`
+- `db` (PostgreSQL) on port `5432`
+
+The backend container applies Alembic migrations automatically on startup.
+
+To stop the stack:
+
+```bash
+docker compose down
+```
+
+## Development Setup
+
+### Frontend
+
+Recommended local versions:
+
+- Node.js 22+
+- npm 10+
+
+Setup:
+
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+The frontend runs at `http://localhost:3000`.
+
+### Backend
+
+Recommended local versions:
+
+- Python 3.12+
+- PostgreSQL 16+
+
+Setup:
+
+```bash
 cd backend
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env
+alembic upgrade head
 uvicorn app.main:app --reload --port 8000
-
-# Or with Docker
-cd backend
-docker-compose up -d
 ```
 
-### Environment Variables
-Create `.env` in `/backend/`:
-```
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/datalens
-JWT_SECRET=your-secret-key
-OLLAMA_URL=http://localhost:11434
-```
+The API runs at `http://localhost:8000`.
 
-## Project Structure
-```
-datalens/
-├── src/                    # Next.js frontend
-│   ├── app/               # App Router pages
-│   ├── components/        # 293+ React components
-│   │   ├── charts/        # 42 chart types
-│   │   ├── data/          # Data tools
-│   │   ├── ml/            # ML model views
-│   │   ├── analytics/     # Analytics dashboards
-│   │   ├── ai/            # AI features
-│   │   ├── query/         # SQL tools
-│   │   ├── report/        # Report builder
-│   │   ├── auth/          # Authentication
-│   │   ├── settings/      # App settings
-│   │   └── layout/        # Layout components
-│   ├── lib/               # Utilities
-│   │   ├── api/           # Backend API client
-│   │   └── duckdb/        # DuckDB WASM client
-│   ├── hooks/             # Custom React hooks
-│   ├── stores/            # Zustand state
-│   └── types/             # TypeScript types
-├── backend/               # Python FastAPI
-│   ├── app/
-│   │   ├── api/           # REST + WebSocket endpoints
-│   │   ├── models/        # SQLAlchemy models
-│   │   ├── schemas/       # Pydantic schemas
-│   │   └── services/      # ML, NLP, analytics
-│   └── tests/             # pytest tests
-└── e2e/                   # Playwright E2E tests
-```
+If you are running the full application manually, make sure PostgreSQL is available locally and update `backend/.env` as needed. If you use Ollama-backed AI features, ensure your local Ollama endpoint matches the configured `OLLAMA_URL`.
 
-## API Endpoints
+## Environment Variables
 
-### Auth
-- `POST /api/v1/auth/register` — Create account
-- `POST /api/v1/auth/login` — Get JWT token
-- `GET /api/v1/auth/me` — Current user
+Use the sample files as the source of truth:
 
-### Machine Learning
-- `POST /api/v1/ml/regression` — Linear/Ridge/Lasso regression
-- `POST /api/v1/ml/cluster` — KMeans/DBSCAN clustering
-- `POST /api/v1/ml/classify` — RandomForest/GBM/SVM classification
-- `POST /api/v1/ml/anomaly-detect` — Isolation Forest/LOF
-- `POST /api/v1/ml/pca` — PCA dimensionality reduction
+- Root app and Docker Compose defaults: [`.env.example`](./.env.example)
+- Backend-only local development defaults: [`backend/.env.example`](./backend/.env.example)
 
-### AI
-- `POST /api/v1/ai/sentiment` — TextBlob sentiment analysis
-- `POST /api/v1/ai/summarize` — TF-IDF data summarization
-- `POST /api/v1/ai/generate-query` — Natural language to SQL
+Important variables defined in the examples include:
 
-### Analytics
-- `POST /api/v1/analytics/churn-predict` — Churn prediction (GBM)
-- `POST /api/v1/analytics/cohort` — Cohort retention analysis
-- `POST /api/v1/analytics/ab-test` — A/B test significance (t-test)
-- `POST /api/v1/analytics/forecast` — Time series forecasting
+- `NEXT_PUBLIC_API_URL`
+- `NEXT_PUBLIC_WS_URL`
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `POSTGRES_DB`
+- `OLLAMA_URL`
+- `OLLAMA_MODEL`
 
 ## Testing
+
+### Frontend tests
+
+Run Jest tests from the repository root:
+
 ```bash
-# Frontend tests (330 suites, 1345+ tests)
 npm test
+```
 
-# Backend tests
-cd backend && pytest
+### Backend tests
 
-# E2E tests
+Run pytest from the backend directory:
+
+```bash
+cd backend
+pytest
+```
+
+### End-to-end tests
+
+Run Playwright tests from the repository root:
+
+```bash
 npx playwright test
 ```
 
+You can also use the package script:
+
+```bash
+npm run test:e2e
+```
+
+## Project Structure
+
+```text
+.
+├── src/                 # Next.js application code, UI, hooks, client utilities
+├── backend/             # FastAPI app, services, models, schemas, migrations, tests
+├── e2e/                 # Playwright end-to-end tests
+├── docs/                # Project documentation and supporting notes
+├── docker-compose.yml   # Full local stack for frontend, backend, and PostgreSQL
+└── .env.example         # Example environment variables for local and Docker use
+```
+
+## Contributing
+
+Contributions are welcome. Start with [CONTRIBUTING.md](./CONTRIBUTING.md) for the development workflow, code style, and pull request expectations.
+
 ## License
-MIT
+
+This project is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
