@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useId, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload,
@@ -41,6 +41,7 @@ export default function FileDropzone({
   const [errorMessage, setErrorMessage] = useState("");
   const [fileName, setFileName] = useState("");
   const [fileSize, setFileSize] = useState(0);
+  const helpTextId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const processFile = useCallback(
@@ -231,6 +232,8 @@ export default function FileDropzone({
         <button
           onClick={() => inputRef.current?.click()}
           disabled={status === "loading"}
+          aria-label="Upload data file"
+          aria-describedby={helpTextId}
           className="flex items-center gap-2 rounded-lg border border-dashed border-slate-300 dark:border-slate-600 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors disabled:opacity-50"
         >
           {status === "loading" ? (
@@ -240,6 +243,9 @@ export default function FileDropzone({
           )}
           {status === "loading" ? "Processing..." : "Upload File"}
         </button>
+        <span id={helpTextId} className="sr-only">
+          Upload CSV, TSV, JSON, or Excel data files up to 500MB.
+        </span>
         <input
           ref={inputRef}
           type="file"
@@ -258,6 +264,9 @@ export default function FileDropzone({
       transition={{ duration: 0.4 }}
       className={`w-full max-w-xl mx-auto ${className}`}
     >
+      <p id={helpTextId} className="sr-only">
+        Upload CSV, TSV, JSON, or Excel data files up to 500MB.
+      </p>
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -266,6 +275,8 @@ export default function FileDropzone({
           (status === "idle" || status === "error") &&
           inputRef.current?.click()
         }
+        aria-label="Upload data file"
+        aria-describedby={helpTextId}
         className={`
           relative overflow-hidden rounded-2xl transition-all duration-300 cursor-pointer
           backdrop-blur-xl bg-white/60 dark:bg-gray-900/60

@@ -198,7 +198,11 @@ export default function Sidebar({
       {/* ----------------------------------------------------------------- */}
       {/* Datasets list                                                     */}
       {/* ----------------------------------------------------------------- */}
-      <div className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
+      <nav
+        aria-label="Main navigation"
+        role="navigation"
+        className="flex-1 overflow-y-auto px-2 py-3 space-y-1"
+      >
         {isOpen && (
           <p className="px-2 mb-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
             Datasets
@@ -231,6 +235,7 @@ export default function Sidebar({
               <div key={ds.id} className="relative group">
                 <button
                   onClick={() => setActiveDataset(ds.id)}
+                  aria-current={isActive ? "page" : undefined}
                   onContextMenu={(e) => {
                     e.preventDefault();
                     setContextMenuId(ds.id);
@@ -336,7 +341,7 @@ export default function Sidebar({
             ))}
           </div>
         )}
-      </div>
+      </nav>
 
       {/* ----------------------------------------------------------------- */}
       {/* Bottom actions                                                     */}

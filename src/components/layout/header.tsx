@@ -106,7 +106,10 @@ export default function Header({
   );
 
   return (
-    <header className="flex items-center gap-3 px-4 h-14 shrink-0 border-b border-gray-200/60 dark:border-gray-700/60 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl">
+    <header
+      role="banner"
+      className="flex items-center gap-3 px-4 h-14 shrink-0 border-b border-gray-200/60 dark:border-gray-700/60 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl"
+    >
       {/* --------------------------------------------------------------- */}
       {/* Left: sidebar toggle + dataset info                              */}
       {/* --------------------------------------------------------------- */}
@@ -162,6 +165,7 @@ export default function Header({
           <input
             ref={searchRef}
             type="text"
+            aria-label="Search dataset"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)}

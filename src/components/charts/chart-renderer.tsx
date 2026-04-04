@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useId, useMemo, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import { motion } from "framer-motion";
 import { BarChart3 } from "lucide-react";
@@ -299,8 +299,30 @@ function buildOption(
   }
 }
 
+function formatChartType(type: ChartConfig["type"]): string {
+  switch (type) {
+    case "area":
+      return "area";
+    case "bar":
+      return "bar";
+    case "histogram":
+      return "histogram";
+    case "line":
+      return "line";
+    case "pie":
+      return "pie";
+    case "scatter":
+      return "scatter";
+    case "heatmap":
+      return "heatmap";
+    default:
+      return "chart";
+  }
+}
+
 function ChartRenderer({ config, data }: ChartRendererProps) {
   const [dark, setDark] = useState(() => isDarkMode());
+  const chartDescriptionId = useId();
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
@@ -335,6 +357,23 @@ function ChartRenderer({ config, data }: ChartRendererProps) {
     return base;
   }, [config, data, dark]);
 
+  const chartTypeLabel = useMemo(() => formatChartType(config.type), [config.type]);
+  const chartAriaLabel = useMemo(() => {
+    const chartName = config.title?.trim() || `${chartTypeLabel} chart`;
+    return `${chartName} (${chartTypeLabel} chart)`;
+  }, [config.title, chartTypeLabel]);
+  const chartDescription = useMemo(() => {
+    const details = [
+      `Rendered as a ${chartTypeLabel} chart.`,
+      config.xAxis ? `X-axis: ${config.xAxis}.` : null,
+      config.yAxis ? `Y-axis: ${config.yAxis}.` : null,
+      config.groupBy ? `Grouped by ${config.groupBy}.` : null,
+      `Displaying ${data.length.toLocaleString()} rows.`,
+    ].filter(Boolean);
+
+    return details.join(" ");
+  }, [chartTypeLabel, config.groupBy, config.xAxis, config.yAxis, data.length]);
+
   if (!data.length || !option) {
     return (
       <motion.div
@@ -353,15 +392,23 @@ function ChartRenderer({ config, data }: ChartRendererProps) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
+      role="img"
+      aria-label={chartAriaLabel}
+      aria-describedby={chartDescriptionId}
       className="w-full"
     >
-      <ReactECharts
-        option={option}
-        style={{ height: 380, width: "100%" }}
-        opts={{ renderer: "svg" }}
-        notMerge
-        lazyUpdate
-      />
+      <p id={chartDescriptionId} className="sr-only">
+        {chartDescription}
+      </p>
+      <div aria-hidden="true">
+        <ReactECharts
+          option={option}
+          style={{ height: 380, width: "100%" }}
+          opts={{ renderer: "svg" }}
+          notMerge
+          lazyUpdate
+        />
+      </div>
     </motion.div>
   );
 }

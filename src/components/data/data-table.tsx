@@ -463,7 +463,10 @@ function DataTable({
                 {title}
               </span>
             )}
-            <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700/60 rounded-full px-2 py-0.5 whitespace-nowrap">
+            <span
+              role="status"
+              className="text-[11px] font-medium text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700/60 rounded-full px-2 py-0.5 whitespace-nowrap"
+            >
               {data.length.toLocaleString()} rows &middot;{" "}
               {columns.length} cols
             </span>
@@ -544,7 +547,10 @@ function DataTable({
           className="overflow-auto"
           style={{ maxHeight }}
         >
-          <table className="w-full text-sm border-collapse">
+          <table
+            aria-label="Dataset table"
+            className="w-full text-sm border-collapse"
+          >
             <thead
               className={
                 stickyHeader ? "sticky top-0 z-10" : ""
@@ -553,6 +559,7 @@ function DataTable({
               <tr className="bg-gray-50/95 dark:bg-gray-800/95 backdrop-blur-sm border-b border-gray-200/60 dark:border-gray-700/60">
                 {/* Row number header */}
                 <th
+                  scope="col"
                   className={`${cellPx} ${cellPy} text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 w-12 select-none`}
                 >
                   #
@@ -560,6 +567,18 @@ function DataTable({
                 {columns.map((col) => (
                   <th
                     key={col}
+                    scope="col"
+                    aria-sort={
+                      sortable
+                        ? sort.column === col
+                          ? sort.direction === "asc"
+                            ? "ascending"
+                            : sort.direction === "desc"
+                              ? "descending"
+                              : "none"
+                          : "none"
+                        : undefined
+                    }
                     className={`${cellPx} ${cellPy} text-left text-[11px] font-medium text-gray-500 dark:text-gray-400 select-none group relative`}
                     style={
                       columnWidths[col]

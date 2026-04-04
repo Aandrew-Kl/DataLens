@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
+
 import pytest
 from httpx import AsyncClient
+from jose import jwt
+
+from app.config import settings
+from app.utils.security import hash_password, verify_password
 
 
 @pytest.mark.asyncio
@@ -102,3 +108,41 @@ async def test_me_no_auth_header(client: AsyncClient) -> None:
 
     assert response.status_code == 401
     assert response.json()["detail"] == "Not authenticated"
+
+
+@pytest.mark.asyncio
+async def test_me_expired_token(client: AsyncClient) -> None:
+    register_response = await client.post(
+        "/auth/register",
+        json={"email": "expired-token@example.com", "password": "super-secret-123"},
+    )
+    assert register_response.status_code == 201
+
+    user_payload = register_response.json()
+    expired_token = jwt.encode(
+        {
+            "sub": user_payload["id"],
+            "email": user_payload["email"],
+            "exp": datetime.now(timezone.utc) - timedelta(minutes=5),
+        },
+        settings.JWT_SECRET,
+        algorithm=settings.JWT_ALGORITHM,
+    )
+
+    response = await client.get(
+        "/auth/me",
+        headers={"Authorization": f"Bearer {expired_token}"},
+    )
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid authentication credentials."
+
+
+def test_password_hashing_verification() -> None:
+    password = "super-secret-123"
+
+    hashed_password = hash_password(password)
+
+    assert hashed_password != password
+    assert verify_password(password, hashed_password) is True
+    assert verify_password("not-the-password", hashed_password) is False
