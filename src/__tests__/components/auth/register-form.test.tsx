@@ -27,17 +27,50 @@ describe("RegisterForm", () => {
   });
 
   it("renders the registration form fields and login link", () => {
-    render(<RegisterForm />);
+    render(<RegisterForm redirectTo="/dashboard?view=saved" />);
 
     expect(screen.getByRole("heading", { level: 2, name: "Create your account" })).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /create account/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /login/i })).toHaveAttribute("href", "/login");
+    expect(screen.getByRole("link", { name: /login/i })).toHaveAttribute(
+      "href",
+      "/login?redirect=%2Fdashboard%3Fview%3Dsaved",
+    );
   });
 
-  it("shows an error when register fails", async () => {
+  it("shows a validation error when the password is too short", async () => {
+    const user = userEvent.setup();
+
+    render(<RegisterForm />);
+
+    await user.type(screen.getByLabelText(/email/i), "new-user@example.com");
+    await user.type(screen.getByLabelText(/^password$/i), "short");
+    await user.type(screen.getByLabelText(/confirm password/i), "short");
+    await user.click(screen.getByRole("button", { name: /create account/i }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Password must be at least 8 characters long.");
+    expect(mockRegister).not.toHaveBeenCalled();
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it("shows a validation error when the passwords do not match", async () => {
+    const user = userEvent.setup();
+
+    render(<RegisterForm />);
+
+    await user.type(screen.getByLabelText(/email/i), "new-user@example.com");
+    await user.type(screen.getByLabelText(/^password$/i), "long-password");
+    await user.type(screen.getByLabelText(/confirm password/i), "different-password");
+    await user.click(screen.getByRole("button", { name: /create account/i }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Passwords do not match.");
+    expect(mockRegister).not.toHaveBeenCalled();
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it("shows an API error when registration fails", async () => {
     const user = userEvent.setup();
     mockRegister.mockRejectedValue(new Error("Email already exists"));
 
@@ -54,23 +87,26 @@ describe("RegisterForm", () => {
     });
   });
 
-  it("calls register() and redirects on submit", async () => {
+  it("submits registration successfully, shows confirmation, and redirects", async () => {
     const user = userEvent.setup();
     mockRegister.mockResolvedValue({
       access_token: "token-123",
       token_type: "bearer",
     });
 
-    render(<RegisterForm />);
+    render(<RegisterForm redirectTo="/workspace" />);
 
-    await user.type(screen.getByLabelText(/email/i), "new-user@example.com");
+    await user.type(screen.getByLabelText(/email/i), "  new-user@example.com  ");
     await user.type(screen.getByLabelText(/^password$/i), "long-password");
     await user.type(screen.getByLabelText(/confirm password/i), "long-password");
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
       expect(mockRegister).toHaveBeenCalledWith("new-user@example.com", "long-password");
-      expect(pushMock).toHaveBeenCalledWith("/");
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Your account has been created. Redirecting to dashboard...",
+      );
+      expect(pushMock).toHaveBeenCalledWith("/workspace");
     });
   });
 });

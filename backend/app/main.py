@@ -5,6 +5,7 @@ import logging
 from collections import defaultdict, deque
 from pathlib import Path
 from time import monotonic
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,6 +22,8 @@ from app.models import analysis, dataset, query_history, user  # noqa: F401
 API_PATH_PREFIX = "/api"
 RATE_LIMIT_MAX_REQUESTS = 100
 RATE_LIMIT_WINDOW_SECONDS = 60
+HSTS_HEADER_VALUE = "max-age=63072000; includeSubDomains; preload"
+LOCALHOST_HOSTNAMES = {"localhost", "127.0.0.1", "::1", "test", "testserver"}
 
 
 class InMemoryRateLimiter:
@@ -49,6 +52,10 @@ class InMemoryRateLimiter:
         self._requests.clear()
 
 
+class RequestEntityTooLargeError(Exception):
+    pass
+
+
 def get_client_ip(request: Request) -> str:
     forwarded_for = request.headers.get("x-forwarded-for")
     if forwarded_for:
@@ -60,9 +67,21 @@ def get_client_ip(request: Request) -> str:
     return "unknown"
 
 
+def get_request_hostname(request: Request) -> str:
+    forwarded_host = request.headers.get("x-forwarded-host")
+    raw_host = forwarded_host.split(",")[0].strip() if forwarded_host else request.headers.get("host", "")
+    hostname = urlsplit(f"//{raw_host}").hostname if raw_host else request.url.hostname
+    return (hostname or "").lower()
+
+
+def should_set_hsts(request: Request) -> bool:
+    return get_request_hostname(request) not in LOCALHOST_HOSTNAMES
+
+
 setup_logging(settings.LOG_LEVEL)
 request_logger = logging.getLogger("app.request")
 health_logger = logging.getLogger("app.health")
+error_logger = logging.getLogger("app.error")
 rate_limiter = InMemoryRateLimiter(
     max_requests=RATE_LIMIT_MAX_REQUESTS,
     window_seconds=RATE_LIMIT_WINDOW_SECONDS,
@@ -93,6 +112,36 @@ async def rate_limit_middleware(request: Request, call_next):
 
 
 @app.middleware("http")
+async def request_size_limit_middleware(request: Request, call_next):
+    content_length = request.headers.get("content-length")
+    if content_length:
+        try:
+            if int(content_length) > settings.MAX_UPLOAD_SIZE:
+                return JSONResponse(status_code=413, content={"detail": "Request body too large."})
+        except ValueError:
+            request_logger.warning("invalid content-length header for path=%s", request.url.path)
+
+    received_bytes = 0
+    original_receive = request._receive
+
+    async def receive():
+        nonlocal received_bytes
+        message = await original_receive()
+        if message["type"] == "http.request":
+            received_bytes += len(message.get("body", b""))
+            if received_bytes > settings.MAX_UPLOAD_SIZE:
+                raise RequestEntityTooLargeError
+        return message
+
+    request._receive = receive
+
+    try:
+        return await call_next(request)
+    except RequestEntityTooLargeError:
+        return JSONResponse(status_code=413, content={"detail": "Request body too large."})
+
+
+@app.middleware("http")
 async def request_logging_middleware(request: Request, call_next):
     start_time = monotonic()
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -110,6 +159,32 @@ async def request_logging_middleware(request: Request, call_next):
             status_code,
             duration_ms,
         )
+
+
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    if should_set_hsts(request):
+        response.headers["Strict-Transport-Security"] = HSTS_HEADER_VALUE
+    return response
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    error_logger.error(
+        "unhandled exception for method=%s path=%s",
+        request.method,
+        request.url.path,
+        exc_info=(type(exc), exc, exc.__traceback__),
+    )
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal server error"},
+    )
 
 
 @app.on_event("startup")

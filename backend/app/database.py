@@ -6,7 +6,11 @@ from sqlalchemy.orm import DeclarativeBase
 from app.config import settings
 
 
-engine = create_async_engine(settings.DATABASE_URL, future=True, echo=False)
+engine_options: dict[str, object] = {"future": True, "echo": False}
+if settings.DATABASE_URL.startswith("postgresql"):
+    engine_options.update(pool_size=20, max_overflow=40)
+
+engine = create_async_engine(settings.DATABASE_URL, **engine_options)
 AsyncSessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 

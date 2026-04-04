@@ -1,8 +1,9 @@
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    ENVIRONMENT: str = "development"
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/datalens"
     JWT_SECRET: str = "change-me"
     JWT_ALGORITHM: str = "HS256"
@@ -13,6 +14,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     REDIS_URL: str = "redis://localhost:6379/0"
     UPLOADS_DIR: str = "./uploads"
+    MAX_UPLOAD_SIZE: int = 50 * 1024 * 1024
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -30,6 +32,13 @@ class Settings(BaseSettings):
                 "http://localhost:3000"
             ]
         return [origin.strip() for origin in value if origin.strip()]
+
+    @model_validator(mode="after")
+    def validate_jwt_secret(self) -> "Settings":
+        insecure_secrets = {"change-me", "changeme-in-production", "change-me-in-production"}
+        if self.ENVIRONMENT.strip().lower() != "development" and self.JWT_SECRET in insecure_secrets:
+            raise ValueError("JWT_SECRET must be changed from the insecure default outside development.")
+        return self
 
 
 settings = Settings()
