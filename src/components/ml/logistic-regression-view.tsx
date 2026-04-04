@@ -8,7 +8,7 @@ import { BarChart, LineChart } from "echarts/charts";
 import { GridComponent, LegendComponent, TooltipComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { motion } from "framer-motion";
-import { Binary, Download, Gauge, Target } from "lucide-react";
+import { Binary, Download, Target } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import {
@@ -20,7 +20,7 @@ import {
   toNumber,
 } from "@/lib/utils/advanced-analytics";
 import { downloadFile } from "@/lib/utils/export";
-import { formatNumber, formatPercent } from "@/lib/utils/formatters";
+import { formatPercent } from "@/lib/utils/formatters";
 import type { ColumnProfile } from "@/types/dataset";
 
 echarts.use([BarChart, LineChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);

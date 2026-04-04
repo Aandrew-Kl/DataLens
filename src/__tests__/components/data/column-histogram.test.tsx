@@ -11,10 +11,7 @@ jest.mock("@/lib/duckdb/client", () => ({
 }));
 
 jest.mock("echarts-for-react/lib/core", () => {
-  const MockChart = React.forwardRef(function MockChart(
-    _props: Record<string, unknown>,
-    _ref: React.Ref<unknown>,
-  ) {
+  const MockChart = React.forwardRef(function MockChart() {
     return <div data-testid="echarts-mock" />;
   });
   MockChart.displayName = "MockChart";

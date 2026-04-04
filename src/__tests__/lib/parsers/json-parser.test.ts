@@ -5,7 +5,8 @@ class MockFileReader {
   onerror: (() => void) | null = null;
   static result = JSON.stringify([{ a: 1 }]);
 
-  readAsText(_file: File): void {
+  readAsText(file: File): void {
+    void file;
     if (this.onload) {
       this.onload({
         target: { result: MockFileReader.result },

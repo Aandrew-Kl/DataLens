@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   Code2,
-  Database,
   LayoutGrid,
   Menu,
   PieChart,

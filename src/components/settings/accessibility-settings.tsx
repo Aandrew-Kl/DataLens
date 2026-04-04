@@ -2,7 +2,7 @@
 
 import { startTransition, useState } from "react";
 import { motion } from "framer-motion";
-import { Accessibility, Contrast, Eye, Type, Vibrate } from "lucide-react";
+import { Accessibility, Type } from "lucide-react";
 import {
   ANALYTICS_EASE,
   GLASS_CARD_CLASS,

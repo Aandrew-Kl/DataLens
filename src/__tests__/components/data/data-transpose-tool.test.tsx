@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 
 import DataTransposeTool from "@/components/data/data-transpose-tool";
 import { runQuery } from "@/lib/duckdb/client";
-import { downloadFile } from "@/lib/utils/export";
 import type { ColumnProfile } from "@/types/dataset";
 
 jest.mock("@/lib/duckdb/client", () => ({
@@ -15,7 +14,6 @@ jest.mock("@/lib/utils/export", () => ({
 }));
 
 const mockRunQuery = jest.mocked(runQuery);
-const mockDownloadFile = jest.mocked(downloadFile);
 
 const columns = [
   {

@@ -8,7 +8,7 @@ import { BarChart, LineChart } from "echarts/charts";
 import { GridComponent, LegendComponent, TooltipComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { motion } from "framer-motion";
-import { Activity, Clock3, Download, HeartPulse } from "lucide-react";
+import { Activity, Download, HeartPulse } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import {

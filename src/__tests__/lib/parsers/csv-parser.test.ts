@@ -11,7 +11,8 @@ class MockFileReader {
   onload: ((event: { target: { result: string } }) => void) | null = null;
   onerror: ((event: { message: string }) => void) | null = null;
 
-  readAsText(_file: Blob): void {
+  readAsText(file: Blob): void {
+    void file;
     this.onload?.({
       target: {
         result: "a,b\n1,2",

@@ -98,7 +98,6 @@ function detectConflicts(shortcuts: ShortcutMap, currentId: string, newKeys: str
 
 export default function ShortcutSettings({
   tableName,
-  columns,
 }: ShortcutSettingsProps) {
   const [shortcuts, setShortcuts] = useState<ShortcutMap>(() =>
     readShortcuts(tableName),

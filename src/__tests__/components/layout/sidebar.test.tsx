@@ -69,7 +69,6 @@ describe("Sidebar", () => {
   });
 
   it("renders the empty state and triggers dataset creation", async () => {
-    const user = userEvent.setup();
     const onNewDataset = jest.fn();
 
     render(
@@ -167,7 +166,6 @@ describe("Sidebar", () => {
   });
 
   it("handles the collapse toggle, settings button, and theme toggle", async () => {
-    const user = userEvent.setup();
     const onToggle = jest.fn();
     const onSettingsOpen = jest.fn();
 

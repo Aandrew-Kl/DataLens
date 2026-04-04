@@ -1,11 +1,9 @@
 import { act } from "react";
-import type { ReactNode } from "react";
 import { render, screen } from "@testing-library/react";
 
 import SentimentAnalyzer from "@/components/analytics/sentiment-analyzer";
 import { runQuery } from "@/lib/duckdb/client";
 import { sentiment } from "@/lib/api/ai";
-import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import type { ColumnProfile } from "@/types/dataset";
 
 jest.mock("framer-motion");
@@ -38,7 +36,6 @@ jest.mock("echarts/renderers", () => ({ CanvasRenderer: {} }));
 
 const mockRunQuery = jest.mocked(runQuery);
 const mockSentiment = jest.mocked(sentiment);
-const mockUseDarkMode = jest.mocked(useDarkMode);
 
 const columns: ColumnProfile[] = [
   {

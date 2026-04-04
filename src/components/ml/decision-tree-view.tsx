@@ -309,19 +309,6 @@ function buildTree(samples: TreeSample[], featureNames: string[], depth: number)
   };
 }
 
-function predictLabel(node: TreeNode, features: number[]): string {
-  if (node.kind === "leaf") {
-    return node.prediction;
-  }
-
-  const value = features[
-    node.feature ? Math.max(0, node.feature.length - node.feature.length) : 0
-  ];
-  return value !== undefined && value <= node.threshold
-    ? predictLabel(node.left, features)
-    : predictLabel(node.right, features);
-}
-
 function predictWithFeatureOrder(node: TreeNode, featureNames: string[], features: number[]): string {
   if (node.kind === "leaf") {
     return node.prediction;

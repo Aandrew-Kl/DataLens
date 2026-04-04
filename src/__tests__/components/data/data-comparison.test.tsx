@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import DataComparison from "@/components/data/data-comparison";
 import { runQuery } from "@/lib/duckdb/client";
 import type { DatasetMeta } from "@/types/dataset";
@@ -84,8 +83,6 @@ describe("DataComparison", () => {
   });
 
   it("compares two datasets after the user selects them", async () => {
-    const user = userEvent.setup();
-
     mockRunQuery.mockImplementation(async (sql) => {
       if (sql.includes('FROM "orders_a"') && sql.includes('MIN("price")')) {
         return [{ mn: 10, mx: 30, avg_val: 20 }];
@@ -145,8 +142,6 @@ describe("DataComparison", () => {
   });
 
   it("shows an error state when stats collection fails", async () => {
-    const user = userEvent.setup();
-
     mockRunQuery.mockRejectedValue(new Error("Comparison failed badly"));
 
     render(<DataComparison datasets={datasets} />);

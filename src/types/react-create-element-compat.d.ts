@@ -10,18 +10,18 @@ declare module "react" {
 
 declare global {
   interface ReadonlyArray<T> {
-    includes(searchElement: unknown, fromIndex?: number): boolean;
+    includes(searchElement: T | unknown, fromIndex?: number): boolean;
   }
 
   interface Array<T> {
-    includes(searchElement: unknown, fromIndex?: number): boolean;
+    includes(searchElement: T | unknown, fromIndex?: number): boolean;
   }
 
   interface Set<T> {
-    has(value: unknown): boolean;
+    has(value: T | unknown): boolean;
   }
 
   interface ReadonlySet<T> {
-    has(value: unknown): boolean;
+    has(value: T | unknown): boolean;
   }
 }

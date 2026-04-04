@@ -185,7 +185,7 @@ export default function ChartsPage() {
     }
 
     void refreshActiveChart();
-  }, [activeChartId, activeDataset?.id, activeDataset?.name, isWorkspaceLoading, refreshActiveChart]);
+  }, [activeChart, activeDataset, isWorkspaceLoading, refreshActiveChart]);
 
   useEffect(() => {
     if (!activeChartId && savedCharts.length > 0) {

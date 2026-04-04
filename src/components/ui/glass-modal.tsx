@@ -63,7 +63,7 @@ export default function GlassModal({
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [handleEscape, open]);
+  }, [open]);
 
   function handleOverlayClick(event: MouseEvent<HTMLDivElement>) {
     if (!closeOnOverlayClick) {

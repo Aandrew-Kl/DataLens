@@ -38,10 +38,7 @@ jest.mock("echarts-for-react/lib/core", () => {
   const React = jest.requireActual<typeof import("react")>("react");
   return {
     __esModule: true,
-    default: React.forwardRef(function MockChart(
-      _props: Record<string, unknown>,
-      _ref: React.Ref<Element>,
-    ) {
+    default: React.forwardRef(function MockChart() {
       return React.createElement("div", { "data-testid": "echart" });
     }),
   };

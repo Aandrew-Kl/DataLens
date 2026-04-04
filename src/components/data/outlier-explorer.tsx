@@ -517,7 +517,10 @@ export default function OutlierExplorer({
   const [refreshKey, setRefreshKey] = useState(0);
 
   const resource = useMemo(
-    () => loadOutlierState(tableName, columns, selectedColumn),
+    () => {
+      void refreshKey;
+      return loadOutlierState(tableName, columns, selectedColumn);
+    },
     [columns, refreshKey, selectedColumn, tableName],
   );
 

@@ -1,6 +1,5 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 import DataOverview from "@/components/data/data-overview";
 import { runQuery } from "@/lib/duckdb/client";

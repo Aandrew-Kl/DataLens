@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import {
   ANALYTICS_EASE,
-  BUTTON_CLASS,
   FIELD_CLASS,
   GLASS_CARD_CLASS,
   GLASS_PANEL_CLASS,

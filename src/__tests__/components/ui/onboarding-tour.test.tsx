@@ -1,6 +1,5 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 import OnboardingTour from "@/components/ui/onboarding-tour";
 import { runQuery } from "@/lib/duckdb/client";

@@ -9,7 +9,6 @@ import {
   FileText,
   RefreshCw,
   Sigma,
-  Sparkles,
   TrendingUp,
 } from "lucide-react";
 import {
@@ -530,7 +529,10 @@ export default function AIDataNarrator({
   const [copied, setCopied] = useState(false);
 
   const resource = useMemo(
-    () => loadNarration(tableName, columns, tone),
+    () => {
+      void refreshKey;
+      return loadNarration(tableName, columns, tone);
+    },
     [columns, refreshKey, tableName, tone],
   );
 

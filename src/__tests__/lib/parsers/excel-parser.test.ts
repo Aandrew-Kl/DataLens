@@ -15,7 +15,8 @@ class MockFileReader {
   onload: ((event: { target: { result: ArrayBuffer | null } }) => void) | null = null;
   onerror: (() => void) | null = null;
 
-  readAsArrayBuffer(_file: File): void {
+  readAsArrayBuffer(file: File): void {
+    void file;
     if (this.onload) {
       this.onload({ target: { result: new ArrayBuffer(8) } });
     }

@@ -196,7 +196,7 @@ function MergePreviewTable({ rows }: { rows: Record<string, unknown>[] }) {
   );
 }
 
-function MergeToolReady({ tableName, columns, promise }: MergeToolReadyProps) {
+function MergeToolReady({ tableName, promise }: MergeToolReadyProps) {
   const catalog = use(promise);
   const [selectedTableNames, setSelectedTableNames] = useState<string[]>([]);
   const [strategy, setStrategy] = useState<MergeStrategy>("append");

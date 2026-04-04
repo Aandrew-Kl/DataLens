@@ -8,7 +8,7 @@ import { ScatterChart } from "echarts/charts";
 import { GridComponent, LegendComponent, TooltipComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { motion } from "framer-motion";
-import { Cuboid, Download, Loader2, Orbit } from "lucide-react";
+import { Cuboid, Download, Orbit } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import {

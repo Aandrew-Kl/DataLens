@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import {
   ANALYTICS_EASE,
-  FIELD_CLASS,
   GLASS_CARD_CLASS,
   GLASS_PANEL_CLASS,
   isRecord,

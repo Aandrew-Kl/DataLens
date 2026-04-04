@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import DistributionAnalyzer from "@/components/data/distribution-analyzer";
@@ -65,14 +65,6 @@ async function renderAsync(targetColumns: ColumnProfile[]) {
   await act(async () => {
     render(<DistributionAnalyzer tableName="sales" columns={targetColumns} />);
   });
-}
-
-function lastOption() {
-  const lastCall = chartPropsSpy.mock.calls.at(-1);
-  return ((lastCall?.[0] as Record<string, unknown>)?.option ?? {}) as Record<
-    string,
-    unknown
-  >;
 }
 
 describe("DistributionAnalyzer", () => {

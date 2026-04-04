@@ -58,12 +58,6 @@ interface TimePoint {
   value: number;
 }
 
-interface BackendForecastResult {
-  forecast: number[];
-  lower_bound: number[];
-  upper_bound: number[];
-}
-
 interface ForecastPoint {
   isoDate: string;
   forecast: number;

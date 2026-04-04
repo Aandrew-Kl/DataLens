@@ -4,11 +4,8 @@ import { Suspense, startTransition, use, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
-  Bot,
   Copy,
   RefreshCw,
-  Sparkles,
-  Target,
 } from "lucide-react";
 import {
   ANALYTICS_EASE,
@@ -23,7 +20,6 @@ import {
   loadOllamaSettings,
 } from "@/lib/ai/ollama-settings";
 import { runQuery } from "@/lib/duckdb/client";
-import { formatNumber, formatPercent } from "@/lib/utils/formatters";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface AIAnomalyExplainerProps {
@@ -513,7 +509,10 @@ export default function AIAnomalyExplainer({
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const resource = useMemo(
-    () => loadAnomalies(tableName, columns),
+    () => {
+      void refreshKey;
+      return loadAnomalies(tableName, columns);
+    },
     [columns, refreshKey, tableName],
   );
 

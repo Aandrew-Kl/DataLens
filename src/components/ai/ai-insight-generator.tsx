@@ -178,42 +178,6 @@ function parseInsightSections(text: string): InsightSection[] {
   }));
 }
 
-function buildSectionsFromBackend(summaries: string[], keywords: string[]) {
-  const baseSections: InsightSection[] = (
-    Object.keys(CATEGORY_META) as InsightCategory[]
-  ).map((category) => ({
-    category,
-    title: CATEGORY_META[category].title,
-    bullets: [],
-  }));
-
-  const sectionMap = new Map(baseSections.map((section) => [section.category, section.bullets]));
-  const bulletPool = [...summaries, ...keywords];
-
-  if (bulletPool.length === 0) {
-    const fallback = "No backend summary data was returned.";
-    for (const section of baseSections) {
-      section.bullets = [fallback];
-    }
-    return baseSections;
-  }
-
-  bulletPool.forEach((bullet, index) => {
-    const category = (Object.keys(CATEGORY_META) as InsightCategory[])[
-      index % Object.keys(CATEGORY_META).length
-    ];
-    sectionMap.get(category)?.push(bullet);
-  });
-
-  return baseSections.map((section) => ({
-    ...section,
-    bullets:
-      section.bullets.length > 0
-        ? section.bullets.slice(0, 4)
-        : ["No backend summary data was returned for this section."],
-  }));
-}
-
 function SectionCard({ section }: { section: InsightSection }) {
   const meta = CATEGORY_META[section.category];
   const Icon = meta.icon;
@@ -232,11 +196,6 @@ function SectionCard({ section }: { section: InsightSection }) {
     </div>
   );
 }
-
-type SummarizeResultFromBackend = {
-  summaries: string[];
-  keywords: string[];
-};
 
 export default function AIInsightGenerator({
   tableName,

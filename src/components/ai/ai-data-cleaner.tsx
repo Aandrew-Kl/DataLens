@@ -23,7 +23,7 @@ import {
   generateOllamaText,
   loadOllamaSettings,
 } from "@/lib/ai/ollama-settings";
-import { formatNumber, formatPercent, generateId } from "@/lib/utils/formatters";
+import { formatNumber, generateId } from "@/lib/utils/formatters";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface AIDataCleanerProps {

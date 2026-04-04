@@ -1,5 +1,4 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import KeyboardShortcutsPanel from "@/components/layout/keyboard-shortcuts-panel";
 import type { ColumnProfile } from "@/types/dataset";
 

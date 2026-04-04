@@ -1,6 +1,5 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 import DataComparisonAdvanced from "@/components/data/data-comparison-advanced";
 import { runQuery } from "@/lib/duckdb/client";
@@ -74,8 +73,6 @@ describe("DataComparisonAdvanced", () => {
   });
 
   it("renders mapped comparisons and lets the user switch the compared dataset", async () => {
-    const user = userEvent.setup();
-
     mockRunQuery.mockImplementation(async (sql) => {
       if (
         sql.includes('FROM "sales_2025"') &&

@@ -12,7 +12,7 @@ import {
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { motion } from "framer-motion";
-import { CalendarRange, Download, Loader2 } from "lucide-react";
+import { CalendarRange, Download } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import {

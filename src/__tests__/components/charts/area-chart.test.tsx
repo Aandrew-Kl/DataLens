@@ -31,9 +31,7 @@ jest.mock("echarts-for-react/lib/core", () => ({
 jest.mock("echarts/core", () => ({
   use: jest.fn(),
   graphic: {
-    LinearGradient: class MockLinearGradient {
-      constructor(..._args: unknown[]) {}
-    },
+    LinearGradient: class MockLinearGradient {},
   },
 }));
 

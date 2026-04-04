@@ -17,10 +17,8 @@ import { motion } from "framer-motion";
 import {
   BarChart3,
   Database,
-  ListFilter,
   RefreshCw,
   Sigma,
-  Tag,
 } from "lucide-react";
 import {
   ANALYTICS_EASE,
@@ -192,13 +190,6 @@ function buildDistributionOption(detail: ColumnDetail): EChartsOption {
       },
     ],
   };
-}
-
-async function queryRowCount(tableName: string) {
-  const rows = await runQuery(
-    `SELECT COUNT(*) AS row_count FROM ${quoteIdentifier(tableName)}`,
-  );
-  return Math.max(0, Math.round(toNumber(rows[0]?.row_count) ?? 0));
 }
 
 async function loadNumericStatistics(
@@ -552,7 +543,10 @@ export default function ColumnStatistics({
   const [refreshKey, setRefreshKey] = useState(0);
 
   const resource = useMemo(
-    () => loadColumnStatistics(tableName, columns, selectedColumn),
+    () => {
+      void refreshKey;
+      return loadColumnStatistics(tableName, columns, selectedColumn);
+    },
     [columns, refreshKey, selectedColumn, tableName],
   );
 

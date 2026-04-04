@@ -66,7 +66,6 @@ describe("QueryOptimizer", () => {
     });
 
     // Apply a rewrite first
-    const initialWarnings = screen.getAllByText("Use rewrite").length;
     await user.click(screen.getAllByText("Use rewrite")[0]);
 
     // Reset

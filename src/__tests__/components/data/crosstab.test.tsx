@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 
 import Crosstab from "@/components/data/crosstab";
 import { runQuery } from "@/lib/duckdb/client";
-import type { ColumnProfile } from "@/types/dataset";
 
 jest.mock("framer-motion");
 jest.mock("@/lib/duckdb/client", () => ({

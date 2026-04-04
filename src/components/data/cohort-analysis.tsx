@@ -4,6 +4,7 @@ import {
   Suspense,
   startTransition,
   useEffect,
+  useEffectEvent,
   useMemo,
   useRef,
   useState,
@@ -685,7 +686,7 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
     ),
   );
 
-  async function analyze() {
+  const analyze = useEffectEvent(async () => {
     const userIdColumn = inferEntityColumn(columns);
     const timestampColumn = safeDateColumn;
 
@@ -803,7 +804,7 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
         );
       });
     }
-  }
+  });
 
   useEffect(() => {
     void analyze();

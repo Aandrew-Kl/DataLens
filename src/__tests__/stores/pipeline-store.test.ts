@@ -240,7 +240,6 @@ describe("usePipelineStore", () => {
 
     for (let index = 0; index < 22; index += 1) {
       nowSpy.mockReturnValueOnce(1_700_000_000_000 + index);
-      // eslint-disable-next-line no-await-in-loop
       await usePipelineStore.getState().executePipeline({
         pipelineId: "pipeline-1",
         tableName: "orders",

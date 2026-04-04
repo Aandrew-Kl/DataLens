@@ -1,6 +1,5 @@
 import { act, render, screen } from "@testing-library/react";
 import DataSamplerStratified from "@/components/data/data-sampler-stratified";
-import { runQuery } from "@/lib/duckdb/client";
 import type { ColumnProfile } from "@/types/dataset";
 
 jest.mock("framer-motion");

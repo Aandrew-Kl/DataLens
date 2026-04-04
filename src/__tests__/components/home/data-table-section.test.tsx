@@ -25,6 +25,8 @@ function mockComponent(label: string) {
   };
 }
 
+const tablePreviewRows = [{ region: "East", revenue: 100 }];
+
 const mockDatasetStore = createMockStore({
   datasets: [],
   activeDatasetId: null,
@@ -135,10 +137,8 @@ jest.mock("@/components/home/workspace-shared", () => ({
     onRowsLoaded?: (rows: Record<string, unknown>[]) => void;
     onRowClick?: (row: Record<string, unknown>) => void;
   }) => {
-    const rows = [{ region: "East", revenue: 100 }];
-
     useEffect(() => {
-      onRowsLoaded?.(rows);
+      onRowsLoaded?.(tablePreviewRows);
     }, [onRowsLoaded]);
 
     return (
@@ -146,7 +146,7 @@ jest.mock("@/components/home/workspace-shared", () => ({
         <tbody>
           <tr>
             <td>
-              <button type="button" onClick={() => onRowClick?.(rows[0])}>
+              <button type="button" onClick={() => onRowClick?.(tablePreviewRows[0])}>
                 East
               </button>
             </td>

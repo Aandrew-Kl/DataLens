@@ -44,7 +44,6 @@ interface TooltipPoint {
 
 const GLASS_PANEL =
   "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
-const DASHBOARD_EASE = [0.22, 1, 0.36, 1] as const;
 
 function isTooltipPoint(value: unknown): value is TooltipPoint {
   if (typeof value !== "object" || value === null) {
@@ -169,7 +168,7 @@ export default function MetricDashboard({
     }, autoRefreshMs);
 
     return () => window.clearInterval(intervalId);
-  }, [autoRefreshEnabled, autoRefreshMs, onRefresh, triggerRefresh]);
+  }, [autoRefreshEnabled, autoRefreshMs, onRefresh]);
 
   return (
     <section className={`overflow-hidden rounded-[2rem] ${GLASS_PANEL}`}>

@@ -25,12 +25,6 @@ interface DataQualityScoreProps {
   columns: ColumnProfile[];
 }
 
-type QualityDimensionKey =
-  | "completeness"
-  | "uniqueness"
-  | "consistency"
-  | "validity";
-
 interface QualityDimensions {
   completeness: number;
   uniqueness: number;

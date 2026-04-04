@@ -149,10 +149,6 @@ export default function DataStandardizer({
   tableName,
   columns,
 }: DataStandardizerProps) {
-  const selectableColumns = useMemo(
-    () => columns.filter((column) => columnMatchesOperation(column, "date") || columnMatchesOperation(column, "phone")),
-    [columns],
-  );
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     defaultSelectedColumns(columns),
   );

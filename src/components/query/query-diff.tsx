@@ -9,7 +9,6 @@ import {
   BUTTON_CLASS,
   GLASS_CARD_CLASS,
   GLASS_PANEL_CLASS,
-  isRecord,
   toCount,
 } from "@/lib/utils/advanced-analytics";
 import { formatDuration, formatNumber } from "@/lib/utils/formatters";

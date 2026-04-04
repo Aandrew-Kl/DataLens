@@ -8,7 +8,7 @@ import { BoxplotChart as EChartsBoxplotChart, ScatterChart } from "echarts/chart
 import { GridComponent, LegendComponent, TooltipComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { motion } from "framer-motion";
-import { Boxes, Download, Loader2, Sigma } from "lucide-react";
+import { Boxes, Download } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import {

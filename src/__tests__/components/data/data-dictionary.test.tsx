@@ -88,7 +88,6 @@ describe("DataDictionary", () => {
   });
 
   it("edits descriptions and persists them to local storage", async () => {
-    const user = userEvent.setup();
     const { unmount } = render(
       <DataDictionary
         tableName="orders"

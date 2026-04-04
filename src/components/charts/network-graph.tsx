@@ -107,20 +107,6 @@ function NetworkGraphEmptyState({ message }: { message: string }) {
   );
 }
 
-function escapeCsvCell(value: unknown) {
-  if (value === null || value === undefined) return "";
-  const stringValue = String(value);
-  if (
-    stringValue.includes(",") ||
-    stringValue.includes('"') ||
-    stringValue.includes("\n") ||
-    stringValue.includes("\r")
-  ) {
-    return `"${stringValue.replace(/"/g, '""')}"`;
-  }
-  return stringValue;
-}
-
 function isCategoricalColumn(column: ColumnProfile) {
   return column.type === "string" || column.type === "boolean" || column.type === "date";
 }
@@ -232,7 +218,7 @@ async function loadNetworkGraph(
 
   const maxDegree = Math.max(...degreeByNode.values(), 1);
   const nodes = Array.from(degreeByNode.entries())
-    .map<NetworkNode>((entry, index) => {
+    .map<NetworkNode>((entry) => {
       const [name, degree] = entry;
       const neighborCount = neighborSetByNode.get(name)?.size ?? 0;
       const scale = Math.sqrt(degree / maxDegree);

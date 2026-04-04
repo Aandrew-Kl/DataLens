@@ -9,10 +9,7 @@ jest.mock("echarts-for-react/lib/core", () => {
 
   return {
     __esModule: true,
-    default: React.forwardRef(function MockChart(
-      props: Record<string, unknown>,
-      _ref: React.Ref<unknown>,
-    ) {
+    default: React.forwardRef(function MockChart(props: Record<string, unknown>) {
       chartPropsSpy(props);
       return React.createElement("div", { "data-testid": "stat-card-sparkline" });
     }),

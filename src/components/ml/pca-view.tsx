@@ -16,7 +16,6 @@ import { useDarkMode } from "@/lib/hooks/use-dark-mode";
 import {
   ANALYTICS_EASE,
   BUTTON_CLASS,
-  FIELD_CLASS,
   GLASS_CARD_CLASS,
   GLASS_PANEL_CLASS,
   quoteIdentifier,
@@ -349,14 +348,6 @@ export default function PCAView({ tableName, columns }: PCAViewProps): ReactNode
 
       if (useBackend && !backendFailed) {
         try {
-          const numericData = samples.flatMap<number[]>((sample) => {
-            const values = numericFeatures.map((feature) => toNumber(sample[feature]));
-            if (values.some((value) => value === null)) {
-              return [];
-            }
-            return [values as number[]];
-          });
-
           const recordData = samples.map((s) => {
             const record: Record<string, unknown> = {};
             for (const f of numericFeatures) {

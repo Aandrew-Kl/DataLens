@@ -70,12 +70,6 @@ export default function AIQueryGenerator({
   const [useBackend, setUseBackend] = useState(true);
   const [backendFailed, setBackendFailed] = useState(false);
   const deferredPrompt = useDeferredValue(prompt);
-  const schemaContext = useMemo(() => {
-    const columnSchema = columns
-      .map((column) => `${column.name} (${column.type})`)
-      .join(", ");
-    return `${tableName} (${columnSchema})`;
-  }, [columns, tableName]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

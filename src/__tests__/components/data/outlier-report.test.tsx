@@ -1,10 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { act } from "react";
 
 import OutlierReport from "@/components/data/outlier-report";
 import { runQuery } from "@/lib/duckdb/client";
-import { downloadFile } from "@/lib/utils/export";
 import type { ColumnProfile } from "@/types/dataset";
 
 const chartPropsSpy = jest.fn();
@@ -21,10 +19,7 @@ jest.mock("echarts-for-react/lib/core", () => {
   const React = jest.requireActual<typeof import("react")>("react");
   return {
     __esModule: true,
-    default: React.forwardRef(function MockChart(
-      props: Record<string, unknown>,
-      _ref: React.Ref<unknown>,
-    ) {
+    default: React.forwardRef(function MockChart(props: Record<string, unknown>) {
       chartPropsSpy(props);
       return React.createElement("div", { "data-testid": "echart" });
     }),
@@ -37,7 +32,6 @@ jest.mock("echarts/core", () => ({ use: jest.fn() }));
 jest.mock("echarts/renderers", () => ({}));
 
 const mockRunQuery = jest.mocked(runQuery);
-const mockDownloadFile = jest.mocked(downloadFile);
 
 const columns: ColumnProfile[] = [
   {
@@ -64,23 +58,6 @@ const reportRows = [
   { __row_id: 5, amount: 10, category: "A", __metric: 10 },
   { __row_id: 6, amount: 100, category: "B", __metric: 100 },
 ];
-
-function getChartOption() {
-  const lastCall = chartPropsSpy.mock.calls.at(-1);
-  const firstArg = lastCall?.[0];
-
-  if (
-    typeof firstArg === "object" &&
-    firstArg !== null &&
-    "option" in firstArg &&
-    typeof firstArg.option === "object" &&
-    firstArg.option !== null
-  ) {
-    return firstArg.option as Record<string, unknown>;
-  }
-
-  return {};
-}
 
 async function renderAsync() {
   await act(async () => {

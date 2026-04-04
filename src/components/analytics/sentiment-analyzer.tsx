@@ -8,7 +8,7 @@ import { PieChart } from "echarts/charts";
 import { LegendComponent, TooltipComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { motion } from "framer-motion";
-import { Download, MessageSquareHeart, SmilePlus, Tags } from "lucide-react";
+import { Download, MessageSquareHeart, SmilePlus } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { sentiment } from "@/lib/api/ai";
 import { useDarkMode } from "@/lib/hooks/use-dark-mode";

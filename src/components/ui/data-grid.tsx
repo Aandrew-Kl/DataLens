@@ -207,7 +207,7 @@ export default function DataGrid({
       window.removeEventListener("mousemove", applyResize);
       window.removeEventListener("mouseup", stopResize);
     };
-  }, [applyResize, resizeState, stopResize]);
+  }, [resizeState]);
 
   useEffect(() => {
     if (!containerRef.current || !activeCell) {

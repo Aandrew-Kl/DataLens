@@ -47,7 +47,6 @@ describe("CommandPalette", () => {
   });
 
   it("executes a clicked command, stores it as recent, and closes", async () => {
-    const user = userEvent.setup();
     const onAction = jest.fn();
     const onClose = jest.fn();
 
@@ -69,9 +68,6 @@ describe("CommandPalette", () => {
   });
 
   it("supports keyboard navigation with enter to run the selected command", async () => {
-    const user = userEvent.setup();
-    void user;
-
     const onAction = jest.fn();
 
     render(<CommandPalette open onClose={jest.fn()} onAction={onAction} />);

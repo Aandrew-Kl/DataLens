@@ -109,8 +109,6 @@ describe("ColumnRenamer", () => {
   });
 
   it("blocks invalid duplicate target names", async () => {
-    const user = userEvent.setup();
-
     render(
       <ColumnRenamer
         tableName="sales"

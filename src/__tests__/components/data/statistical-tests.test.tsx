@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 import StatisticalTests from "@/components/data/statistical-tests";
 import { runQuery } from "@/lib/duckdb/client";
@@ -127,7 +126,6 @@ describe("StatisticalTests", () => {
   });
 
   it("runs a t-test and records it in session history", async () => {
-    const user = userEvent.setup();
     mockRunTTest.mockResolvedValueOnce(makeResult({}));
 
     render(
@@ -165,7 +163,6 @@ describe("StatisticalTests", () => {
   });
 
   it("switches to chi-square and renders the returned result", async () => {
-    const user = userEvent.setup();
     mockRunChiSquare.mockResolvedValueOnce(
       makeResult({
         id: "result-2",
@@ -208,7 +205,6 @@ describe("StatisticalTests", () => {
   });
 
   it("surfaces execution errors from the statistical engine", async () => {
-    const user = userEvent.setup();
     mockRunTTest.mockRejectedValueOnce(new Error("Test execution failed"));
 
     render(
