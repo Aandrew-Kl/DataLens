@@ -1,10 +1,11 @@
 import pandas as pd
 from fastapi import APIRouter, HTTPException, status
 
+from app.api.docs import build_error_responses
 from app.schemas.ai import (
-    NLQueryRequest,
     ExplainRequest,
     ExplainResponse,
+    NLQueryRequest,
     QueryGenerateRequest,
     QueryGenerateResponse,
     SentimentRequest,
@@ -17,7 +18,17 @@ from app.services import nlp_service
 router = APIRouter(prefix="/ai", tags=["ai"])
 
 
-@router.post("/sentiment", response_model=SentimentResponse)
+@router.post(
+    "/sentiment",
+    response_model=SentimentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Analyze sentiment",
+    description="Score sentiment for text rows in the provided dataset sample and return aggregates and top terms.",
+    response_description="The sentiment analysis results.",
+    responses=build_error_responses(
+        bad_request="The sentiment analysis request could not be processed with the provided dataset or parameters.",
+    ),
+)
 async def analyze_sentiment(payload: SentimentRequest) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
@@ -26,7 +37,17 @@ async def analyze_sentiment(payload: SentimentRequest) -> dict:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
-@router.post("/summarize", response_model=SummarizeResponse)
+@router.post(
+    "/summarize",
+    response_model=SummarizeResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Summarize text data",
+    description="Generate a natural-language summary and key statistics for the provided text columns.",
+    response_description="The dataset summary results.",
+    responses=build_error_responses(
+        bad_request="The summarization request could not be processed with the provided dataset or parameters.",
+    ),
+)
 async def summarize_data(payload: SummarizeRequest) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
@@ -35,7 +56,17 @@ async def summarize_data(payload: SummarizeRequest) -> dict:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
-@router.post("/generate-query", response_model=QueryGenerateResponse)
+@router.post(
+    "/generate-query",
+    response_model=QueryGenerateResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Generate SQL from natural language",
+    description="Convert a natural-language question into a SQL query and explain the generated statement.",
+    response_description="The generated SQL query and explanation.",
+    responses=build_error_responses(
+        bad_request="The SQL generation request could not be processed with the provided prompt or dataset context.",
+    ),
+)
 async def generate_query(payload: QueryGenerateRequest) -> dict:
     try:
         frame = pd.DataFrame(payload.data) if payload.data else pd.DataFrame()
@@ -45,7 +76,17 @@ async def generate_query(payload: QueryGenerateRequest) -> dict:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
-@router.post("/explain", response_model=ExplainResponse)
+@router.post(
+    "/explain",
+    response_model=ExplainResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Explain SQL",
+    description="Break down a SQL statement into a human-readable summary, steps, tables, and columns.",
+    response_description="The SQL explanation details.",
+    responses=build_error_responses(
+        bad_request="The SQL explanation request could not be processed with the provided statement.",
+    ),
+)
 async def explain_sql(payload: ExplainRequest) -> dict:
     try:
         return nlp_service.explain(payload.sql)

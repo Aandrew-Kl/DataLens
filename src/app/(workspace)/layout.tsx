@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useCallback } from "react";
+import { Suspense, type ReactNode, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -25,6 +25,27 @@ const TABS = [
   { href: "/reports", label: "Reports" },
   { href: "/settings", label: "Settings" },
 ] as const;
+
+function WorkspaceContentFallback() {
+  return (
+    <div className="flex min-h-[24rem] items-center justify-center">
+      <div className="w-full max-w-3xl animate-pulse rounded-2xl bg-white/60 p-6 backdrop-blur-xl dark:bg-slate-900/60">
+        <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+          Loading workspace...
+        </p>
+        <div className="mt-4 space-y-3">
+          <div className="h-10 rounded-xl bg-white/70 dark:bg-slate-800/70" />
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="h-24 rounded-xl bg-white/70 dark:bg-slate-800/70" />
+            <div className="h-24 rounded-xl bg-white/70 dark:bg-slate-800/70" />
+            <div className="h-24 rounded-xl bg-white/70 dark:bg-slate-800/70" />
+          </div>
+          <div className="h-48 rounded-xl bg-white/70 dark:bg-slate-800/70" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function WorkspaceLayout({
   children,
@@ -197,7 +218,9 @@ export default function WorkspaceLayout({
           <div className="h-0.5 bg-purple-500 animate-pulse flex-shrink-0" />
         ) : null}
 
-        <main className="flex-1 overflow-y-auto p-4">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4">
+          <Suspense fallback={<WorkspaceContentFallback />}>{children}</Suspense>
+        </main>
       </div>
 
       <CommandPalette

@@ -9,7 +9,7 @@ from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy import text
 
 from app.api.router import api_router
@@ -87,7 +87,13 @@ rate_limiter = InMemoryRateLimiter(
     window_seconds=RATE_LIMIT_WINDOW_SECONDS,
 )
 
-app = FastAPI(title="DataLens Backend", version=settings.APP_VERSION)
+app = FastAPI(
+    title="DataLens Backend",
+    description="AI-powered data exploration and analysis API",
+    version=settings.APP_VERSION,
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -192,6 +198,16 @@ async def on_startup() -> None:
     Path(settings.UPLOADS_DIR).mkdir(parents=True, exist_ok=True)
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
+
+
+@app.get("/docs", include_in_schema=False)
+async def legacy_docs_redirect() -> RedirectResponse:
+    return RedirectResponse(url="/api/docs")
+
+
+@app.get("/redoc", include_in_schema=False)
+async def legacy_redoc_redirect() -> RedirectResponse:
+    return RedirectResponse(url="/api/redoc")
 
 
 @app.get("/health", response_model=None)

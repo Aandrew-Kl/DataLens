@@ -8,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.auth import get_current_user
+from app.api.docs import build_error_responses
 from app.database import get_db
 from app.models.dataset import Dataset
 from app.models.user import User
@@ -18,7 +19,18 @@ router = APIRouter(prefix="/datasets", tags=["datasets"])
 UPLOAD_DIR = Path("uploads")
 
 
-@router.post("/upload", response_model=DatasetResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/upload",
+    response_model=DatasetResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Upload a dataset",
+    description="Upload a CSV file, store it on disk, and create dataset metadata for the authenticated user.",
+    response_description="The stored dataset metadata.",
+    responses=build_error_responses(
+        bad_request="The uploaded file is missing, is not a CSV file, or could not be parsed.",
+        unauthorized="Authentication is required to upload a dataset.",
+    ),
+)
 async def upload_dataset(
     file: UploadFile = File(...),
     name: str | None = Form(default=None),
@@ -54,7 +66,17 @@ async def upload_dataset(
     return dataset
 
 
-@router.get("/", response_model=list[DatasetResponse])
+@router.get(
+    "/",
+    response_model=list[DatasetResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List datasets",
+    description="Return all datasets that belong to the authenticated user, ordered by newest first.",
+    response_description="A list of datasets owned by the authenticated user.",
+    responses=build_error_responses(
+        unauthorized="Authentication is required to list datasets.",
+    ),
+)
 async def list_datasets(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -65,7 +87,18 @@ async def list_datasets(
     return list(result.scalars().all())
 
 
-@router.get("/{dataset_id}", response_model=DatasetResponse)
+@router.get(
+    "/{dataset_id}",
+    response_model=DatasetResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get a dataset",
+    description="Fetch a single dataset owned by the authenticated user.",
+    response_description="The requested dataset metadata.",
+    responses=build_error_responses(
+        unauthorized="Authentication is required to access dataset details.",
+        not_found="No dataset was found for the provided identifier.",
+    ),
+)
 async def get_dataset(
     dataset_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
@@ -80,7 +113,18 @@ async def get_dataset(
     return dataset
 
 
-@router.delete("/{dataset_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{dataset_id}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a dataset",
+    description="Delete a dataset record and remove its uploaded file from storage.",
+    response_description="The dataset was deleted successfully.",
+    responses=build_error_responses(
+        unauthorized="Authentication is required to delete a dataset.",
+        not_found="No dataset was found for the provided identifier.",
+    ),
+)
 async def delete_dataset(
     dataset_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
