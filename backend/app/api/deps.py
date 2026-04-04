@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import uuid
+
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
@@ -12,7 +14,7 @@ from app.models.dataset import Dataset
 from app.models.query_history import QueryHistory
 
 
-async def get_owned_dataset(db: AsyncSession, user_id: int, dataset_id: int) -> Dataset:
+async def get_owned_dataset(db: AsyncSession, user_id: uuid.UUID, dataset_id: uuid.UUID) -> Dataset:
     """Fetch a dataset owned by the current user or raise a 404."""
 
     result = await db.execute(
@@ -30,8 +32,8 @@ async def get_owned_dataset(db: AsyncSession, user_id: int, dataset_id: int) -> 
 async def save_analysis(
     db: AsyncSession,
     *,
-    user_id: int,
-    dataset_id: int,
+    user_id: uuid.UUID,
+    dataset_id: uuid.UUID,
     analysis_type: str,
     config: dict,
     result: dict,
@@ -43,8 +45,8 @@ async def save_analysis(
             user_id=user_id,
             dataset_id=dataset_id,
             analysis_type=analysis_type,
-            config_json=jsonable_encoder(config),
-            result_json=jsonable_encoder(result),
+            config=jsonable_encoder(config),
+            result=jsonable_encoder(result),
         )
     )
     await db.commit()
@@ -53,8 +55,8 @@ async def save_analysis(
 async def save_query(
     db: AsyncSession,
     *,
-    user_id: int,
-    dataset_id: int,
+    user_id: uuid.UUID,
+    dataset_id: uuid.UUID,
     sql_text: str,
     duration_ms: int,
 ) -> None:

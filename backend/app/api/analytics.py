@@ -1,9 +1,10 @@
+import pandas as pd
 from fastapi import APIRouter, HTTPException, status
 
 from app.schemas.analytics import (
-    ABTestRequest,
     ABTestResponse,
-    ChurnRequest,
+    AbTestRequest,
+    ChurnPredictRequest,
     ChurnResponse,
     CohortRequest,
     CohortResponse,
@@ -12,14 +13,14 @@ from app.schemas.analytics import (
 )
 from app.services import analytics_service
 
-
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 
 @router.post("/churn-predict", response_model=ChurnResponse)
-async def predict_churn(payload: ChurnRequest) -> dict:
+async def predict_churn(payload: ChurnPredictRequest) -> dict:
     try:
-        return analytics_service.churn_predict(payload.data, payload.features)
+        frame = pd.DataFrame(payload.data)
+        return analytics_service.churn_predict(frame, payload)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
@@ -27,15 +28,17 @@ async def predict_churn(payload: ChurnRequest) -> dict:
 @router.post("/cohort", response_model=CohortResponse)
 async def run_cohort_analysis(payload: CohortRequest) -> dict:
     try:
-        return analytics_service.cohort_analysis(payload.data, payload.date_col, payload.user_col)
+        frame = pd.DataFrame(payload.data)
+        return analytics_service.cohort_analysis(frame, payload)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
 @router.post("/ab-test", response_model=ABTestResponse)
-async def run_ab_test(payload: ABTestRequest) -> dict:
+async def run_ab_test(payload: AbTestRequest) -> dict:
     try:
-        return analytics_service.ab_test(payload.control, payload.treatment, payload.alpha)
+        frame = pd.DataFrame(payload.data)
+        return analytics_service.ab_test(frame, payload)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
@@ -43,6 +46,7 @@ async def run_ab_test(payload: ABTestRequest) -> dict:
 @router.post("/forecast", response_model=ForecastResponse)
 async def run_forecast(payload: ForecastRequest) -> dict:
     try:
-        return analytics_service.forecast(payload.data, payload.date_col, payload.value_col, payload.periods)
+        frame = pd.DataFrame(payload.data)
+        return analytics_service.forecast(frame, payload.date_col, payload.value_col, payload.periods, payload.method)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

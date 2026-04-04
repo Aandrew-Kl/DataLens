@@ -11,48 +11,6 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
-
-from app.schemas import ai as ai_schema
-from app.schemas import analytics as analytics_schema
-
-
-class NLQueryRequest(BaseModel):
-    question: str
-    use_ollama: bool = False
-
-
-class ChurnPredictRequest(BaseModel):
-    feature_columns: list[str]
-    target_column: str
-    test_size: float = 0.2
-
-
-class CohortAnalysisRequest(BaseModel):
-    entity_id_column: str
-    signup_date_column: str
-    activity_date_column: str
-    frequency: str = "monthly"
-
-
-class AbTestServiceRequest(BaseModel):
-    group_column: str
-    metric_column: str
-    variant_a: str
-    variant_b: str
-    metric_type: str = "continuous"
-    confidence_level: float = 0.95
-
-
-if not hasattr(ai_schema, "NLQueryRequest"):
-    ai_schema.NLQueryRequest = NLQueryRequest
-if not hasattr(analytics_schema, "ChurnPredictRequest"):
-    analytics_schema.ChurnPredictRequest = ChurnPredictRequest
-if not hasattr(analytics_schema, "CohortRequest"):
-    analytics_schema.CohortRequest = CohortAnalysisRequest
-if not hasattr(analytics_schema, "AbTestRequest"):
-    analytics_schema.AbTestRequest = AbTestServiceRequest
-
-
 @pytest.fixture
 def regression_data() -> list[dict[str, object]]:
     rng = np.random.default_rng(12)

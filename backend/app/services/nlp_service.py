@@ -125,12 +125,16 @@ def summarize(frame: pd.DataFrame, dataset_id: int, text_columns: list[str], max
     top_terms = _top_terms(documents, max_terms=max_terms)
 
     null_cells = int(frame.isna().sum().sum())
+    correlations_text = ", ".join(
+        "{} vs {} ({:.2f})".format(pair["left"], pair["right"], pair["correlation"])
+        for pair in profile["correlations"][:3]
+    ) or "not available"
+    terms_text = ", ".join(term["term"] for term in top_terms[:5]) or "not available"
     summary_text = (
         f"Dataset {dataset_id} contains {frame.shape[0]} rows across {frame.shape[1]} columns. "
         f"There are {null_cells} missing cells in total. "
-        f"The strongest numeric correlations are "
-        f"{', '.join(f'{pair['left']} vs {pair['right']} ({pair['correlation']:.2f})' for pair in profile['correlations'][:3]) or 'not available'}. "
-        f"Top textual terms are {', '.join(term['term'] for term in top_terms[:5]) or 'not available'}."
+        f"The strongest numeric correlations are {correlations_text}. "
+        f"Top textual terms are {terms_text}."
     )
 
     key_statistics = {

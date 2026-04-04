@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     JWT_EXPIRE_HOURS: int = 24
     OLLAMA_URL: str = "http://localhost:11434"
     REDIS_URL: str = "redis://localhost:6379/0"
+    UPLOADS_DIR: str = "./uploads"
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -17,3 +18,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def get_settings() -> Settings:
+    return settings

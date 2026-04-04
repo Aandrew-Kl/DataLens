@@ -1,9 +1,10 @@
+import pandas as pd
 from fastapi import APIRouter, HTTPException, status
 
 from app.schemas.ml import (
     AnomalyRequest,
     AnomalyResponse,
-    ClassifyRequest,
+    ClassificationRequest,
     ClassifyResponse,
     ClusterRequest,
     ClusterResponse,
@@ -14,14 +15,14 @@ from app.schemas.ml import (
 )
 from app.services import ml_service
 
-
 router = APIRouter(prefix="/ml", tags=["ml"])
 
 
 @router.post("/regression", response_model=RegressionResponse)
 async def run_regression(payload: RegressionRequest) -> dict:
     try:
-        return ml_service.regression(payload.data, payload.target, payload.features, payload.method)
+        frame = pd.DataFrame(payload.data)
+        return ml_service.regression(frame, payload)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
@@ -29,15 +30,17 @@ async def run_regression(payload: RegressionRequest) -> dict:
 @router.post("/cluster", response_model=ClusterResponse)
 async def run_clustering(payload: ClusterRequest) -> dict:
     try:
-        return ml_service.cluster(payload.data, payload.features, payload.method, payload.n_clusters)
+        frame = pd.DataFrame(payload.data)
+        return ml_service.cluster(frame, payload)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
 @router.post("/classify", response_model=ClassifyResponse)
-async def run_classification(payload: ClassifyRequest) -> dict:
+async def run_classification(payload: ClassificationRequest) -> dict:
     try:
-        return ml_service.classify(payload.data, payload.target, payload.features, payload.method)
+        frame = pd.DataFrame(payload.data)
+        return ml_service.classify(frame, payload)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
@@ -45,7 +48,8 @@ async def run_classification(payload: ClassifyRequest) -> dict:
 @router.post("/anomaly-detect", response_model=AnomalyResponse)
 async def run_anomaly_detection(payload: AnomalyRequest) -> dict:
     try:
-        return ml_service.anomaly_detect(payload.data, payload.features, payload.method)
+        frame = pd.DataFrame(payload.data)
+        return ml_service.anomaly_detect(frame, payload)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
@@ -53,6 +57,7 @@ async def run_anomaly_detection(payload: AnomalyRequest) -> dict:
 @router.post("/pca", response_model=PCAResponse)
 async def run_pca(payload: PCARequest) -> dict:
     try:
-        return ml_service.pca(payload.data, payload.features, payload.n_components)
+        frame = pd.DataFrame(payload.data)
+        return ml_service.pca(frame, payload)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

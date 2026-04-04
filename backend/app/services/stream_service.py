@@ -96,6 +96,16 @@ async def stream_csv_rows(
         working = chunk
 
         if query:
+            import re
+
+            # Only allow safe filter expressions: column_name operator value
+            # Reject any function calls, imports, or code execution attempts
+            unsafe_patterns = re.compile(
+                r"(__\w+__|import\s|exec\s*\(|eval\s*\(|compile\s*\(|open\s*\(|os\.|sys\.|subprocess)",
+                re.IGNORECASE,
+            )
+            if unsafe_patterns.search(query):
+                raise ValueError("Query expression contains disallowed patterns.")
             try:
                 working = chunk.query(query)
             except Exception as exc:

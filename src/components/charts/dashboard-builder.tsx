@@ -245,9 +245,6 @@ function buildChartOption(widget: WidgetConfig, rows: Record<string, unknown>[],
 }
 
 function exportHtml(tableName: string, widgets: WidgetConfig[], runtimes: Record<string, WidgetRuntime>) {
-  const chartIds = widgets
-    .filter((widget) => ["bar", "line", "pie", "scatter"].includes(widget.type))
-    .map((widget) => widget.id);
   const payload = widgets.map((widget) => ({
     ...widget,
     runtime: runtimes[widget.id],
@@ -285,6 +282,16 @@ function exportHtml(tableName: string, widgets: WidgetConfig[], runtimes: Record
     <div class="grid" id="grid"></div>
   </div>
   <script>
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+    function sanitizeChartId(str) {
+      return String(str).replace(/[^A-Za-z0-9_-]/g, "");
+    }
+    function chartDomId(str, index) {
+      const safeId = sanitizeChartId(str);
+      return "chart-" + (safeId ? safeId + "-" + index : "widget-" + index);
+    }
     const widgets = ${safeJson};
     const grid = document.getElementById("grid");
     const dark = true;
@@ -301,34 +308,36 @@ function exportHtml(tableName: string, widgets: WidgetConfig[], runtimes: Record
       const labels = rows.map((row) => String(row.label ?? ""));
       return { color: [widget.color], tooltip: Object.assign({}, tooltip, { trigger: "axis" }), grid: { left: 40, right: 18, top: 24, bottom: 46, containLabel: true }, xAxis: { type: "category", data: labels, axisLabel: { color: textColor, rotate: labels.length > 8 ? 24 : 0, fontSize: 11 }, axisLine: { lineStyle: { color: axisLine } } }, yAxis: { type: "value", axisLabel: { color: textColor }, splitLine: { lineStyle: { color: axisLine, type: "dashed" } } }, series: [{ type: widget.type, data: rows.map((row) => Number(row.value ?? 0)), smooth: widget.type === "line" }] };
     }
-    widgets.forEach((widget) => {
+    widgets.forEach((widget, index) => {
       const card = document.createElement("article");
       card.className = "card";
-      card.innerHTML = '<div class="eyebrow">' + widget.type + '</div><div class="title">' + widget.title + '</div>';
+      card.innerHTML = '<div class="eyebrow">' + escapeHtml(widget.type) + '</div><div class="title">' + escapeHtml(widget.title) + '</div>';
       if (widget.type === "kpi") {
-        card.innerHTML += '<div class="kpi">' + (widget.runtime?.value ?? "—") + '</div><div class="subtle">' + widget.aggregation.toUpperCase() + ' of ' + (widget.yAxis || "rows") + '</div>';
+        card.innerHTML += '<div class="kpi">' + escapeHtml(widget.runtime?.value ?? "—") + '</div><div class="subtle">' + escapeHtml(widget.aggregation.toUpperCase()) + ' of ' + escapeHtml(widget.yAxis || "rows") + '</div>';
       } else if (widget.type === "table") {
         const rows = widget.runtime?.rows ?? [];
-        const headers = widget.tableColumns.map((name) => '<th>' + name + '</th>').join('');
-        const body = rows.map((row) => '<tr>' + widget.tableColumns.map((name) => '<td>' + String(row[name] ?? "null") + '</td>').join('') + '</tr>').join('');
+        const headers = widget.tableColumns.map((name) => '<th>' + escapeHtml(name) + '</th>').join('');
+        const body = rows.map((row) => '<tr>' + widget.tableColumns.map((name) => '<td>' + escapeHtml(String(row[name] ?? "null")) + '</td>').join('') + '</tr>').join('');
         card.innerHTML += '<table><thead><tr>' + headers + '</tr></thead><tbody>' + body + '</tbody></table>';
       } else if (widget.type === "text") {
-        card.innerHTML += '<div class="text-widget">' + widget.text.replaceAll('\\n', '<br />') + '</div>';
+        card.innerHTML += '<div class="text-widget">' + escapeHtml(widget.text).replaceAll('\\n', '<br />') + '</div>';
       } else {
         const chart = document.createElement("div");
         chart.className = "chart";
-        chart.id = "chart-" + widget.id;
+        chart.id = chartDomId(widget.id, index);
         card.appendChild(chart);
       }
       grid.appendChild(card);
     });
-    ${chartIds.map((id) => `{
-      const widget = widgets.find((entry) => entry.id === "${id}");
-      if (widget) {
-        const chart = echarts.init(document.getElementById("chart-${id}"));
-        chart.setOption(chartOption(widget, widget.runtime?.rows ?? []));
+    widgets.forEach((widget, index) => {
+      if (["bar", "line", "pie", "scatter"].includes(widget.type)) {
+        const chartNode = document.getElementById(chartDomId(widget.id, index));
+        if (chartNode) {
+          const chart = echarts.init(chartNode);
+          chart.setOption(chartOption(widget, widget.runtime?.rows ?? []));
+        }
       }
-    }`).join("\n")}
+    });
   </script>
 </body>
 </html>`;
