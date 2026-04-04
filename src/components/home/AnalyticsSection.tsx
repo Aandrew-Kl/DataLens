@@ -101,20 +101,23 @@ export default function AnalyticsSection({
   const [showColumnDetail, setShowColumnDetail] = useState(false);
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
 
-  useEffect(() => {
-    if (!columns.length) {
-      setAnalyticsColumnName("");
-      return;
+  const derivedColumnName = useMemo(() => {
+    if (!columns.length) return "";
+    if (columns.some((column) => column.name === analyticsColumnName)) {
+      return analyticsColumnName;
     }
-
-    if (!columns.some((column) => column.name === analyticsColumnName)) {
-      const fallback =
-        columns.find((column) => column.type === "number")?.name ??
-        columns[0]?.name ??
-        "";
-      setAnalyticsColumnName(fallback);
-    }
+    return (
+      columns.find((column) => column.type === "number")?.name ??
+      columns[0]?.name ??
+      ""
+    );
   }, [analyticsColumnName, columns]);
+
+  useEffect(() => {
+    if (derivedColumnName !== analyticsColumnName) {
+      setAnalyticsColumnName(derivedColumnName);
+    }
+  }, [derivedColumnName, analyticsColumnName]);
 
   const analyticsColumn = useMemo(
     () =>
