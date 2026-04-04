@@ -1,5 +1,24 @@
 import type { NextConfig } from "next";
 
+const securityHeaders = [
+  {
+    key: "Cross-Origin-Opener-Policy",
+    value: "same-origin",
+  },
+  {
+    key: "Cross-Origin-Embedder-Policy",
+    value: "credentialless",
+  },
+  {
+    key: "X-DNS-Prefetch-Control",
+    value: "off",
+  },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=()",
+  },
+] satisfies NonNullable<Awaited<ReturnType<NonNullable<NextConfig["headers"]>>>>[number]["headers"];
+
 const nextConfig: NextConfig = {
   // Enable standalone output for Docker deployment
   output: "standalone",
@@ -7,21 +26,15 @@ const nextConfig: NextConfig = {
   // Turbopack config (Next.js 16 default bundler)
   turbopack: {},
 
+  poweredByHeader: false,
+  compress: true,
+
   // Allow WASM files and cross-origin isolation for DuckDB-WASM
   async headers() {
     return [
       {
         source: "/(.*)",
-        headers: [
-          {
-            key: "Cross-Origin-Opener-Policy",
-            value: "same-origin",
-          },
-          {
-            key: "Cross-Origin-Embedder-Policy",
-            value: "credentialless",
-          },
-        ],
+        headers: securityHeaders,
       },
     ];
   },

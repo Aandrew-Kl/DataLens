@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { chat, checkOllamaHealth } from "@/lib/ai/ollama-client";
 import { suggestQuestionsPrompt, autoDashboardPrompt } from "@/lib/ai/prompts";
 import { generateFallbackQuestions, generateFallbackDashboard } from "@/lib/ai/fallback";
+import { logger } from "@/lib/logger";
 import type { ColumnProfile } from "@/types/dataset";
 
 export async function POST(request: Request) {
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ error: "Invalid type" }, { status: 400 });
   } catch (error) {
-    console.error("AI suggest error:", error);
+    logger.error("AI suggest error", { error });
     // On any error, try fallback
     try {
       const body = await request.clone().json();

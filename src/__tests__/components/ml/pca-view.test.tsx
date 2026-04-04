@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import PCAView from "@/components/ml/pca-view";
 import { runQuery } from "@/lib/duckdb/client";
@@ -98,17 +98,23 @@ describe("PCAView", () => {
     mockRunQuery.mockResolvedValue(pcaRows);
 
     await renderAsync();
+    await user.click(screen.getByRole("button", { name: "Backend ON" }));
     await user.click(screen.getByRole("button", { name: "Compute PCA" }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Export scores" })).toBeEnabled();
+    });
 
     expect(
-      await screen.findByText(/Explained variance captured by first 2 components:/i),
+      screen.getByText(/Explained variance captured by first 2 components:/i),
     ).toBeInTheDocument();
     expect(screen.getAllByText("revenue").length).toBeGreaterThan(0);
     expect(screen.getAllByText("profit").length).toBeGreaterThan(0);
 
-    const varianceOption = chartPropsSpy.mock.calls[chartPropsSpy.mock.calls.length - 2]?.[0]
-      ?.option as { xAxis?: { data?: string[] } };
-    expect(varianceOption.xAxis?.data).toEqual(["PC1", "PC2", "PC3"]);
+    const varianceOption = chartPropsSpy.mock.calls
+      .map((call) => call[0]?.option as { xAxis?: { data?: string[] } } | undefined)
+      .find((option) => Array.isArray(option?.xAxis?.data));
+
+    expect(varianceOption?.xAxis?.data).toEqual(["PC1", "PC2", "PC3"]);
   });
 
   it("exports component scores as CSV", async () => {
@@ -117,8 +123,11 @@ describe("PCAView", () => {
     mockRunQuery.mockResolvedValue(pcaRows);
 
     await renderAsync();
+    await user.click(screen.getByRole("button", { name: "Backend ON" }));
     await user.click(screen.getByRole("button", { name: "Compute PCA" }));
-    await screen.findByText(/Explained variance captured by first 2 components:/i);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Export scores" })).toBeEnabled();
+    });
 
     await user.click(screen.getByRole("button", { name: "Export scores" }));
 

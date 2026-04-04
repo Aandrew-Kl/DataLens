@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { chat, checkOllamaHealth } from "@/lib/ai/ollama-client";
+import { logger } from "@/lib/logger";
 
 function stripCodeFences(value: string): string {
   return value
@@ -123,13 +124,13 @@ export async function POST(request: Request) {
           return NextResponse.json({ explanation, mode: "ai" });
         }
       } catch (error) {
-        console.error("AI explain error, using fallback:", error);
+        logger.warn("AI explain error, using fallback", { error });
       }
     }
 
     return NextResponse.json({ explanation: fallbackExplanation, mode: "fallback" });
   } catch (error) {
-    console.error("AI explain route error:", error);
+    logger.error("AI explain route error", { error });
     return NextResponse.json({ error: "Failed to explain SQL query." }, { status: 500 });
   }
 }

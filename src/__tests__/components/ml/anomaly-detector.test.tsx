@@ -99,6 +99,7 @@ describe("ML AnomalyDetector", () => {
     const user = userEvent.setup();
 
     await renderDetector();
+    await user.click(screen.getByRole("button", { name: "Backend" }));
 
     await user.selectOptions(
       screen.getByRole("combobox", { name: /sigma threshold/i }),
@@ -123,6 +124,7 @@ describe("ML AnomalyDetector", () => {
     const user = userEvent.setup();
 
     await renderDetector();
+    await user.click(screen.getByRole("button", { name: "Backend" }));
 
     await user.selectOptions(
       screen.getByRole("combobox", { name: /sigma threshold/i }),

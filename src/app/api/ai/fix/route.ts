@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { chat, checkOllamaHealth } from "@/lib/ai/ollama-client";
+import { logger } from "@/lib/logger";
 import type { ColumnProfile } from "@/types/dataset";
 
 type FixResult = {
@@ -436,13 +437,13 @@ export async function POST(request: Request) {
           return NextResponse.json({ ...parsed, mode: "ai" });
         }
       } catch (aiError) {
-        console.error("AI fix error, using fallback:", aiError);
+        logger.warn("AI fix error, using fallback", { error: aiError });
       }
     }
 
     return NextResponse.json({ ...fallback, mode: "fallback" });
   } catch (error) {
-    console.error("AI fix route error:", error);
+    logger.error("AI fix route error", { error });
     return NextResponse.json({ error: "Failed to fix SQL query." }, { status: 500 });
   }
 }

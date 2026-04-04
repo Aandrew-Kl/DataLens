@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { generateSQL } from "@/lib/ai/sql-generator";
 import { generateFallbackSQL } from "@/lib/ai/fallback";
 import { checkOllamaHealth } from "@/lib/ai/ollama-client";
+import { logger } from "@/lib/logger";
 import type { ColumnProfile } from "@/types/dataset";
 
 export async function POST(request: Request) {
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ sql, mode: ollamaOk ? "ai" : "fallback" });
   } catch (error) {
-    console.error("AI query error:", error);
+    logger.error("AI query error", { error });
     return NextResponse.json(
       { error: "Failed to generate query. Is Ollama running?" },
       { status: 500 }

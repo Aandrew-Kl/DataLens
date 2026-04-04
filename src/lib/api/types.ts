@@ -79,10 +79,40 @@ export interface ForecastResult {
   model: string;
 }
 
-export interface ApiError {
-  status: number;
-  message: string;
-  detail?: string;
+function getApiErrorDetail(body: unknown): string | undefined {
+  if (typeof body === "string" && body.trim()) {
+    return body;
+  }
+
+  if (!body || typeof body !== "object") {
+    return undefined;
+  }
+
+  const candidate = body as Record<string, unknown>;
+
+  for (const key of ["detail", "message", "error"]) {
+    const value = candidate[key];
+    if (typeof value === "string" && value.trim()) {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
+export class ApiError extends Error {
+  readonly status: number;
+  readonly body: unknown;
+  readonly detail?: string;
+
+  constructor(status: number, message: string, body: unknown = null) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.body = body;
+    this.detail = getApiErrorDetail(body);
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
 }
 
 export interface AuthToken {

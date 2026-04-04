@@ -17,6 +17,7 @@ describe("api client", () => {
   beforeEach(() => {
     jest.resetModules();
     jest.clearAllMocks();
+    jest.useRealTimers();
     window.localStorage.clear();
     Object.defineProperty(globalThis, "fetch", {
       writable: true,
@@ -41,12 +42,14 @@ describe("api client", () => {
     }
 
     const client = await import("@/lib/api/client");
+    const { ApiError } = await import("@/lib/api/types");
     const { useAuthStore } = await import("@/stores/auth-store");
 
     useAuthStore.setState({ token: null, isAuthenticated: false });
 
     return {
       ...client,
+      ApiError,
       useAuthStore,
     };
   }
@@ -60,13 +63,17 @@ describe("api client", () => {
 
     await expect(request("GET", "/status")).resolves.toEqual(responseBody);
 
-    expect(fetchMock).toHaveBeenCalledWith("https://api.example.com/status", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: undefined,
-    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.example.com/status",
+      expect.objectContaining({
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: undefined,
+        signal: expect.any(AbortSignal),
+      }),
+    );
   });
 
   test("adds bearer auth headers when a token exists", async () => {
@@ -83,14 +90,15 @@ describe("api client", () => {
 
     expect(fetchMock).toHaveBeenCalledWith(
       "http://localhost:8000/api/v1/items",
-      {
+      expect.objectContaining({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer secret-token",
         },
         body: JSON.stringify({ id: 1, name: "alpha" }),
-      },
+        signal: expect.any(AbortSignal),
+      }),
     );
   });
 
@@ -103,12 +111,17 @@ describe("api client", () => {
       ),
     );
 
-    const { request, useAuthStore } = await loadClient();
+    const { request, ApiError, useAuthStore } = await loadClient();
     useAuthStore.getState().setToken("expired-token");
 
-    await expect(request("GET", "/api/v1/protected")).rejects.toEqual({
+    const protectedRequest = request("GET", "/api/v1/protected");
+
+    await expect(protectedRequest).rejects.toBeInstanceOf(ApiError);
+    await expect(protectedRequest).rejects.toMatchObject({
       status: 401,
       message: "Unauthorized",
+      detail: "expired",
+      body: { detail: "expired" },
     });
 
     expect(useAuthStore.getState().token).toBeNull();
@@ -126,23 +139,29 @@ describe("api client", () => {
       )
       .mockResolvedValueOnce({
         ok: false,
-        status: 500,
-        statusText: "Server Error",
+        status: 400,
+        statusText: "Bad Request",
         json: jest.fn().mockRejectedValue(new Error("invalid json")),
       } as unknown as Response);
 
-    const { request } = await loadClient();
+    const { request, ApiError } = await loadClient();
 
-    await expect(request("POST", "/api/v1/items", { bad: true })).rejects.toEqual({
+    const invalidRequest = request("POST", "/api/v1/items", { bad: true });
+
+    await expect(invalidRequest).rejects.toBeInstanceOf(ApiError);
+    await expect(invalidRequest).rejects.toMatchObject({
       status: 422,
       message: "Validation failed",
       detail: "Validation failed",
+      body: { detail: "Validation failed" },
     });
 
-    await expect(request("GET", "/api/v1/fallback-error")).rejects.toEqual({
-      status: 500,
-      message: "Server Error",
-      detail: "Server Error",
+    const fallbackErrorRequest = request("GET", "/api/v1/fallback-error");
+
+    await expect(fallbackErrorRequest).rejects.toBeInstanceOf(ApiError);
+    await expect(fallbackErrorRequest).rejects.toMatchObject({
+      status: 400,
+      message: "Bad Request",
     });
   });
 
@@ -158,12 +177,76 @@ describe("api client", () => {
 
     await expect(uploadFile("/api/v1/files", file)).resolves.toEqual(responseBody);
 
-    expect(fetchMock).toHaveBeenCalledWith("https://uploads.example.com/api/v1/files", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer upload-token",
-      },
-      body: expect.any(FormData),
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://uploads.example.com/api/v1/files",
+      expect.objectContaining({
+        method: "POST",
+        headers: {
+          Authorization: "Bearer upload-token",
+        },
+        body: expect.any(FormData),
+        signal: expect.any(AbortSignal),
+      }),
+    );
+  });
+
+  test("retries transient 5xx responses with exponential backoff", async () => {
+    jest.useFakeTimers();
+    const fetchMock = jest.mocked(globalThis.fetch);
+    fetchMock
+      .mockResolvedValueOnce(
+        createJsonResponse(
+          { detail: "temporarily unavailable" },
+          { ok: false, status: 503, statusText: "Service Unavailable" },
+        ),
+      )
+      .mockResolvedValueOnce(
+        createJsonResponse(
+          { detail: "still warming up" },
+          { ok: false, status: 502, statusText: "Bad Gateway" },
+        ),
+      )
+      .mockResolvedValueOnce(createJsonResponse({ ok: true }));
+
+    const { request } = await loadClient();
+
+    const requestPromise = request("GET", "/api/v1/retry-me");
+    await jest.runAllTimersAsync();
+
+    await expect(requestPromise).resolves.toEqual({ ok: true });
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  test("times out requests and stops after the configured retry budget", async () => {
+    jest.useFakeTimers();
+    const fetchMock = jest.mocked(globalThis.fetch);
+    fetchMock.mockImplementation(
+      (_url, init) =>
+        new Promise((_resolve, reject) => {
+          const signal = init?.signal as AbortSignal | undefined;
+          signal?.addEventListener("abort", () => {
+            const abortError = new Error("The operation was aborted.");
+            abortError.name = "AbortError";
+            reject(abortError);
+          });
+        }),
+    );
+
+    const { request, ApiError } = await loadClient();
+
+    const requestPromise = request("GET", "/api/v1/slow", undefined, {
+      timeoutMs: 10,
+    }).catch((error) => error);
+    await jest.runAllTimersAsync();
+
+    const error = await requestPromise;
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({
+      status: 408,
+      message: "Request timed out after 1 second.",
+      body: null,
     });
+    expect(fetchMock).toHaveBeenCalledTimes(4);
   });
 });

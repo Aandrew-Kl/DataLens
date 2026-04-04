@@ -73,6 +73,7 @@ describe("AbTestAnalyzer", () => {
     ]);
 
     await renderAsync();
+    await user.click(screen.getByRole("button", { name: "Backend: on" }));
     await user.click(screen.getByRole("button", { name: "Analyze test" }));
 
     expect(
@@ -95,6 +96,7 @@ describe("AbTestAnalyzer", () => {
     ]);
 
     await renderAsync();
+    await user.click(screen.getByRole("button", { name: "Backend: on" }));
     await user.click(screen.getByRole("button", { name: "Analyze test" }));
     await screen.findByText(/Treatment improves conversion_rate by 27\.3% with p=/);
     await user.click(screen.getByRole("button", { name: "Export CSV" }));

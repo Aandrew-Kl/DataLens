@@ -72,6 +72,7 @@ describe("AIQueryGenerator", () => {
     mockGenerateSQL.mockResolvedValue('SELECT "month", SUM("revenue") FROM "sales" GROUP BY 1;');
 
     await renderAsync();
+    await user.click(screen.getByRole("button", { name: "Backend: ON" }));
     fireEvent.change(
       screen.getByPlaceholderText(/For example:/i),
       { target: { value: "Show monthly revenue" } },
@@ -93,6 +94,7 @@ describe("AIQueryGenerator", () => {
     mockRunQuery.mockResolvedValue([{ month: "2026-01-01" }, { month: "2026-02-01" }]);
 
     await renderAsync();
+    await user.click(screen.getByRole("button", { name: "Backend: ON" }));
     fireEvent.change(
       screen.getByPlaceholderText(/For example:/i),
       { target: { value: "Give me two rows" } },

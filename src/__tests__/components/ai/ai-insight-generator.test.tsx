@@ -96,6 +96,7 @@ describe("AIInsightGenerator", () => {
     ].join("\n"));
 
     await renderAsync();
+    await user.click(screen.getByRole("button", { name: "Backend: on" }));
     await user.click(screen.getByRole("button", { name: "Generate insights" }));
 
     expect(await screen.findByText("Trends")).toBeInTheDocument();
@@ -123,6 +124,7 @@ describe("AIInsightGenerator", () => {
     ].join("\n"));
 
     await renderAsync();
+    await user.click(screen.getByRole("button", { name: "Backend: on" }));
     await user.click(screen.getByRole("button", { name: "Generate insights" }));
     await screen.findByText("Trends");
 
