@@ -1,7 +1,9 @@
 import pandas as pd
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.api.auth import get_current_user
 from app.api.docs import build_error_responses
+from app.models.user import User
 from app.schemas.ml import (
     AnomalyRequest,
     AnomalyResponse,
@@ -32,7 +34,10 @@ router = APIRouter(prefix="/ml", tags=["ml"])
         bad_request="The regression request could not be processed with the provided dataset or parameters.",
     ),
 )
-async def run_regression(payload: RegressionRequest) -> dict:
+async def run_regression(
+    payload: RegressionRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return ml_service.regression(frame, payload)
@@ -51,7 +56,10 @@ async def run_regression(payload: RegressionRequest) -> dict:
         bad_request="The clustering request could not be processed with the provided dataset or parameters.",
     ),
 )
-async def run_clustering(payload: ClusterRequest) -> dict:
+async def run_clustering(
+    payload: ClusterRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return ml_service.cluster(frame, payload)
@@ -70,7 +78,10 @@ async def run_clustering(payload: ClusterRequest) -> dict:
         bad_request="The classification request could not be processed with the provided dataset or parameters.",
     ),
 )
-async def run_classification(payload: ClassificationRequest) -> dict:
+async def run_classification(
+    payload: ClassificationRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return ml_service.classify(frame, payload)
@@ -89,7 +100,10 @@ async def run_classification(payload: ClassificationRequest) -> dict:
         bad_request="The anomaly detection request could not be processed with the provided dataset or parameters.",
     ),
 )
-async def run_anomaly_detection(payload: AnomalyRequest) -> dict:
+async def run_anomaly_detection(
+    payload: AnomalyRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return ml_service.anomaly_detect(frame, payload)
@@ -108,7 +122,10 @@ async def run_anomaly_detection(payload: AnomalyRequest) -> dict:
         bad_request="The PCA request could not be processed with the provided dataset or parameters.",
     ),
 )
-async def run_pca(payload: PCARequest) -> dict:
+async def run_pca(
+    payload: PCARequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return ml_service.pca(frame, payload)
@@ -127,7 +144,10 @@ async def run_pca(payload: PCARequest) -> dict:
         bad_request="The decision tree request could not be processed with the provided dataset or parameters.",
     ),
 )
-async def run_decision_tree(payload: DecisionTreeRequest) -> dict:
+async def run_decision_tree(
+    payload: DecisionTreeRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return ml_service.decision_tree(frame, payload)

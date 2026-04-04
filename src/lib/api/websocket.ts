@@ -11,7 +11,8 @@ export type SocketMessageHandler = (message: SocketMessage) => void;
 export type ProgressHandler = (update: ProgressUpdate) => void;
 export type ConnectionStateHandler = (connected: boolean) => void;
 
-const DEFAULT_WEBSOCKET_URL = "ws://localhost:8000/ws/data-stream";
+const DEFAULT_WEBSOCKET_URL =
+  process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000/ws/data-stream";
 const BASE_RETRY_DELAY_MS = 500;
 const MAX_RETRY_DELAY_MS = 15_000;
 

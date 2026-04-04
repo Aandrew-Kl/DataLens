@@ -1,7 +1,9 @@
 import pandas as pd
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.api.auth import get_current_user
 from app.api.docs import build_error_responses
+from app.models.user import User
 from app.schemas.analytics import (
     ABTestResponse,
     AbTestRequest,
@@ -28,7 +30,10 @@ router = APIRouter(prefix="/analytics", tags=["analytics"])
         bad_request="The churn prediction request could not be processed with the provided dataset or parameters.",
     ),
 )
-async def predict_churn(payload: ChurnPredictRequest) -> dict:
+async def predict_churn(
+    payload: ChurnPredictRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return analytics_service.churn_predict(frame, payload)
@@ -47,7 +52,10 @@ async def predict_churn(payload: ChurnPredictRequest) -> dict:
         bad_request="The cohort analysis request could not be processed with the provided dataset or parameters.",
     ),
 )
-async def run_cohort_analysis(payload: CohortRequest) -> dict:
+async def run_cohort_analysis(
+    payload: CohortRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return analytics_service.cohort_analysis(frame, payload)
@@ -66,7 +74,10 @@ async def run_cohort_analysis(payload: CohortRequest) -> dict:
         bad_request="The A/B test request could not be processed with the provided dataset or parameters.",
     ),
 )
-async def run_ab_test(payload: AbTestRequest) -> dict:
+async def run_ab_test(
+    payload: AbTestRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return analytics_service.ab_test(frame, payload)
@@ -85,7 +96,10 @@ async def run_ab_test(payload: AbTestRequest) -> dict:
         bad_request="The forecasting request could not be processed with the provided dataset or parameters.",
     ),
 )
-async def run_forecast(payload: ForecastRequest) -> dict:
+async def run_forecast(
+    payload: ForecastRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return analytics_service.forecast(frame, payload.date_col, payload.value_col, payload.periods, payload.method)

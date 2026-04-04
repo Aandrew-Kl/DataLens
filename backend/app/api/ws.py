@@ -45,8 +45,6 @@ async def data_stream_websocket(
     chunk_size: int = Query(default=500, ge=1, le=5000),
     db: AsyncSession = Depends(get_db),
 ) -> None:
-    await websocket.accept()
-
     user = await _authenticate_user(token=token, db=db)
     if user is None:
         await websocket.close(
@@ -54,6 +52,8 @@ async def data_stream_websocket(
             reason="Invalid authentication token.",
         )
         return
+
+    await websocket.accept()
 
     result = await db.execute(
         select(Dataset).where(

@@ -1,7 +1,9 @@
 import pandas as pd
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.api.auth import get_current_user
 from app.api.docs import build_error_responses
+from app.models.user import User
 from app.schemas.ai import (
     ExplainRequest,
     ExplainResponse,
@@ -29,7 +31,10 @@ router = APIRouter(prefix="/ai", tags=["ai"])
         bad_request="The sentiment analysis request could not be processed with the provided dataset or parameters.",
     ),
 )
-async def analyze_sentiment(payload: SentimentRequest) -> dict:
+async def analyze_sentiment(
+    payload: SentimentRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return nlp_service.sentiment(frame, payload.text_column, payload.limit)
@@ -48,7 +53,10 @@ async def analyze_sentiment(payload: SentimentRequest) -> dict:
         bad_request="The summarization request could not be processed with the provided dataset or parameters.",
     ),
 )
-async def summarize_data(payload: SummarizeRequest) -> dict:
+async def summarize_data(
+    payload: SummarizeRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return nlp_service.summarize(frame, payload.dataset_id, payload.text_columns, payload.max_terms)
@@ -67,7 +75,10 @@ async def summarize_data(payload: SummarizeRequest) -> dict:
         bad_request="The SQL generation request could not be processed with the provided prompt or dataset context.",
     ),
 )
-async def generate_query(payload: QueryGenerateRequest) -> dict:
+async def generate_query(
+    payload: QueryGenerateRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         frame = pd.DataFrame(payload.data) if payload.data else pd.DataFrame()
         request = NLQueryRequest(question=payload.question, use_ollama=payload.use_ollama)
@@ -87,7 +98,10 @@ async def generate_query(payload: QueryGenerateRequest) -> dict:
         bad_request="The SQL explanation request could not be processed with the provided statement.",
     ),
 )
-async def explain_sql(payload: ExplainRequest) -> dict:
+async def explain_sql(
+    payload: ExplainRequest,
+    _current_user: User = Depends(get_current_user),
+) -> dict:
     try:
         return nlp_service.explain(payload.sql)
     except ValueError as exc:

@@ -275,6 +275,11 @@ async def on_startup() -> None:
         await connection.run_sync(Base.metadata.create_all)
 
 
+@app.on_event("shutdown")
+async def on_shutdown() -> None:
+    await engine.dispose()
+
+
 @app.get("/docs", include_in_schema=False)
 async def legacy_docs_redirect() -> RedirectResponse:
     return RedirectResponse(url="/api/docs")
