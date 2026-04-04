@@ -17,3 +17,27 @@ export interface HomeFeatureCard {
   title: string;
   description: string;
 }
+
+export type AppTab =
+  | "profile"
+  | "dashboard"
+  | "connectors"
+  | "catalog"
+  | "query"
+  | "sql"
+  | "charts"
+  | "forecast"
+  | "ml"
+  | "explore"
+  | "builder"
+  | "transforms"
+  | "wrangler"
+  | "lineage"
+  | "quality"
+  | "clean"
+  | "advanced"
+  | "analytics"
+  | "reports"
+  | "pivot"
+  | "compare"
+  | "settings";
