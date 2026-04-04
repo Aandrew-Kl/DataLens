@@ -293,7 +293,7 @@ def anomaly_detect(frame: pd.DataFrame, request: AnomalyRequest) -> dict:
 def pca(frame: pd.DataFrame, request: PCARequest) -> dict:
     """Run principal component analysis on numeric features."""
 
-    logger.info("Running %s with %d rows, features=%s", request.algorithm, frame.shape[0], request.feature_columns)
+    logger.info("Running pca with %d rows, features=%s", frame.shape[0], request.feature_columns)
 
     features = _numeric_matrix(frame, request.feature_columns)
     _require_rows(features, minimum=4)
@@ -331,7 +331,7 @@ def pca(frame: pd.DataFrame, request: PCARequest) -> dict:
 def decision_tree(frame: pd.DataFrame, request: DecisionTreeRequest) -> dict:
     """Train and export a decision tree classifier."""
 
-    logger.info("Running %s with %d rows, features=%s", request.algorithm, frame.shape[0], request.feature_columns)
+    logger.info("Running decision_tree with %d rows, features=%s", frame.shape[0], request.feature_columns)
 
     ensure_columns_exist(frame, request.feature_columns + [request.target_column])
     working = frame[request.feature_columns + [request.target_column]].dropna(subset=[request.target_column]).copy()
