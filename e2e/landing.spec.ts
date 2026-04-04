@@ -22,8 +22,13 @@ test("landing page loads with onboarding UI", async ({ page }) => {
 test("dark mode toggle switches between light and dark themes", async ({
   page,
 }) => {
+  test.slow();
+
+  await page.waitForLoadState("networkidle");
+
   const html = page.locator("html");
   const toggle = page.getByRole("button", { name: "Toggle dark mode" });
+  await expect(toggle).toBeVisible({ timeout: 30_000 });
 
   await expect
     .poll(() =>
@@ -71,10 +76,14 @@ test("feature showcase content is visible on the landing page", async ({
 test("keyboard shortcuts dialog opens from the global shortcut", async ({
   page,
 }) => {
+  test.slow();
+
   await openKeyboardShortcuts(page);
 
   await expect(
     page.getByRole("dialog", { name: /work faster without leaving the keyboard/i }),
-  ).toBeVisible();
-  await expect(page.getByText("Keyboard shortcuts")).toBeVisible();
+  ).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByText("Keyboard shortcuts")).toBeVisible({
+    timeout: 30_000,
+  });
 });

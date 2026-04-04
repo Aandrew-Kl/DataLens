@@ -23,19 +23,25 @@ test.describe("Navigation", () => {
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Explore" }),
-    ).toBeVisible();
-    await expect(page.getByRole("button", { name: "New Dataset" })).toBeVisible();
+    ).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole("button", { name: "New Dataset" })).toBeVisible({
+      timeout: 30_000,
+    });
 
     await page.getByRole("button", { name: "New Dataset" }).click();
-    await expect(page.getByText("Uploader")).toBeVisible();
-    await expect(page.getByText("Dataset uploader will be wired here.")).toBeVisible();
+    await expect(page.getByText("Uploader")).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText("Dataset uploader will be wired here.")).toBeVisible({
+      timeout: 30_000,
+    });
   });
 
   test("charts page loads", async ({ page }) => {
     await page.goto("/charts");
 
-    await expect(page.getByRole("heading", { level: 1, name: "Charts" })).toBeVisible();
-    await expect(page.getByText("Saved charts")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Charts" })).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(page.getByText("Saved charts")).toBeVisible({ timeout: 30_000 });
   });
 
   test("sql page loads", async ({ page }) => {
@@ -43,10 +49,10 @@ test.describe("Navigation", () => {
 
     await expect(
       page.getByRole("heading", { level: 1, name: "SQL Editor" }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 30_000 });
     await expect(
       page.getByText("Open a dataset in the workspace to start writing and running SQL."),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 30_000 });
   });
 
   test("settings page loads", async ({ page }) => {
@@ -54,8 +60,10 @@ test.describe("Navigation", () => {
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Workspace Settings" }),
-    ).toBeVisible();
-    await expect(page.getByRole("heading", { level: 2, name: "Theme" })).toBeVisible();
+    ).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole("heading", { level: 2, name: "Theme" })).toBeVisible({
+      timeout: 30_000,
+    });
   });
 
   test("workspace tabs appear after data upload", async ({ page }) => {

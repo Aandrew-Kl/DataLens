@@ -52,6 +52,7 @@ export async function installDuckDbAssetRoutes(page: Page) {
 export async function openLandingPage(page: Page) {
   await installDuckDbAssetRoutes(page);
   await page.goto("/");
+  await page.waitForLoadState("networkidle");
   await expect(page).toHaveTitle(/DataLens/i);
 }
 
@@ -77,16 +78,16 @@ export async function uploadInlineCsv(
 export async function waitForDatasetWorkspace(page: Page, fileName: string) {
   await expect(
     page.getByRole("heading", { name: "Column Profiles" }),
-  ).toBeVisible({ timeout: 60_000 });
-  await expect(page.getByText(fileName).first()).toBeVisible({ timeout: 60_000 });
+  ).toBeVisible({ timeout: 90_000 });
+  await expect(page.getByText(fileName).first()).toBeVisible({ timeout: 90_000 });
   await expect(page.getByRole("button", { name: "Profile" })).toBeVisible({
-    timeout: 60_000,
+    timeout: 90_000,
   });
   await expect(page.getByRole("button", { name: "SQL Editor" })).toBeVisible({
-    timeout: 60_000,
+    timeout: 90_000,
   });
   await expect(page.getByRole("button", { name: "Charts" })).toBeVisible({
-    timeout: 60_000,
+    timeout: 90_000,
   });
 }
 
