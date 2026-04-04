@@ -119,8 +119,8 @@ async def on_startup() -> None:
         await connection.run_sync(Base.metadata.create_all)
 
 
-@app.get("/health")
-@app.get("/api/v1/health")
+@app.get("/health", response_model=None)
+@app.get("/api/v1/health", response_model=None)
 async def healthcheck() -> dict[str, object] | JSONResponse:
     try:
         async with engine.connect() as connection:
