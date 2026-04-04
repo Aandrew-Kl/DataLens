@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class NLQueryRequest(BaseModel):
@@ -15,7 +15,7 @@ class NLQueryRequest(BaseModel):
 
 class SentimentRequest(BaseModel):
     data: list[dict[str, Any]]
-    text_column: str
+    text_column: str = ""
     limit: Optional[int] = None
 
 
@@ -47,7 +47,7 @@ class SummarizeResponse(BaseModel):
 
 class QueryGenerateRequest(BaseModel):
     question: str
-    schema: dict[str, list[str]]
+    schema: dict[str, list[str]] = Field(default_factory=dict)
     table_name: str = ""
     data: list[dict[str, Any]] = []
     use_ollama: bool = False

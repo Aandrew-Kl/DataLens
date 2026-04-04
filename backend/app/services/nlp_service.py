@@ -62,6 +62,9 @@ def _top_terms(texts: list[str], max_terms: int) -> list[dict[str, float | str]]
 def sentiment(frame: pd.DataFrame, text_column: str, limit: int | None = None) -> dict:
     """Analyze row-level sentiment with TextBlob."""
 
+    if not text_column:
+        raise ValueError("text_column is required.")
+
     ensure_columns_exist(frame, [text_column])
     texts = frame[text_column].dropna().astype(str)
     logger.info("Sentiment analysis on column %s, %d rows", text_column, len(texts))
