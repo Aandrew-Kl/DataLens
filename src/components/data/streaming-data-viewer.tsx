@@ -13,7 +13,8 @@ export interface StreamingDataViewerProps {
   className?: string;
 }
 
-const DEFAULT_WS_URL = "ws://localhost:8000/api/ws/data-stream";
+const DEFAULT_WS_URL =
+  process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000/ws/data-stream";
 const PANEL_CLASS =
   "rounded-2xl border border-white/20 bg-white/60 backdrop-blur-xl dark:bg-slate-900/60";
 const EASE = [0.22, 1, 0.36, 1] as const;

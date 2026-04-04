@@ -7,7 +7,8 @@ import {
   type SocketMessage,
 } from "@/lib/api/websocket";
 
-const DEFAULT_WEBSOCKET_URL = "ws://localhost:8000/ws/data-stream";
+const DEFAULT_WEBSOCKET_URL =
+  process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000/ws/data-stream";
 
 export interface UseWebSocketResult {
   isConnected: boolean;

@@ -19,7 +19,8 @@ export interface UseStreamingQueryState {
   execute: (query: string) => void;
 }
 
-const DEFAULT_WS_URL = "ws://localhost:8000/ws/data-stream";
+const DEFAULT_WS_URL =
+  process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000/ws/data-stream";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === "object" && !Array.isArray(value)

@@ -35,7 +35,7 @@ describe("StreamingDataViewer", () => {
     render(<StreamingDataViewer />);
 
     expect(mockUseStreamingQuery).toHaveBeenCalledWith(
-      "ws://localhost:8000/api/ws/data-stream",
+      "ws://localhost:8000/ws/data-stream",
     );
     expect(screen.getByText("Connected")).toBeInTheDocument();
     expect(screen.getByLabelText("WebSocket connected")).toBeInTheDocument();
