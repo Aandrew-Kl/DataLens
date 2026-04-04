@@ -25,6 +25,14 @@ function getErrorMessage(error: unknown): string {
   return "Login failed. Please try again.";
 }
 
+function buildAuthLink(pathname: string, redirectTo: string): string {
+  if (redirectTo === "/") {
+    return pathname;
+  }
+
+  return `${pathname}?redirect=${encodeURIComponent(redirectTo)}`;
+}
+
 export default function LoginForm({
   redirectTo = "/",
   className = "",
@@ -125,7 +133,13 @@ export default function LoginForm({
       </form>
 
       <p className="mt-5 text-sm text-slate-600 dark:text-slate-300">
-        Don&apos;t have an account? <Link href="/register" className="font-semibold text-cyan-700 underline underline-offset-4 dark:text-cyan-300">Register</Link>
+        Don&apos;t have an account?{" "}
+        <Link
+          href={buildAuthLink("/register", redirectTo)}
+          className="font-semibold text-cyan-700 underline underline-offset-4 dark:text-cyan-300"
+        >
+          Register
+        </Link>
       </p>
     </section>
   );

@@ -14,8 +14,10 @@ jest.mock("@/components/auth/login-form", () => ({
 }));
 
 describe("LoginPage", () => {
-  it("renders the LoginForm component", () => {
-    render(<LoginPage />);
+  it("renders the LoginForm component", async () => {
+    const page = await LoginPage({ searchParams: Promise.resolve({}) });
+
+    render(page);
 
     expect(screen.getByTestId("login-form")).toBeInTheDocument();
   });

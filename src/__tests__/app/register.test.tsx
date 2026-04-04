@@ -8,8 +8,10 @@ jest.mock("@/components/auth/register-form", () => ({
 }));
 
 describe("RegisterPage", () => {
-  it("renders the RegisterForm component", () => {
-    render(<RegisterPage />);
+  it("renders the RegisterForm component", async () => {
+    const page = await RegisterPage({ searchParams: Promise.resolve({}) });
+
+    render(page);
 
     expect(screen.getByTestId("register-form")).toBeInTheDocument();
   });

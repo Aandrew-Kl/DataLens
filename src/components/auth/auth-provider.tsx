@@ -11,6 +11,7 @@ import {
   useTransition,
 } from "react";
 import { getMe, login as apiLogin, logout as apiLogout, register as apiRegister } from "@/lib/api/auth";
+import { getStoredAuthToken } from "@/lib/auth/token-storage";
 import type { UserInfo } from "@/lib/api/types";
 
 interface AuthContextValue {
@@ -28,8 +29,6 @@ interface AuthProviderProps {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const TOKEN_KEY = "datalens_token";
-
 export default function AuthProvider({ children }: AuthProviderProps): React.ReactNode {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +42,7 @@ export default function AuthProvider({ children }: AuthProviderProps): React.Rea
       return;
     }
 
-    const hasToken = Boolean(window.localStorage.getItem(TOKEN_KEY));
+    const hasToken = Boolean(getStoredAuthToken());
     if (!hasToken) {
       startTransition(() => {
         setIsLoading(false);

@@ -1,4 +1,9 @@
-import { create } from 'zustand';
+import { create } from "zustand";
+import {
+  clearStoredAuthToken,
+  getStoredAuthToken,
+  persistAuthToken,
+} from "@/lib/auth/token-storage";
 
 interface AuthState {
   token: string | null;
@@ -7,21 +12,17 @@ interface AuthState {
   clearToken: () => void;
 }
 
-const TOKEN_KEY = 'datalens_token';
+const initialToken = getStoredAuthToken();
 
 export const useAuthStore = create<AuthState>((set) => ({
-  token: typeof window !== 'undefined' ? window.localStorage.getItem(TOKEN_KEY) : null,
-  isAuthenticated: typeof window !== 'undefined' ? Boolean(window.localStorage.getItem(TOKEN_KEY)) : false,
+  token: initialToken,
+  isAuthenticated: Boolean(initialToken),
   setToken: (token: string) => {
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(TOKEN_KEY, token);
-    }
+    persistAuthToken(token);
     set({ token, isAuthenticated: true });
   },
   clearToken: () => {
-    if (typeof window !== 'undefined') {
-      window.localStorage.removeItem(TOKEN_KEY);
-    }
+    clearStoredAuthToken();
     set({ token: null, isAuthenticated: false });
   },
 }));

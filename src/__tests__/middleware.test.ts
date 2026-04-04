@@ -21,10 +21,9 @@ const createMockRequest = (pathname: string, hasToken = false) => {
       searchParams: nextUrl.searchParams,
     },
     cookies: {
-      get: jest.fn((key: string) => (key === "datalens_token" && hasToken ? "token" : null)),
-    },
-    headers: {
-      get: jest.fn((key: string) => (key === "authorization" && hasToken ? "Bearer token" : null)),
+      get: jest.fn((key: string) =>
+        key === "datalens-auth-token" && hasToken ? { value: "token" } : null,
+      ),
     },
     url: "http://localhost:3000",
   } as const;
@@ -37,15 +36,12 @@ describe("middleware", () => {
 
   it("has the expected matcher config", () => {
     expect(config.matcher).toEqual([
-      "/settings/:path*",
-      "/reports/:path*",
-      "/login",
-      "/register",
+      "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)",
     ]);
   });
 
   it("allows public routes without token", () => {
-    const publicRoutes = ["/login", "/register"];
+    const publicRoutes = ["/", "/login", "/register"];
 
     publicRoutes.forEach((pathname) => {
       const request = createMockRequest(pathname);
@@ -56,32 +52,32 @@ describe("middleware", () => {
     });
   });
 
-  it("redirects to /login when accessing /settings without token", () => {
-    const request = createMockRequest("/settings");
+  it("redirects to /login when accessing a protected route without token", () => {
+    const request = createMockRequest("/dashboard");
     const response = middleware(request as unknown as Parameters<typeof middleware>[0]);
 
     expect(NextResponse.redirect).toHaveBeenCalledWith(
       expect.objectContaining({
         pathname: "/login",
-        search: "?redirect=%2Fsettings",
-      })
+        search: "?redirect=%2Fdashboard",
+      }),
     );
     expect(response).toEqual({
       type: "redirect",
-      url: "http://localhost:3000/login?redirect=%2Fsettings",
+      url: "http://localhost:3000/login?redirect=%2Fdashboard",
     });
   });
 
-  it("redirects to / when accessing /login with token", () => {
+  it("allows public auth routes even when a token exists", () => {
     const request = createMockRequest("/login", true);
     const response = middleware(request as unknown as Parameters<typeof middleware>[0]);
 
-    expect(NextResponse.redirect).toHaveBeenCalledWith(new URL("/", request.url));
-    expect(response).toEqual({ type: "redirect", url: "http://localhost:3000/" });
+    expect(response).toEqual({ type: "next" });
+    expect(NextResponse.next).toHaveBeenCalled();
   });
 
-  it("allows /settings with token", () => {
-    const request = createMockRequest("/settings", true);
+  it("allows protected routes when the auth cookie exists", () => {
+    const request = createMockRequest("/dashboard", true);
     const response = middleware(request as unknown as Parameters<typeof middleware>[0]);
 
     expect(response).toEqual({ type: "next" });

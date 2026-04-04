@@ -25,6 +25,14 @@ function getErrorMessage(error: unknown): string {
   return "Unable to create your account. Please try again.";
 }
 
+function buildAuthLink(pathname: string, redirectTo: string): string {
+  if (redirectTo === "/") {
+    return pathname;
+  }
+
+  return `${pathname}?redirect=${encodeURIComponent(redirectTo)}`;
+}
+
 export default function RegisterForm({
   redirectTo = "/",
   className = "",
@@ -169,7 +177,13 @@ export default function RegisterForm({
       </form>
 
       <p className="mt-5 text-sm text-slate-600 dark:text-slate-300">
-        Already have an account? <Link href="/login" className="font-semibold text-cyan-700 underline underline-offset-4 dark:text-cyan-300">Login</Link>
+        Already have an account?{" "}
+        <Link
+          href={buildAuthLink("/login", redirectTo)}
+          className="font-semibold text-cyan-700 underline underline-offset-4 dark:text-cyan-300"
+        >
+          Login
+        </Link>
       </p>
     </section>
   );
