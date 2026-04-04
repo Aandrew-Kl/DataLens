@@ -35,6 +35,7 @@ interface DataPreviewProps {
   tableName: string;
   columns: ColumnProfile[];
   previewRows: Record<string, unknown>[];
+  initialPageSize?: 10 | 25 | 50 | 100;
 }
 
 interface PreviewDataResult {
@@ -279,11 +280,15 @@ function ColumnStatsPopover({
   );
 }
 
-function DataPreviewReady({ tableName, columns }: DataPreviewProps) {
+function DataPreviewReady({
+  tableName,
+  columns,
+  initialPageSize = 25,
+}: DataPreviewProps) {
   const [sort, setSort] = useState<SortState>({ column: null, direction: null });
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(25);
+  const [pageSize, setPageSize] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(initialPageSize);
   const [widths, setWidths] = useState<Record<string, number>>({});
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
   const [selectedRowKey, setSelectedRowKey] = useState<string | null>(null);
