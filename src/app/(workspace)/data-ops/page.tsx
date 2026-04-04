@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import StreamingDataViewer from "@/components/data/streaming-data-viewer";
 import { useDatasetStore } from "@/stores/dataset-store";
 import type { ColumnProfile, DatasetMeta } from "@/types/dataset";
 
@@ -543,6 +544,14 @@ export default function DataOpsPage() {
         ) : (
           <p className="text-sm text-slate-600 dark:text-slate-300">No active dataset selected.</p>
         )}
+      </section>
+
+      <section className={glass}>
+        <h2 className="text-base font-semibold">Server-side data streaming</h2>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+          Execute a streaming query against the backend and inspect rows as they arrive from the server in real time.
+        </p>
+        <StreamingDataViewer className="mt-4 border-white/20 bg-white/45 dark:bg-slate-950/45" />
       </section>
     </div>
   );
