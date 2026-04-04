@@ -6,8 +6,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class RegressionRequest(BaseModel):
-    data: list[dict[str, Any]]
-    feature_columns: list[str]
+    data: list[dict[str, Any]] = Field(max_length=50000)
+    feature_columns: list[str] = Field(max_length=100)
     target_column: str
     algorithm: str = "linear"
     cv_folds: int = Field(default=5, ge=2)
@@ -26,8 +26,8 @@ class RegressionResponse(BaseModel):
 
 
 class ClusterRequest(BaseModel):
-    data: list[dict[str, Any]]
-    feature_columns: list[str]
+    data: list[dict[str, Any]] = Field(max_length=50000)
+    feature_columns: list[str] = Field(max_length=100)
     algorithm: str = "kmeans"
     n_clusters: int = Field(default=3, ge=1)
     eps: float = Field(default=0.5, gt=0)
@@ -45,8 +45,8 @@ class ClusterResponse(BaseModel):
 
 
 class ClassificationRequest(BaseModel):
-    data: list[dict[str, Any]]
-    feature_columns: list[str]
+    data: list[dict[str, Any]] = Field(max_length=50000)
+    feature_columns: list[str] = Field(max_length=100)
     target_column: str
     algorithm: str = "random_forest"
     test_size: float = Field(default=0.2, gt=0, lt=1)
@@ -65,8 +65,8 @@ class ClassifyResponse(BaseModel):
 
 
 class AnomalyRequest(BaseModel):
-    data: list[dict[str, Any]]
-    feature_columns: list[str]
+    data: list[dict[str, Any]] = Field(max_length=50000)
+    feature_columns: list[str] = Field(max_length=100)
     algorithm: str = "isolation_forest"
     contamination: float = Field(default=0.1, gt=0, lt=0.5)
     n_neighbors: int = Field(default=20, ge=1)
@@ -83,8 +83,8 @@ class AnomalyResponse(BaseModel):
 
 
 class PCARequest(BaseModel):
-    data: list[dict[str, Any]]
-    feature_columns: list[str]
+    data: list[dict[str, Any]] = Field(max_length=50000)
+    feature_columns: list[str] = Field(max_length=100)
     n_components: Optional[int] = Field(default=2, ge=1)
 
 
@@ -98,8 +98,8 @@ class PCAResponse(BaseModel):
 
 
 class DecisionTreeRequest(BaseModel):
-    data: list[dict[str, Any]]
-    feature_columns: list[str]
+    data: list[dict[str, Any]] = Field(max_length=50000)
+    feature_columns: list[str] = Field(max_length=100)
     target_column: str
     max_depth: Optional[int] = None
     test_size: float = Field(default=0.2, gt=0, lt=1)

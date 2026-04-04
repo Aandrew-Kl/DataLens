@@ -7,10 +7,14 @@ from httpx import AsyncClient
 pytestmark = pytest.mark.asyncio
 
 
-async def test_ai_sentiment_endpoint_returns_rows(client: AsyncClient) -> None:
+async def test_ai_sentiment_endpoint_returns_rows(
+    client: AsyncClient,
+    auth_headers: dict[str, str],
+) -> None:
     response = await client.post(
         "/ai/sentiment",
         json={"data": [{"text": "I love this"}], "text_column": "text"},
+        headers=auth_headers,
     )
 
     assert response.status_code == 200
@@ -22,6 +26,7 @@ async def test_ai_sentiment_endpoint_returns_rows(client: AsyncClient) -> None:
 async def test_ai_summarize_endpoint_returns_summary_and_top_terms(
     client: AsyncClient,
     sentiment_texts: list[str],
+    auth_headers: dict[str, str],
 ) -> None:
     response = await client.post(
         "/ai/summarize",
@@ -31,6 +36,7 @@ async def test_ai_summarize_endpoint_returns_summary_and_top_terms(
             "dataset_id": 1,
             "max_terms": 5,
         },
+        headers=auth_headers,
     )
 
     assert response.status_code == 200
@@ -40,7 +46,10 @@ async def test_ai_summarize_endpoint_returns_summary_and_top_terms(
     assert isinstance(payload["top_terms"], list)
 
 
-async def test_ai_generate_query_endpoint_returns_sql(client: AsyncClient) -> None:
+async def test_ai_generate_query_endpoint_returns_sql(
+    client: AsyncClient,
+    auth_headers: dict[str, str],
+) -> None:
     response = await client.post(
         "/ai/generate-query",
         json={
@@ -52,6 +61,7 @@ async def test_ai_generate_query_endpoint_returns_sql(client: AsyncClient) -> No
             "table_name": "test_table",
             "use_ollama": False,
         },
+        headers=auth_headers,
     )
 
     assert response.status_code == 200
@@ -60,10 +70,14 @@ async def test_ai_generate_query_endpoint_returns_sql(client: AsyncClient) -> No
     assert "COUNT(*)" in payload["sql"].upper()
 
 
-async def test_ai_explain_endpoint_returns_summary_steps_and_tables(client: AsyncClient) -> None:
+async def test_ai_explain_endpoint_returns_summary_steps_and_tables(
+    client: AsyncClient,
+    auth_headers: dict[str, str],
+) -> None:
     response = await client.post(
         "/ai/explain",
         json={"sql": "SELECT name FROM users WHERE age > 25"},
+        headers=auth_headers,
     )
 
     assert response.status_code == 200
@@ -75,10 +89,14 @@ async def test_ai_explain_endpoint_returns_summary_steps_and_tables(client: Asyn
     assert "users" in payload["tables"]
 
 
-async def test_ai_sentiment_endpoint_requires_text_column(client: AsyncClient) -> None:
+async def test_ai_sentiment_endpoint_requires_text_column(
+    client: AsyncClient,
+    auth_headers: dict[str, str],
+) -> None:
     response = await client.post(
         "/ai/sentiment",
         json={"data": [{"text": "I love this"}]},
+        headers=auth_headers,
     )
 
     assert response.status_code == 400

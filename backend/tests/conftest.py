@@ -1,10 +1,12 @@
 import sys
+from uuid import uuid4
 from pathlib import Path
 
 import numpy as np
 import pytest
 import pytest_asyncio
 from datetime import datetime, timedelta
+from httpx import AsyncClient
 from pydantic import BaseModel
 
 
@@ -141,3 +143,25 @@ async def client():
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+
+
+@pytest_asyncio.fixture
+async def auth_headers(client: AsyncClient) -> dict[str, str]:
+    """Register a user and return Authorization headers for authenticated requests."""
+    email = f"test-{uuid4()}@example.com"
+    password = "test-password-123"
+
+    register_response = await client.post(
+        "/auth/register",
+        json={"email": email, "password": password},
+    )
+    assert register_response.status_code == 201
+
+    login_response = await client.post(
+        "/auth/login",
+        json={"email": email, "password": password},
+    )
+    assert login_response.status_code == 200
+
+    access_token = login_response.json()["access_token"]
+    return {"Authorization": f"Bearer {access_token}"}

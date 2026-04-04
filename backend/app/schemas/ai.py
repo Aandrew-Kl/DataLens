@@ -14,7 +14,7 @@ class NLQueryRequest(BaseModel):
 
 
 class SentimentRequest(BaseModel):
-    data: list[dict[str, Any]]
+    data: list[dict[str, Any]] = Field(max_length=50000)
     text_column: str = ""
     limit: Optional[int] = None
 
@@ -30,7 +30,7 @@ class SentimentResponse(BaseModel):
 
 
 class SummarizeRequest(BaseModel):
-    data: list[dict[str, Any]]
+    data: list[dict[str, Any]] = Field(max_length=50000)
     dataset_id: int = 0
     text_columns: list[str] = []
     max_terms: int = 20
@@ -49,7 +49,7 @@ class QueryGenerateRequest(BaseModel):
     question: str
     schema: dict[str, list[str]] = Field(default_factory=dict)
     table_name: str = ""
-    data: list[dict[str, Any]] = []
+    data: list[dict[str, Any]] = Field(default_factory=list, max_length=50000)
     use_ollama: bool = False
 
 

@@ -10,6 +10,7 @@ pytestmark = pytest.mark.asyncio
 async def test_analytics_churn_predict_endpoint_returns_scores_and_importance(
     client: AsyncClient,
     classification_data: list[dict[str, object]],
+    auth_headers: dict[str, str],
 ) -> None:
     response = await client.post(
         "/analytics/churn-predict",
@@ -18,6 +19,7 @@ async def test_analytics_churn_predict_endpoint_returns_scores_and_importance(
             "feature_columns": ["feature_a", "feature_b", "plan"],
             "target_column": "churned",
         },
+        headers=auth_headers,
     )
 
     assert response.status_code == 200
@@ -30,6 +32,7 @@ async def test_analytics_churn_predict_endpoint_returns_scores_and_importance(
 async def test_analytics_cohort_endpoint_returns_summaries(
     client: AsyncClient,
     cohort_data: list[dict[str, object]],
+    auth_headers: dict[str, str],
 ) -> None:
     response = await client.post(
         "/analytics/cohort",
@@ -39,6 +42,7 @@ async def test_analytics_cohort_endpoint_returns_summaries(
             "signup_date_column": "signup_date",
             "activity_date_column": "activity_date",
         },
+        headers=auth_headers,
     )
 
     assert response.status_code == 200
@@ -50,6 +54,7 @@ async def test_analytics_cohort_endpoint_returns_summaries(
 async def test_analytics_ab_test_endpoint_returns_statistics(
     client: AsyncClient,
     ab_test_data: list[dict[str, object]],
+    auth_headers: dict[str, str],
 ) -> None:
     response = await client.post(
         "/analytics/ab-test",
@@ -60,6 +65,7 @@ async def test_analytics_ab_test_endpoint_returns_statistics(
             "variant_a": "A",
             "variant_b": "B",
         },
+        headers=auth_headers,
     )
 
     assert response.status_code == 200
@@ -71,6 +77,7 @@ async def test_analytics_ab_test_endpoint_returns_statistics(
 async def test_analytics_forecast_endpoint_returns_seven_points(
     client: AsyncClient,
     forecast_data: list[dict[str, object]],
+    auth_headers: dict[str, str],
 ) -> None:
     response = await client.post(
         "/analytics/forecast",
@@ -81,6 +88,7 @@ async def test_analytics_forecast_endpoint_returns_seven_points(
             "periods": 7,
             "method": "holt",
         },
+        headers=auth_headers,
     )
 
     assert response.status_code == 200

@@ -6,8 +6,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ChurnPredictRequest(BaseModel):
-    data: list[dict[str, Any]]
-    feature_columns: list[str]
+    data: list[dict[str, Any]] = Field(max_length=50000)
+    feature_columns: list[str] = Field(max_length=100)
     target_column: str
     test_size: float = Field(default=0.2, gt=0, lt=1)
 
@@ -25,7 +25,7 @@ class ChurnResponse(BaseModel):
 
 
 class CohortRequest(BaseModel):
-    data: list[dict[str, Any]]
+    data: list[dict[str, Any]] = Field(max_length=50000)
     entity_id_column: str
     signup_date_column: str
     activity_date_column: str
@@ -42,7 +42,7 @@ class CohortResponse(BaseModel):
 
 
 class AbTestRequest(BaseModel):
-    data: list[dict[str, Any]]
+    data: list[dict[str, Any]] = Field(max_length=50000)
     group_column: str
     metric_column: str
     variant_a: str
@@ -67,7 +67,7 @@ class ABTestResponse(BaseModel):
 
 
 class ForecastRequest(BaseModel):
-    data: list[dict[str, Any]]
+    data: list[dict[str, Any]] = Field(max_length=50000)
     date_col: str
     value_col: str
     periods: int = Field(default=7, ge=1)
