@@ -7,7 +7,6 @@ services:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/datalens
       JWT_SECRET: change-me
       OLLAMA_URL: http://host.docker.internal:11434
-      REDIS_URL: redis://host.docker.internal:6379/0
     depends_on:
       - postgres
   postgres:
