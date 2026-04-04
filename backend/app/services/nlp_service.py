@@ -306,7 +306,13 @@ def explain(sql: str) -> dict:
     """Explain a SQL query in plain English."""
 
     formatted = sqlparse.format(sql, reindent=True, keyword_case="upper")
-    tables = [match for match in sum(_TABLE_RE.findall(formatted), ()) if match]
+    raw_matches = _TABLE_RE.findall(formatted)
+    tables = []
+    for match in raw_matches:
+        if isinstance(match, tuple):
+            tables.extend(m for m in match if m)
+        elif match:
+            tables.append(match)
     select_clause = _SELECT_RE.search(formatted)
     where_clause = _WHERE_RE.search(formatted)
     group_clause = _GROUP_RE.search(formatted)

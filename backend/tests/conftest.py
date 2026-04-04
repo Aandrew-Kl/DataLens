@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import pytest_asyncio
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 
@@ -118,7 +119,7 @@ def sentiment_texts() -> list[str]:
     ]
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client():
     """Async HTTP client wired to the FastAPI application."""
     from httpx import ASGITransport, AsyncClient

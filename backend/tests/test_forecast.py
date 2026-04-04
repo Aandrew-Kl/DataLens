@@ -34,5 +34,5 @@ def test_forecast_too_few_rows() -> None:
             "value": [10, 20, 30],
         }
     )
-    with pytest.raises(ValueError, match="at least 8"):
+    with pytest.raises(ValueError, match="(?i)at least 8"):
         forecast(frame, date_column="date", value_column="value", periods=5, method="holt")
