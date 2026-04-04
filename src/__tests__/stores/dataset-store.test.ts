@@ -1,10 +1,7 @@
 import { useDatasetStore } from "@/stores/dataset-store";
 import type { DatasetMeta } from "@/types/dataset";
 
-function makeDataset(
-  id: string,
-  overrides: Partial<DatasetMeta> = {},
-): DatasetMeta {
+function makeDataset(id: string, overrides: Partial<DatasetMeta> = {}): DatasetMeta {
   return {
     id,
     name: `Dataset ${id}`,
@@ -35,66 +32,104 @@ function makeDataset(
 
 describe("useDatasetStore", () => {
   beforeEach(() => {
-    useDatasetStore.setState({
-      datasets: [],
-      activeDatasetId: null,
-    });
+    useDatasetStore.setState(useDatasetStore.getInitialState());
   });
 
-  it("adds datasets and makes the latest one active", () => {
-    const first = makeDataset("one");
-    const second = makeDataset("two");
+  it("has correct initial state", () => {
+    const state = useDatasetStore.getState();
+
+    expect(state.datasets).toEqual([]);
+    expect(state.activeDatasetId).toBeNull();
+  });
+
+  it("adds a dataset and makes it the active dataset", () => {
+    const dataset = makeDataset("dataset-1");
+
+    useDatasetStore.getState().addDataset(dataset);
+
+    const state = useDatasetStore.getState();
+    expect(state.datasets).toEqual([dataset]);
+    expect(state.activeDatasetId).toBe("dataset-1");
+    expect(state.getActiveDataset()).toEqual(dataset);
+  });
+
+  it("replaces active dataset whenever a new dataset is added", () => {
+    const first = makeDataset("dataset-1");
+    const second = makeDataset("dataset-2");
 
     useDatasetStore.getState().addDataset(first);
     useDatasetStore.getState().addDataset(second);
 
+    expect(useDatasetStore.getState().activeDatasetId).toBe("dataset-2");
     expect(useDatasetStore.getState().datasets).toEqual([first, second]);
-    expect(useDatasetStore.getState().activeDatasetId).toBe("two");
     expect(useDatasetStore.getState().getActiveDataset()).toEqual(second);
   });
 
-  it("switches the active dataset by id", () => {
-    const first = makeDataset("one");
-    const second = makeDataset("two");
+  it("sets active dataset by id", () => {
+    const first = makeDataset("dataset-1");
+    const second = makeDataset("dataset-2");
 
     useDatasetStore.getState().addDataset(first);
     useDatasetStore.getState().addDataset(second);
-    useDatasetStore.getState().setActiveDataset("one");
+    useDatasetStore.getState().setActiveDataset("dataset-1");
 
-    expect(useDatasetStore.getState().activeDatasetId).toBe("one");
-    expect(useDatasetStore.getState().getActiveDataset()).toEqual(first);
+    const state = useDatasetStore.getState();
+    expect(state.activeDatasetId).toBe("dataset-1");
+    expect(state.getActiveDataset()).toEqual(first);
   });
 
-  it("removes inactive datasets without changing the active selection", () => {
-    const first = makeDataset("one");
-    const second = makeDataset("two");
+  it("clears active dataset when null is set", () => {
+    useDatasetStore.getState().addDataset(makeDataset("dataset-1"));
+    useDatasetStore.getState().setActiveDataset(null);
+
+    const state = useDatasetStore.getState();
+    expect(state.activeDatasetId).toBeNull();
+    expect(state.getActiveDataset()).toBeUndefined();
+  });
+
+  it("removes an inactive dataset without changing active dataset", () => {
+    const first = makeDataset("dataset-1");
+    const second = makeDataset("dataset-2");
 
     useDatasetStore.getState().addDataset(first);
     useDatasetStore.getState().addDataset(second);
-    useDatasetStore.getState().removeDataset("one");
+    useDatasetStore.getState().removeDataset("dataset-1");
 
-    expect(useDatasetStore.getState().datasets).toEqual([second]);
-    expect(useDatasetStore.getState().activeDatasetId).toBe("two");
-    expect(useDatasetStore.getState().getActiveDataset()).toEqual(second);
+    const state = useDatasetStore.getState();
+    expect(state.datasets).toEqual([second]);
+    expect(state.activeDatasetId).toBe("dataset-2");
+    expect(state.getActiveDataset()).toEqual(second);
   });
 
-  it("clears the active id when removing the active dataset", () => {
-    const first = makeDataset("one");
-    const second = makeDataset("two");
+  it("clears active dataset when the active dataset is removed", () => {
+    const first = makeDataset("dataset-1");
+    const second = makeDataset("dataset-2");
 
     useDatasetStore.getState().addDataset(first);
     useDatasetStore.getState().addDataset(second);
-    useDatasetStore.getState().removeDataset("two");
+    useDatasetStore.getState().setActiveDataset("dataset-1");
+    useDatasetStore.getState().removeDataset("dataset-1");
 
-    expect(useDatasetStore.getState().datasets).toEqual([first]);
-    expect(useDatasetStore.getState().activeDatasetId).toBeNull();
-    expect(useDatasetStore.getState().getActiveDataset()).toBeUndefined();
+    const state = useDatasetStore.getState();
+    expect(state.datasets).toEqual([second]);
+    expect(state.activeDatasetId).toBeNull();
+    expect(state.getActiveDataset()).toBeUndefined();
   });
 
-  it("returns undefined when the active id does not match a dataset", () => {
-    useDatasetStore.getState().addDataset(makeDataset("one"));
+  it("returns undefined when active dataset id does not resolve", () => {
+    useDatasetStore.getState().addDataset(makeDataset("dataset-1"));
     useDatasetStore.getState().setActiveDataset("missing");
 
     expect(useDatasetStore.getState().getActiveDataset()).toBeUndefined();
+  });
+
+  it("does not change state when removing a non-existing dataset", () => {
+    const dataset = makeDataset("dataset-1");
+    useDatasetStore.getState().addDataset(dataset);
+
+    useDatasetStore.getState().removeDataset("non-existent");
+
+    expect(useDatasetStore.getState().datasets).toEqual([dataset]);
+    expect(useDatasetStore.getState().activeDatasetId).toBe("dataset-1");
   });
 });

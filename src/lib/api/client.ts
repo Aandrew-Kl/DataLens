@@ -1,18 +1,10 @@
 import type { ApiError } from "./types";
+import { useAuthStore } from "@/stores/auth-store";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 function getToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("datalens_token");
-}
-
-export function saveToken(token: string): void {
-  localStorage.setItem("datalens_token", token);
-}
-
-export function clearToken(): void {
-  localStorage.removeItem("datalens_token");
+  return useAuthStore.getState().token;
 }
 
 export async function request<T>(
@@ -36,7 +28,7 @@ export async function request<T>(
   });
 
   if (res.status === 401) {
-    clearToken();
+    useAuthStore.getState().clearToken();
     throw { status: 401, message: "Unauthorized" } satisfies ApiError;
   }
 

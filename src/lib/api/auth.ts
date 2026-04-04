@@ -1,15 +1,16 @@
-import { request, saveToken, clearToken } from "./client";
+import { request } from "./client";
+import { useAuthStore } from "@/stores/auth-store";
 import type { AuthToken, UserInfo } from "./types";
 
 export async function register(email: string, password: string): Promise<AuthToken> {
   const result = await request<AuthToken>("POST", "/api/v1/auth/register", { email, password });
-  saveToken(result.access_token);
+  useAuthStore.getState().setToken(result.access_token);
   return result;
 }
 
 export async function login(email: string, password: string): Promise<AuthToken> {
   const result = await request<AuthToken>("POST", "/api/v1/auth/login", { email, password });
-  saveToken(result.access_token);
+  useAuthStore.getState().setToken(result.access_token);
   return result;
 }
 
@@ -18,5 +19,5 @@ export async function getMe(): Promise<UserInfo> {
 }
 
 export function logout(): void {
-  clearToken();
+  useAuthStore.getState().clearToken();
 }

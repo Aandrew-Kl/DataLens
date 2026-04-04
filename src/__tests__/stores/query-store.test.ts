@@ -28,14 +28,18 @@ function makeResult(overrides: Partial<QueryResult> = {}): QueryResult {
 
 describe("useQueryStore", () => {
   beforeEach(() => {
-    useQueryStore.setState({
-      history: [],
-      lastResult: null,
-      isQuerying: false,
-    });
+    useQueryStore.setState(useQueryStore.getInitialState());
   });
 
-  it("prepends new history entries so the newest query is first", () => {
+  it("has correct initial state", () => {
+    const state = useQueryStore.getState();
+
+    expect(state.history).toEqual([]);
+    expect(state.lastResult).toBeNull();
+    expect(state.isQuerying).toBe(false);
+  });
+
+  it("prepends history entries and keeps newest first", () => {
     useQueryStore.getState().addToHistory(makeSavedQuery(1));
     useQueryStore.getState().addToHistory(makeSavedQuery(2));
 
@@ -45,7 +49,7 @@ describe("useQueryStore", () => {
     ]);
   });
 
-  it("keeps only the latest fifty history entries", () => {
+  it("keeps at most fifty history entries", () => {
     for (let index = 0; index < 60; index += 1) {
       useQueryStore.getState().addToHistory(makeSavedQuery(index));
     }
@@ -58,7 +62,7 @@ describe("useQueryStore", () => {
   });
 
   it("stores and clears the last query result", () => {
-    const result = makeResult();
+    const result = makeResult({ rowCount: 2 });
 
     useQueryStore.getState().setLastResult(result);
     expect(useQueryStore.getState().lastResult).toEqual(result);
@@ -67,7 +71,7 @@ describe("useQueryStore", () => {
     expect(useQueryStore.getState().lastResult).toBeNull();
   });
 
-  it("tracks whether a query is currently running", () => {
+  it("tracks query running state", () => {
     useQueryStore.getState().setIsQuerying(true);
     expect(useQueryStore.getState().isQuerying).toBe(true);
 
@@ -75,14 +79,14 @@ describe("useQueryStore", () => {
     expect(useQueryStore.getState().isQuerying).toBe(false);
   });
 
-  it("clears history without resetting other query state", () => {
+  it("clears only history when requested", () => {
     const lastResult = makeResult({
       sql: "SELECT COUNT(*)",
       rowCount: 42,
     });
 
     useQueryStore.setState({
-      history: [makeSavedQuery(1)],
+      history: [makeSavedQuery(1), makeSavedQuery(2)],
       lastResult,
       isQuerying: true,
     });
@@ -92,5 +96,15 @@ describe("useQueryStore", () => {
     expect(useQueryStore.getState().history).toEqual([]);
     expect(useQueryStore.getState().lastResult).toEqual(lastResult);
     expect(useQueryStore.getState().isQuerying).toBe(true);
+  });
+
+  it("does not modify history when clearing an empty history", () => {
+    useQueryStore.getState().clearHistory();
+
+    expect(useQueryStore.getState()).toMatchObject({
+      history: [],
+      lastResult: null,
+      isQuerying: false,
+    });
   });
 });

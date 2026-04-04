@@ -1,4 +1,4 @@
-import type { Bookmark } from "@/stores/bookmark-store";
+import { useBookmarkStore, type Bookmark } from "@/stores/bookmark-store";
 
 const STORAGE_KEY = "datalens-bookmarks";
 
@@ -16,7 +16,7 @@ function makeBookmark(
   };
 }
 
-async function loadBookmarkStore() {
+async function loadFreshBookmarkStore() {
   jest.resetModules();
   return import("@/stores/bookmark-store");
 }
@@ -25,35 +25,39 @@ describe("useBookmarkStore", () => {
   beforeEach(() => {
     window.localStorage.clear();
     jest.restoreAllMocks();
+    useBookmarkStore.setState(useBookmarkStore.getInitialState());
   });
 
-  it("hydrates valid bookmarks from localStorage and filters invalid records", async () => {
+  it("has correct initial state", () => {
+    expect(useBookmarkStore.getState().bookmarks).toEqual([]);
+  });
+
+  it("hydrates bookmarks from localStorage and filters invalid records", async () => {
     const valid = makeBookmark("valid");
     window.localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify([
         valid,
-        { id: 123, label: "broken" },
-        { ...makeBookmark("bad-date"), createdAt: "later" },
+        { id: 123, label: "broken", datasetId: "bad", tableName: "x" },
+        { ...makeBookmark("invalid"), createdAt: "later" },
       ]),
     );
 
-    const { useBookmarkStore } = await loadBookmarkStore();
+    const { useBookmarkStore: fresh } = await loadFreshBookmarkStore();
 
-    expect(useBookmarkStore.getState().bookmarks).toEqual([valid]);
+    expect(fresh.getState().bookmarks).toEqual([valid]);
   });
 
-  it("falls back to an empty list when localStorage contains malformed JSON", async () => {
+  it("falls back to an empty list for malformed localStorage JSON", async () => {
     window.localStorage.setItem(STORAGE_KEY, "{broken-json");
 
-    const { useBookmarkStore } = await loadBookmarkStore();
+    const { useBookmarkStore: fresh } = await loadFreshBookmarkStore();
 
-    expect(useBookmarkStore.getState().bookmarks).toEqual([]);
+    expect(fresh.getState().bookmarks).toEqual([]);
   });
 
-  it("adds bookmarks, de-duplicates ids, and persists the latest value", async () => {
-    const { useBookmarkStore } = await loadBookmarkStore();
-    const original = makeBookmark("same-id", {
+  it("adds bookmarks, de-duplicates ids, and persists to localStorage", () => {
+    const first = makeBookmark("same-id", {
       label: "Original",
       createdAt: 1_700_000_000_000,
     });
@@ -62,7 +66,7 @@ describe("useBookmarkStore", () => {
       createdAt: 1_800_000_000_000,
     });
 
-    useBookmarkStore.getState().addBookmark(original);
+    useBookmarkStore.getState().addBookmark(first);
     useBookmarkStore.getState().addBookmark(replacement);
 
     expect(useBookmarkStore.getState().bookmarks).toEqual([replacement]);
@@ -71,8 +75,7 @@ describe("useBookmarkStore", () => {
     ]);
   });
 
-  it("removes bookmarks from both the store and localStorage", async () => {
-    const { useBookmarkStore } = await loadBookmarkStore();
+  it("removes bookmarks and keeps memory and storage consistent", () => {
     const first = makeBookmark("first");
     const second = makeBookmark("second");
 
@@ -86,8 +89,16 @@ describe("useBookmarkStore", () => {
     ]);
   });
 
-  it("filters bookmarks by dataset and sorts them newest-first", async () => {
-    const { useBookmarkStore } = await loadBookmarkStore();
+  it("does nothing when removing a missing bookmark", () => {
+    const bookmark = makeBookmark("first");
+
+    useBookmarkStore.getState().addBookmark(bookmark);
+    useBookmarkStore.getState().removeBookmark("missing");
+
+    expect(useBookmarkStore.getState().bookmarks).toEqual([bookmark]);
+  });
+
+  it("filters bookmarks by dataset and sorts newest-first", () => {
     const older = makeBookmark("older", {
       datasetId: "dataset-1",
       createdAt: 100,
@@ -111,13 +122,27 @@ describe("useBookmarkStore", () => {
     ]);
   });
 
-  it("clears bookmarks and persists the empty state", async () => {
-    const { useBookmarkStore } = await loadBookmarkStore();
-
+  it("clears bookmarks and persists empty storage", () => {
     useBookmarkStore.getState().addBookmark(makeBookmark("first"));
     useBookmarkStore.getState().clearBookmarks();
 
     expect(useBookmarkStore.getState().bookmarks).toEqual([]);
     expect(window.localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify([]));
+  });
+
+  it("keeps in-memory state when localStorage writes fail", () => {
+    const setItemSpy = jest
+      .spyOn(Storage.prototype, "setItem")
+      .mockImplementation(() => {
+        throw new Error("No storage");
+      });
+
+    const bookmark = makeBookmark("storage-fail");
+
+    useBookmarkStore.getState().addBookmark(bookmark);
+
+    expect(useBookmarkStore.getState().bookmarks).toEqual([bookmark]);
+
+    setItemSpy.mockRestore();
   });
 });

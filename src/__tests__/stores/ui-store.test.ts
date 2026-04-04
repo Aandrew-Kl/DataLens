@@ -1,15 +1,38 @@
 import { useUIStore } from "@/stores/ui-store";
 
 describe("useUIStore", () => {
+  const darkClassTokens = new Set<string>();
+
   beforeEach(() => {
-    useUIStore.setState({
-      sidebarOpen: true,
-      theme: "light",
+    darkClassTokens.clear();
+    jest.restoreAllMocks();
+
+    jest.spyOn(document.documentElement.classList, "add").mockImplementation((...tokens: string[]) => {
+      tokens.forEach((token) => darkClassTokens.add(token));
     });
-    document.documentElement.classList.remove("dark");
+
+    jest
+      .spyOn(document.documentElement.classList, "remove")
+      .mockImplementation((...tokens: string[]) => {
+        tokens.forEach((token) => darkClassTokens.delete(token));
+      });
+
+    jest
+      .spyOn(document.documentElement.classList, "contains")
+      .mockImplementation((token) => darkClassTokens.has(token));
+
+    useUIStore.setState(useUIStore.getInitialState());
   });
 
-  it("toggles the sidebar open state", () => {
+  it("has correct initial state", () => {
+    const state = useUIStore.getState();
+
+    expect(state.sidebarOpen).toBe(true);
+    expect(state.theme).toBe("light");
+    expect(document.documentElement.classList.contains("dark")).toBe(false);
+  });
+
+  it("toggles sidebar open state", () => {
     useUIStore.getState().toggleSidebar();
     expect(useUIStore.getState().sidebarOpen).toBe(false);
 
@@ -17,15 +40,16 @@ describe("useUIStore", () => {
     expect(useUIStore.getState().sidebarOpen).toBe(true);
   });
 
-  it("sets the dark theme and applies the dark class", () => {
+  it("adds dark class and updates theme when setting dark theme", () => {
     useUIStore.getState().setTheme("dark");
 
     expect(useUIStore.getState().theme).toBe("dark");
     expect(document.documentElement.classList.contains("dark")).toBe(true);
   });
 
-  it("sets the light theme and removes the dark class", () => {
-    document.documentElement.classList.add("dark");
+  it("removes dark class and updates theme when setting light theme", () => {
+    useUIStore.getState().setTheme("dark");
+    darkClassTokens.add("dark");
 
     useUIStore.getState().setTheme("light");
 
@@ -33,7 +57,7 @@ describe("useUIStore", () => {
     expect(document.documentElement.classList.contains("dark")).toBe(false);
   });
 
-  it("toggles between light and dark themes while updating the DOM class", () => {
+  it("toggles theme and keeps class list synchronized", () => {
     useUIStore.getState().toggleTheme();
 
     expect(useUIStore.getState().theme).toBe("dark");
@@ -43,5 +67,13 @@ describe("useUIStore", () => {
 
     expect(useUIStore.getState().theme).toBe("light");
     expect(document.documentElement.classList.contains("dark")).toBe(false);
+  });
+
+  it("is idempotent when setting the same theme value", () => {
+    useUIStore.getState().setTheme("dark");
+    useUIStore.getState().setTheme("dark");
+
+    expect(useUIStore.getState().theme).toBe("dark");
+    expect(document.documentElement.classList.contains("dark")).toBe(true);
   });
 });

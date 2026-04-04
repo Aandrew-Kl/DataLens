@@ -21,26 +21,31 @@ function makeChart(overrides: Partial<DraftChart> = {}): DraftChart {
 
 describe("useChartStore", () => {
   beforeEach(() => {
-    useChartStore.setState({
-      savedCharts: [],
-      activeChartId: null,
-      chartHistory: [],
-    });
+    useChartStore.setState(useChartStore.getInitialState());
     jest.restoreAllMocks();
   });
 
-  it("adds a chart, stamps timestamps, and clones mutable fields", () => {
-    jest.spyOn(Date, "now").mockReturnValue(1_700_000_000_000);
+  it("has correct initial state", () => {
+    const state = useChartStore.getState();
 
+    expect(state.savedCharts).toEqual([]);
+    expect(state.activeChartId).toBeNull();
+    expect(state.chartHistory).toEqual([]);
+  });
+
+  it("adds a chart with generated id when not provided and stores cloned data", () => {
+    const now = 1_700_000_000_000;
     const sourceColumns = ["month", "revenue"];
     const sourceOptions = { palette: ["#0f172a"] };
-    const input = makeChart({
+    const chart = makeChart({
       id: "",
       columns: sourceColumns,
       options: sourceOptions,
     });
 
-    useChartStore.getState().addChart(input);
+    jest.spyOn(Date, "now").mockReturnValue(now);
+
+    useChartStore.getState().addChart(chart);
 
     sourceColumns.push("profit");
     sourceOptions.palette.push("#10b981");
@@ -48,33 +53,46 @@ describe("useChartStore", () => {
     const state = useChartStore.getState();
     const saved = state.savedCharts[0];
 
-    expect(saved).toMatchObject({
-      type: "bar",
-      title: "Revenue by Month",
-      columns: ["month", "revenue"],
-      options: { palette: ["#0f172a"] },
-      createdAt: 1_700_000_000_000,
-      updatedAt: 1_700_000_000_000,
-    });
-    expect(saved.id).toMatch(/^chart_/);
     expect(state.activeChartId).toBe(saved.id);
+    expect(saved.id).toMatch(/^chart_/);
+    expect(saved.columns).toEqual(["month", "revenue"]);
+    expect(saved.options).toEqual({ palette: ["#0f172a"] });
+    expect(saved.createdAt).toBe(now);
+    expect(saved.updatedAt).toBe(now);
     expect(state.chartHistory[0]).toEqual(saved);
   });
 
-  it("removes the active chart and falls back to the next saved chart", () => {
-    useChartStore.getState().addChart(makeChart({ id: "chart-a", title: "Chart A" }));
-    useChartStore.getState().addChart(makeChart({ id: "chart-b", title: "Chart B" }));
+  it("keeps provided chart id when supplied", () => {
+    useChartStore.getState().addChart(makeChart({ id: "provided-id" }));
+
+    expect(useChartStore.getState().savedCharts[0]?.id).toBe("provided-id");
+    expect(useChartStore.getState().activeChartId).toBe("provided-id");
+  });
+
+  it("removes a chart and falls back active chart id", () => {
+    useChartStore.getState().addChart(makeChart({ id: "chart-a", title: "A" }));
+    useChartStore.getState().addChart(makeChart({ id: "chart-b", title: "B" }));
 
     useChartStore.getState().removeChart("chart-b");
 
     const state = useChartStore.getState();
-
     expect(state.savedCharts.map((chart) => chart.id)).toEqual(["chart-a"]);
     expect(state.activeChartId).toBe("chart-a");
     expect(state.chartHistory[0]?.id).toBe("chart-b");
   });
 
-  it("updates a chart, preserves its identity, and stores the previous snapshot in history", () => {
+  it("does nothing when removing a non-existing chart", () => {
+    useChartStore.getState().addChart(makeChart({ id: "chart-a" }));
+
+    useChartStore.getState().removeChart("missing");
+
+    expect(useChartStore.getState().savedCharts.map((chart) => chart.id)).toEqual([
+      "chart-a",
+    ]);
+    expect(useChartStore.getState().activeChartId).toBe("chart-a");
+  });
+
+  it("updates a chart and pushes previous version into history", () => {
     const nowSpy = jest.spyOn(Date, "now");
     nowSpy.mockReturnValueOnce(100).mockReturnValueOnce(250);
 
@@ -82,7 +100,6 @@ describe("useChartStore", () => {
 
     const patchColumns = ["region"];
     const patchOptions = { legend: { show: true } };
-
     useChartStore.getState().updateChart("chart-1", {
       title: "Updated",
       columns: patchColumns,
@@ -90,7 +107,7 @@ describe("useChartStore", () => {
     });
 
     patchColumns.push("profit");
-    Object.assign(patchOptions, { tooltip: { trigger: "axis" } });
+    patchOptions.legend.show = false;
 
     const state = useChartStore.getState();
     const saved = state.savedCharts[0];
@@ -107,34 +124,60 @@ describe("useChartStore", () => {
     expect(state.chartHistory[0]).toMatchObject({
       id: "chart-1",
       title: "Original",
+      columns: ["month", "revenue"],
       createdAt: 100,
       updatedAt: 100,
     });
   });
 
-  it("duplicates a chart with a new id and a copy suffix in the title", () => {
+  it("does not update state when attempting to update missing chart", () => {
+    useChartStore.getState().addChart(makeChart({ id: "chart-1" }));
+
+    useChartStore.getState().updateChart("missing", {
+      title: "Never",
+    });
+
+    const stored = useChartStore.getState().savedCharts;
+    expect(stored).toHaveLength(1);
+    expect(stored[0].id).toBe("chart-1");
+    expect(stored[0].title).toBe("Revenue by Month");
+  });
+
+  it("duplicates a chart and generates a new id", () => {
     const nowSpy = jest.spyOn(Date, "now");
     nowSpy.mockReturnValueOnce(100).mockReturnValueOnce(200);
 
-    useChartStore.getState().addChart(makeChart({ id: "chart-1", title: "Bookings" }));
-
+    useChartStore.getState().addChart(makeChart({ id: "chart-1", title: "Original" }));
     useChartStore.getState().duplicateChart("chart-1");
 
     const state = useChartStore.getState();
     const duplicated = state.savedCharts[0];
     const original = state.savedCharts[1];
 
-    expect(state.savedCharts).toHaveLength(2);
+    expect(duplicated).toMatchObject({
+      id: expect.any(String),
+      title: "Original Copy",
+      columns: original.columns,
+      options: original.options,
+      createdAt: 200,
+      updatedAt: 200,
+    });
     expect(duplicated.id).not.toBe(original.id);
-    expect(duplicated.title).toBe("Bookings Copy");
-    expect(duplicated.columns).toEqual(original.columns);
-    expect(duplicated.options).toEqual(original.options);
-    expect(duplicated.createdAt).toBe(200);
     expect(state.activeChartId).toBe(duplicated.id);
     expect(state.chartHistory[0]?.id).toBe(duplicated.id);
   });
 
-  it("reorders charts and ignores invalid reorder requests", () => {
+  it("does nothing when duplicating a missing chart", () => {
+    useChartStore.getState().addChart(makeChart({ id: "chart-1" }));
+
+    useChartStore.getState().duplicateChart("missing");
+
+    expect(useChartStore.getState().savedCharts).toEqual([
+      expect.objectContaining({ id: "chart-1" }),
+    ]);
+  });
+
+  it("reorders charts when indices are valid and ignores invalid reorder requests", () => {
     useChartStore.getState().addChart(makeChart({ id: "chart-a", title: "A" }));
     useChartStore.getState().addChart(makeChart({ id: "chart-b", title: "B" }));
     useChartStore.getState().addChart(makeChart({ id: "chart-c", title: "C" }));
@@ -147,6 +190,7 @@ describe("useChartStore", () => {
     ]);
 
     useChartStore.getState().reorderCharts(-1, 1);
+    useChartStore.getState().reorderCharts(1, 3);
     expect(useChartStore.getState().savedCharts.map((chart) => chart.id)).toEqual([
       "chart-b",
       "chart-a",
@@ -154,7 +198,19 @@ describe("useChartStore", () => {
     ]);
   });
 
-  it("clears all saved charts and history", () => {
+  it("keeps query history bounded to ten entries", () => {
+    for (let index = 0; index < 11; index += 1) {
+      useChartStore.getState().addChart(makeChart({ id: `chart-${index}` }));
+    }
+
+    const state = useChartStore.getState();
+
+    expect(state.chartHistory).toHaveLength(10);
+    expect(state.chartHistory[0]?.id).toBe("chart-10");
+    expect(state.chartHistory[9]?.id).toBe("chart-1");
+  });
+
+  it("clears charts and history", () => {
     useChartStore.getState().addChart(makeChart({ id: "chart-a" }));
     useChartStore.getState().addChart(makeChart({ id: "chart-b" }));
 
