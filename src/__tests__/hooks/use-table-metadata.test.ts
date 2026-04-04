@@ -221,4 +221,34 @@ describe("useTableMetadata", () => {
 
     expect(result.current).toHaveLength(0);
   });
+
+  it("quotes table identifiers safely when counting rows", async () => {
+    mockRunQuery.mockImplementation(async (sql) => {
+      if (sql.includes("information_schema.tables")) {
+        return [{ table_name: 'sales"daily', column_count: "2" }];
+      }
+
+      if (sql.includes('COUNT(*) AS row_count FROM "sales""daily"')) {
+        return [{ row_count: 4 }];
+      }
+
+      return [];
+    });
+
+    const { result } = renderHook(() => useTableMetadata());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+      expect(result.current).toHaveLength(1);
+    });
+
+    expect(result.current[0]).toMatchObject({
+      tableName: 'sales"daily',
+      columnCount: 2,
+      rowCountEstimate: 4,
+    });
+    expect(mockRunQuery).toHaveBeenCalledWith(
+      expect.stringContaining('COUNT(*) AS row_count FROM "sales""daily"'),
+    );
+  });
 });

@@ -182,6 +182,40 @@ describe("useColumnStats", () => {
     expect(result.current.refreshedAt).toBeNull();
   });
 
+  it("falls back to empty aggregates when DuckDB returns no rows", async () => {
+    jest.spyOn(Date, "now").mockReturnValue(1_700_000_555_000);
+    mockRunQuery.mockResolvedValueOnce([]);
+
+    const { result } = renderHook(() => useColumnStats("orders", "missing_metric"));
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current).toMatchObject({
+      tableName: "orders",
+      columnName: "missing_metric",
+      count: 0,
+      nonNullCount: 0,
+      distinctCount: 0,
+      nullCount: 0,
+      min: null,
+      max: null,
+      mean: null,
+      median: null,
+      stddev: null,
+      percentiles: {
+        p25: null,
+        p50: null,
+        p75: null,
+        p95: null,
+        p99: null,
+      },
+      refreshedAt: 1_700_000_555_000,
+      error: null,
+    });
+  });
+
   it("ignores stale responses after the table or column changes mid-request", async () => {
     const firstRequest = createDeferred<Record<string, unknown>[]>();
     const secondRequest = createDeferred<Record<string, unknown>[]>();

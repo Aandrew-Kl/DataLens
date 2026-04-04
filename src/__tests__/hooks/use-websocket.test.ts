@@ -1,85 +1,185 @@
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from "@testing-library/react";
 
+import { useWebSocket } from "@/hooks/use-websocket";
 import {
+  DataLensSocket,
   type ProgressUpdate,
   type SocketMessage,
-} from '@/lib/api/websocket';
-import { DataLensSocket } from '@/lib/api/websocket';
-import { useWebSocket } from '@/hooks/use-websocket';
+} from "@/lib/api/websocket";
 
-jest.mock('@/lib/api/websocket', () => {
-  const actual = jest.requireActual('@/lib/api/websocket');
+jest.mock("@/lib/api/websocket", () => ({
+  DataLensSocket: jest.fn(),
+}));
 
-  return {
-    ...actual,
-    DataLensSocket: jest.fn(),
+interface MockSocketInstance {
+  url: string;
+  connect: jest.Mock<void, [string | undefined]>;
+  disconnect: jest.Mock<void, []>;
+  send: jest.Mock<void, [unknown]>;
+  onMessage: jest.Mock<void, [(message: SocketMessage) => void]>;
+  onProgress: jest.Mock<void, [(update: ProgressUpdate) => void]>;
+  onConnectionStateChange: jest.Mock<void, [(connected: boolean) => void]>;
+  messageHandler?: (message: SocketMessage) => void;
+  progressHandler?: (update: ProgressUpdate) => void;
+  connectionHandler?: (connected: boolean) => void;
+}
+
+const DEFAULT_URL = "ws://localhost:8000/ws/data-stream";
+const originalLocalStorage = window.localStorage;
+
+function createSocketInstance(url: string): MockSocketInstance {
+  const instance: MockSocketInstance = {
+    url,
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+    send: jest.fn(),
+    onMessage: jest.fn((callback: (message: SocketMessage) => void) => {
+      instance.messageHandler = callback;
+    }),
+    onProgress: jest.fn((callback: (update: ProgressUpdate) => void) => {
+      instance.progressHandler = callback;
+    }),
+    onConnectionStateChange: jest.fn((callback: (connected: boolean) => void) => {
+      instance.connectionHandler = callback;
+    }),
   };
-});
 
-describe('useWebSocket', () => {
-  let mockInstance: {
-    connect: jest.Mock;
-    disconnect: jest.Mock;
-    send: jest.Mock;
-    onMessage: jest.Mock;
-    onProgress: jest.Mock;
-    onConnectionStateChange: jest.Mock;
-  };
+  return instance;
+}
+
+describe("useWebSocket", () => {
+  let storageState: Record<string, string>;
+  let getItemMock: jest.Mock<string | null, [string]>;
+  let socketInstances: MockSocketInstance[];
 
   beforeEach(() => {
-    const mockedConstructor = DataLensSocket as jest.Mock;
-    mockInstance = {
-      connect: jest.fn(),
-      disconnect: jest.fn(),
-      send: jest.fn(),
-      onMessage: jest.fn((callback: (message: SocketMessage) => void) => {
-        void callback;
-      }),
-      onProgress: jest.fn((callback: (nextProgress: ProgressUpdate) => void) => {
-        void callback;
-      }),
-      onConnectionStateChange: jest.fn((callback: (connected: boolean) => void) => {
-        void callback;
-      }),
-    };
+    storageState = {};
+    getItemMock = jest.fn((key: string) => storageState[key] ?? null);
+    socketInstances = [];
 
-    mockedConstructor.mockReset();
-    mockedConstructor.mockImplementation(() => mockInstance);
-    localStorage.clear();
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      value: {
+        clear: jest.fn(() => {
+          storageState = {};
+        }),
+        getItem: getItemMock,
+        key: jest.fn((index: number) => Object.keys(storageState)[index] ?? null),
+        get length() {
+          return Object.keys(storageState).length;
+        },
+        removeItem: jest.fn((key: string) => {
+          delete storageState[key];
+        }),
+        setItem: jest.fn((key: string, value: string) => {
+          storageState[key] = value;
+        }),
+      } as unknown as Storage,
+    });
+
+    const mockedSocket = DataLensSocket as jest.MockedClass<typeof DataLensSocket>;
+    mockedSocket.mockReset();
+    mockedSocket.mockImplementation((url = DEFAULT_URL) => {
+      const instance = createSocketInstance(url);
+      socketInstances.push(instance);
+      return instance as unknown as DataLensSocket;
+    });
   });
 
   afterEach(() => {
-    localStorage.clear();
+    jest.restoreAllMocks();
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      value: originalLocalStorage,
+    });
   });
 
-  it('returns isConnected false initially', () => {
-    const { result } = renderHook(() => useWebSocket());
+  function getLatestSocket(): MockSocketInstance {
+    const latestSocket = socketInstances.at(-1);
+    if (!latestSocket) {
+      throw new Error("Expected a socket instance to be created.");
+    }
 
-    expect(result.current.isConnected).toBe(false);
-  });
+    return latestSocket;
+  }
 
-  it('calls socket.connect on mount', () => {
+  it("creates the default socket and connects with the stored token", () => {
+    storageState.datalens_token = "token-123";
+
     renderHook(() => useWebSocket());
 
-    expect(mockInstance.connect).toHaveBeenCalledTimes(1);
+    expect(DataLensSocket).toHaveBeenCalledWith(DEFAULT_URL);
+    expect(getItemMock).toHaveBeenCalledWith("datalens_token");
+    expect(getLatestSocket().connect).toHaveBeenCalledWith("token-123");
   });
 
-  it('calls socket.disconnect on unmount', () => {
-    const { unmount } = renderHook(() => useWebSocket());
+  it("uses a custom URL and connects without a token when none is stored", () => {
+    renderHook(() => useWebSocket("ws://example.test/socket"));
 
-    expect(mockInstance.disconnect).not.toHaveBeenCalled();
+    expect(DataLensSocket).toHaveBeenCalledWith("ws://example.test/socket");
+    expect(getLatestSocket().connect).toHaveBeenCalledWith(undefined);
+  });
+
+  it("updates connection, message, and progress state from socket callbacks", () => {
+    const { result } = renderHook(() => useWebSocket());
+    const socket = getLatestSocket();
+    const message: SocketMessage = { type: "done", payload: { rows: 4 } };
+    const progress: ProgressUpdate = {
+      percent: 75,
+      label: "Loading",
+      stage: "transform",
+    };
+
+    act(() => {
+      socket.connectionHandler?.(true);
+      socket.messageHandler?.(message);
+      socket.progressHandler?.(progress);
+    });
+
+    expect(result.current.isConnected).toBe(true);
+    expect(result.current.lastMessage).toEqual(message);
+    expect(result.current.progress).toEqual(progress);
+  });
+
+  it("delegates sendMessage to the active socket instance", () => {
+    const { result } = renderHook(() => useWebSocket());
+    const payload = { event: "ping", attempt: 1 };
+
+    act(() => {
+      result.current.sendMessage(payload);
+    });
+
+    expect(getLatestSocket().send).toHaveBeenCalledWith(payload);
+  });
+
+  it("disconnects the previous socket and reconnects when the URL changes", () => {
+    const { result, rerender } = renderHook(
+      ({ url }) => useWebSocket(url),
+      {
+        initialProps: { url: "ws://example.test/one" },
+      },
+    );
+    const firstSocket = getLatestSocket();
+
+    act(() => {
+      firstSocket.connectionHandler?.(true);
+      firstSocket.messageHandler?.({ type: "first" });
+    });
+
+    rerender({ url: "ws://example.test/two" });
+
+    expect(firstSocket.disconnect).toHaveBeenCalledTimes(1);
+    expect(DataLensSocket).toHaveBeenNthCalledWith(2, "ws://example.test/two");
+    expect(result.current.isConnected).toBe(false);
+    expect(result.current.lastMessage).toBeNull();
+  });
+
+  it("disconnects the socket when the hook unmounts", () => {
+    const { unmount } = renderHook(() => useWebSocket());
+    const socket = getLatestSocket();
 
     unmount();
 
-    expect(mockInstance.disconnect).toHaveBeenCalledTimes(1);
-  });
-
-  it('sendMessage calls socket.send', () => {
-    const { result } = renderHook(() => useWebSocket());
-    const payload = { event: 'ping' };
-
-    result.current.sendMessage(payload);
-
-    expect(mockInstance.send).toHaveBeenCalledWith(payload);
+    expect(socket.disconnect).toHaveBeenCalledTimes(1);
   });
 });

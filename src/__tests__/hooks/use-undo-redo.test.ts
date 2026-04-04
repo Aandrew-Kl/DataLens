@@ -1,9 +1,9 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 
 import { useUndoRedo } from "@/hooks/use-undo-redo";
 
 describe("useUndoRedo", () => {
-  it("clones the initial state so outside mutations do not leak into the hook", async () => {
+  it("clones the initial state so outside mutations do not leak into the hook", () => {
     const initial = {
       items: ["north", "south"],
       meta: { selected: "north" },
@@ -14,29 +14,40 @@ describe("useUndoRedo", () => {
     initial.items.push("east");
     initial.meta.selected = "south";
 
-    await waitFor(() => {
-      expect(result.current.state).toEqual({
-        items: ["north", "south"],
-        meta: { selected: "north" },
-      });
+    expect(result.current.state).toEqual({
+      items: ["north", "south"],
+      meta: { selected: "north" },
     });
   });
 
-  it("records history on state changes and enables undo", async () => {
-    const { result } = renderHook(() => useUndoRedo({ count: 1 }));
+  it("records history and clones newly assigned state snapshots", () => {
+    const nextState: { filters: string[]; nested: { limit: number } } = {
+      filters: ["region"],
+      nested: { limit: 100 },
+    };
+    const { result } = renderHook(() =>
+      useUndoRedo<{ filters: string[]; nested: { limit: number } }>({
+        filters: [],
+        nested: { limit: 0 },
+      }),
+    );
 
     act(() => {
-      result.current.setState({ count: 2 });
+      result.current.setState(nextState);
     });
 
-    await waitFor(() => {
-      expect(result.current.state).toEqual({ count: 2 });
-      expect(result.current.canUndo).toBe(true);
-      expect(result.current.canRedo).toBe(false);
+    nextState.filters.push("country");
+    nextState.nested.limit = 50;
+
+    expect(result.current.state).toEqual({
+      filters: ["region"],
+      nested: { limit: 100 },
     });
+    expect(result.current.canUndo).toBe(true);
+    expect(result.current.canRedo).toBe(false);
   });
 
-  it("skips history updates when the next state is deeply equal", async () => {
+  it("skips history updates when the next state is deeply equal", () => {
     const { result } = renderHook(() =>
       useUndoRedo({
         filters: ["region"],
@@ -51,16 +62,28 @@ describe("useUndoRedo", () => {
       });
     });
 
-    await waitFor(() => {
-      expect(result.current.canUndo).toBe(false);
-      expect(result.current.state).toEqual({
-        filters: ["region"],
-        nested: { limit: 100 },
-      });
+    expect(result.current.state).toEqual({
+      filters: ["region"],
+      nested: { limit: 100 },
     });
+    expect(result.current.canUndo).toBe(false);
+    expect(result.current.canRedo).toBe(false);
   });
 
-  it("undoes and redoes through cloned snapshots", async () => {
+  it("treats undo and redo as no-ops at the history boundaries", () => {
+    const { result } = renderHook(() => useUndoRedo({ step: 0 }));
+
+    act(() => {
+      result.current.undo();
+      result.current.redo();
+    });
+
+    expect(result.current.state).toEqual({ step: 0 });
+    expect(result.current.canUndo).toBe(false);
+    expect(result.current.canRedo).toBe(false);
+  });
+
+  it("undoes and redoes through cloned snapshots", () => {
     const { result } = renderHook(() => useUndoRedo({ version: 0 }));
 
     act(() => {
@@ -72,22 +95,20 @@ describe("useUndoRedo", () => {
       result.current.undo();
     });
 
-    await waitFor(() => {
-      expect(result.current.state).toEqual({ version: 1 });
-      expect(result.current.canRedo).toBe(true);
-    });
+    expect(result.current.state).toEqual({ version: 1 });
+    expect(result.current.canUndo).toBe(true);
+    expect(result.current.canRedo).toBe(true);
 
     act(() => {
       result.current.redo();
     });
 
-    await waitFor(() => {
-      expect(result.current.state).toEqual({ version: 2 });
-      expect(result.current.canUndo).toBe(true);
-    });
+    expect(result.current.state).toEqual({ version: 2 });
+    expect(result.current.canUndo).toBe(true);
+    expect(result.current.canRedo).toBe(false);
   });
 
-  it("clears redo history after a new state is recorded following undo", async () => {
+  it("clears redo history after a new state is recorded following undo", () => {
     const { result } = renderHook(() => useUndoRedo({ step: 0 }));
 
     act(() => {
@@ -98,14 +119,12 @@ describe("useUndoRedo", () => {
       result.current.redo();
     });
 
-    await waitFor(() => {
-      expect(result.current.state).toEqual({ step: 3 });
-      expect(result.current.canRedo).toBe(false);
-      expect(result.current.canUndo).toBe(true);
-    });
+    expect(result.current.state).toEqual({ step: 3 });
+    expect(result.current.canUndo).toBe(true);
+    expect(result.current.canRedo).toBe(false);
   });
 
-  it("caps undo history at fifty snapshots", async () => {
+  it("caps undo history at fifty snapshots", () => {
     const { result } = renderHook(() => useUndoRedo({ value: 0 }));
 
     act(() => {
@@ -120,10 +139,8 @@ describe("useUndoRedo", () => {
       }
     });
 
-    await waitFor(() => {
-      expect(result.current.state).toEqual({ value: 5 });
-      expect(result.current.canUndo).toBe(false);
-      expect(result.current.canRedo).toBe(true);
-    });
+    expect(result.current.state).toEqual({ value: 5 });
+    expect(result.current.canUndo).toBe(false);
+    expect(result.current.canRedo).toBe(true);
   });
 });

@@ -10,6 +10,7 @@ describe("useDebounce", () => {
   afterEach(() => {
     jest.clearAllTimers();
     jest.useRealTimers();
+    jest.restoreAllMocks();
   });
 
   it("returns the current value immediately and updates after the delay", () => {
@@ -91,13 +92,13 @@ describe("useDebounce", () => {
     rerender({ value: 2, delay: 400 });
 
     act(() => {
-      jest.advanceTimersByTime(199);
+      jest.advanceTimersByTime(399);
     });
 
     expect(result.current).toBe(1);
 
     act(() => {
-      jest.advanceTimersByTime(201);
+      jest.advanceTimersByTime(1);
     });
 
     expect(result.current).toBe(2);
@@ -123,5 +124,24 @@ describe("useDebounce", () => {
     });
 
     expect(result.current).toBe(nextObject);
+  });
+
+  it("cleans up the pending timer when the hook unmounts", () => {
+    const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
+    const { rerender, unmount } = renderHook(
+      ({ value }) => useDebounce(value, 100),
+      {
+        initialProps: { value: "first" },
+      },
+    );
+
+    rerender({ value: "second" });
+    unmount();
+
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
   });
 });

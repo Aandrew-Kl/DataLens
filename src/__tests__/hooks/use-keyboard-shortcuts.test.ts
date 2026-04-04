@@ -30,6 +30,30 @@ describe("useKeyboardShortcuts", () => {
     jest.restoreAllMocks();
   });
 
+  it("registers and removes a single global keydown listener", () => {
+    const addEventListenerSpy = jest.spyOn(window, "addEventListener");
+    const removeEventListenerSpy = jest.spyOn(window, "removeEventListener");
+    const shortcuts: Shortcut[] = [
+      {
+        key: "k",
+        handler: jest.fn(),
+        description: "Open command bar",
+      },
+    ];
+
+    const { unmount } = renderHook(() => useKeyboardShortcuts(shortcuts));
+
+    const registeredHandler = addEventListenerSpy.mock.calls.find(
+      ([eventName]) => eventName === "keydown",
+    )?.[1];
+
+    expect(typeof registeredHandler).toBe("function");
+
+    unmount();
+
+    expect(removeEventListenerSpy).toHaveBeenCalledWith("keydown", registeredHandler);
+  });
+
   it("fires plain shortcuts and prevents the browser default action", () => {
     const handler = jest.fn();
     const shortcuts: Shortcut[] = [
@@ -88,7 +112,7 @@ describe("useKeyboardShortcuts", () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
-  it("ignores shortcuts while the user is typing in an input", () => {
+  it("ignores shortcuts while the user is typing in an input or contenteditable region", () => {
     const handler = jest.fn();
     const shortcuts: Shortcut[] = [
       {
@@ -109,7 +133,21 @@ describe("useKeyboardShortcuts", () => {
     input.blur();
     dispatchKey({ key: "s" });
 
-    expect(handler).toHaveBeenCalledTimes(1);
+    const editable = document.createElement("div");
+    editable.setAttribute("contenteditable", "true");
+    Object.defineProperty(editable, "isContentEditable", {
+      configurable: true,
+      value: true,
+    });
+    document.body.appendChild(editable);
+    editable.focus();
+
+    dispatchKey({ key: "s" });
+
+    editable.blur();
+    dispatchKey({ key: "s" });
+
+    expect(handler).toHaveBeenCalledTimes(2);
   });
 
   it("uses the latest shortcut handlers after rerenders", () => {

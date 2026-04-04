@@ -12,11 +12,47 @@ const INITIAL_VALUE: Preferences = {
   theme: "light",
   dense: false,
 };
+const originalLocalStorage = window.localStorage;
 
 describe("useLocalStorage", () => {
+  let storageState: Record<string, string>;
+  let getItemMock: jest.Mock<string | null, [string]>;
+  let setItemMock: jest.Mock<void, [string, string]>;
+
   beforeEach(() => {
-    window.localStorage.clear();
+    storageState = {};
+    getItemMock = jest.fn((key: string) => storageState[key] ?? null);
+    setItemMock = jest.fn((key: string, value: string) => {
+      storageState[key] = value;
+    });
+
+    const localStorageMock = {
+      clear: jest.fn(() => {
+        storageState = {};
+      }),
+      getItem: getItemMock,
+      key: jest.fn((index: number) => Object.keys(storageState)[index] ?? null),
+      get length() {
+        return Object.keys(storageState).length;
+      },
+      removeItem: jest.fn((key: string) => {
+        delete storageState[key];
+      }),
+      setItem: setItemMock,
+    } as unknown as Storage;
+
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      value: localStorageMock,
+    });
+  });
+
+  afterEach(() => {
     jest.restoreAllMocks();
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      value: originalLocalStorage,
+    });
   });
 
   it("hydrates state from localStorage when valid JSON is present", () => {
@@ -24,18 +60,18 @@ describe("useLocalStorage", () => {
       theme: "dark",
       dense: true,
     };
-
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+    storageState[STORAGE_KEY] = JSON.stringify(stored);
 
     const { result } = renderHook(() =>
       useLocalStorage(STORAGE_KEY, INITIAL_VALUE),
     );
 
+    expect(getItemMock).toHaveBeenCalledWith(STORAGE_KEY);
     expect(result.current[0]).toEqual(stored);
   });
 
-  it("falls back to the initial value when the stored JSON cannot be parsed", () => {
-    window.localStorage.setItem(STORAGE_KEY, "{invalid-json");
+  it("falls back to the initial value when stored JSON cannot be parsed", () => {
+    storageState[STORAGE_KEY] = "{invalid-json";
 
     const { result } = renderHook(() =>
       useLocalStorage(STORAGE_KEY, INITIAL_VALUE),
@@ -60,7 +96,8 @@ describe("useLocalStorage", () => {
       theme: "light",
       dense: true,
     });
-    expect(window.localStorage.getItem(STORAGE_KEY)).toBe(
+    expect(setItemMock).toHaveBeenCalledWith(
+      STORAGE_KEY,
       JSON.stringify({
         theme: "light",
         dense: true,
@@ -68,7 +105,7 @@ describe("useLocalStorage", () => {
     );
   });
 
-  it("responds to storage events for the same key and ignores unrelated keys", () => {
+  it("updates state from storage events for the same key and ignores unrelated keys", () => {
     const { result } = renderHook(() =>
       useLocalStorage(STORAGE_KEY, INITIAL_VALUE),
     );
@@ -105,48 +142,67 @@ describe("useLocalStorage", () => {
     });
   });
 
-  it("resets to the initial value when the storage event removes or corrupts the value", () => {
-    const { result } = renderHook(() =>
-      useLocalStorage(STORAGE_KEY, INITIAL_VALUE),
+  it("resets to the latest initial value when the active key is removed or corrupted", () => {
+    const nextInitialValue: Preferences = {
+      theme: "dark",
+      dense: true,
+    };
+    const { result, rerender } = renderHook(
+      ({ storageKey, initialValue }) =>
+        useLocalStorage(storageKey, initialValue),
+      {
+        initialProps: {
+          storageKey: STORAGE_KEY,
+          initialValue: INITIAL_VALUE,
+        },
+      },
     );
+
+    rerender({
+      storageKey: "dashboard-preferences",
+      initialValue: nextInitialValue,
+    });
 
     act(() => {
       result.current[1]({
-        theme: "dark",
+        theme: "light",
         dense: true,
       });
     });
 
-    expect(result.current[0]).toEqual({
-      theme: "dark",
-      dense: true,
-    });
+    expect(setItemMock).toHaveBeenLastCalledWith(
+      "dashboard-preferences",
+      JSON.stringify({
+        theme: "light",
+        dense: true,
+      }),
+    );
 
     act(() => {
       window.dispatchEvent(
         new StorageEvent("storage", {
-          key: STORAGE_KEY,
+          key: "dashboard-preferences",
           newValue: null,
         }),
       );
     });
 
-    expect(result.current[0]).toEqual(INITIAL_VALUE);
+    expect(result.current[0]).toEqual(nextInitialValue);
 
     act(() => {
       window.dispatchEvent(
         new StorageEvent("storage", {
-          key: STORAGE_KEY,
+          key: "dashboard-preferences",
           newValue: "{broken-json",
         }),
       );
     });
 
-    expect(result.current[0]).toEqual(INITIAL_VALUE);
+    expect(result.current[0]).toEqual(nextInitialValue);
   });
 
-  it("keeps the React state in sync even when localStorage writes fail", () => {
-    jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+  it("keeps React state in sync even when localStorage writes fail", () => {
+    setItemMock.mockImplementation(() => {
       throw new Error("Storage blocked");
     });
 

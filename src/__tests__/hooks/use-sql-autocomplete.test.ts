@@ -148,4 +148,35 @@ describe("useSQLAutocomplete", () => {
 
     expect(result.current.some((suggestion) => suggestion.label === "COUNT")).toBe(true);
   });
+
+  it("deduplicates table suggestions even when the current table is also in the dataset store", async () => {
+    mountEditor("SELECT * FROM ");
+
+    const { result } = renderHook(() => useSQLAutocomplete("orders", columns));
+
+    await waitFor(() => {
+      expect(result.current[0]?.category).toBe("table");
+    });
+
+    const orderSuggestions = result.current.filter(
+      (suggestion) => suggestion.category === "table" && suggestion.label === "orders",
+    );
+
+    expect(orderSuggestions).toHaveLength(1);
+  });
+
+  it("prioritizes matching column suggestions inside WHERE clauses", async () => {
+    mountEditor('SELECT * FROM "orders" WHERE reg');
+
+    const { result } = renderHook(() => useSQLAutocomplete("orders", columns));
+
+    await waitFor(() => {
+      expect(result.current[0]?.category).toBe("column");
+      expect(result.current[0]?.label).toBe("region");
+    });
+
+    expect(result.current.slice(0, 2).map((suggestion) => suggestion.label)).toContain(
+      "region",
+    );
+  });
 });

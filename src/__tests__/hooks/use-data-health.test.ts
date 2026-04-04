@@ -236,4 +236,54 @@ describe("useDataHealth", () => {
       expect(result.current.score).toBe(84);
     });
   });
+
+  it("ignores malformed sessionStorage cache entries and recomputes health", async () => {
+    const stringColumns: ColumnProfile[] = [
+      {
+        name: "region",
+        type: "string",
+        nullCount: 0,
+        uniqueCount: 4,
+        sampleValues: ["East", "West"],
+      },
+    ];
+
+    window.sessionStorage.setItem(
+      buildCacheKey("orders", stringColumns),
+      '{"score":"bad"}',
+    );
+
+    mockRunQuery.mockResolvedValueOnce([{ row_count: 50 }]);
+
+    const { result } = renderHook(() => useDataHealth("orders", stringColumns));
+
+    expect(result.current.loading).toBe(true);
+    expect(result.current.score).toBe(0);
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+      expect(result.current.score).toBe(100);
+    });
+
+    expect(window.sessionStorage.getItem(buildCacheKey("orders", stringColumns))).toContain(
+      '"score":100',
+    );
+  });
+
+  it("returns empty health when the table has zero rows", async () => {
+    mockRunQuery.mockResolvedValueOnce([{ row_count: 0 }]);
+
+    const { result } = renderHook(() => useDataHealth("orders", healthColumns));
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current).toMatchObject({
+      score: 0,
+      issues: [],
+      suggestions: [],
+    });
+    expect(mockRunQuery).toHaveBeenCalledTimes(1);
+  });
 });

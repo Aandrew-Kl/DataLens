@@ -1,133 +1,171 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
+import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 
-import {
-  useKeyboardNavigation,
-  type UseKeyboardNavigationOptions,
-} from "@/hooks/use-keyboard-navigation";
+import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation";
 
-type GridHarnessProps = UseKeyboardNavigationOptions;
-
-function GridHarness(props: GridHarnessProps) {
-  const navigation = useKeyboardNavigation(props);
-
-  return (
-    <div>
-      <button onClick={() => navigation.setActive(10, 10)}>Set far cell</button>
-      <div
-        data-testid="grid"
-        {...navigation.containerProps}
-      >
-        {Array.from({ length: props.rows }, (_, row) => (
-          <div
-            key={`row-${row}`}
-            role="row"
-          >
-            {Array.from({ length: props.cols }, (_, col) => {
-              const cellProps = navigation.getCellProps(row, col);
-              return (
-                <div
-                  key={`${row}-${col}`}
-                  data-testid={`cell-${row}-${col}`}
-                  {...cellProps}
-                >
-                  {row},{col}
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-      <output data-testid="active">
-        {navigation.activeRow},{navigation.activeCol}
-      </output>
-    </div>
-  );
+function createKeyboardEvent(key: string): ReactKeyboardEvent {
+  return {
+    key,
+    preventDefault: jest.fn(),
+  } as unknown as ReactKeyboardEvent;
 }
 
 describe("useKeyboardNavigation", () => {
-  it("moves through the grid with arrows and Home/End", () => {
-    render(
-      <GridHarness
-        rows={3}
-        cols={4}
-      />,
+  it("starts at the first cell and exposes matching ARIA metadata", () => {
+    const { result } = renderHook(() =>
+      useKeyboardNavigation({
+        rows: 3,
+        cols: 4,
+      }),
     );
 
-    const grid = screen.getByTestId("grid");
-
-    expect(grid).toHaveAttribute("aria-activedescendant", expect.stringContaining("0-0"));
-    expect(screen.getByTestId("cell-0-0")).toHaveAttribute("aria-selected", "true");
-
-    fireEvent.keyDown(grid, { key: "ArrowRight" });
-    expect(screen.getByTestId("active")).toHaveTextContent("0,1");
-
-    fireEvent.keyDown(grid, { key: "ArrowDown" });
-    expect(screen.getByTestId("active")).toHaveTextContent("1,1");
-
-    fireEvent.keyDown(grid, { key: "End" });
-    expect(screen.getByTestId("active")).toHaveTextContent("1,3");
-
-    fireEvent.keyDown(grid, { key: "Home" });
-    expect(screen.getByTestId("active")).toHaveTextContent("1,0");
-
-    fireEvent.click(screen.getByRole("button", { name: "Set far cell" }));
-    expect(screen.getByTestId("active")).toHaveTextContent("2,3");
+    expect(result.current.activeRow).toBe(0);
+    expect(result.current.activeCol).toBe(0);
+    expect(result.current.containerProps.tabIndex).toBe(0);
+    expect(result.current.containerProps.role).toBe("grid");
+    expect(result.current.containerProps["aria-activedescendant"]).toMatch(
+      /-cell-0-0$/,
+    );
+    expect(result.current.getCellProps(0, 0)).toMatchObject({
+      role: "gridcell",
+      "aria-selected": true,
+      tabIndex: -1,
+    });
+    expect(result.current.getCellProps(0, 1)["aria-selected"]).toBe(false);
   });
 
-  it("wraps around edges when wrapping is enabled", () => {
-    render(
-      <GridHarness
-        rows={2}
-        cols={2}
-        wrap
-      />,
+  it("moves through the grid with arrow keys, Home/End, and clamped setActive calls", () => {
+    const { result } = renderHook(() =>
+      useKeyboardNavigation({
+        rows: 3,
+        cols: 4,
+      }),
     );
 
-    const grid = screen.getByTestId("grid");
+    act(() => {
+      result.current.containerProps.onKeyDown(createKeyboardEvent("ArrowRight"));
+    });
+    act(() => {
+      result.current.containerProps.onKeyDown(createKeyboardEvent("ArrowDown"));
+    });
+    act(() => {
+      result.current.containerProps.onKeyDown(createKeyboardEvent("End"));
+    });
+    act(() => {
+      result.current.containerProps.onKeyDown(createKeyboardEvent("Home"));
+    });
 
-    fireEvent.keyDown(grid, { key: "ArrowLeft" });
-    expect(screen.getByTestId("active")).toHaveTextContent("0,1");
+    expect(result.current.activeRow).toBe(1);
+    expect(result.current.activeCol).toBe(0);
 
-    fireEvent.keyDown(grid, { key: "ArrowUp" });
-    expect(screen.getByTestId("active")).toHaveTextContent("1,1");
+    act(() => {
+      result.current.setActive(10, 10);
+    });
+
+    expect(result.current.activeRow).toBe(2);
+    expect(result.current.activeCol).toBe(3);
   });
 
-  it("invokes selection handlers for Enter and Space", () => {
+  it("wraps around row and column bounds when wrapping is enabled", () => {
+    const { result } = renderHook(() =>
+      useKeyboardNavigation({
+        rows: 2,
+        cols: 2,
+        wrap: true,
+      }),
+    );
+
+    act(() => {
+      result.current.containerProps.onKeyDown(createKeyboardEvent("ArrowLeft"));
+    });
+    act(() => {
+      result.current.containerProps.onKeyDown(createKeyboardEvent("ArrowUp"));
+    });
+
+    expect(result.current.activeRow).toBe(1);
+    expect(result.current.activeCol).toBe(1);
+  });
+
+  it("invokes selection and escape callbacks from keyboard actions", () => {
     const onSelect = jest.fn();
+    const onEscape = jest.fn();
 
-    render(
-      <GridHarness
-        rows={2}
-        cols={2}
-        onSelect={onSelect}
-      />,
+    const { result } = renderHook(() =>
+      useKeyboardNavigation({
+        rows: 2,
+        cols: 2,
+        onSelect,
+        onEscape,
+      }),
     );
 
-    const grid = screen.getByTestId("grid");
-
-    fireEvent.keyDown(grid, { key: "ArrowDown" });
-    fireEvent.keyDown(grid, { key: "ArrowRight" });
-    fireEvent.keyDown(grid, { key: "Enter" });
-    fireEvent.keyDown(grid, { key: " " });
+    act(() => {
+      result.current.containerProps.onKeyDown(createKeyboardEvent("ArrowDown"));
+    });
+    act(() => {
+      result.current.containerProps.onKeyDown(createKeyboardEvent("ArrowRight"));
+    });
+    act(() => {
+      result.current.containerProps.onKeyDown(createKeyboardEvent("Enter"));
+    });
+    act(() => {
+      result.current.containerProps.onKeyDown(createKeyboardEvent(" "));
+    });
+    act(() => {
+      result.current.containerProps.onKeyDown(createKeyboardEvent("Escape"));
+    });
 
     expect(onSelect).toHaveBeenCalledTimes(2);
     expect(onSelect).toHaveBeenNthCalledWith(1, 1, 1);
     expect(onSelect).toHaveBeenNthCalledWith(2, 1, 1);
+    expect(onEscape).toHaveBeenCalledTimes(1);
   });
 
-  it("invokes the escape handler", () => {
-    const onEscape = jest.fn();
-
-    render(
-      <GridHarness
-        rows={2}
-        cols={2}
-        onEscape={onEscape}
-      />,
+  it("returns an inactive grid state when there are no cells", () => {
+    const { result } = renderHook(() =>
+      useKeyboardNavigation({
+        rows: 0,
+        cols: 0,
+      }),
     );
 
-    fireEvent.keyDown(screen.getByTestId("grid"), { key: "Escape" });
+    const event = createKeyboardEvent("ArrowRight");
 
-    expect(onEscape).toHaveBeenCalledTimes(1);
+    act(() => {
+      result.current.containerProps.onKeyDown(event);
+      result.current.setActive(3, 3);
+    });
+
+    expect(result.current.activeRow).toBe(-1);
+    expect(result.current.activeCol).toBe(-1);
+    expect(result.current.containerProps.tabIndex).toBe(-1);
+    expect(result.current.containerProps["aria-activedescendant"]).toBe("");
+    expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it("normalizes the active position when the grid dimensions shrink", () => {
+    const { result, rerender } = renderHook(
+      ({ rows, cols }: { rows: number; cols: number }) =>
+        useKeyboardNavigation({
+          rows,
+          cols,
+        }),
+      {
+        initialProps: {
+          rows: 4,
+          cols: 5,
+        },
+      },
+    );
+
+    act(() => {
+      result.current.setActive(3, 4);
+    });
+
+    rerender({ rows: 1, cols: 2 });
+
+    expect(result.current.activeRow).toBe(0);
+    expect(result.current.activeCol).toBe(1);
+    expect(result.current.getCellProps(0, 1)["aria-selected"]).toBe(true);
   });
 });

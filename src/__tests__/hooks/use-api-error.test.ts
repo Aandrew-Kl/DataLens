@@ -1,56 +1,78 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook } from "@testing-library/react";
 
-import { useApiError } from '@/hooks/use-api-error';
+import { useApiError } from "@/hooks/use-api-error";
 
-describe('useApiError', () => {
-  it('initial state has null error', () => {
+describe("useApiError", () => {
+  it("starts without an error", () => {
     const { result } = renderHook(() => useApiError());
 
     expect(result.current.error).toBeNull();
     expect(result.current.isError).toBe(false);
   });
 
-  it('handleError sets error from Error instance', () => {
+  it("captures messages from Error instances", () => {
     const { result } = renderHook(() => useApiError());
 
     act(() => {
-      result.current.handleError(new Error('Something broke'));
+      result.current.handleError(new Error("Something broke"));
     });
 
-    expect(result.current.error).toBe('Something broke');
+    expect(result.current.error).toBe("Something broke");
     expect(result.current.isError).toBe(true);
   });
 
-  it('handleError sets error from object with message', () => {
+  it("captures messages from objects with string messages", () => {
     const { result } = renderHook(() => useApiError());
 
     act(() => {
-      result.current.handleError({ message: 'Object error message' });
+      result.current.handleError({ message: "Object error message" });
     });
 
-    expect(result.current.error).toBe('Object error message');
+    expect(result.current.error).toBe("Object error message");
     expect(result.current.isError).toBe(true);
   });
 
-  it('handleError sets default message for unknown types', () => {
+  it("stringifies non-string message values from error-like objects", () => {
+    const { result } = renderHook(() => useApiError());
+
+    act(() => {
+      result.current.handleError({ message: 404 });
+    });
+
+    expect(result.current.error).toBe("404");
+    expect(result.current.isError).toBe(true);
+  });
+
+  it("falls back to the default message for null and primitive values", () => {
     const { result } = renderHook(() => useApiError());
 
     act(() => {
       result.current.handleError(42);
     });
 
-    expect(result.current.error).toBe('An unexpected error occurred.');
+    expect(result.current.error).toBe("An unexpected error occurred.");
     expect(result.current.isError).toBe(true);
-  });
-
-  it('clearError resets error to null', () => {
-    const { result } = renderHook(() => useApiError());
 
     act(() => {
-      result.current.handleError(new Error('Temporary'));
+      result.current.handleError(null);
     });
 
-    expect(result.current.error).toBe('Temporary');
+    expect(result.current.error).toBe("An unexpected error occurred.");
+  });
+
+  it("clears the current error and keeps callback references stable", () => {
+    const { result, rerender } = renderHook(() => useApiError());
+    const initialHandleError = result.current.handleError;
+    const initialClearError = result.current.clearError;
+
+    act(() => {
+      result.current.handleError(new Error("Temporary"));
+    });
+
+    rerender();
+
+    expect(result.current.handleError).toBe(initialHandleError);
+    expect(result.current.clearError).toBe(initialClearError);
 
     act(() => {
       result.current.clearError();
