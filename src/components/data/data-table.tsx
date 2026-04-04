@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  memo,
   useState,
   useMemo,
   useCallback,
@@ -241,7 +242,7 @@ function CopiedTooltip({ show }: { show: boolean }) {
 // Main component
 // ---------------------------------------------------------------------------
 
-export default function DataTable({
+function DataTable({
   data,
   columns,
   pageSize: initialPageSize = 50,
@@ -442,9 +443,9 @@ export default function DataTable({
         <p className="text-xs text-gray-300 dark:text-gray-600">
           Load a dataset to see results here
         </p>
-      </motion.div>
-    );
-  }
+        </motion.div>
+  );
+}
 
   return (
     <motion.div
@@ -771,3 +772,5 @@ export default function DataTable({
     </motion.div>
   );
 }
+
+export default memo(DataTable);

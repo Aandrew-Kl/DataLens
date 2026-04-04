@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ElementType, type ReactNode } from "react";
+import { memo, useEffect, useState, type ElementType, type ReactNode } from "react";
 import ReactECharts from "echarts-for-react";
 import { motion } from "framer-motion";
 import {
@@ -322,7 +322,7 @@ function getInsights(rowCount: number, stats: Stats) {
   ];
 }
 
-export default function ColumnStats({ tableName, column, rowCount }: ColumnStatsProps) {
+function ColumnStats({ tableName, column, rowCount }: ColumnStatsProps) {
   const dark = useDarkMode();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -485,3 +485,5 @@ export default function ColumnStats({ tableName, column, rowCount }: ColumnStats
     </motion.section>
   );
 }
+
+export default memo(ColumnStats);

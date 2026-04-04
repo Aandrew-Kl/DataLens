@@ -8,6 +8,8 @@ from app.schemas.ml import (
     ClassifyResponse,
     ClusterRequest,
     ClusterResponse,
+    DecisionTreeRequest,
+    DecisionTreeResponse,
     PCARequest,
     PCAResponse,
     RegressionRequest,
@@ -59,5 +61,14 @@ async def run_pca(payload: PCARequest) -> dict:
     try:
         frame = pd.DataFrame(payload.data)
         return ml_service.pca(frame, payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/decision-tree", response_model=DecisionTreeResponse)
+async def run_decision_tree(payload: DecisionTreeRequest) -> dict:
+    try:
+        frame = pd.DataFrame(payload.data)
+        return ml_service.decision_tree(frame, payload)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

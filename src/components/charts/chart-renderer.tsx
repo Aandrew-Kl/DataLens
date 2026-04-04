@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import { motion } from "framer-motion";
 import { BarChart3 } from "lucide-react";
@@ -299,7 +299,7 @@ function buildOption(
   }
 }
 
-export default function ChartRenderer({ config, data }: ChartRendererProps) {
+function ChartRenderer({ config, data }: ChartRendererProps) {
   const [dark, setDark] = useState(() => isDarkMode());
 
   useEffect(() => {
@@ -365,3 +365,5 @@ export default function ChartRenderer({ config, data }: ChartRendererProps) {
     </motion.div>
   );
 }
+
+export default memo(ChartRenderer);

@@ -6,6 +6,7 @@ import base64
 import json
 import math
 import re
+import logging
 from datetime import date, datetime
 from io import BytesIO
 from pathlib import Path
@@ -16,6 +17,8 @@ import pandas as pd
 
 from app.config import get_settings
 from app.schemas.dataset import ColumnInfo, DatasetCreate
+
+logger = logging.getLogger(__name__)
 
 SUPPORTED_FORMATS = {"csv", "json", "xlsx", "xls", "excel"}
 _SANITIZE_RE = re.compile(r"[^A-Za-z0-9._-]+")
@@ -154,6 +157,8 @@ def _categorical_distribution(series: pd.Series) -> dict:
 def profile_dataset(frame: pd.DataFrame) -> dict:
     """Generate a production-grade profile for the supplied dataframe."""
 
+    logger.info("Profiling dataset: %d rows, %d columns", frame.shape[0], frame.shape[1])
+
     describe_frame = frame.describe(include="all", datetime_is_numeric=True).transpose()
     describe = to_native(
         describe_frame.replace([np.inf, -np.inf], np.nan).where(pd.notna(describe_frame), None).to_dict(orient="index")
@@ -213,12 +218,14 @@ def profile_dataset(frame: pd.DataFrame) -> dict:
 def process_upload(payload: DatasetCreate) -> dict:
     """Decode, persist, and profile an uploaded dataset payload."""
 
+    file_format = _infer_format(payload.filename, payload.format)
+    logger.info("Processing upload: %s (%s format)", payload.filename, file_format)
+
     try:
         raw_bytes = base64.b64decode(payload.content_base64, validate=True)
     except ValueError as exc:
         raise ValueError("Dataset content_base64 is not valid base64.") from exc
 
-    file_format = _infer_format(payload.filename, payload.format)
     frame = _read_dataframe(raw_bytes, file_format)
 
     uploads_dir = Path(get_settings().UPLOADS_DIR)

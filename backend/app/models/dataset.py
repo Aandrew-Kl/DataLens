@@ -21,3 +21,4 @@ class Dataset(Base):
 
     user: Mapped["User"] = relationship(back_populates="datasets")
     analyses: Mapped[list["SavedAnalysis"]] = relationship(back_populates="dataset", cascade="all, delete-orphan")
+    query_history: Mapped[list["QueryHistory"]] = relationship(back_populates="dataset", cascade="all, delete-orphan")

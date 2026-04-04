@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import logging
 
 import numpy as np
 import pandas as pd
@@ -17,9 +18,13 @@ from app.services import forecast_service
 from app.services.data_service import ensure_columns_exist, to_native
 from app.services.ml_service import _build_preprocessor, _require_rows
 
+logger = logging.getLogger(__name__)
+
 
 def churn_predict(frame: pd.DataFrame, request: ChurnPredictRequest) -> dict:
     """Train a gradient-boosted churn model and return risk scores."""
+
+    logger.info("Churn prediction on %d rows", frame.shape[0])
 
     ensure_columns_exist(frame, request.feature_columns + [request.target_column])
     working = frame[request.feature_columns + [request.target_column]].dropna(subset=[request.target_column]).copy()
@@ -81,6 +86,13 @@ def churn_predict(frame: pd.DataFrame, request: ChurnPredictRequest) -> dict:
 
 def cohort_analysis(frame: pd.DataFrame, request: CohortRequest) -> dict:
     """Build cohort retention outputs grouped by signup period."""
+
+    logger.info(
+        "Cohort analysis: entity=%s, signup=%s, activity=%s",
+        request.entity_id_column,
+        request.signup_date_column,
+        request.activity_date_column,
+    )
 
     ensure_columns_exist(
         frame,
@@ -178,6 +190,13 @@ def _cohens_d(a: np.ndarray, b: np.ndarray) -> float:
 def ab_test(frame: pd.DataFrame, request: AbTestRequest) -> dict:
     """Run a continuous or binary A/B test."""
 
+    logger.info(
+        "A/B test: %s vs %s on %s",
+        request.variant_a,
+        request.variant_b,
+        request.metric_column,
+    )
+
     ensure_columns_exist(frame, [request.group_column, request.metric_column])
     working = frame[[request.group_column, request.metric_column]].dropna().copy()
     group_a = working.loc[working[request.group_column].astype(str) == request.variant_a, request.metric_column]
@@ -256,5 +275,7 @@ def ab_test(frame: pd.DataFrame, request: AbTestRequest) -> dict:
 
 def forecast(frame: pd.DataFrame, date_column: str, value_column: str, periods: int, method: str) -> dict:
     """Delegate time-series forecasting to the forecast service."""
+
+    logger.info("Forecasting %d periods using %s", periods, method)
 
     return forecast_service.forecast(frame, date_column=date_column, value_column=value_column, periods=periods, method=method)

@@ -58,3 +58,16 @@ class QueryGenerateResponse(BaseModel):
 
     sql: str
     explanation: str
+
+
+class ExplainRequest(BaseModel):
+    sql: str
+
+
+class ExplainResponse(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    summary: str
+    steps: list[str]
+    tables: list[str]
+    columns: list[str]

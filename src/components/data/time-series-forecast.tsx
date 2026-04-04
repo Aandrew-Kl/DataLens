@@ -1,6 +1,6 @@
 "use client";
 
-import React, { startTransition, useMemo, useState } from "react";
+import React, { memo, startTransition, useMemo, useState } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import * as echarts from "echarts/core";
 import type { EChartsOption } from "echarts";
@@ -431,7 +431,7 @@ function ForecastTable({ result }: { result: ForecastResult }) {
   );
 }
 
-export default function TimeSeriesForecast({
+function TimeSeriesForecast({
   tableName,
   columns,
 }: TimeSeriesForecastProps): React.ReactNode {
@@ -727,3 +727,5 @@ export default function TimeSeriesForecast({
     </motion.section>
   );
 }
+
+export default memo(TimeSeriesForecast);

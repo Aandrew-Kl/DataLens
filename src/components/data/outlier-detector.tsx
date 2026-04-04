@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -185,7 +185,7 @@ async function fetchColumnSummary(
   };
 }
 
-export default function OutlierDetector({
+function OutlierDetector({
   tableName,
   columns,
 }: OutlierDetectorProps) {
@@ -607,3 +607,5 @@ export default function OutlierDetector({
     </motion.section>
   );
 }
+
+export default memo(OutlierDetector);

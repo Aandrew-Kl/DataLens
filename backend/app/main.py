@@ -5,9 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.database import Base, engine
+from app.logging_config import setup_logging
 from app.models import analysis, dataset, user  # noqa: F401
 
 
+setup_logging()
 app = FastAPI(title="DataLens Backend", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,

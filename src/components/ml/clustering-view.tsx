@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { memo, useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import * as echarts from "echarts/core";
 import type { EChartsOption } from "echarts";
@@ -246,7 +246,7 @@ function SummaryTable({
   );
 }
 
-export default function ClusteringView({ tableName, columns }: ClusteringViewProps) {
+function ClusteringView({ tableName, columns }: ClusteringViewProps) {
   const dark = useSyncExternalStore(subscribeDarkMode, getDarkModeSnapshot, () => false);
   const numericColumns = useMemo(
     () => columns.filter((column) => column.type === "number"),
@@ -823,3 +823,5 @@ export default function ClusteringView({ tableName, columns }: ClusteringViewPro
     </section>
   );
 }
+
+export default memo(ClusteringView);

@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, memo, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { ColumnProfile } from "@/types/dataset";
 import { runQuery } from "@/lib/duckdb/client";
@@ -71,7 +71,7 @@ function getHeatStyle(value: number | null): { backgroundColor: string; color: s
   };
 }
 
-export default function CorrelationMatrix({
+function CorrelationMatrix({
   tableName,
   columns,
 }: CorrelationMatrixProps) {
@@ -426,3 +426,5 @@ export default function CorrelationMatrix({
     </motion.section>
   );
 }
+
+export default memo(CorrelationMatrix);

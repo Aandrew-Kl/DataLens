@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { memo, useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import * as echarts from "echarts/core";
 import type { EChartsOption } from "echarts";
@@ -241,7 +241,7 @@ function AnovaTable({ summary }: { summary: AnovaSummary | null }) {
   );
 }
 
-export default function RegressionView({ tableName, columns }: RegressionViewProps) {
+function RegressionView({ tableName, columns }: RegressionViewProps) {
   const dark = useSyncExternalStore(subscribeDarkMode, getDarkModeSnapshot, () => false);
   const numericColumns = useMemo(
     () => columns.filter((column) => column.type === "number"),
@@ -677,3 +677,5 @@ export default function RegressionView({ tableName, columns }: RegressionViewPro
     </section>
   );
 }
+
+export default memo(RegressionView);

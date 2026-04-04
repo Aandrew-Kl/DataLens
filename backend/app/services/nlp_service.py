@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from collections import Counter
 from time import perf_counter
@@ -16,6 +17,8 @@ from textblob import TextBlob
 from app.config import get_settings
 from app.schemas.ai import NLQueryRequest
 from app.services.data_service import ensure_columns_exist, profile_dataset, to_native
+
+logger = logging.getLogger(__name__)
 
 _TOKEN_RE = re.compile(r"[A-Za-z][A-Za-z0-9_]+")
 _TABLE_RE = re.compile(r"\b(?:FROM|JOIN)\s+([A-Za-z0-9_\".]+)", re.IGNORECASE)
@@ -61,6 +64,8 @@ def sentiment(frame: pd.DataFrame, text_column: str, limit: int | None = None) -
 
     ensure_columns_exist(frame, [text_column])
     texts = frame[text_column].dropna().astype(str)
+    logger.info("Sentiment analysis on column %s, %d rows", text_column, len(texts))
+
     if texts.empty:
         raise ValueError("Selected text column does not contain any non-null rows.")
 
@@ -116,6 +121,8 @@ def summarize(frame: pd.DataFrame, dataset_id: int, text_columns: list[str], max
         for column in frame.columns
         if pd.api.types.is_string_dtype(frame[column]) or pd.api.types.is_object_dtype(frame[column])
     ]
+    logger.info("Summarizing dataset %d, %d text columns", dataset_id, len(available_text_columns))
+
     ensure_columns_exist(frame, available_text_columns)
 
     profile = profile_dataset(frame)
@@ -257,12 +264,15 @@ async def _generate_with_ollama(question: str, columns: list[str], table_name: s
                 data.get("message", {}).get("content")
                 or data.get("response")
             )
-    except HTTPError:
+    except HTTPError as exc:
+        logger.error("Ollama SQL generation failed: %s", exc)
         return None
 
 
 async def generate_query(request: NLQueryRequest, frame: pd.DataFrame, table_name: str) -> dict:
     """Translate a natural-language question into SQL."""
+
+    logger.info("Generating SQL for: %s", request.question[:100])
 
     start = perf_counter()
     entities = _extract_entities(request.question, frame)

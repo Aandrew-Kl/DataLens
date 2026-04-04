@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Hash,
@@ -430,7 +430,7 @@ function TypeDistribution({ columns }: { columns: ColumnProfile[] }) {
   );
 }
 
-export default function DataProfiler({
+function DataProfiler({
   columns,
   rowCount = 0,
   onColumnClick,
@@ -608,3 +608,5 @@ export default function DataProfiler({
     </div>
   );
 }
+
+export default memo(DataProfiler);

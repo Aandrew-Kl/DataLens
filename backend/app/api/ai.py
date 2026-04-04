@@ -3,6 +3,8 @@ from fastapi import APIRouter, HTTPException, status
 
 from app.schemas.ai import (
     NLQueryRequest,
+    ExplainRequest,
+    ExplainResponse,
     QueryGenerateRequest,
     QueryGenerateResponse,
     SentimentRequest,
@@ -39,5 +41,13 @@ async def generate_query(payload: QueryGenerateRequest) -> dict:
         frame = pd.DataFrame(payload.data) if payload.data else pd.DataFrame()
         request = NLQueryRequest(question=payload.question, use_ollama=payload.use_ollama)
         return await nlp_service.generate_query(request, frame, payload.table_name)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/explain", response_model=ExplainResponse)
+async def explain_sql(payload: ExplainRequest) -> dict:
+    try:
+        return nlp_service.explain(payload.sql)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

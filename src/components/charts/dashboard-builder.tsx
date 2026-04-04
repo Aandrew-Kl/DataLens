@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { memo, startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import ReactECharts from "echarts-for-react";
 import {
@@ -438,7 +438,7 @@ function WidgetCard({
   );
 }
 
-export default function DashboardBuilder({ tableName, columns, rowCount }: DashboardBuilderProps) {
+function DashboardBuilder({ tableName, columns, rowCount }: DashboardBuilderProps) {
   const [widgets, setWidgets] = useState<WidgetConfig[]>([]);
   const [panelOpen, setPanelOpen] = useState(false);
   const [activeWidgetId, setActiveWidgetId] = useState<string | null>(null);
@@ -802,3 +802,5 @@ export default function DashboardBuilder({ tableName, columns, rowCount }: Dashb
     </motion.section>
   );
 }
+
+export default memo(DashboardBuilder);

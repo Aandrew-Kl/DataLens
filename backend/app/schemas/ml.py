@@ -103,3 +103,13 @@ class DecisionTreeRequest(BaseModel):
     target_column: str
     max_depth: Optional[int] = None
     test_size: float = Field(default=0.2, gt=0, lt=1)
+
+
+class DecisionTreeResponse(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    row_count: int
+    feature_importance: dict[str, float]
+    tree_structure: str
+    metrics: dict[str, Any]
+    class_labels: list[str]
