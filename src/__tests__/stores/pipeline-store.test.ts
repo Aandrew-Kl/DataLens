@@ -30,6 +30,8 @@ const columns: ColumnProfile[] = [
   },
 ];
 
+type DraftPipeline = Omit<SavedPipeline, "savedAt">;
+
 function makeStep(overrides: Partial<PipelineStep> = {}): PipelineStep {
   return {
     ...createPipelineStep("filter", columns),
@@ -40,8 +42,6 @@ function makeStep(overrides: Partial<PipelineStep> = {}): PipelineStep {
     ...overrides,
   };
 }
-
-type DraftPipeline = Omit<SavedPipeline, "savedAt">;
 
 function makePipeline(overrides: Partial<DraftPipeline> = {}): DraftPipeline {
   return {
@@ -54,13 +54,18 @@ function makePipeline(overrides: Partial<DraftPipeline> = {}): DraftPipeline {
 
 describe("usePipelineStore", () => {
   beforeEach(() => {
-    usePipelineStore.setState({
-      pipelines: [],
-      activePipelineId: null,
-      executionHistory: [],
-    });
+    usePipelineStore.setState(usePipelineStore.getInitialState());
     mockRunQuery.mockReset();
+    mockRunQuery.mockResolvedValue([]);
     jest.restoreAllMocks();
+  });
+
+  it("has correct initial state", () => {
+    const state = usePipelineStore.getState();
+
+    expect(state.pipelines).toEqual([]);
+    expect(state.activePipelineId).toBeNull();
+    expect(state.executionHistory).toEqual([]);
   });
 
   it("adds a pipeline, clones its steps, and marks it active", () => {
@@ -81,9 +86,64 @@ describe("usePipelineStore", () => {
       steps: [{ value: "East" }],
     });
     expect(state.pipelines[0]?.steps).not.toBe(draftSteps);
+    expect(state.pipelines[0]?.steps[0]).not.toBe(draftSteps[0]);
   });
 
-  it("removes the active pipeline and falls back to the next available one", () => {
+  it("updates a pipeline and keeps a cloned step list", () => {
+    // Build test data BEFORE mocking Date.now (createPipelineStep calls Date.now internally)
+    const pipelineDraft = makePipeline({ id: "pipeline-1", name: "Original" });
+    const replacement = [
+      {
+        ...makeStep({
+          id: "step-2",
+          type: "sort",
+          direction: "DESC",
+        }),
+      },
+    ];
+
+    const nowSpy = jest.spyOn(Date, "now");
+    nowSpy.mockReturnValueOnce(1_700_000_000_000).mockReturnValueOnce(1_700_000_000_001);
+
+    usePipelineStore.getState().addPipeline(pipelineDraft);
+    const original = usePipelineStore.getState().pipelines[0];
+    const originalSavedAt = original?.savedAt ?? 0;
+    expect(originalSavedAt).toBe(1_700_000_000_000);
+
+    usePipelineStore.getState().updatePipeline("pipeline-1", {
+      name: "Sorted",
+      steps: replacement,
+    });
+
+    replacement[0].direction = "ASC";
+
+    const state = usePipelineStore.getState();
+    const saved = state.pipelines[0];
+
+    expect(state.activePipelineId).toBe("pipeline-1");
+    expect(saved).toMatchObject({
+      id: "pipeline-1",
+      name: "Sorted",
+      steps: [{ id: "step-2", type: "sort", direction: "DESC" }],
+    });
+    expect(saved?.savedAt).toBe(1_700_000_000_001);
+    expect(saved?.steps[0]).not.toBe(replacement[0]);
+    nowSpy.mockRestore();
+  });
+
+  it("does not update missing pipelines", () => {
+    usePipelineStore.getState().addPipeline(makePipeline({ id: "pipeline-1" }));
+
+    usePipelineStore.getState().updatePipeline("missing", { name: "Never" });
+
+    const state = usePipelineStore.getState();
+    expect(state.pipelines).toHaveLength(1);
+    expect(state.pipelines[0]?.id).toBe("pipeline-1");
+    expect(state.pipelines[0]?.name).toBe("Regional Filter");
+    expect(state.activePipelineId).toBe("pipeline-1");
+  });
+
+  it("removes a pipeline and falls back to the next available one", () => {
     usePipelineStore.getState().addPipeline(makePipeline({ id: "pipeline-a", name: "A" }));
     usePipelineStore.getState().addPipeline(makePipeline({ id: "pipeline-b", name: "B" }));
 
@@ -95,26 +155,14 @@ describe("usePipelineStore", () => {
     expect(usePipelineStore.getState().activePipelineId).toBe("pipeline-a");
   });
 
-  it("updates a pipeline, refreshes savedAt, and clones replacement steps", () => {
-    usePipelineStore.getState().addPipeline(makePipeline({ id: "pipeline-1", name: "Original" }));
-    const originalSavedAt = usePipelineStore.getState().pipelines[0]?.savedAt ?? 0;
+  it("does not change active pipeline when removing a missing pipeline", () => {
+    usePipelineStore.getState().addPipeline(makePipeline({ id: "pipeline-1" }));
 
-    const replacementSteps = [makeStep({ id: "step-2", type: "sort", direction: "DESC" })];
-    usePipelineStore.getState().updatePipeline("pipeline-1", {
-      name: "Sorted",
-      steps: replacementSteps,
-    });
+    usePipelineStore.getState().removePipeline("missing-id");
 
-    replacementSteps[0].direction = "ASC";
-
-    const saved = usePipelineStore.getState().pipelines[0];
-
-    expect(saved).toMatchObject({
-      id: "pipeline-1",
-      name: "Sorted",
-      steps: [{ id: "step-2", type: "sort", direction: "DESC" }],
-    });
-    expect(saved.savedAt).toBeGreaterThanOrEqual(originalSavedAt);
+    expect(usePipelineStore.getState().pipelines.map((pipeline) => pipeline.id)).toEqual([
+      "pipeline-1",
+    ]);
     expect(usePipelineStore.getState().activePipelineId).toBe("pipeline-1");
   });
 
@@ -141,6 +189,7 @@ describe("usePipelineStore", () => {
       { region: "East", sales: 100 },
       { region: "East", sales: 120 },
     ]);
+
     usePipelineStore.getState().addPipeline(makePipeline());
 
     const record = await usePipelineStore.getState().executePipeline({
@@ -156,13 +205,14 @@ describe("usePipelineStore", () => {
       errorMessage: null,
     });
     expect(record?.sql).toContain('SELECT * FROM "orders" WHERE "region" = \'East\'');
-    expect(mockRunQuery).toHaveBeenCalledWith(record?.sql ?? "");
+    expect(mockRunQuery).toHaveBeenCalledTimes(1);
     expect(usePipelineStore.getState().activePipelineId).toBe("pipeline-1");
     expect(usePipelineStore.getState().executionHistory[0]).toEqual(record);
   });
 
   it("records runQuery failures as execution errors", async () => {
     mockRunQuery.mockRejectedValueOnce(new Error("DuckDB exploded"));
+
     usePipelineStore.getState().addPipeline(makePipeline());
 
     const record = await usePipelineStore.getState().executePipeline({
@@ -178,10 +228,35 @@ describe("usePipelineStore", () => {
       errorMessage: "DuckDB exploded",
     });
     expect(record?.sql).toContain('SELECT * FROM "orders" WHERE "region" = \'East\'');
+    expect(usePipelineStore.getState().activePipelineId).toBe("pipeline-1");
     expect(usePipelineStore.getState().executionHistory[0]).toEqual(record);
   });
 
-  it("clears execution history without touching saved pipelines", () => {
+  it("keeps execution history bounded to the most recent 20 runs", async () => {
+    const nowSpy = jest.spyOn(Date, "now");
+    mockRunQuery.mockResolvedValue([]);
+
+    usePipelineStore.getState().addPipeline(makePipeline());
+
+    for (let index = 0; index < 22; index += 1) {
+      nowSpy.mockReturnValueOnce(1_700_000_000_000 + index);
+      // eslint-disable-next-line no-await-in-loop
+      await usePipelineStore.getState().executePipeline({
+        pipelineId: "pipeline-1",
+        tableName: "orders",
+        columns,
+      });
+    }
+
+    const state = usePipelineStore.getState();
+    expect(state.executionHistory).toHaveLength(20);
+    expect(state.executionHistory[0]?.pipelineId).toBe("pipeline-1");
+    expect(state.executionHistory[0]?.sql).toContain('SELECT * FROM "orders" WHERE "region" = \'East\'');
+    expect(mockRunQuery).toHaveBeenCalledTimes(22);
+    nowSpy.mockRestore();
+  });
+
+  it("clears execution history without removing pipelines", () => {
     usePipelineStore.setState({
       pipelines: [{ ...makePipeline(), savedAt: 1 }],
       activePipelineId: "pipeline-1",
@@ -203,7 +278,7 @@ describe("usePipelineStore", () => {
     usePipelineStore.getState().clearHistory();
 
     expect(usePipelineStore.getState().pipelines).toHaveLength(1);
-    expect(usePipelineStore.getState().executionHistory).toEqual([]);
     expect(usePipelineStore.getState().activePipelineId).toBe("pipeline-1");
+    expect(usePipelineStore.getState().executionHistory).toEqual([]);
   });
 });

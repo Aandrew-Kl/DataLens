@@ -95,6 +95,9 @@ export const usePipelineStore = create<PipelineStore>((set, get) => ({
 
   updatePipeline: (id, patch) =>
     set((state) => {
+      const index = state.pipelines.findIndex((pipeline) => pipeline.id === id);
+      if (index < 0) return state;
+
       const nextPipelines = state.pipelines.map((pipeline) =>
         pipeline.id === id
           ? {

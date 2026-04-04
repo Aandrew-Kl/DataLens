@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import LoginForm from "@/components/auth/login-form";
@@ -18,51 +18,48 @@ jest.mock("framer-motion");
 
 const mockLogin = jest.mocked(login);
 
-async function renderAsync(): Promise<void> {
-  await act(async () => {
-    render(<LoginForm />);
-  });
-}
-
 describe("LoginForm", () => {
   beforeEach(() => {
     mockLogin.mockReset();
     pushMock.mockReset();
   });
 
-  it("renders email and password fields", async () => {
-    await renderAsync();
+  it("renders email and password inputs and login button", () => {
+    render(<LoginForm />);
 
     expect(screen.getByPlaceholderText("you@example.com")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Enter your password")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
   });
 
-  it("shows error on failed login", async () => {
+  it("shows error message on failed login", async () => {
     const user = userEvent.setup();
     mockLogin.mockRejectedValue(new Error("Invalid credentials"));
 
-    await renderAsync();
+    render(<LoginForm />);
 
     await user.type(screen.getByPlaceholderText("you@example.com"), "user@example.com");
     await user.type(screen.getByPlaceholderText("Enter your password"), "wrongpass");
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await user.click(screen.getByRole("button", { name: /sign in/i }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Invalid credentials");
-    expect(mockLogin).toHaveBeenCalledWith("user@example.com", "wrongpass");
+    await waitFor(() => {
+      expect(mockLogin).toHaveBeenCalledWith("user@example.com", "wrongpass");
+      expect(screen.getByRole("alert")).toHaveTextContent("Invalid credentials");
+    });
   });
 
-  it("calls login() on submit", async () => {
+  it("calls login() with correct email and password on submit", async () => {
     const user = userEvent.setup();
     mockLogin.mockResolvedValue({
       access_token: "token-123",
       token_type: "bearer",
     });
 
-    await renderAsync();
+    render(<LoginForm />);
 
     await user.type(screen.getByPlaceholderText("you@example.com"), "user@example.com");
     await user.type(screen.getByPlaceholderText("Enter your password"), "strong-pass");
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await user.click(screen.getByRole("button", { name: /sign in/i }));
 
     await waitFor(() => {
       expect(mockLogin).toHaveBeenCalledWith("user@example.com", "strong-pass");

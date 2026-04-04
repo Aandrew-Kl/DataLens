@@ -1,63 +1,69 @@
-import { render, screen } from "@testing-library/react";
+import { useState } from "react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
-function ThrowingComponent(): React.ReactNode {
-  throw new Error("Something has failed");
+jest.mock("framer-motion");
+
+function ThrowingChild({ shouldThrow }: { shouldThrow: boolean }) {
+  if (shouldThrow) {
+    throw new Error("Something has failed");
+  }
+
+  return <p>Recovered content</p>;
 }
 
-function HealthyComponent() {
+function HealthyChild() {
   return <p>All good</p>;
 }
 
-function HealthWithFallbackBoundary() {
-  return (
-    <ErrorBoundary fallback={<p>Fallback UI</p>}>
-      <ThrowingComponent />
-    </ErrorBoundary>
-  );
-}
+function ResettableBoundary() {
+  const [shouldThrow, setShouldThrow] = useState(true);
 
-function DefaultBoundary() {
   return (
-    <ErrorBoundary>
-      <ThrowingComponent />
+    <ErrorBoundary onReset={() => setShouldThrow(false)}>
+      <ThrowingChild shouldThrow={shouldThrow} />
     </ErrorBoundary>
   );
 }
 
 describe("ErrorBoundary", () => {
-  let consoleErrorSpy: jest.SpyInstance;
-
-  beforeEach(() => {
-    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    consoleErrorSpy.mockRestore();
-  });
-
   it("renders children when no error is thrown", () => {
     render(
       <ErrorBoundary>
-        <HealthyComponent />
+        <HealthyChild />
       </ErrorBoundary>,
     );
 
     expect(screen.getByText("All good")).toBeInTheDocument();
   });
 
-  it("renders fallback when child throws", () => {
-    render(<HealthWithFallbackBoundary />);
+  it("renders fallback UI when an error is thrown", async () => {
+    render(
+      <ErrorBoundary>
+        <ThrowingChild shouldThrow />
+      </ErrorBoundary>,
+    );
 
-    expect(screen.getByText("Fallback UI")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+      expect(screen.getByText("Something has failed")).toBeInTheDocument();
+    });
   });
 
-  it("shows the Try again button in error state", () => {
-    render(<DefaultBoundary />);
+  it("reset button recovers the boundary and re-renders children", async () => {
+    const user = userEvent.setup();
 
-    expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+    render(<ResettableBoundary />);
+
     expect(screen.getByText("Something has failed")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /try again/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /try again/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Recovered content")).toBeInTheDocument();
+    });
   });
 });

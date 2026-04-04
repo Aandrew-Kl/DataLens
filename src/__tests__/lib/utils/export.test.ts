@@ -1,105 +1,171 @@
 /**
  * @jest-environment jsdom
  */
-import { exportToCSV, exportToJSON, exportToClipboard } from "@/lib/utils/export";
+import * as exportUtils from "@/lib/utils/export";
 
-// Mock browser APIs
-const mockClick = jest.fn();
-const mockRevokeObjectURL = jest.fn();
-let lastCreatedUrl: string | undefined;
+const { downloadFile, exportToCSV, exportToJSON, exportToClipboard } = exportUtils;
+
+if (typeof Blob.prototype.text !== "function") {
+  Object.defineProperty(Blob.prototype, "text", {
+    configurable: true,
+    writable: true,
+    value: function text(this: Blob): Promise<string> {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsText(this);
+      });
+    },
+  });
+}
+
+let createObjectURLSpy: jest.SpyInstance;
+let revokeObjectURLSpy: jest.SpyInstance;
+let appendChildSpy: jest.SpyInstance;
+let removeChildSpy: jest.SpyInstance;
+let createElementSpy: jest.SpyInstance;
+let anchor: HTMLAnchorElement;
+let clickSpy: jest.Mock;
+let originalCreateElement: typeof document.createElement;
 
 beforeEach(() => {
-  // Mock URL.createObjectURL
-  global.URL.createObjectURL = jest.fn(() => {
-    lastCreatedUrl = "blob:mock-url";
-    return lastCreatedUrl;
-  });
-  global.URL.revokeObjectURL = mockRevokeObjectURL;
+  jest.useFakeTimers();
 
-  // Mock document.createElement for anchor tags
-  const originalCreateElement = document.createElement.bind(document);
-  jest.spyOn(document, "createElement").mockImplementation((tag: string) => {
-    if (tag === "a") {
-      const link = originalCreateElement("a");
-      link.click = mockClick;
-      return link;
-    }
-    return originalCreateElement(tag);
-  });
+  createObjectURLSpy = jest
+    .spyOn(URL, "createObjectURL")
+    .mockReturnValue("blob:mock-url");
+  createObjectURLSpy.mockClear();
+  revokeObjectURLSpy = jest
+    .spyOn(URL, "revokeObjectURL")
+    .mockImplementation(() => undefined);
+  revokeObjectURLSpy.mockClear();
 
-  jest.clearAllMocks();
+  appendChildSpy = jest
+    .spyOn(document.body, "appendChild")
+    .mockImplementation((node: Node) => node);
+  removeChildSpy = jest
+    .spyOn(document.body, "removeChild")
+    .mockImplementation((node: Node) => node);
+
+  originalCreateElement = document.createElement.bind(document);
+  anchor = originalCreateElement("a") as HTMLAnchorElement;
+  clickSpy = jest.fn();
+  jest.spyOn(anchor, "click").mockImplementation(clickSpy);
+
+  createElementSpy = jest
+    .spyOn(document, "createElement")
+    .mockImplementation((tag: string) => {
+      if (tag === "a") {
+        return anchor;
+      }
+      return originalCreateElement(tag);
+    });
 });
 
 afterEach(() => {
+  jest.useRealTimers();
   jest.restoreAllMocks();
 });
 
+describe("downloadFile", () => {
+  it("creates a blob with requested mime type and triggers a click", () => {
+    downloadFile("name,score\nAlice,10", "dataset.csv", "text/csv;charset=utf-8;");
+
+    expect(createObjectURLSpy).toHaveBeenCalledWith(
+      expect.any(Blob),
+    );
+    expect(createElementSpy).toHaveBeenCalledWith("a");
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+
+    const createdBlob = createObjectURLSpy.mock.calls[0][0] as Blob;
+    expect(createdBlob).toBeInstanceOf(Blob);
+    expect(createdBlob.type).toBe("text/csv;charset=utf-8;");
+    expect(anchor.href).toBe("blob:mock-url");
+    expect(anchor.download).toBe("dataset.csv");
+    expect(anchor.style.display).toBe("none");
+    expect(appendChildSpy).toHaveBeenCalledWith(anchor);
+
+    jest.runOnlyPendingTimers();
+
+    expect(removeChildSpy).toHaveBeenCalledWith(anchor);
+    expect(revokeObjectURLSpy).toHaveBeenCalledWith("blob:mock-url");
+  });
+});
+
 describe("exportToCSV", () => {
-  it("creates a download with correct filename", () => {
+  it("formats headers, order, and escaped values", async () => {
     const data = [
-      { name: "Alice", age: 30 },
-      { name: "Bob", age: 25 },
+      { name: "Alice", note: 'He said, "hello"', score: 10 },
+      { score: 20, name: "Bob", region: "NA" },
     ];
 
-    exportToCSV(data, "test");
-    expect(mockClick).toHaveBeenCalled();
+    exportToCSV(data, "summary.csv");
+
+    expect(createObjectURLSpy).toHaveBeenCalledWith(expect.any(Blob));
+
+    const blob = createObjectURLSpy.mock.calls[0][0] as Blob;
+    expect(blob.type).toBe("text/csv;charset=utf-8;");
+    expect(anchor.download).toBe("summary.csv");
+    expect(clickSpy).toHaveBeenCalled();
+
+    const csv = await blob.text();
+
+    expect(csv).toBe(
+      "name,note,score,region\n" +
+        'Alice,"He said, ""hello""",10,\n' +
+        "Bob,,20,NA",
+    );
   });
 
-  it("handles empty data", () => {
-    exportToCSV([], "empty");
-    // Should still create a file (just headers or empty)
-  });
-
-  it("handles special characters in values", () => {
-    const data = [
-      { name: 'Alice "Ally"', note: "has, comma" },
-      { name: "Bob\nNewline", note: "normal" },
-    ];
-
-    exportToCSV(data, "special");
-    expect(mockClick).toHaveBeenCalled();
+  it("does not trigger a download for empty data", () => {
+    exportToCSV([], "empty.csv");
+    expect(createObjectURLSpy).not.toHaveBeenCalled();
   });
 });
 
 describe("exportToJSON", () => {
-  it("creates a download with correct filename", () => {
-    const data = [
-      { name: "Alice", age: 30 },
-      { name: "Bob", age: 25 },
-    ];
+  it("passes a pretty-printed JSON payload to downloadFile", async () => {
+    const data = [{ name: "Alice", nested: { score: 10 } }, { name: "Bob" }];
 
-    exportToJSON(data, "test");
-    expect(mockClick).toHaveBeenCalled();
-  });
+    exportToJSON(data, "export.json");
 
-  it("handles complex nested data", () => {
-    const data = [
-      { name: "Alice", meta: { score: 95 } },
-    ];
+    const blob = createObjectURLSpy.mock.calls[0][0] as Blob;
+    expect(blob.type).toBe("application/json;charset=utf-8;");
 
-    exportToJSON(data, "nested");
-    expect(mockClick).toHaveBeenCalled();
+    const payload = await blob.text();
+    expect(payload).toBe(JSON.stringify(data, null, 2));
+    expect(anchor.download).toBe("export.json");
   });
 });
 
 describe("exportToClipboard", () => {
-  it("copies data to clipboard", async () => {
-    const mockWriteText = jest.fn().mockResolvedValue(undefined);
+  it("writes TSV to clipboard and sanitizes tab/newline characters", async () => {
+    const writeText = jest.fn().mockResolvedValue(undefined);
     Object.assign(navigator, {
-      clipboard: { writeText: mockWriteText },
+      clipboard: { writeText },
     });
 
     const data = [
-      { name: "Alice", age: 30 },
-      { name: "Bob", age: 25 },
+      { name: "A\tB", notes: "line1\nline2" },
+      { name: "C", notes: "ok" },
     ];
 
     await exportToClipboard(data);
-    expect(mockWriteText).toHaveBeenCalled();
 
-    const clipboardContent = mockWriteText.mock.calls[0][0];
-    expect(clipboardContent).toContain("Alice");
-    expect(clipboardContent).toContain("Bob");
-    expect(clipboardContent).toContain("\t"); // Tab-separated
+    expect(writeText).toHaveBeenCalledTimes(1);
+    const tsv = writeText.mock.calls[0][0] as string;
+
+    expect(tsv).toBe("name\tnotes\nA B	line1 line2\nC\tok");
+  });
+
+  it("does not write to clipboard for empty data", async () => {
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, {
+      clipboard: { writeText },
+    });
+
+    await exportToClipboard([]);
+    expect(writeText).not.toHaveBeenCalled();
   });
 });

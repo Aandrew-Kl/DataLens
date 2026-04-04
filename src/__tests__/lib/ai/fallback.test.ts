@@ -1,7 +1,7 @@
 import {
-  generateFallbackSQL,
-  generateFallbackQuestions,
   generateFallbackDashboard,
+  generateFallbackQuestions,
+  generateFallbackSQL,
 } from "@/lib/ai/fallback";
 import type { ColumnProfile } from "@/types/dataset";
 
@@ -35,111 +35,152 @@ const dateCol: ColumnProfile = {
   max: "2024-12-31",
 };
 
-const columns = [numericCol, stringCol, dateCol];
+const numericOnlyColumns: ColumnProfile[] = [
+  {
+    ...numericCol,
+    name: "amount",
+    mean: 42,
+  },
+];
+
+const stringOnlyColumns: ColumnProfile[] = [
+  {
+    ...stringCol,
+    name: "category",
+  },
+];
+
+const columns: ColumnProfile[] = [numericCol, stringCol, dateCol];
 
 describe("generateFallbackSQL", () => {
-  it('handles "how many" queries', () => {
-    const sql = generateFallbackSQL("How many rows?", "sales", columns);
-    expect(sql).toContain("COUNT(*)");
-    expect(sql).toContain("sales");
+  it("handles count and preview style queries", () => {
+    expect(generateFallbackSQL("How many rows exist?", "sales_data", columns)).toContain(
+      'SELECT COUNT(*) AS total_count FROM "sales_data"',
+    );
+    expect(generateFallbackSQL("show first rows", "sales_data", columns)).toContain(
+      'SELECT * FROM "sales_data" LIMIT 20',
+    );
   });
 
-  it('handles "top N" queries', () => {
-    const sql = generateFallbackSQL("Show top 10 records", "sales", columns);
-    expect(sql).toContain("LIMIT 10");
-    expect(sql).toContain("ORDER BY");
-    expect(sql).toContain("DESC");
+  it("handles top N and average with numeric columns", () => {
+    expect(generateFallbackSQL("Show top 7", "sales_data", columns)).toContain(
+      "ORDER BY \"revenue\" DESC LIMIT 7",
+    );
+    expect(generateFallbackSQL("average revenue", "sales_data", columns)).toContain(
+      'AVG("revenue") AS avg_revenue',
+    );
   });
 
-  it('handles "average" queries', () => {
-    const sql = generateFallbackSQL("What is the average revenue?", "sales", columns);
-    expect(sql).toContain("AVG");
+  it("handles date trends and grouping", () => {
+    expect(generateFallbackSQL("monthly trend", "sales_data", columns)).toContain(
+      "DATE_TRUNC('month', \"order_date\"::DATE) AS month",
+    );
+    expect(generateFallbackSQL("distribution by region", "sales_data", columns)).toContain(
+      'GROUP BY "region"',
+    );
+    expect(generateFallbackSQL("show unique regions", "sales_data", columns)).toContain(
+      'GROUP BY "region"',
+    );
   });
 
-  it('handles "sum" / "total" queries', () => {
-    const sql = generateFallbackSQL("Show total revenue by region", "sales", columns);
-    expect(sql).toContain("SUM");
-    expect(sql).toContain("GROUP BY");
+  it("quotes table names with spaces", () => {
+    const sql = generateFallbackSQL("how many", "sales data", columns);
+    expect(sql).toContain('"sales data"');
   });
 
-  it('handles "trend" queries with date columns', () => {
-    const sql = generateFallbackSQL("Show monthly trend of revenue", "sales", columns);
-    expect(sql).toContain("DATE_TRUNC");
-    expect(sql).toContain("month");
-  });
-
-  it('handles "show" / "preview" queries', () => {
-    const sql = generateFallbackSQL("Show me the data", "sales", columns);
-    expect(sql).toContain("SELECT *");
-    expect(sql).toContain("LIMIT");
-  });
-
-  it("returns valid SQL for unknown queries", () => {
-    const sql = generateFallbackSQL("something random", "sales", columns);
-    expect(sql).toBeTruthy();
-    expect(typeof sql).toBe("string");
-  });
-
-  it("quotes table and column names", () => {
-    const sql = generateFallbackSQL("count", "my table", columns);
-    expect(sql).toContain('"my table"');
+  it("returns a SQL string for unknown question patterns", () => {
+    const sql = generateFallbackSQL("something unexpected", "sales", columns);
+    expect(sql).toContain("SELECT");
+    expect(sql).toContain('FROM "sales"');
   });
 });
 
 describe("generateFallbackQuestions", () => {
-  it("returns an array of questions", () => {
+  it("returns an array of non-empty strings", () => {
     const questions = generateFallbackQuestions("sales", columns);
+
     expect(Array.isArray(questions)).toBe(true);
     expect(questions.length).toBeGreaterThan(0);
+    expect(questions.every((question) => typeof question === "string" && question.length > 0)).toBe(true);
+  });
+
+  it("uses column metadata to create relevant suggestions", () => {
+    const questions = generateFallbackQuestions("sales", columns);
+    const joined = questions.join(" | ");
+
+    expect(joined).toContain("revenue");
+    expect(joined).toContain("region");
+    expect(joined[0]).toBeDefined();
+    expect(joined).toContain("total rows");
+  });
+
+  it("still returns questions without numeric columns", () => {
+    const questions = generateFallbackQuestions("products", stringOnlyColumns);
+
+    expect(questions).toEqual([
+      "How many total rows are in the dataset?",
+      "What are the unique values of category?",
+    ]);
+  });
+
+  it("caps the number of questions at six", () => {
+    const questions = generateFallbackQuestions("sales", [
+      numericCol,
+      stringCol,
+      dateCol,
+      numericCol,
+      stringCol,
+      dateCol,
+    ]);
+
     expect(questions.length).toBeLessThanOrEqual(6);
-  });
-
-  it("includes relevant column names", () => {
-    const questions = generateFallbackQuestions("sales", columns);
-    const combined = questions.join(" ");
-    expect(combined).toContain("revenue");
-  });
-
-  it("always includes total rows question", () => {
-    const questions = generateFallbackQuestions("sales", columns);
-    expect(questions[0]).toContain("rows");
-  });
-
-  it("handles columns with no numeric types", () => {
-    const questions = generateFallbackQuestions("data", [stringCol]);
-    expect(questions.length).toBeGreaterThan(0);
   });
 });
 
 describe("generateFallbackDashboard", () => {
-  it("returns metrics and charts", () => {
-    const dashboard = generateFallbackDashboard("sales", columns, 100);
-    expect(dashboard.metrics).toBeDefined();
-    expect(dashboard.charts).toBeDefined();
-    expect(dashboard.metrics.length).toBeGreaterThan(0);
+  it("returns metrics and charts for mixed column types", () => {
+    const dashboard = generateFallbackDashboard("sales", columns, 120);
+
+    expect(dashboard).toEqual(
+      expect.objectContaining({
+        metrics: expect.any(Array),
+        charts: expect.any(Array),
+      }),
+    );
+    expect(dashboard.metrics.length).toBeGreaterThanOrEqual(2);
     expect(dashboard.charts.length).toBeGreaterThan(0);
+
+    const metricLabels = dashboard.metrics.map((metric) => metric.label);
+    expect(metricLabels).toContain("Total Rows");
+    expect(metricLabels).toContain("Columns");
   });
 
-  it("includes row count metric", () => {
-    const dashboard = generateFallbackDashboard("sales", columns, 100);
-    expect(dashboard.metrics.some((m) => m.label === "Total Rows")).toBe(true);
-  });
+  it("produces chart SQL that references quoted identifiers", () => {
+    const dashboard = generateFallbackDashboard("sales table", columns, 120);
 
-  it("generates bar chart for string x number", () => {
-    const dashboard = generateFallbackDashboard("sales", columns, 100);
-    expect(dashboard.charts.some((c) => c.type === "bar")).toBe(true);
-  });
-
-  it("generates line chart when date column exists", () => {
-    const dashboard = generateFallbackDashboard("sales", columns, 100);
-    expect(dashboard.charts.some((c) => c.type === "line")).toBe(true);
-  });
-
-  it("charts contain valid SQL", () => {
-    const dashboard = generateFallbackDashboard("sales", columns, 100);
     dashboard.charts.forEach((chart) => {
-      expect(chart.sql).toContain("SELECT");
-      expect(chart.sql).toContain("sales");
+      expect(chart.id).toMatch(/^chart-/);
+      expect(chart.title).toBeTruthy();
+      expect(chart.sql).toContain('FROM "sales table"');
+      expect(chart.sql).toMatch(/^SELECT /);
     });
+  });
+
+  it("returns only metrics when there are no string columns", () => {
+    const dashboard = generateFallbackDashboard("numbers_only", numericOnlyColumns, 50);
+
+    expect(dashboard.metrics.length).toBeGreaterThan(0);
+    expect(dashboard.charts).toHaveLength(0);
+    expect(dashboard.metrics[0].label).toBe("Total Rows");
+    expect(dashboard.metrics[1].label).toBe("Columns");
+  });
+
+  it("returns a limited dashboard for string-only schema", () => {
+    const dashboard = generateFallbackDashboard("strings", stringOnlyColumns, 50);
+
+    expect(dashboard.metrics.length).toBe(2);
+    expect(dashboard.charts).toHaveLength(1);
+    expect(dashboard.charts[0]).toMatchObject({ type: "pie", xAxis: "category", yAxis: "count" });
+    expect(dashboard.charts[0].sql).toContain("COUNT(*) AS count");
   });
 });

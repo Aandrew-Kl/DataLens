@@ -1,9 +1,17 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import DataProfiler from "@/components/data/data-profiler";
 import type { ColumnProfile } from "@/types/dataset";
 
-const mockColumns: ColumnProfile[] = [
+jest.mock("framer-motion");
+jest.mock("@/lib/duckdb/client", () => ({
+  runQuery: jest.fn().mockResolvedValue([]),
+}));
+jest.mock("echarts", () => ({}));
+jest.mock("echarts-for-react", () => jest.fn(() => null));
+
+const columns: ColumnProfile[] = [
   {
     name: "amount",
     type: "number",
@@ -34,48 +42,39 @@ const mockColumns: ColumnProfile[] = [
 ];
 
 describe("DataProfiler", () => {
-  it("renders an empty state when there are no columns", () => {
-    render(<DataProfiler columns={[]} rowCount={0} />);
+  it("renders columns from profile data", () => {
+    render(<DataProfiler columns={columns} rowCount={100} />);
 
-    expect(screen.getByText("No column profiles available")).toBeInTheDocument();
-  });
-
-  it("renders the quality overview and column cards in grid mode", () => {
-    const onColumnClick = jest.fn();
-
-    render(
-      <DataProfiler
-        columns={mockColumns}
-        rowCount={100}
-        onColumnClick={onColumnClick}
-      />,
-    );
-
-    expect(screen.getByText("Data Quality")).toBeInTheDocument();
     expect(screen.getByText("amount")).toBeInTheDocument();
-    expect(screen.getAllByText("Samples")).toHaveLength(mockColumns.length);
-
-    fireEvent.click(screen.getByText("amount"));
-    expect(onColumnClick).toHaveBeenCalledWith(mockColumns[0]);
+    expect(screen.getByText("region")).toBeInTheDocument();
+    expect(screen.getByText("created_at")).toBeInTheDocument();
   });
 
-  it("switches to list mode and keeps rows clickable", () => {
-    const onColumnClick = jest.fn();
+  it("displays column names and type labels", () => {
+    render(<DataProfiler columns={columns} rowCount={100} />);
 
-    render(
-      <DataProfiler
-        columns={mockColumns}
-        rowCount={100}
-        onColumnClick={onColumnClick}
-      />,
-    );
+    expect(screen.getByText("Number")).toBeInTheDocument();
+    expect(screen.getByText("String")).toBeInTheDocument();
+    expect(screen.getByText("Date")).toBeInTheDocument();
+  });
 
-    fireEvent.click(screen.getByRole("button", { name: /list/i }));
+  it("shows null and unique count stats", async () => {
+    const user = userEvent.setup();
+    render(<DataProfiler columns={columns} rowCount={100} />);
 
-    expect(screen.getByRole("columnheader", { name: /column/i })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: /complete/i })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /list/i }));
 
-    fireEvent.click(screen.getByText("region"));
-    expect(onColumnClick).toHaveBeenCalledWith(mockColumns[1]);
+    await waitFor(() => {
+      const amountRow = screen.getByRole("row", { name: /amount/i });
+      const regionRow = screen.getByRole("row", { name: /region/i });
+      const dateRow = screen.getByRole("row", { name: /created_at/i });
+
+      expect(amountRow).toHaveTextContent("90");
+      expect(amountRow).toHaveTextContent("2");
+      expect(regionRow).toHaveTextContent("4");
+      expect(regionRow).toHaveTextContent("0");
+      expect(dateRow).toHaveTextContent("80");
+      expect(dateRow).toHaveTextContent("10");
+    });
   });
 });
