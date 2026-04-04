@@ -129,7 +129,7 @@ def should_set_hsts(request: Request) -> bool:
     return get_request_hostname(request) not in LOCALHOST_HOSTNAMES
 
 
-setup_logging(settings.LOG_LEVEL)
+setup_logging(settings.LOG_LEVEL, environment=settings.ENVIRONMENT)
 request_logger = logging.getLogger("app.request")
 health_logger = logging.getLogger("app.health")
 error_logger = logging.getLogger("app.error")
