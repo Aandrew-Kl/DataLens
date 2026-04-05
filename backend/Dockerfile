@@ -13,6 +13,12 @@ COPY app ./app
 COPY alembic ./alembic
 COPY alembic.ini ./alembic.ini
 
+RUN addgroup --system --gid 1001 appuser \
+  && adduser --system --uid 1001 --ingroup appuser appuser \
+  && mkdir -p /app/uploads && chown -R appuser:appuser /app/uploads
+
+USER appuser
+
 EXPOSE 8000
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=20s --retries=3 \
