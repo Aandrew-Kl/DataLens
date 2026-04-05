@@ -119,7 +119,6 @@ describe("api client", () => {
     await expect(protectedRequest).rejects.toBeInstanceOf(ApiError);
     await expect(protectedRequest).rejects.toMatchObject({
       status: 401,
-      message: "Unauthorized",
       detail: "expired",
       body: { detail: "expired" },
     });

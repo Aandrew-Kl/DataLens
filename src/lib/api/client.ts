@@ -129,7 +129,11 @@ async function getSuccessfulResponse(
       if (response.status === 401) {
         const body = await readResponseBody(response);
         useAuthStore.getState().clearToken();
-        throw new ApiError(401, "Unauthorized", body);
+        throw new ApiError(
+          401,
+          getErrorMessage(body, "Unauthorized"),
+          body
+        );
       }
 
       if (!response.ok) {

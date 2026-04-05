@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { login } from "@/lib/api/auth";
@@ -9,6 +9,16 @@ interface LoginFormProps {
   redirectTo?: string;
   className?: string;
   title?: string;
+}
+
+const RATE_LIMIT_COOLDOWN_SECONDS = 60;
+
+function isRateLimitError(error: unknown): boolean {
+  if (error && typeof error === "object" && "status" in error) {
+    return (error as { status: number }).status === 429;
+  }
+
+  return false;
 }
 
 function getErrorMessage(error: unknown): string {
@@ -44,6 +54,37 @@ export default function LoginForm({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTransitioning, startTransition] = useTransition();
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startCooldown = useCallback(() => {
+    if (cooldownRef.current) {
+      clearInterval(cooldownRef.current);
+    }
+
+    setCooldownSeconds(RATE_LIMIT_COOLDOWN_SECONDS);
+
+    cooldownRef.current = setInterval(() => {
+      setCooldownSeconds((prev) => {
+        if (prev <= 1) {
+          if (cooldownRef.current) {
+            clearInterval(cooldownRef.current);
+            cooldownRef.current = null;
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1_000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (cooldownRef.current) {
+        clearInterval(cooldownRef.current);
+      }
+    };
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
@@ -67,9 +108,14 @@ export default function LoginForm({
         setIsSubmitting(false);
         setError(getErrorMessage(err));
       });
+
+      if (isRateLimitError(err)) {
+        startCooldown();
+      }
     }
   };
 
+  const isRateLimited = cooldownSeconds > 0;
   const isBusy = isSubmitting || isTransitioning;
 
   return (
@@ -118,7 +164,7 @@ export default function LoginForm({
 
         <button
           type="submit"
-          disabled={isBusy}
+          disabled={isBusy || isRateLimited}
           className="inline-flex w-full items-center justify-center rounded-xl bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isBusy ? (
@@ -126,6 +172,8 @@ export default function LoginForm({
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
               Signing in...
             </span>
+          ) : isRateLimited ? (
+            `Try again in ${cooldownSeconds}s`
           ) : (
             "Sign in"
           )}

@@ -134,6 +134,26 @@ describe("LoginForm", () => {
       });
   });
 
+  it("shows a cooldown timer when rate limited", async () => {
+    const user = userEvent.setup();
+    const rateLimitError = Object.assign(new Error("Too many login attempts. Please try again later."), {
+      status: 429,
+    });
+    mockLogin.mockRejectedValue(rateLimitError);
+
+    render(<LoginForm />);
+
+    await user.type(screen.getByLabelText(/email/i), "user@example.com");
+    await user.type(screen.getByLabelText(/password/i), "wrongpass");
+    await user.click(screen.getByRole("button", { name: /sign in/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent("Too many login attempts");
+    });
+
+    expect(screen.getByRole("button", { name: /try again in/i })).toBeDisabled();
+  });
+
   it("calls the login API and redirects on success", async () => {
     const user = userEvent.setup();
     mockLogin.mockResolvedValue({
