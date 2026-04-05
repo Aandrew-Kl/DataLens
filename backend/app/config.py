@@ -12,7 +12,6 @@ class Settings(BaseSettings):
     OLLAMA_URL: str = "http://localhost:11434"
     LOG_LEVEL: str = "INFO"
     APP_VERSION: str = "1.0.0"
-    REDIS_URL: str = "redis://localhost:6379/0"
     UPLOADS_DIR: str = "./uploads"
     MAX_UPLOAD_SIZE: int = 50 * 1024 * 1024
 
