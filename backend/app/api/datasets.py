@@ -49,8 +49,12 @@ async def upload_dataset(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unable to parse CSV file.") from exc
 
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    file_id = f"{uuid.uuid4()}_{file.filename}"
-    file_path = UPLOAD_DIR / file_id
+    safe_filename = file.filename.replace("/", "_").replace("\\", "_").replace("\0", "_")
+    file_id = f"{uuid.uuid4()}_{safe_filename}"
+    upload_dir = UPLOAD_DIR.resolve()
+    file_path = (UPLOAD_DIR / file_id).resolve()
+    if not str(file_path).startswith(str(upload_dir)):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid filename.")
     file_path.write_bytes(contents)
 
     dataset = Dataset(

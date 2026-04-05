@@ -52,6 +52,18 @@ export default function RegisterForm({
       return "Password must be at least 8 characters long.";
     }
 
+    if (!/[A-Z]/.test(password)) {
+      return "Password must contain at least one uppercase letter.";
+    }
+
+    if (!/[a-z]/.test(password)) {
+      return "Password must contain at least one lowercase letter.";
+    }
+
+    if (!/[0-9]/.test(password)) {
+      return "Password must contain at least one digit.";
+    }
+
     if (password !== confirmPassword) {
       return "Passwords do not match.";
     }
@@ -129,7 +141,7 @@ export default function RegisterForm({
             value={password}
             onChange={(event): void => setPassword(event.target.value)}
             className="w-full rounded-xl border border-white/25 bg-white/60 px-4 py-3 text-slate-900 outline-none ring-0 transition focus:border-cyan-300 focus:shadow-sm focus:shadow-cyan-200 dark:bg-slate-900/60 dark:text-slate-100"
-            placeholder="Minimum 8 characters"
+            placeholder="Min 8 chars, uppercase, lowercase, digit"
             required
           />
         </label>

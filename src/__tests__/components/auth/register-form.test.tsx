@@ -55,14 +55,63 @@ describe("RegisterForm", () => {
     expect(pushMock).not.toHaveBeenCalled();
   });
 
+  it("shows a validation error when the password has no uppercase letter", async () => {
+    const user = userEvent.setup();
+
+    render(<RegisterForm />);
+
+    await user.type(screen.getByLabelText(/email/i), "new-user@example.com");
+    await user.type(screen.getByLabelText(/^password$/i), "lowercase1");
+    await user.type(screen.getByLabelText(/confirm password/i), "lowercase1");
+    await user.click(screen.getByRole("button", { name: /create account/i }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Password must contain at least one uppercase letter.",
+    );
+    expect(mockRegister).not.toHaveBeenCalled();
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it("shows a validation error when the password has no lowercase letter", async () => {
+    const user = userEvent.setup();
+
+    render(<RegisterForm />);
+
+    await user.type(screen.getByLabelText(/email/i), "new-user@example.com");
+    await user.type(screen.getByLabelText(/^password$/i), "UPPERCASE1");
+    await user.type(screen.getByLabelText(/confirm password/i), "UPPERCASE1");
+    await user.click(screen.getByRole("button", { name: /create account/i }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Password must contain at least one lowercase letter.",
+    );
+    expect(mockRegister).not.toHaveBeenCalled();
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it("shows a validation error when the password has no digit", async () => {
+    const user = userEvent.setup();
+
+    render(<RegisterForm />);
+
+    await user.type(screen.getByLabelText(/email/i), "new-user@example.com");
+    await user.type(screen.getByLabelText(/^password$/i), "NoDigitsHere");
+    await user.type(screen.getByLabelText(/confirm password/i), "NoDigitsHere");
+    await user.click(screen.getByRole("button", { name: /create account/i }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Password must contain at least one digit.");
+    expect(mockRegister).not.toHaveBeenCalled();
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
   it("shows a validation error when the passwords do not match", async () => {
     const user = userEvent.setup();
 
     render(<RegisterForm />);
 
     await user.type(screen.getByLabelText(/email/i), "new-user@example.com");
-    await user.type(screen.getByLabelText(/^password$/i), "long-password");
-    await user.type(screen.getByLabelText(/confirm password/i), "different-password");
+    await user.type(screen.getByLabelText(/^password$/i), "ValidPass1");
+    await user.type(screen.getByLabelText(/confirm password/i), "Different1");
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     expect(screen.getByRole("alert")).toHaveTextContent("Passwords do not match.");
@@ -77,12 +126,12 @@ describe("RegisterForm", () => {
     render(<RegisterForm />);
 
     await user.type(screen.getByLabelText(/email/i), "new-user@example.com");
-    await user.type(screen.getByLabelText(/^password$/i), "long-password");
-    await user.type(screen.getByLabelText(/confirm password/i), "long-password");
+    await user.type(screen.getByLabelText(/^password$/i), "ValidPass1");
+    await user.type(screen.getByLabelText(/confirm password/i), "ValidPass1");
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
-      expect(mockRegister).toHaveBeenCalledWith("new-user@example.com", "long-password");
+      expect(mockRegister).toHaveBeenCalledWith("new-user@example.com", "ValidPass1");
       expect(screen.getByRole("alert")).toHaveTextContent("Email already exists");
     });
   });
@@ -97,12 +146,12 @@ describe("RegisterForm", () => {
     render(<RegisterForm redirectTo="/workspace" />);
 
     await user.type(screen.getByLabelText(/email/i), "  new-user@example.com  ");
-    await user.type(screen.getByLabelText(/^password$/i), "long-password");
-    await user.type(screen.getByLabelText(/confirm password/i), "long-password");
+    await user.type(screen.getByLabelText(/^password$/i), "ValidPass1");
+    await user.type(screen.getByLabelText(/confirm password/i), "ValidPass1");
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
-      expect(mockRegister).toHaveBeenCalledWith("new-user@example.com", "long-password");
+      expect(mockRegister).toHaveBeenCalledWith("new-user@example.com", "ValidPass1");
       expect(screen.getByRole("status")).toHaveTextContent(
         "Your account has been created. Redirecting to dashboard...",
       );
