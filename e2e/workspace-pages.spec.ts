@@ -45,4 +45,19 @@ test.describe("Workspace Pages", () => {
     await openWorkspaceTab(page, "Reports");
     await expect(page.getByText(/report/i).first()).toBeVisible({ timeout: 60_000 });
   });
+
+  test("data-ops tab loads pipeline tools", async ({ page }) => {
+    await openWorkspaceTab(page, "Data Ops");
+    await expect(page.getByText(/data ops|pipeline|operation/i).first()).toBeVisible({ timeout: 60_000 });
+  });
+
+  test("query tab shows query interface", async ({ page }) => {
+    await openWorkspaceTab(page, "Query");
+    await expect(page.getByText(/query|sql|search/i).first()).toBeVisible({ timeout: 60_000 });
+  });
+
+  test("pivot tab loads pivot builder", async ({ page }) => {
+    await openWorkspaceTab(page, "Pivot");
+    await expect(page.getByText(/pivot|table|row|column/i).first()).toBeVisible({ timeout: 60_000 });
+  });
 });
