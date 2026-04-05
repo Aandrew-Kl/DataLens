@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uuid
+import logging
 
 from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect, status
 from jose import JWTError
@@ -16,6 +17,8 @@ from app.models.user import User
 from app.services.stream_service import stream_csv_rows
 from app.utils.security import decode_access_token
 
+
+_ws_logger = logging.getLogger("app.ws")
 
 router = APIRouter(tags=["websocket"])
 
@@ -94,11 +97,12 @@ async def data_stream_websocket(
             )
     except WebSocketDisconnect:
         return
-    except Exception as exc:
+    except Exception:
+        _ws_logger.exception("unexpected error in websocket stream dataset_id=%s", dataset_id)
         if websocket.client_state != WebSocketState.DISCONNECTED:
             await websocket.close(
                 code=status.WS_1011_INTERNAL_ERROR,
-                reason=str(exc),
+                reason="An internal error occurred.",
             )
     finally:
         if websocket.client_state != WebSocketState.DISCONNECTED:
