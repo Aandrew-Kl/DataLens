@@ -13,8 +13,18 @@ class SavedAnalysis(Base):
     __tablename__ = "saved_analyses"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    dataset_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("datasets.id", ondelete="CASCADE"), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    dataset_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("datasets.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
     analysis_type: Mapped[str] = mapped_column(String(100), nullable=False)
     config: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
     result: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)

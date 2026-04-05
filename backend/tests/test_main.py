@@ -1,5 +1,5 @@
 import logging
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from httpx import AsyncClient
@@ -64,6 +64,9 @@ async def test_request_logging_middleware_logs_request_details(
         response = await client.get("/v1/health", headers={"x-forwarded-for": "logging-test"})
 
     assert response.status_code == 200
+    request_id = response.headers["x-request-id"]
+    assert UUID(request_id)
+    assert any(f"request_id={request_id}" in record.message for record in caplog.records)
     assert any("method=GET" in record.message for record in caplog.records)
     assert any("status_code=200" in record.message for record in caplog.records)
     assert any("duration_ms=" in record.message for record in caplog.records)
@@ -85,6 +88,15 @@ async def test_security_headers_are_applied(client: AsyncClient) -> None:
     assert response.headers["x-xss-protection"] == "1; mode=block"
     assert response.headers["referrer-policy"] == "strict-origin-when-cross-origin"
     assert response.headers["permissions-policy"] == "camera=(), microphone=(), geolocation=()"
+    assert response.headers["content-security-policy"] == (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: blob:; "
+        "font-src 'self' data:; "
+        "connect-src 'self' ws: wss:; "
+        "frame-ancestors 'none'"
+    )
     assert "strict-transport-security" not in response.headers
 
 

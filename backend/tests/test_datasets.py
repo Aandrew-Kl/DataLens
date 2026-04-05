@@ -19,7 +19,7 @@ def _isolated_upload_dir(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
 
 async def _register_and_login(client: AsyncClient) -> dict[str, str]:
     email = f"{uuid4()}@example.com"
-    password = "super-secret-123"
+    password = "StrongPass123"
 
     register_response = await client.post(
         "/auth/register",

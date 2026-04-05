@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import uuid
 from collections import defaultdict, deque
 from pathlib import Path
 from time import monotonic, time
@@ -210,17 +211,21 @@ async def rate_limit_middleware(request: Request, call_next):
 
 @app.middleware("http")
 async def request_logging_middleware(request: Request, call_next):
+    request_id = str(uuid.uuid4())
+    request.state.request_id = request_id
     start_time = monotonic()
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
     try:
         response = await call_next(request)
         status_code = response.status_code
+        response.headers["X-Request-ID"] = request_id
         return response
     finally:
         duration_ms = (monotonic() - start_time) * 1000
         request_logger.info(
-            "method=%s path=%s status_code=%s duration_ms=%.2f",
+            "request_id=%s method=%s path=%s status_code=%s duration_ms=%.2f",
+            request_id,
             request.method,
             request.url.path,
             status_code,
@@ -236,6 +241,15 @@ async def security_headers_middleware(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: blob:; "
+        "font-src 'self' data:; "
+        "connect-src 'self' ws: wss:; "
+        "frame-ancestors 'none'"
+    )
     if should_set_hsts(request):
         response.headers["Strict-Transport-Security"] = HSTS_HEADER_VALUE
     return response

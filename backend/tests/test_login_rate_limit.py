@@ -11,7 +11,7 @@ async def test_login_rate_limit_blocks_after_max_attempts(client: AsyncClient) -
 
     register_resp = await client.post(
         "/auth/register",
-        json={"email": email, "password": "correct-password-123"},
+        json={"email": email, "password": "CorrectPassword123"},
     )
     assert register_resp.status_code == 201
 
@@ -28,7 +28,7 @@ async def test_login_rate_limit_blocks_after_max_attempts(client: AsyncClient) -
 async def test_successful_login_resets_attempts(client: AsyncClient) -> None:
     """A successful login should reset the attempt counter."""
     email = "reset-test@example.com"
-    password = "correct-password-123"
+    password = "CorrectPassword123"
 
     await client.post("/auth/register", json={"email": email, "password": password})
 

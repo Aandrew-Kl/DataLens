@@ -54,7 +54,7 @@ def ws_client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> TestClient:
 
 def _register_login_user(client: TestClient) -> str:
     email = f"ws-{uuid.uuid4().hex}@example.com"
-    password = "super-secret-123"
+    password = "StrongPass123"
 
     register_response = client.post(
         "/api/auth/register",

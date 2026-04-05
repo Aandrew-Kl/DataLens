@@ -149,7 +149,7 @@ async def client():
 async def auth_headers(client: AsyncClient) -> dict[str, str]:
     """Register a user and return Authorization headers for authenticated requests."""
     email = f"test-{uuid4()}@example.com"
-    password = "test-password-123"
+    password = "TestPassword123"
 
     register_response = await client.post(
         "/auth/register",

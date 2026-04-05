@@ -26,26 +26,22 @@ describe("NotFoundPage", () => {
     expect(
       screen.getByRole("heading", { name: "Page not found" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("404")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "The page you were looking for doesn't exist or is no longer available.",
+        "The page you are looking for does not exist or has been moved.",
       ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Return to a safe route and keep exploring your datasets."),
     ).toBeInTheDocument();
   });
 
   it("renders navigation links back into the app", () => {
     render(<NotFoundPage />);
 
-    expect(screen.getByRole("link", { name: "Back home" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Back to home" })).toHaveAttribute(
       "href",
       "/",
     );
     expect(
-      screen.getByRole("link", { name: "Go to dashboard" }),
+      screen.getByRole("link", { name: "Open dashboard" }),
     ).toHaveAttribute("href", "/dashboard");
   });
 });

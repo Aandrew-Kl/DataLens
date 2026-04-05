@@ -18,14 +18,14 @@ async def test_register_login_and_me(client: AsyncClient) -> None:
 
     register_response = await client.post(
         "/auth/register",
-        json={"email": "auth@example.com", "password": "super-secret-123"},
+        json={"email": "auth@example.com", "password": "StrongPass123"},
     )
     assert register_response.status_code == 201
     assert register_response.json()["email"] == "auth@example.com"
 
     login_response = await client.post(
         "/auth/login",
-        json={"email": "auth@example.com", "password": "super-secret-123"},
+        json={"email": "auth@example.com", "password": "StrongPass123"},
     )
     assert login_response.status_code == 200
     token_payload = login_response.json()
@@ -42,7 +42,7 @@ async def test_register_login_and_me(client: AsyncClient) -> None:
 
 @pytest.mark.asyncio
 async def test_register_duplicate_email(client: AsyncClient) -> None:
-    payload = {"email": "duplicate@example.com", "password": "super-secret-123"}
+    payload = {"email": "duplicate@example.com", "password": "StrongPass123"}
 
     first_response = await client.post("/auth/register", json=payload)
     assert first_response.status_code == 201
@@ -67,13 +67,13 @@ async def test_register_short_password(client: AsyncClient) -> None:
 async def test_login_wrong_password(client: AsyncClient) -> None:
     register_response = await client.post(
         "/auth/register",
-        json={"email": "wrong-password@example.com", "password": "super-secret-123"},
+        json={"email": "wrong-password@example.com", "password": "StrongPass123"},
     )
     assert register_response.status_code == 201
 
     login_response = await client.post(
         "/auth/login",
-        json={"email": "wrong-password@example.com", "password": "not-the-password"},
+        json={"email": "wrong-password@example.com", "password": "WrongPass123"},
     )
 
     assert login_response.status_code == 401
@@ -84,7 +84,7 @@ async def test_login_wrong_password(client: AsyncClient) -> None:
 async def test_login_nonexistent_user(client: AsyncClient) -> None:
     response = await client.post(
         "/auth/login",
-        json={"email": "missing@example.com", "password": "super-secret-123"},
+        json={"email": "missing@example.com", "password": "StrongPass123"},
     )
 
     assert response.status_code == 401
@@ -114,7 +114,7 @@ async def test_me_no_auth_header(client: AsyncClient) -> None:
 async def test_me_expired_token(client: AsyncClient) -> None:
     register_response = await client.post(
         "/auth/register",
-        json={"email": "expired-token@example.com", "password": "super-secret-123"},
+        json={"email": "expired-token@example.com", "password": "StrongPass123"},
     )
     assert register_response.status_code == 201
 
@@ -138,8 +138,54 @@ async def test_me_expired_token(client: AsyncClient) -> None:
     assert response.json()["detail"] == "Invalid authentication credentials."
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("password", "message_fragment"),
+    [
+        ("lowercase123", "uppercase"),
+        ("UPPERCASE123", "lowercase"),
+        ("NoDigitsHere", "digit"),
+    ],
+)
+async def test_register_requires_password_complexity(
+    client: AsyncClient,
+    password: str,
+    message_fragment: str,
+) -> None:
+    response = await client.post(
+        "/auth/register",
+        json={"email": "complexity@example.com", "password": password},
+    )
+
+    assert response.status_code == 422
+    assert any(error["loc"] == ["body", "password"] for error in response.json()["detail"])
+    assert any(message_fragment in error["msg"].lower() for error in response.json()["detail"])
+
+
+@pytest.mark.asyncio
+async def test_register_rejects_invalid_email(client: AsyncClient) -> None:
+    response = await client.post(
+        "/auth/register",
+        json={"email": "not-an-email", "password": "StrongPass123"},
+    )
+
+    assert response.status_code == 422
+    assert any(error["loc"] == ["body", "email"] for error in response.json()["detail"])
+
+
+@pytest.mark.asyncio
+async def test_login_rejects_invalid_email(client: AsyncClient) -> None:
+    response = await client.post(
+        "/auth/login",
+        json={"email": "not-an-email", "password": "StrongPass123"},
+    )
+
+    assert response.status_code == 422
+    assert any(error["loc"] == ["body", "email"] for error in response.json()["detail"])
+
+
 def test_password_hashing_verification() -> None:
-    password = "super-secret-123"
+    password = "StrongPass123"
 
     hashed_password = hash_password(password)
 
