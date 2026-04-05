@@ -1,11 +1,18 @@
 import { test, expect } from "@playwright/test";
 import { openLandingPage, uploadInlineCsv, openWorkspaceTab } from "./support";
 
+const AUTH_COOKIE = {
+  name: "datalens-auth-token",
+  value: "e2e-auth-token",
+  url: "http://localhost:3000",
+};
+
 test.use({ colorScheme: "light" });
 
 test.describe("Workspace Pages", () => {
   test.beforeEach(async ({ page }) => {
     test.slow();
+    await page.context().addCookies([AUTH_COOKIE]);
     await openLandingPage(page);
     await uploadInlineCsv(page, { fileName: "workspace_test.csv" });
   });
@@ -47,17 +54,17 @@ test.describe("Workspace Pages", () => {
   });
 
   test("data-ops tab loads pipeline tools", async ({ page }) => {
-    await openWorkspaceTab(page, "Data Ops");
+    await page.goto("/data-ops");
     await expect(page.getByText(/data ops|pipeline|operation/i).first()).toBeVisible({ timeout: 60_000 });
   });
 
   test("query tab shows query interface", async ({ page }) => {
-    await openWorkspaceTab(page, "Query");
+    await page.goto("/query");
     await expect(page.getByText(/query|sql|search/i).first()).toBeVisible({ timeout: 60_000 });
   });
 
   test("pivot tab loads pivot builder", async ({ page }) => {
-    await openWorkspaceTab(page, "Pivot");
+    await page.goto("/pivot");
     await expect(page.getByText(/pivot|table|row|column/i).first()).toBeVisible({ timeout: 60_000 });
   });
 });

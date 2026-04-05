@@ -80,6 +80,25 @@ jest.mock("@/components/settings/settings-panel", () => ({
   default: () => <div>Settings Panel</div>,
 }));
 
+jest.mock("@/components/data/file-dropzone", () => ({
+  __esModule: true,
+  default: () => <div>File Dropzone</div>,
+}));
+
+jest.mock("@/lib/duckdb/client", () => ({
+  getTableRowCount: jest.fn().mockResolvedValue(0),
+  loadCSVIntoDB: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock("@/lib/duckdb/profiler", () => ({
+  profileTable: jest.fn().mockResolvedValue([]),
+}));
+
+jest.mock("@/lib/utils/formatters", () => ({
+  generateId: jest.fn(() => "test-id"),
+  sanitizeTableName: jest.fn(() => "test_table"),
+}));
+
 import WorkspaceLayout from "@/app/(workspace)/layout";
 
 describe("WorkspaceLayout", () => {

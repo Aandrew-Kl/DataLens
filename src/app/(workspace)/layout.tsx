@@ -6,7 +6,11 @@ import { usePathname } from "next/navigation";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { useUIStore } from "@/stores/ui-store";
 import { useDatasetStore } from "@/stores/dataset-store";
-import { Sun, Moon, Menu, Upload, Settings, Search } from "lucide-react";
+import FileDropzone from "@/components/data/file-dropzone";
+import { getTableRowCount, loadCSVIntoDB } from "@/lib/duckdb/client";
+import { profileTable } from "@/lib/duckdb/profiler";
+import { generateId, sanitizeTableName } from "@/lib/utils/formatters";
+import { Sun, Moon, Menu, Upload, Settings, Search, X } from "lucide-react";
 import CommandPalette from "@/components/layout/command-palette";
 import SettingsPanel from "@/components/settings/settings-panel";
 
@@ -241,18 +245,66 @@ export default function WorkspaceLayout({
             aria-label="Close uploader"
             onClick={() => setShowUploader(false)}
           />
-          <div className="relative max-w-sm w-full rounded-2xl border border-white/30 bg-white/80 dark:bg-slate-900/90 dark:border-white/10 backdrop-blur-xl p-4 shadow-xl">
-            <h3 className="text-sm font-semibold">Uploader</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-              Dataset uploader will be wired here.
-            </p>
-            <button
-              type="button"
-              onClick={() => setShowUploader(false)}
-              className="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-purple-600 text-white hover:bg-purple-500"
-            >
-              Close
-            </button>
+          <div className="relative w-full max-w-lg rounded-2xl border border-white/30 bg-white/80 p-4 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/90">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold">Upload Dataset</h3>
+              <button
+                type="button"
+                onClick={() => setShowUploader(false)}
+                className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-white/70 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-slate-200"
+                aria-label="Close uploader"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex justify-center">
+              <FileDropzone
+                compact
+                className="w-full"
+                onFileLoaded={(result) => {
+                  const { addDataset } = useDatasetStore.getState();
+                  const { setIsLoading, setLoadError, setProfileData } =
+                    useWorkspaceStore.getState();
+
+                  setIsLoading(true);
+                  setLoadError(null);
+
+                  void (async () => {
+                    try {
+                      const nextTableName = sanitizeTableName(result.fileName);
+                      await loadCSVIntoDB(nextTableName, result.csvContent);
+
+                      const [columns, rowCount] = await Promise.all([
+                        profileTable(nextTableName),
+                        getTableRowCount(nextTableName),
+                      ]);
+
+                      addDataset({
+                        id: generateId(),
+                        name: nextTableName,
+                        fileName: result.fileName,
+                        rowCount,
+                        columnCount: columns.length,
+                        columns,
+                        uploadedAt: Date.now(),
+                        sizeBytes: result.sizeBytes,
+                      });
+                      setProfileData(columns);
+                      setShowUploader(false);
+                    } catch (error) {
+                      console.error("Failed to load dataset:", error);
+                      setLoadError(
+                        error instanceof Error
+                          ? error.message
+                          : "Failed to load dataset",
+                      );
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  })();
+                }}
+              />
+            </div>
           </div>
         </div>
       ) : null}
