@@ -84,6 +84,7 @@ async def test_security_headers_are_applied(client: AsyncClient) -> None:
     assert response.headers["x-content-type-options"] == "nosniff"
     assert response.headers["x-xss-protection"] == "1; mode=block"
     assert response.headers["referrer-policy"] == "strict-origin-when-cross-origin"
+    assert response.headers["permissions-policy"] == "camera=(), microphone=(), geolocation=()"
     assert "strict-transport-security" not in response.headers
 
 
