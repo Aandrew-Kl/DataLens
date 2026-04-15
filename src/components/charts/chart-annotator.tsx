@@ -1,7 +1,7 @@
 "use client";
 
 import { quoteIdentifier } from "@/lib/utils/sql";
-import { useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { EChartsOption } from "echarts";
 import ReactECharts from "echarts-for-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -13,8 +13,8 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
-import { runQuery } from "@/lib/duckdb/client";
 import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { useDuckDBQuery } from "@/hooks/use-duckdb-query";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface ChartAnnotatorProps {
@@ -147,8 +147,8 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
     aggregation: "SUM",
   });
   const [rows, setRows] = useState<Record<string, unknown>[]>([]);
+  const [querySql, setQuerySql] = useState<string | null>(null);
   const [notice, setNotice] = useState<Notice>(null);
-  const [loading, setLoading] = useState(false);
   const [annotationKind, setAnnotationKind] = useState<AnnotationKind>("text");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [label, setLabel] = useState("");
@@ -159,6 +159,12 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
   const [lineValue, setLineValue] = useState("");
   const [regionStart, setRegionStart] = useState("");
   const [regionEnd, setRegionEnd] = useState("");
+  const {
+    data: queryRows,
+    loading,
+    error: queryError,
+    refetch,
+  } = useDuckDBQuery(querySql);
 
   const currentChartKey = chartKey(config);
   const annotations = useMemo(
@@ -211,22 +217,33 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
     };
   }, [annotations, config, dark, rows]);
 
-  async function loadChart() {
+  useEffect(() => {
+    if (!queryRows) return;
+    setRows(queryRows);
+    setNotice("Chart data loaded from DuckDB.");
+  }, [queryRows]);
+
+  useEffect(() => {
+    if (!queryError) return;
+    setRows([]);
+    setNotice(queryError);
+  }, [queryError]);
+
+  function loadChart() {
     if (!config.xColumn || !config.yColumn) {
       setNotice("Select chart columns first.");
       return;
     }
-    setLoading(true);
+
+    const nextSql = buildSql(tableName, config);
     setNotice(null);
-    try {
-      setRows(await runQuery(buildSql(tableName, config)));
-      setNotice("Chart data loaded from DuckDB.");
-    } catch (error) {
-      setRows([]);
-      setNotice(error instanceof Error ? error.message : "Chart query failed.");
-    } finally {
-      setLoading(false);
+
+    if (querySql === nextSql) {
+      refetch();
+      return;
     }
+
+    setQuerySql(nextSql);
   }
 
   function resetEditor() {

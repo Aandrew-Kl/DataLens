@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  Suspense,
-  use,
   useMemo,
 } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
@@ -22,14 +20,13 @@ import {
   HardDrive,
   Rows4,
 } from "lucide-react";
-import { runQuery } from "@/lib/duckdb/client";
+import { useDatasetProfile, type DatasetProfileResult } from "@/hooks/use-dataset-profile";
 import { formatBytes, formatNumber, formatPercent } from "@/lib/utils/formatters";
 import {
   ANALYTICS_EASE,
   GLASS_CARD_CLASS,
   GLASS_PANEL_CLASS,
   isRecord,
-  quoteIdentifier,
   toCount,
 } from "@/lib/utils/advanced-analytics";
 import type { ColumnProfile, ColumnType } from "@/types/dataset";
@@ -95,93 +92,67 @@ function estimateColumnBytes(column: ColumnProfile) {
   return Math.max(8, averageLength + 8);
 }
 
-function loadProfilerLite(
-  tableName: string,
+function buildProfilerLiteSummary(
   columns: ColumnProfile[],
-): Promise<ProfilerLiteResult> {
-  return runQuery(
-    `SELECT COUNT(*) AS row_count FROM ${quoteIdentifier(tableName)}`,
-  )
-    .then((rows) => {
-      const firstRow = rows[0];
-      const rowCount =
-        isRecord(firstRow) ? toCount(firstRow.row_count) : 0;
-      const totalNulls = columns.reduce(
-        (sum, column) => sum + Math.max(0, column.nullCount),
-        0,
-      );
-      const typeCounts = new Map<ColumnType, number>();
+  profile: DatasetProfileResult,
+): ProfilerLiteResult {
+  const rowCount = profile.rowCount;
+  const nullCountForColumn = (column: ColumnProfile) =>
+    profile.nullCounts[column.name] ?? column.nullCount;
+  const totalNulls = columns.reduce(
+    (sum, column) => sum + Math.max(0, nullCountForColumn(column)),
+    0,
+  );
+  const typeCounts = new Map<ColumnType, number>();
 
-      columns.forEach((column) => {
-        typeCounts.set(column.type, (typeCounts.get(column.type) ?? 0) + 1);
-      });
+  columns.forEach((column) => {
+    typeCounts.set(column.type, (typeCounts.get(column.type) ?? 0) + 1);
+  });
 
-      const typeSummary = (Object.keys(TYPE_LABELS) as ColumnType[])
-        .map<TypeSummary>((type) => ({
-          type,
-          count: typeCounts.get(type) ?? 0,
-        }))
-        .filter((entry) => entry.count > 0);
+  const typeSummary = (Object.keys(TYPE_LABELS) as ColumnType[])
+    .map<TypeSummary>((type) => ({
+      type,
+      count: typeCounts.get(type) ?? 0,
+    }))
+    .filter((entry) => entry.count > 0);
 
-      const nullSummary = columns
-        .map((column) => ({
-          name: column.name,
-          percentage: rowCount > 0 ? (column.nullCount / rowCount) * 100 : 0,
-        }))
-        .sort((left, right) => right.percentage - left.percentage)
-        .slice(0, 8);
+  const nullSummary = columns
+    .map((column) => ({
+      name: column.name,
+      percentage:
+        rowCount > 0 ? (nullCountForColumn(column) / rowCount) * 100 : 0,
+    }))
+    .sort((left, right) => right.percentage - left.percentage)
+    .slice(0, 8);
 
-      const uniqueColumns = columns
-        .map<UniqueColumnSummary>((column) => ({
-          name: column.name,
-          uniqueCount: column.uniqueCount,
-          uniquenessRate:
-            rowCount > 0 ? (column.uniqueCount / rowCount) * 100 : 0,
-        }))
-        .sort(
-          (left, right) =>
-            right.uniqueCount - left.uniqueCount ||
-            right.uniquenessRate - left.uniquenessRate,
-        )
-        .slice(0, MAX_UNIQUE_COLUMNS);
+  const uniqueColumns = columns
+    .map<UniqueColumnSummary>((column) => ({
+      name: column.name,
+      uniqueCount: column.uniqueCount,
+      uniquenessRate:
+        rowCount > 0 ? (column.uniqueCount / rowCount) * 100 : 0,
+    }))
+    .sort(
+      (left, right) =>
+        right.uniqueCount - left.uniqueCount ||
+        right.uniquenessRate - left.uniquenessRate,
+    )
+    .slice(0, MAX_UNIQUE_COLUMNS);
 
-      const bytesPerRow = columns.reduce(
-        (sum, column) => sum + estimateColumnBytes(column),
-        0,
-      );
+  const bytesPerRow = columns.reduce(
+    (sum, column) => sum + estimateColumnBytes(column),
+    0,
+  );
 
-      return {
-        rowCount,
-        memoryEstimate: Math.round(bytesPerRow * rowCount),
-        totalNulls,
-        typeSummary,
-        nullSummary,
-        uniqueColumns,
-        error: null,
-      };
-    })
-    .catch((error: unknown) => ({
-      rowCount: 0,
-      memoryEstimate: 0,
-      totalNulls: columns.reduce(
-        (sum, column) => sum + Math.max(0, column.nullCount),
-        0,
-      ),
-      typeSummary: [],
-      nullSummary: [],
-      uniqueColumns: columns
-        .map<UniqueColumnSummary>((column) => ({
-          name: column.name,
-          uniqueCount: column.uniqueCount,
-          uniquenessRate: 0,
-        }))
-        .sort((left, right) => right.uniqueCount - left.uniqueCount)
-        .slice(0, MAX_UNIQUE_COLUMNS),
-      error:
-        error instanceof Error
-          ? error.message
-          : "Unable to load the profiler summary.",
-    }));
+  return {
+    rowCount,
+    memoryEstimate: Math.round(bytesPerRow * rowCount),
+    totalNulls,
+    typeSummary,
+    nullSummary,
+    uniqueColumns,
+    error: profile.error,
+  };
 }
 
 function buildTypeDistributionOption(summary: TypeSummary[]): EChartsOption {
@@ -356,8 +327,7 @@ function UniqueColumnRow({ entry }: { entry: UniqueColumnSummary }) {
   );
 }
 
-function ProfilerLitePanel({ resource }: { resource: Promise<ProfilerLiteResult> }) {
-  const summary = use(resource);
+function ProfilerLitePanel({ summary }: { summary: ProfilerLiteResult }) {
   const typeDistributionOption = buildTypeDistributionOption(summary.typeSummary);
   const nullPercentageOption = buildNullPercentageOption(summary.nullSummary);
 
@@ -467,9 +437,10 @@ function DataProfilerLiteBody({
   tableName,
   columns,
 }: DataProfilerLiteProps) {
-  const resource = useMemo(
-    () => loadProfilerLite(tableName, columns),
-    [columns, tableName],
+  const profile = useDatasetProfile(tableName);
+  const summary = useMemo(
+    () => buildProfilerLiteSummary(columns, profile),
+    [columns, profile],
   );
 
   if (columns.length === 0) {
@@ -491,9 +462,11 @@ function DataProfilerLiteBody({
         </p>
       </div>
 
-      <Suspense fallback={<ProfilerLiteLoadingState />}>
-        <ProfilerLitePanel resource={resource} />
-      </Suspense>
+      {profile.loading ? (
+        <ProfilerLiteLoadingState />
+      ) : (
+        <ProfilerLitePanel summary={summary} />
+      )}
     </section>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
@@ -19,8 +18,7 @@ import {
 } from "lucide-react";
 import type { ColumnProfile } from "@/types/dataset";
 import type { ChartConfig, ChartType } from "@/types/chart";
-import { runQuery } from "@/lib/duckdb/client";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { useChartData } from "@/hooks/use-chart-data";
 import ChartRenderer from "@/components/charts/chart-renderer";
 
 type BuilderChartType = Exclude<ChartType, "heatmap">;
@@ -153,80 +151,6 @@ function buildDefaultTitle(
   return `${metricLabel} by ${xAxis}`;
 }
 
-function buildChartSql(
-  tableName: string,
-  type: BuilderChartType,
-  xAxis: string,
-  yAxis: string,
-  aggregation: Aggregation,
-  groupBy: string,
-): string | null {
-  const safeTable = quoteIdentifier(tableName);
-  const safeX = xAxis ? quoteIdentifier(xAxis) : null;
-  const safeY = yAxis ? quoteIdentifier(yAxis) : null;
-  const safeGroup = groupBy ? quoteIdentifier(groupBy) : null;
-
-  if (type === "histogram") {
-    if (!safeY) return null;
-    return [
-      `SELECT ${safeY}`,
-      `FROM ${safeTable}`,
-      `WHERE ${safeY} IS NOT NULL`,
-      "LIMIT 5000",
-    ].join(" ");
-  }
-
-  if (type === "scatter") {
-    if (!safeX || !safeY) return null;
-    return [
-      `SELECT ${safeX}, ${safeY}`,
-      `FROM ${safeTable}`,
-      `WHERE ${safeX} IS NOT NULL AND ${safeY} IS NOT NULL`,
-      "LIMIT 400",
-    ].join(" ");
-  }
-
-  if (!safeX || !safeY) return null;
-
-  const aggregatedValue = `${buildMetricExpression(aggregation, yAxis, quoteIdentifier, { cast: false, preserveCase: true })} AS ${safeY}`;
-  const filters = `WHERE ${safeX} IS NOT NULL AND ${safeY} IS NOT NULL`;
-
-  if (type === "pie") {
-    return [
-      `SELECT ${safeX}, ${aggregatedValue}`,
-      `FROM ${safeTable}`,
-      filters,
-      "GROUP BY 1",
-      "ORDER BY 2 DESC",
-      "LIMIT 12",
-    ].join(" ");
-  }
-
-  if (safeGroup) {
-    return [
-      `SELECT ${safeX}, ${safeGroup}, ${aggregatedValue}`,
-      `FROM ${safeTable}`,
-      `${filters} AND ${safeGroup} IS NOT NULL`,
-      "GROUP BY 1, 2",
-      "ORDER BY 1 ASC, 2 ASC",
-      type === "bar" ? "LIMIT 120" : "LIMIT 200",
-    ].join(" ");
-  }
-
-  const orderClause =
-    type === "line" || type === "area" ? "ORDER BY 1 ASC" : "ORDER BY 2 DESC";
-  const limitClause = type === "bar" ? "LIMIT 24" : "LIMIT 80";
-
-  return [
-    `SELECT ${safeX}, ${aggregatedValue}`,
-    `FROM ${safeTable}`,
-    filters,
-    "GROUP BY 1",
-    orderClause,
-    limitClause,
-  ].join(" ");
-}
-
 async function exportPreviewAsPng(container: HTMLElement, fileName: string): Promise<void> {
   const svg = container.querySelector("svg");
   if (!(svg instanceof SVGSVGElement)) {
@@ -311,11 +235,8 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
   const [aggregation, setAggregation] = useState<Aggregation>("sum");
   const [groupBy, setGroupBy] = useState("");
   const [title, setTitle] = useState("");
-  const [data, setData] = useState<Record<string, unknown>[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
 
   const supportsAggregation = chartType !== "scatter" && chartType !== "histogram";
@@ -386,51 +307,23 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
     ],
   );
 
-  const sql = useMemo(
-    () => buildChartSql(tableName, chartType, xAxis, yAxis, aggregation, groupBy),
-    [aggregation, chartType, groupBy, tableName, xAxis, yAxis],
-  );
+  const {
+    chartData: data,
+    loading: isLoading,
+    error,
+    sql,
+  } = useChartData({
+    tableName,
+    type: chartType,
+    xColumn: requiresXAxis ? xAxis || undefined : undefined,
+    yColumn: yAxis || undefined,
+    aggregation: supportsAggregation ? aggregation : undefined,
+    groupBy: supportsGroupBy && groupBy ? groupBy : undefined,
+  });
 
   useEffect(() => {
     setNotice(null);
   }, [aggregation, chartType, groupBy, title, xAxis, yAxis]);
-
-  useEffect(() => {
-    if (!sql) {
-      setData([]);
-      setError(null);
-      setIsLoading(false);
-      return;
-    }
-
-    let active = true;
-    setIsLoading(true);
-    setError(null);
-
-    runQuery(sql)
-      .then((rows) => {
-        if (!active) return;
-        setData(rows);
-      })
-      .catch((queryError: unknown) => {
-        if (!active) return;
-        setData([]);
-        setError(
-          queryError instanceof Error
-            ? queryError.message
-            : "The preview query could not be executed.",
-        );
-      })
-      .finally(() => {
-        if (active) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [sql]);
 
   async function handleSave(): Promise<void> {
     if (!sql || data.length === 0) return;
