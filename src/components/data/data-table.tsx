@@ -586,23 +586,27 @@ function DataTable({
                         : { minWidth: 80 }
                     }
                   >
-                    <div
-                      className={`flex items-center gap-1.5 ${
+                    <button
+                      type="button"
+                      disabled={!sortable}
+                      className={`flex w-full items-center gap-1.5 border-0 bg-transparent p-0 text-left ${
                         sortable ? "cursor-pointer" : ""
                       } ${
                         resolvedColumnTypes[col] === "number"
                           ? "justify-end"
                           : ""
-                      }`}
+                      } disabled:cursor-default`}
                       onClick={() => handleSort(col)}
                     >
                       <span className="truncate">{col}</span>
                       {sortable && (
                         <SortIcon column={col} sort={sort} />
                       )}
-                    </div>
+                    </button>
                     {/* Resize handle */}
-                    <div
+                    <button
+                      type="button"
+                      aria-label={`Resize ${col} column`}
                       className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-purple-400/30 active:bg-purple-400/50 transition-colors"
                       onMouseDown={(e) => handleResizeStart(e, col)}
                     />
@@ -666,12 +670,15 @@ function DataTable({
                                 : undefined
                             }
                           >
-                            <div
-                              className={`truncate ${
+                            <button
+                              type="button"
+                              className={`w-full truncate border-0 bg-transparent p-0 ${
                                 isNull
                                   ? "text-gray-300 dark:text-gray-600 italic"
                                   : "text-gray-700 dark:text-gray-300"
-                              } cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors`}
+                              } cursor-pointer transition-colors hover:text-purple-600 dark:hover:text-purple-400 ${
+                                type === "number" ? "text-right" : "text-left"
+                              }`}
                               title={rawCellString(value)}
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -685,7 +692,7 @@ function DataTable({
                               ) : (
                                 display
                               )}
-                            </div>
+                            </button>
                             <CopiedTooltip
                               show={copiedCell === cellId}
                             />
