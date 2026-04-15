@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { chat, checkOllamaHealth } from "@/lib/ai/ollama-client";
+import { requireAuth } from "@/lib/auth/require-auth";
 import { logger } from "@/lib/logger";
 
 function stripCodeFences(value: string): string {
@@ -94,6 +95,9 @@ function generateFallbackExplanation(sql: string): string {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
     const { sql }: { sql?: string } = body;

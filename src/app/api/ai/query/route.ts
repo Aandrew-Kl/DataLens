@@ -2,10 +2,14 @@ import { NextResponse } from "next/server";
 import { generateSQL } from "@/lib/ai/sql-generator";
 import { generateFallbackSQL } from "@/lib/ai/fallback";
 import { checkOllamaHealth } from "@/lib/ai/ollama-client";
+import { requireAuth } from "@/lib/auth/require-auth";
 import { logger } from "@/lib/logger";
 import type { ColumnProfile } from "@/types/dataset";
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
     const {
