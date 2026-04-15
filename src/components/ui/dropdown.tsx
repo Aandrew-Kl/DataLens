@@ -141,14 +141,7 @@ export default function Dropdown({ trigger, items }: DropdownProps) {
         tabIndex={0}
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " " || event.key === "ArrowDown") {
-            event.preventDefault();
-            event.stopPropagation();
-            setIsOpen(true);
-            setFocusIndex(0);
-          }
-        }}
+        onKeyDown={handleKeyDown}
       >
         {trigger}
       </div>
