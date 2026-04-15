@@ -19,6 +19,9 @@ const config: Config = {
     "<rootDir>/.next/",
     "<rootDir>/node_modules/",
   ],
+  transformIgnorePatterns: [
+    "/node_modules/(?!jose/)",
+  ],
   testMatch: [
     "<rootDir>/src/**/__tests__/**/*.{ts,tsx}",
     "<rootDir>/src/**/*.{spec,test}.{ts,tsx}",
@@ -38,4 +41,34 @@ const config: Config = {
   },
 };
 
-export default createJestConfig(config);
+const createConfig = createJestConfig(config);
+
+const allowJoseTransform = (pattern: string) => {
+  if (pattern === "/node_modules/") {
+    return "/node_modules/(?!jose/)";
+  }
+
+  if (pattern.startsWith("/node_modules/(?!.pnpm)(?!(")) {
+    return pattern.replace(/\(\?!\((?!jose\|)([^)]*)\)\/\)$/, "(?!(jose|$1)/)");
+  }
+
+  if (pattern.startsWith("/node_modules[\\\\/]\\.pnpm[\\\\/](?!(")) {
+    return pattern
+      .replace(/\(\?!\((?!jose\|)([^)]*)\)@\)/, "(?!(jose|$1)@)")
+      .replace(
+        /\(\?!\.\*node_modules\[\\\\\/\]\((?!jose\|)([^)]*)\)\[\\\\\/\]\)/,
+        "(?!.*node_modules[\\\\/](jose|$1)[\\\\/])",
+      );
+  }
+
+  return pattern;
+};
+
+export default async () => {
+  const resolvedConfig = await createConfig();
+
+  return {
+    ...resolvedConfig,
+    transformIgnorePatterns: resolvedConfig.transformIgnorePatterns?.map(allowJoseTransform),
+  };
+};

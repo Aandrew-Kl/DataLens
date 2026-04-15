@@ -1,15 +1,24 @@
 import { middleware, config } from "@/middleware";
 import { NextResponse } from "next/server";
 
-jest.mock("next/server", () => ({
-  NextResponse: {
-    next: jest.fn(() => ({ type: "next" })),
-    redirect: jest.fn((url) => ({
-      type: "redirect",
-      url: typeof url === "string" ? url : url.toString(),
-    })),
-  },
-}));
+jest.mock("next/server", () => {
+  class MockNextResponse {}
+
+  return {
+    NextResponse: Object.assign(MockNextResponse, {
+      next: jest.fn(() => ({ type: "next" })),
+      json: jest.fn((data, init) => ({
+        type: "json",
+        data,
+        status: init?.status ?? 200,
+      })),
+      redirect: jest.fn((url) => ({
+        type: "redirect",
+        url: typeof url === "string" ? url : url.toString(),
+      })),
+    }),
+  };
+});
 
 const createMockRequest = (pathname: string, hasToken = false) => {
   const nextUrl = new URL(`http://localhost:3000${pathname === "/" ? "" : pathname}`);
@@ -36,7 +45,7 @@ describe("middleware", () => {
 
   it("has the expected matcher config", () => {
     expect(config.matcher).toEqual([
-      "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)",
+      "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)",
     ]);
   });
 
@@ -65,6 +74,29 @@ describe("middleware", () => {
     expect(response).toEqual({
       type: "redirect",
       url: "http://localhost:3000/login?redirect=%2Fdashboard",
+    });
+  });
+
+  it("allows public API routes without token", () => {
+    const request = createMockRequest("/api/health");
+    const response = middleware(request as unknown as Parameters<typeof middleware>[0]);
+
+    expect(response).toEqual({ type: "next" });
+    expect(NextResponse.next).toHaveBeenCalled();
+  });
+
+  it("returns 401 JSON for protected API routes without token", () => {
+    const request = createMockRequest("/api/ai/query");
+    const response = middleware(request as unknown as Parameters<typeof middleware>[0]);
+
+    expect(NextResponse.json).toHaveBeenCalledWith(
+      { error: "Unauthorized" },
+      { status: 401 },
+    );
+    expect(response).toEqual({
+      type: "json",
+      data: { error: "Unauthorized" },
+      status: 401,
     });
   });
 

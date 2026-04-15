@@ -3,13 +3,21 @@ import { generateFallbackDashboard, generateFallbackQuestions } from "@/lib/ai/f
 import { autoDashboardPrompt, suggestQuestionsPrompt } from "@/lib/ai/prompts";
 import { POST } from "@/app/api/ai/suggest/route";
 
-jest.mock("next/server", () => ({
-  NextResponse: {
-    json: jest.fn((data, init) => ({
-      json: async () => data,
-      status: init?.status ?? 200,
-    })),
-  },
+jest.mock("next/server", () => {
+  class MockNextResponse {}
+
+  return {
+    NextResponse: Object.assign(MockNextResponse, {
+      json: jest.fn((data, init) => ({
+        json: async () => data,
+        status: init?.status ?? 200,
+      })),
+    }),
+  };
+});
+
+jest.mock("@/lib/auth/require-auth", () => ({
+  requireAuth: jest.fn().mockResolvedValue({ userId: "test-user" }),
 }));
 
 jest.mock("@/lib/ai/ollama-client", () => ({
