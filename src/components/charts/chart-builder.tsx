@@ -20,6 +20,7 @@ import {
 import type { ColumnProfile } from "@/types/dataset";
 import type { ChartConfig, ChartType } from "@/types/chart";
 import { runQuery } from "@/lib/duckdb/client";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import ChartRenderer from "@/components/charts/chart-renderer";
 
 type BuilderChartType = Exclude<ChartType, "heatmap">;
@@ -187,7 +188,7 @@ function buildChartSql(
 
   if (!safeX || !safeY) return null;
 
-  const aggregatedValue = `${aggregation}(${safeY}) AS ${safeY}`;
+  const aggregatedValue = `${buildMetricExpression(aggregation, yAxis, quoteIdentifier, { cast: false, preserveCase: true })} AS ${safeY}`;
   const filters = `WHERE ${safeX} IS NOT NULL AND ${safeY} IS NOT NULL`;
 
   if (type === "pie") {

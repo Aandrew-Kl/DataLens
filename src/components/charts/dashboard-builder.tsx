@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { formatNumber, generateId } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface DashboardBuilderProps {
@@ -117,7 +118,7 @@ function widgetQuery(tableName: string, widget: WidgetConfig): string | null {
   if (widget.type === "kpi") {
     if (widget.aggregation === "count") return `SELECT COUNT(*) AS value FROM ${tableSql}`;
     if (!widget.yAxis) return null;
-    return `SELECT ${widget.aggregation}(${yAxis}) AS value FROM ${tableSql} WHERE ${yAxis} IS NOT NULL`;
+    return `SELECT ${buildMetricExpression(widget.aggregation, widget.yAxis, quoteId, { cast: false, preserveCase: true })} AS value FROM ${tableSql} WHERE ${yAxis} IS NOT NULL`;
   }
   if (widget.type === "scatter") {
     if (!widget.xAxis || !widget.yAxis) return null;
@@ -130,7 +131,9 @@ function widgetQuery(tableName: string, widget: WidgetConfig): string | null {
   }
   if (!widget.xAxis) return null;
   if (widget.type === "pie") {
-    const metricSql = widget.aggregation === "count" || !widget.yAxis ? "COUNT(*)" : `${widget.aggregation}(${yAxis})`;
+    const metricSql = widget.aggregation === "count" || !widget.yAxis
+      ? "COUNT(*)"
+      : buildMetricExpression(widget.aggregation, widget.yAxis, quoteId, { cast: false, preserveCase: true });
     return `
       SELECT ${xAxis} AS label, ${metricSql} AS value
       FROM ${tableSql}
@@ -142,7 +145,7 @@ function widgetQuery(tableName: string, widget: WidgetConfig): string | null {
   }
   if (!widget.yAxis) return null;
   return `
-    SELECT ${xAxis} AS label, ${widget.aggregation}(${yAxis}) AS value
+    SELECT ${xAxis} AS label, ${buildMetricExpression(widget.aggregation, widget.yAxis, quoteId, { cast: false, preserveCase: true })} AS value
     FROM ${tableSql}
     WHERE ${xAxis} IS NOT NULL AND ${yAxis} IS NOT NULL
     GROUP BY 1

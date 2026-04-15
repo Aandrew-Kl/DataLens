@@ -5,6 +5,7 @@ import ChartRenderer from "@/components/charts/chart-renderer";
 import DashboardBuilder from "@/components/charts/dashboard-builder";
 import { runQuery } from "@/lib/duckdb/client";
 import { sanitizeTableName } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import { useChartStore } from "@/stores/chart-store";
 import { useDatasetStore } from "@/stores/dataset-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -96,7 +97,7 @@ const buildChartQuery = (chart: SavedChartConfig, dataset?: DatasetMeta | null) 
     )} WHERE ${quote(xAxis)} IS NOT NULL AND ${quote(yAxis)} IS NOT NULL LIMIT 500`;
   }
 
-  const metric = `${aggregation.toUpperCase()}(${quote(yAxis)})`;
+  const metric = buildMetricExpression(aggregation, yAxis, quote, { cast: false, preserveCase: true });
 
   if (groupBy) {
     return `SELECT ${quote(xAxis)} AS ${quote(xAxis)}, ${quote(groupBy)} AS ${quote(

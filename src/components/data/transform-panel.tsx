@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import type { ColumnProfile } from "@/types/dataset";
 import { runQuery } from "@/lib/duckdb/client";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import FormulaEditor from "./formula-editor";
 
 interface TransformPanelProps {
@@ -387,7 +388,7 @@ function buildGroupStatement(
     }
 
     selectLines.push(
-      `  ${aggregate.functionName}(${quoteIdentifier(column.name)}) AS ${quoteIdentifier(alias)}`
+      `  ${buildMetricExpression(aggregate.functionName, column.name, quoteIdentifier, { cast: false })} AS ${quoteIdentifier(alias)}`
     );
   }
 

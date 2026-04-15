@@ -14,6 +14,7 @@ import {
 import { runQuery } from "@/lib/duckdb/client";
 import { downloadFile } from "@/lib/utils/export";
 import { formatNumber, generateId } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface PivotTableAdvancedProps {
@@ -59,7 +60,7 @@ const aggSql: Record<AggFn, string> = {
   MIN: "MIN",
   MAX: "MAX",
   MEDIAN: "MEDIAN",
-  STDEV: "STDDEV_SAMP",
+  STDEV: "STDDEV",
 };
 function quoteLiteral(value: string) {
   return `'${value.replace(/'/g, "''")}'`;
@@ -115,7 +116,10 @@ function buildPivotSql(
   const dimensionFields = [...rowFields, ...columnFields];
   const safeDimensions = dimensionFields.map((field) => `CAST(${quoteIdentifier(field)} AS VARCHAR) AS ${quoteIdentifier(field)}`);
   const safeMeasures = valueFields.map((field) => {
-    const measure = field.aggregation === "COUNT" ? "COUNT(*)" : `${aggSql[field.aggregation]}(${quoteIdentifier(field.column)})`;
+    const measure =
+      field.aggregation === "COUNT"
+        ? "COUNT(*)"
+        : buildMetricExpression(aggSql[field.aggregation], field.column, quoteIdentifier, { cast: false });
     return `${measure} AS ${quoteIdentifier(field.alias)}`;
   });
   const groupBy = safeDimensions.length > 0 ? `GROUP BY ${safeDimensions.map((_, index) => index + 1).join(", ")}` : "";

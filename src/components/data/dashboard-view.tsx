@@ -23,6 +23,7 @@ import ChartRenderer from "@/components/charts/chart-renderer";
 import Modal from "@/components/ui/modal";
 import { runQuery } from "@/lib/duckdb/client";
 import { sanitizeTableName, formatNumber } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { DatasetMeta, ColumnProfile } from "@/types/dataset";
 import type {
   ChartConfig,
@@ -173,12 +174,14 @@ function buildChartSQL(
     return `SELECT ${safeY} FROM ${safeTable} LIMIT 2000`;
   }
 
+  const metric = agg === "count" ? `COUNT(${safeY})` : buildMetricExpression(agg, chart.yAxis, undefined, { cast: false, preserveCase: true });
+
   if (chart.groupBy) {
     const safeGroup = `"${chart.groupBy}"`;
-    return `SELECT ${safeX}, ${safeGroup}, ${agg}(${safeY}) AS value FROM ${safeTable} GROUP BY ${safeX}, ${safeGroup} ORDER BY value DESC LIMIT 50`;
+    return `SELECT ${safeX}, ${safeGroup}, ${metric} AS value FROM ${safeTable} GROUP BY ${safeX}, ${safeGroup} ORDER BY value DESC LIMIT 50`;
   }
 
-  return `SELECT ${safeX}, ${agg}(${safeY}) AS value FROM ${safeTable} GROUP BY ${safeX} ORDER BY value DESC LIMIT 20`;
+  return `SELECT ${safeX}, ${metric} AS value FROM ${safeTable} GROUP BY ${safeX} ORDER BY value DESC LIMIT 20`;
 }
 
 /* ════════════════════════════════════════════════════════════════

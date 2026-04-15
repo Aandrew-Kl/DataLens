@@ -13,6 +13,7 @@ import {
 } from "@/lib/utils/advanced-analytics";
 import { downloadFile } from "@/lib/utils/export";
 import { formatNumber } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface DataAggregatorProps {
@@ -64,7 +65,12 @@ function buildAggregationSql(
       if (fn === "COUNT") {
         return `COUNT(${quoteIdentifier(metric.columnName)}) AS ${quoteIdentifier(alias)}`;
       }
-      return `${fn}(TRY_CAST(${quoteIdentifier(metric.columnName)} AS DOUBLE)) AS ${quoteIdentifier(alias)}`;
+      return `${buildMetricExpression(
+        fn,
+        metric.columnName,
+        (column) => `TRY_CAST(${quoteIdentifier(column)} AS DOUBLE)`,
+        { cast: false },
+      )} AS ${quoteIdentifier(alias)}`;
     }),
   );
 

@@ -529,11 +529,14 @@ export default function DataWrangler({ tableName, columns }: DataWranglerProps) 
             throw new Error("Mean and median fill require a numeric column.");
           }
 
-          const aggregate = fillForm.strategy === "mean" ? "AVG" : "MEDIAN";
+          const aggregateExpression =
+            fillForm.strategy === "mean"
+              ? `AVG(TRY_CAST(${safeColumn} AS DOUBLE))`
+              : `MEDIAN(TRY_CAST(${safeColumn} AS DOUBLE))`;
           const expression = `COALESCE(TRY_CAST(${safeColumn} AS DOUBLE), stats.fill_value)`;
           const selectSql = `
             WITH stats AS (
-              SELECT ${aggregate}(TRY_CAST(${safeColumn} AS DOUBLE)) AS fill_value
+              SELECT ${aggregateExpression} AS fill_value
               FROM ${safeTable}
             )
             SELECT ${buildReplacementSelect(workingColumns, { [fillForm.column]: expression })}

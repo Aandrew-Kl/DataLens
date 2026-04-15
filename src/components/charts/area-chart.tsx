@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { formatNumber } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ColumnProfile } from "@/types/dataset";
 
 echarts.use([LineChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);
@@ -150,7 +151,7 @@ async function loadAreaData(
   const groupProjection = safeGroup
     ? `COALESCE(CAST(${safeGroup} AS VARCHAR), 'Unknown') AS group_label`
     : "'All rows' AS group_label";
-  const aggregationExpression = `${aggregation}(metric_value)`;
+  const aggregationExpression = buildMetricExpression(aggregation, "metric_value", (column) => column, { cast: false });
 
   const rows = await runQuery(`
     WITH prepared AS (

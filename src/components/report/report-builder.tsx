@@ -19,6 +19,7 @@ import {
 
 import { runQuery } from "@/lib/duckdb/client";
 import { generateReportHTML } from "@/lib/utils/report-export";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ChartConfig } from "@/types/chart";
 import type { DatasetMeta, ColumnProfile } from "@/types/dataset";
 import type { ReportConfig, ReportWidget } from "@/types/report";
@@ -152,7 +153,7 @@ function buildChartSQL(
     case "histogram":
       return `SELECT ROUND(CAST(${safeY} AS DOUBLE), 0) AS ${safeX}, COUNT(*) AS ${safeY} FROM ${table} WHERE ${safeY} IS NOT NULL GROUP BY 1 ORDER BY 1 LIMIT 30`;
     default:
-      return `SELECT ${safeX} AS ${safeX}, ${aggregation}(${safeY}) AS ${safeY} FROM ${table} WHERE ${safeX} IS NOT NULL AND ${safeY} IS NOT NULL GROUP BY 1 ORDER BY 2 DESC LIMIT 24`;
+      return `SELECT ${safeX} AS ${safeX}, ${buildMetricExpression(aggregation, yAxis, quoteIdentifier, { cast: false, preserveCase: true })} AS ${safeY} FROM ${table} WHERE ${safeX} IS NOT NULL AND ${safeY} IS NOT NULL GROUP BY 1 ORDER BY 2 DESC LIMIT 24`;
   }
 }
 
@@ -168,7 +169,7 @@ function buildMetricSQL(
     return `SELECT COUNT(${safeColumn}) AS value FROM ${table}`;
   }
 
-  return `SELECT ${aggregation}(${safeColumn}) AS value FROM ${table} WHERE ${safeColumn} IS NOT NULL`;
+  return `SELECT ${buildMetricExpression(aggregation, columnName, quoteIdentifier, { cast: false, preserveCase: true })} AS value FROM ${table} WHERE ${safeColumn} IS NOT NULL`;
 }
 
 function getMetricResult(

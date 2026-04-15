@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { formatNumber } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ColumnProfile } from "@/types/dataset";
 
 echarts.use([
@@ -163,7 +164,7 @@ async function loadHeatmapData(
     : `AND ${safeValue} IS NOT NULL AND TRY_CAST(${safeValue} AS DOUBLE) IS NOT NULL`;
   const metricSelect = useRowCount
     ? "COUNT(*)"
-    : `${aggregation}(metric_value)`;
+    : buildMetricExpression(aggregation, "metric_value", (column) => column, { cast: false });
 
   const rows = await runQuery(`
     WITH filtered AS (

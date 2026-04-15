@@ -1,5 +1,6 @@
 import { quoteIdentifier } from "@/lib/utils/sql";
 import type { ColumnProfile } from "@/types/dataset";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 
 export type StepType =
   | "filter"
@@ -139,7 +140,10 @@ export function compilePipeline(tableName: string, baseColumns: ColumnProfile[],
       currentColumns = [...groups];
     } else if (step.type === "aggregate") {
       const groups = step.groupColumns.filter(Boolean);
-      const metric = step.aggregateFunction === "COUNT" && !step.aggregateColumn ? "COUNT(*)" : `${step.aggregateFunction}(${quoteIdentifier(step.aggregateColumn)})`;
+      const metric =
+        step.aggregateFunction === "COUNT" && step.aggregateColumn
+          ? `COUNT(${quoteIdentifier(step.aggregateColumn)})`
+          : buildMetricExpression(step.aggregateFunction, step.aggregateColumn || undefined, quoteIdentifier, { cast: false });
       sql = `SELECT ${groups.length ? `${groups.map(quoteIdentifier).join(", ")}, ` : ""}${metric} AS ${quoteIdentifier(step.aggregateAlias || "metric_value")} FROM ${currentSource}${groups.length ? ` GROUP BY ${groups.map(quoteIdentifier).join(", ")}` : ""}`;
       currentColumns = [...groups, step.aggregateAlias || "metric_value"];
     } else if (step.type === "join") {

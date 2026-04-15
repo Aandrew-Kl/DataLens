@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { formatNumber } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface GeoChartProps {
@@ -232,7 +233,7 @@ export default function GeoChart({ tableName, columns }: GeoChartProps) {
       setLoading(true);
       setMessage(null);
       try {
-        const metric = aggregation === "COUNT" || !valueColumn ? "COUNT(*)" : `${aggregation}(CAST(${quoteIdentifier(valueColumn)} AS DOUBLE))`;
+        const metric = buildMetricExpression(aggregation, valueColumn || undefined, quoteIdentifier);
         const rows =
           activeMode.kind === "coordinates"
             ? await runQuery(`SELECT CAST(${quoteIdentifier(activeMode.longitudeColumn)} AS DOUBLE) AS longitude, CAST(${quoteIdentifier(activeMode.latitudeColumn)} AS DOUBLE) AS latitude, ${metric} AS metric_value FROM ${quoteIdentifier(tableName)} WHERE ${quoteIdentifier(activeMode.latitudeColumn)} IS NOT NULL AND ${quoteIdentifier(activeMode.longitudeColumn)} IS NOT NULL GROUP BY 1, 2 ORDER BY metric_value DESC LIMIT 500`)

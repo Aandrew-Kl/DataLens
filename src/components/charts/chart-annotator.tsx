@@ -14,6 +14,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface ChartAnnotatorProps {
@@ -114,7 +115,7 @@ function buildSql(tableName: string, config: ChartConfig) {
     return `SELECT ${safeX} AS x_value, ${safeY} AS y_value FROM ${safeTable} WHERE ${safeX} IS NOT NULL AND ${safeY} IS NOT NULL LIMIT 400`;
   }
 
-  const measure = config.aggregation === "COUNT" ? "COUNT(*)" : `${config.aggregation}(${safeY})`;
+  const measure = buildMetricExpression(config.aggregation, config.yColumn, quoteIdentifier, { cast: false });
   return [
     `SELECT CAST(${safeX} AS VARCHAR) AS x_value, ${measure} AS y_value`,
     `FROM ${safeTable}`,
