@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { startTransition, useEffect, useEffectEvent, useMemo, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import type { EChartsOption } from "echarts";
@@ -177,11 +178,6 @@ const itemVariants: Variants = {
     transition: { duration: 0.35, ease: "easeOut" as const },
   },
 };
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, "\"\"")}"`;
-}
-
 function getColumnAlias(index: number, suffix: string) {
   return `c${index}_${suffix}`;
 }

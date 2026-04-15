@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { startTransition, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -44,11 +45,6 @@ interface DebugResult {
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
   "rounded-[1.75rem] border border-white/20 bg-white/75 backdrop-blur-2xl shadow-xl shadow-slate-950/10 dark:bg-slate-950/45";
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function defaultQuery(tableName: string) {
   return `SELECT *\nFROM ${quoteIdentifier(tableName)}\nLIMIT 100;`;
 }

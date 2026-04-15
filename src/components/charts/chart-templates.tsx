@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useMemo, useState, type ReactElement } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { EChartsOption } from "echarts";
@@ -90,11 +91,6 @@ const TEMPLATES: TemplateDefinition[] = [
   { id: "funnel-chart", name: "Funnel chart", kind: "funnel", description: "Descending funnel for stage-based conversion or throughput." },
   { id: "waterfall-chart", name: "Waterfall chart", kind: "waterfall", description: "Show changes between sequential buckets or periods." },
 ];
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function readNumber(value: unknown): number {
   if (typeof value === "number") {
     return Number.isFinite(value) ? value : 0;

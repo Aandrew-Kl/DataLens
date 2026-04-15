@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useMemo, useState } from "react";
 import type { EChartsOption } from "echarts";
 import * as echarts from "echarts";
@@ -52,11 +53,6 @@ const USA_FRAME = {
   type: "FeatureCollection",
   features: [{ type: "Feature", properties: { name: "United States" }, geometry: { type: "Polygon", coordinates: [[[-125, 24], [-66, 24], [-66, 50], [-125, 50], [-125, 24]]] } }],
 } as unknown as Parameters<typeof echarts.registerMap>[1];
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function parseCentroids(value: string) {
   return Object.fromEntries(
     value.split(";").map((item) => {

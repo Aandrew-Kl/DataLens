@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -98,11 +99,6 @@ function normalizeName(value: string) {
 function tokenizeName(value: string) {
   return normalizeName(value).split("_").filter(Boolean);
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function sanitizeViewName(value: string) {
   const sanitized = value
     .toLowerCase()

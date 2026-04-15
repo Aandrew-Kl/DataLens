@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import {
   startTransition,
   useDeferredValue,
@@ -168,11 +169,6 @@ function isLegacyProps(
 ): props is LegacyChartGalleryProps {
   return "charts" in props;
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function useDarkMode() {
   const [dark, setDark] = useState(false);
   const syncDarkMode = useEffectEvent(() => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
@@ -111,11 +112,6 @@ const panelVariants = {
     transition: { duration: 0.35, ease: "easeOut" as const },
   },
 };
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function toTitleCase(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }

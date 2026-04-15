@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { startTransition, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Code2, Download, Loader2, Play, Sparkles } from "lucide-react";
@@ -37,11 +38,6 @@ const EXPRESSION_TEMPLATES: ExpressionTemplate[] = [
     snippet: "CONCAT(customer_name, ' / ', region)",
   },
 ] as const;
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function sanitizeName(value: string): string {
   const sanitized = value
     .trim()

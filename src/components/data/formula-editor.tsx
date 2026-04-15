@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -131,11 +132,6 @@ const FUNCTION_GROUPS: FunctionGroup[] = [
     ],
   },
 ];
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message) {
     return error.message;

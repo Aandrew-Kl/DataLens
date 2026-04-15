@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import {
   useMemo,
   useRef,
@@ -173,11 +174,6 @@ const SAMPLE_DATASETS: SampleDataset[] = [
     ].join("\n"),
   },
 ] as const;
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function safeTableName(value: string): string {
   return sanitizeTableName(value).toLowerCase();
 }

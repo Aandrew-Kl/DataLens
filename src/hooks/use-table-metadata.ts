@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { runQuery } from "@/lib/duckdb/client";
 import { useDatasetStore } from "@/stores/dataset-store";
@@ -32,11 +33,6 @@ const EMPTY_STATE: TableMetadataState = {
   refreshedAt: 0,
   error: null,
 };
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function toNumber(value: unknown): number {
   if (typeof value === "number") {
     return Number.isFinite(value) ? value : 0;

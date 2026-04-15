@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type { ColumnProfile } from "@/types/dataset";
@@ -19,11 +20,6 @@ interface MissingColumnMetric {
   nullPercentage: number;
   completeness: number;
 }
-
-function quoteIdentifier(identifier: string): string {
-  return `"${identifier.replace(/"/g, '""')}"`;
-}
-
 function getCompletenessColor(completeness: number): string {
   if (completeness > 95) return "bg-emerald-500";
   if (completeness >= 80) return "bg-amber-400";

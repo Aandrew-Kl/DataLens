@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { motion } from "framer-motion";
 import {
   Calculator,
@@ -115,11 +116,6 @@ const AGG_SQL: Record<AggFn, string> = {
   MEDIAN: "MEDIAN",
   STDEV: "STDDEV_SAMP",
 };
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function quoteLiteral(value: string) {
   return `'${value.replaceAll("'", "''")}'`;
 }

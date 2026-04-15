@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { History, PencilLine, RotateCcw, Save, Search } from "lucide-react";
@@ -45,11 +46,6 @@ function createId(): string {
 
   return `audit-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function escapeLiteral(value: string): string {
   return `'${value.replace(/'/g, "''")}'`;
 }

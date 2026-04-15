@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { startTransition, useMemo, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -156,11 +157,6 @@ function writeRuleSets(tableName: string, ruleSets: SavedRuleSet[]) {
   ruleSetCache.set(key, { raw, parsed: ruleSets });
   emitStorageChange();
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function escapeLiteral(value: string) {
   return `'${value.replaceAll("'", "''")}'`;
 }

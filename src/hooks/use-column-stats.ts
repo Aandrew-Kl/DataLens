@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { runQuery } from "@/lib/duckdb/client";
 
@@ -52,11 +53,6 @@ const EMPTY_STATS: ColumnStatistics = {
   refreshedAt: null,
   error: null,
 };
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function toNumber(value: unknown): number | null {
   if (value == null) {
     return null;

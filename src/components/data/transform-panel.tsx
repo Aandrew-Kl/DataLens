@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -142,11 +143,6 @@ const TRANSFORM_TABS = [
   label: string;
   icon: typeof Filter;
 }>;
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function quoteLiteral(value: string): string {
   return `'${value.replace(/'/g, "''")}'`;
 }

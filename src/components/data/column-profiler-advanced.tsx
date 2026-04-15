@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import {
   useEffect,
   useMemo,
@@ -132,11 +133,6 @@ const WEEKDAYS = [
   "Friday",
   "Saturday",
 ];
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function toNumber(value: unknown) {
   const parsed = value == null ? Number.NaN : Number(value);
   return Number.isFinite(parsed) ? parsed : null;

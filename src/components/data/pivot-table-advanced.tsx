@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -60,11 +61,6 @@ const aggSql: Record<AggFn, string> = {
   MEDIAN: "MEDIAN",
   STDEV: "STDDEV_SAMP",
 };
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function quoteLiteral(value: string) {
   return `'${value.replace(/'/g, "''")}'`;
 }

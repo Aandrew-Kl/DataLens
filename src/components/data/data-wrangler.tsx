@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { Suspense, startTransition, use, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -123,11 +124,6 @@ const TAB_META: Array<{
   { key: "trim", label: "Trim whitespace", Icon: Eraser },
   { key: "dedupe", label: "Remove duplicates", Icon: GitBranchPlus },
 ] as const;
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function quoteLiteral(value: string) {
   return `'${value.replaceAll("'", "''")}'`;
 }

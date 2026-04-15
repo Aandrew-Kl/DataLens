@@ -1,4 +1,5 @@
 "use client";
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { startTransition, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, CheckCircle2, Loader2, Plus, ShieldAlert, Trash2, XCircle } from "lucide-react";
@@ -27,7 +28,6 @@ const RULE_OPTIONS: Array<{ value: RuleType; label: string }> = [
 function createRule(type: RuleType = "not_null"): ValidationRule {
   return { id: generateId(), type, min: "", max: "", pattern: "", allowedValues: "" };
 }
-function quoteIdentifier(value: string) { return `"${value.replace(/"/g, '""')}"`; }
 function escapeLiteral(value: string) { return `'${value.replace(/'/g, "''")}'`; }
 function parseAllowedValues(value: string) { return value.split(/[\n,]+/).map((entry) => entry.trim()).filter(Boolean); }
 function renderValue(value: unknown) {

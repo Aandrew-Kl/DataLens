@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { EChartsOption } from "echarts";
 import ReactECharts from "echarts-for-react";
@@ -75,11 +76,6 @@ function emitChange() {
 function storageKey(tableName: string) {
   return `datalens:chart-annotations:${tableName}`;
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function readAnnotations(tableName: string): ChartAnnotation[] {
   if (typeof window === "undefined") return [];
   try {

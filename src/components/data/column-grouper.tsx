@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -61,11 +62,6 @@ function emitChange() {
 function storageKey(tableName: string) {
   return `datalens:column-grouper:${tableName}`;
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function sanitizeAlias(value: string) {
   const trimmed = value.trim().replace(/[^a-zA-Z0-9_]/g, "_");
   const normalized = /^[a-zA-Z_]/.test(trimmed) ? trimmed : `calc_${trimmed}`;

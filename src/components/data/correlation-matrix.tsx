@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { Fragment, memo, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { ColumnProfile } from "@/types/dataset";
@@ -16,11 +17,6 @@ interface CorrelationCell {
   correlation: number | null;
   pairCount: number;
 }
-
-function quoteIdentifier(identifier: string): string {
-  return `"${identifier.replace(/"/g, '""')}"`;
-}
-
 function quoteStringLiteral(value: string): string {
   return `'${value.replace(/'/g, "''")}'`;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -76,11 +77,6 @@ const WEEKDAY_LABELS = [
 function storageKey(tableName: string): string {
   return `${STORAGE_KEY_PREFIX}${tableName}`;
 }
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function readTasks(tableName: string): ScheduledTask[] {
   if (typeof window === "undefined") return [];
   try {

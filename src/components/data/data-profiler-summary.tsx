@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import {
   useEffect,
   useMemo,
@@ -65,11 +66,6 @@ interface MetricCardConfig {
 }
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function toNumber(value: unknown) {
   const parsed = value == null ? Number.NaN : Number(value);
   return Number.isFinite(parsed) ? parsed : 0;

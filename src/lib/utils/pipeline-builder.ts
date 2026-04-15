@@ -1,3 +1,4 @@
+import { quoteIdentifier } from "@/lib/utils/sql";
 import type { ColumnProfile } from "@/types/dataset";
 
 export type StepType =
@@ -68,11 +69,6 @@ export const STEP_META: Record<StepType, { label: string; hint: string }> = {
   deduplicate: { label: "Deduplicate", hint: "Keep one row per key set." },
   sample: { label: "Sample", hint: "Preview a slice of the pipeline output." },
 };
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function quoteLiteral(value: string) {
   return `'${value.replace(/'/g, "''")}'`;
 }

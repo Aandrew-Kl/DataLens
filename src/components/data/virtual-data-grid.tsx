@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import {
   useCallback,
   useDeferredValue,
@@ -88,11 +89,6 @@ const TYPE_META: Record<
     Icon: CircleHelp,
   },
 };
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function quoteLiteral(value: string): string {
   return `'${value.replace(/'/g, "''")}'`;
 }

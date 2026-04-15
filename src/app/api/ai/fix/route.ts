@@ -1,3 +1,4 @@
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { NextResponse } from "next/server";
 import { chat, checkOllamaHealth } from "@/lib/ai/ollama-client";
 import { logger } from "@/lib/logger";
@@ -56,11 +57,6 @@ function stripCodeFences(value: string): string {
     .replace(/\s*```$/, "")
     .trim();
 }
-
-function quoteIdentifier(identifier: string): string {
-  return `"${identifier.replace(/"/g, "\"\"")}"`;
-}
-
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

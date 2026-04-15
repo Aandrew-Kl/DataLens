@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import type { EChartsOption } from "echarts";
 import ReactECharts from "echarts-for-react";
@@ -20,8 +21,6 @@ const SAMPLE_ROWS = 320;
 const MAX_CATEGORY_BUCKETS = 8;
 const PANEL = "rounded-2xl border border-gray-200/70 bg-white/85 shadow-sm backdrop-blur dark:border-gray-800 dark:bg-gray-900/80";
 const CATEGORY_COLORS = ["#38bdf8", "#34d399", "#f59e0b", "#f472b6", "#818cf8", "#fb7185", "#2dd4bf", "#f97316"];
-
-function quoteIdentifier(value: string) { return `"${value.replaceAll('"', '""')}"`; }
 function isCategoricalCandidate(column: ColumnProfile) {
   if (column.type === "string" || column.type === "boolean") return true;
   return (column.type === "number" || column.type === "unknown") && column.uniqueCount > 1 && column.uniqueCount <= 12;
