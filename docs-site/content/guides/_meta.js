@@ -4,5 +4,6 @@ export default {
   dashboards: "Dashboards",
   "data-pipelines": "Data Pipelines",
   "ml-workflows": "ML Workflows",
+  observability: "Observability",
   "ai-assistant": "AI Assistant",
 };
