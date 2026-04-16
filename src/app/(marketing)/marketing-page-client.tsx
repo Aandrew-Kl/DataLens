@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import MarketingHero from "./marketing-hero";
@@ -35,7 +35,9 @@ export default function MarketingPageClient() {
   useEffect(() => {
     const stored = window.localStorage.getItem("datalens-theme");
     if (stored === "light" || stored === "dark") {
-      setTheme(stored);
+      startTransition(() => {
+        setTheme(stored);
+      });
     }
   }, []);
 
