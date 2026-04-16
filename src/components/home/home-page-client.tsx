@@ -54,6 +54,7 @@ import FeatureShowcase from "@/components/home/FeatureShowcase";
 import DataUploadSection from "@/components/home/DataUploadSection";
 import QuickStartGuide from "@/components/home/QuickStartGuide";
 import HomeTabPanels from "@/components/home/HomeTabPanels";
+import SampleDatasetsGallery from "@/components/onboarding/sample-datasets-gallery";
 import type {
   AppTab,
   FileDropResult,
@@ -1276,6 +1277,27 @@ export default function HomePageClient() {
                       </div>
 
                       <FileDropzone onFileLoaded={handleFileLoaded} />
+                      <div className="mt-4">
+                        <SampleDatasetsGallery
+                          onDatasetLoaded={async ({
+                            tableName,
+                            fileName,
+                            rowCount,
+                            columnCount,
+                          }) => {
+                            addDataset({
+                              id: generateId(),
+                              name: tableName,
+                              fileName,
+                              rowCount,
+                              columnCount,
+                              columns: [],
+                              uploadedAt: Date.now(),
+                              sizeBytes: 0,
+                            });
+                          }}
+                        />
+                      </div>
 
                       {isLoading && (
                         <div className="mt-4 flex items-center justify-center gap-3 text-sm text-slate-500">
