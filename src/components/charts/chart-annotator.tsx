@@ -1,7 +1,7 @@
 "use client";
 
 import { quoteIdentifier } from "@/lib/utils/sql";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { EChartsOption } from "echarts";
 import ReactECharts from "echarts-for-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -63,6 +63,7 @@ type ChartAnnotation = TextAnnotation | LineAnnotation | RegionAnnotation;
 type Notice = string | null;
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+const EMPTY_ROWS: Record<string, unknown>[] = [];
 const listeners = new Set<() => void>();
 
 function subscribe(listener: () => void) {
@@ -146,9 +147,8 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
     yColumn: columns.find((column) => column.type === "number")?.name ?? columns[0]?.name ?? "",
     aggregation: "SUM",
   });
-  const [rows, setRows] = useState<Record<string, unknown>[]>([]);
   const [querySql, setQuerySql] = useState<string | null>(null);
-  const [notice, setNotice] = useState<Notice>(null);
+  const [manualNotice, setManualNotice] = useState<Notice>(null);
   const [annotationKind, setAnnotationKind] = useState<AnnotationKind>("text");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [label, setLabel] = useState("");
@@ -165,6 +165,11 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
     error: queryError,
     refetch,
   } = useDuckDBQuery(querySql);
+  const rows = queryRows ?? EMPTY_ROWS;
+  const notice =
+    manualNotice
+    ?? queryError
+    ?? (querySql && !loading && queryRows ? "Chart data loaded from DuckDB." : null);
 
   const currentChartKey = chartKey(config);
   const annotations = useMemo(
@@ -217,26 +222,14 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
     };
   }, [annotations, config, dark, rows]);
 
-  useEffect(() => {
-    if (!queryRows) return;
-    setRows(queryRows);
-    setNotice("Chart data loaded from DuckDB.");
-  }, [queryRows]);
-
-  useEffect(() => {
-    if (!queryError) return;
-    setRows([]);
-    setNotice(queryError);
-  }, [queryError]);
-
   function loadChart() {
     if (!config.xColumn || !config.yColumn) {
-      setNotice("Select chart columns first.");
+      setManualNotice("Select chart columns first.");
       return;
     }
 
     const nextSql = buildSql(tableName, config);
-    setNotice(null);
+    setManualNotice(null);
 
     if (querySql === nextSql) {
       refetch();
@@ -260,7 +253,7 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
 
   function saveAnnotation() {
     if (!label.trim()) {
-      setNotice("Annotation label is required.");
+      setManualNotice("Annotation label is required.");
       return;
     }
 
@@ -276,7 +269,7 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
       : [annotation, ...allAnnotations];
 
     writeAnnotations(tableName, nextAnnotations);
-    setNotice(editingId ? "Annotation updated." : "Annotation saved.");
+    setManualNotice(editingId ? "Annotation updated." : "Annotation saved.");
     resetEditor();
   }
 
@@ -300,14 +293,14 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
 
   function deleteAnnotation(annotationId: string) {
     writeAnnotations(tableName, allAnnotations.filter((annotation) => annotation.id !== annotationId));
-    setNotice("Annotation deleted.");
+    setManualNotice("Annotation deleted.");
     if (editingId === annotationId) resetEditor();
   }
 
   function exportPng() {
     const instance = chartRef.current?.getEchartsInstance();
     if (!instance) {
-      setNotice("Render the chart before exporting it.");
+      setManualNotice("Render the chart before exporting it.");
       return;
     }
 

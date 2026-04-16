@@ -64,7 +64,7 @@ const allowJoseTransform = (pattern: string) => {
   return pattern;
 };
 
-export default async () => {
+const jestConfig = async () => {
   const resolvedConfig = await createConfig();
 
   return {
@@ -72,3 +72,5 @@ export default async () => {
     transformIgnorePatterns: resolvedConfig.transformIgnorePatterns?.map(allowJoseTransform),
   };
 };
+
+export default jestConfig;

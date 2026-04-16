@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { quoteIdentifier } from "@/lib/utils/sql";
 import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import { useDuckDBQuery } from "@/hooks/use-duckdb-query";
@@ -163,15 +162,6 @@ function buildChartDataSql(config: UseChartDataConfig): string | null {
   ].join(" ");
 }
 
-function getQueryConfigError(config: UseChartDataConfig): string | null {
-  try {
-    buildChartDataSql(config);
-    return null;
-  } catch (error) {
-    return error instanceof Error ? error.message : "Unable to build chart query.";
-  }
-}
-
 function transformChartRows(
   rows: Record<string, unknown>[],
   config: UseChartDataConfig,
@@ -195,33 +185,17 @@ function transformChartRows(
 }
 
 export function useChartData(config: UseChartDataConfig): UseChartDataResult {
-  const {
-    tableName,
-    type,
-    xColumn,
-    yColumn,
-    aggregation,
-    groupBy,
-    limit,
-    filters,
-  } = config;
-  const filterSignature = Array.isArray(filters) ? filters.join("\n") : filters;
+  let configError: string | null = null;
+  let sql: string | null = null;
 
-  const configError = useMemo(
-    () => getQueryConfigError(config),
-    [aggregation, filterSignature, groupBy, limit, tableName, type, xColumn, yColumn],
-  );
-
-  const sql = useMemo(
-    () => (configError ? null : buildChartDataSql(config)),
-    [aggregation, configError, filterSignature, groupBy, limit, tableName, type, xColumn, yColumn],
-  );
+  try {
+    sql = buildChartDataSql(config);
+  } catch (error) {
+    configError = error instanceof Error ? error.message : "Unable to build chart query.";
+  }
 
   const query = useDuckDBQuery(sql);
-  const chartData = useMemo(
-    () => transformChartRows(query.data ?? [], config),
-    [aggregation, groupBy, query.data, tableName, type, xColumn, yColumn],
-  );
+  const chartData = transformChartRows(query.data ?? [], config);
 
   return {
     chartData,

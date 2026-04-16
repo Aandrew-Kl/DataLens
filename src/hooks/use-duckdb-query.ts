@@ -10,57 +10,66 @@ export interface UseDuckDBQueryResult<T = Record<string, unknown>[]> {
   refetch: () => void;
 }
 
+interface QueryState<T> {
+  requestKey: string | null;
+  data: T | null;
+  error: string | null;
+}
+
 export function useDuckDBQuery<T = Record<string, unknown>[]>(
   sql: string | null,
-  deps: unknown[] = [],
 ): UseDuckDBQueryResult<T> {
-  const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [queryState, setQueryState] = useState<QueryState<T>>({
+    requestKey: null,
+    data: null,
+    error: null,
+  });
   const [refreshKey, setRefreshKey] = useState(0);
+  const requestKey = sql ? `${refreshKey}:${sql}` : null;
 
   const refetch = useCallback(() => {
     setRefreshKey((current) => current + 1);
   }, []);
 
   useEffect(() => {
-    if (!sql) {
-      setData(null);
-      setLoading(false);
-      setError(null);
+    if (!sql || !requestKey) {
       return;
     }
 
     let active = true;
 
-    setData(null);
-    setLoading(true);
-    setError(null);
-
     runQuery(sql)
       .then((rows) => {
         if (!active) return;
-        setData(rows as T);
+        setQueryState({
+          requestKey,
+          data: rows as T,
+          error: null,
+        });
       })
       .catch((queryError: unknown) => {
         if (!active) return;
-        setData(null);
-        setError(
-          queryError instanceof Error
-            ? queryError.message
-            : "Failed to run DuckDB query.",
-        );
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
+        setQueryState({
+          requestKey,
+          data: null,
+          error:
+            queryError instanceof Error
+              ? queryError.message
+              : "Failed to run DuckDB query.",
+        });
       });
 
     return () => {
       active = false;
     };
-  }, [sql, refreshKey, ...deps]);
+  }, [requestKey, sql]);
 
-  return { data, loading, error, refetch };
+  const isCurrentRequestResolved = queryState.requestKey === requestKey;
+
+  return {
+    data: requestKey && isCurrentRequestResolved ? queryState.data : null,
+    loading: requestKey !== null && !isCurrentRequestResolved,
+    error: requestKey && isCurrentRequestResolved ? queryState.error : null,
+    refetch,
+  };
 }
