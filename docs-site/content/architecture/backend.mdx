@@ -1,0 +1,31 @@
+---
+title: Backend
+description: Review the FastAPI service, persistence layer, and server-side analytics responsibilities.
+---
+
+# Backend
+
+The backend is a FastAPI application backed by PostgreSQL and Alembic migrations.
+
+## Core Responsibilities
+
+- user registration, login, and bearer-token validation
+- dataset metadata persistence
+- machine learning and analytics endpoints
+- AI endpoints that broker local Ollama access
+- operational middleware for security headers, rate limiting, request IDs, and metrics
+
+## Key Route Groups
+
+- `/auth`
+- `/datasets`
+- `/ai`
+- `/ml`
+- `/analytics`
+
+## Persistence and Runtime
+
+- PostgreSQL stores users, datasets, and other durable backend records.
+- SQLAlchemy manages async database access.
+- Alembic applies schema migrations.
+- FastAPI auto-generates OpenAPI docs for the service.

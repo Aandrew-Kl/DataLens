@@ -1,0 +1,53 @@
+---
+title: AI Setup
+description: Configure local Ollama so DataLens can translate natural language into SQL and explain results.
+---
+
+# AI Setup
+
+DataLens is designed to work without cloud AI by default. For natural-language features, run Ollama locally and point the app at it.
+
+## 1. Install Ollama
+
+Install Ollama on the same machine as DataLens, or on a reachable machine inside your local network.
+
+## 2. Pull a Model
+
+The default example model in the repository is `llama3.2`:
+
+```bash
+ollama pull llama3.2
+```
+
+## 3. Configure `OLLAMA_URL`
+
+Update your `.env` file so the AI routes can reach Ollama:
+
+```bash
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2
+```
+
+If you are using manual development, keep the frontend and backend env files aligned with the same Ollama host.
+
+## 4. Test Natural Language to SQL
+
+With a dataset loaded, try a prompt like:
+
+```text
+Show total revenue by region for the last 30 days.
+```
+
+Expected flow:
+
+1. DataLens sends the prompt plus schema context to the AI route.
+2. The route checks Ollama health.
+3. If the model is reachable, SQL is generated and explained.
+4. If Ollama is unavailable, DataLens falls back to deterministic helpers where possible.
+
+## Verification Checklist
+
+- `OLLAMA_URL` resolves from the running app process.
+- The selected model has been pulled locally.
+- AI routes stop timing out once Ollama is running.
+- Generated SQL references the active table and real columns from your dataset.

@@ -442,8 +442,9 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-[1.3rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
               <label className="block text-sm font-semibold text-slate-900 dark:text-slate-50">
+                <span>
                 Pixel ratio
-              </label>
+                </span>
               <select
                 value={pixelRatio}
                 onChange={(event) => setPixelRatio(Number(event.target.value))}
@@ -452,12 +453,14 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
                 <option value={2}>PNG 2x</option>
                 <option value={4}>PNG 4x</option>
               </select>
+              </label>
             </div>
 
             <div className="rounded-[1.3rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
               <label className="block text-sm font-semibold text-slate-900 dark:text-slate-50">
+                <span>
                 Background
-              </label>
+                </span>
               <select
                 value={background}
                 onChange={(event) => setBackground(event.target.value as BackgroundChoice)}
@@ -467,12 +470,14 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
                 <option value="white">White</option>
                 <option value="dark">Dark</option>
               </select>
+              </label>
             </div>
 
             <div className="rounded-[1.3rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
               <label className="block text-sm font-semibold text-slate-900 dark:text-slate-50">
+                <span>
                 Width
-              </label>
+                </span>
               <input
                 type="number"
                 min={320}
@@ -480,12 +485,14 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
                 onChange={(event) => setWidth(Math.max(Number(event.target.value), 320))}
                 className="mt-3 w-full rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
               />
+              </label>
             </div>
 
             <div className="rounded-[1.3rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
               <label className="block text-sm font-semibold text-slate-900 dark:text-slate-50">
+                <span>
                 Height
-              </label>
+                </span>
               <input
                 type="number"
                 min={240}
@@ -493,6 +500,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
                 onChange={(event) => setHeight(Math.max(Number(event.target.value), 240))}
                 className="mt-3 w-full rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
               />
+              </label>
             </div>
           </div>
 

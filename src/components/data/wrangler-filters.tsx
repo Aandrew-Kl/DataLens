@@ -255,58 +255,58 @@ export function WranglerFilters(props: WranglerFiltersProps) {
 
       {activeTab === "split" ? (
         <div className="space-y-4">
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Source column</label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Source column</span>
             <select value={splitForm.column} onChange={(event) => setSplitForm((current) => ({ ...current, column: event.target.value, prefix: `${event.target.value || "part"}_split` }))} className={FIELD_CLASS}>
               {textColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
             </select>
-          </div>
+          </label>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Delimiter</label>
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Delimiter</span>
               <input value={splitForm.delimiter} onChange={(event) => setSplitForm((current) => ({ ...current, delimiter: event.target.value }))} className={FIELD_CLASS} />
-            </div>
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Parts</label>
+            </label>
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Parts</span>
               <input type="number" min={2} max={6} value={splitForm.parts} onChange={(event) => setSplitForm((current) => ({ ...current, parts: Number(event.target.value) }))} className={FIELD_CLASS} />
-            </div>
+            </label>
           </div>
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Output prefix</label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Output prefix</span>
             <input value={splitForm.prefix} onChange={(event) => setSplitForm((current) => ({ ...current, prefix: event.target.value }))} className={FIELD_CLASS} />
-          </div>
+          </label>
         </div>
       ) : null}
 
       {activeTab === "merge" ? (
         <div className="space-y-4">
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Columns to merge</label>
+          <fieldset>
+            <legend className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Columns to merge</legend>
             <MultiColumnPicker columns={workingColumns} selected={mergeForm.columns} onToggle={(columnName) => toggleColumns(setMergeForm, columnName)} />
-          </div>
+          </fieldset>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Separator</label>
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Separator</span>
               <input value={mergeForm.separator} onChange={(event) => setMergeForm((current) => ({ ...current, separator: event.target.value }))} className={FIELD_CLASS} />
-            </div>
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Output column</label>
+            </label>
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Output column</span>
               <input value={mergeForm.output} onChange={(event) => setMergeForm((current) => ({ ...current, output: event.target.value }))} className={FIELD_CLASS} />
-            </div>
+            </label>
           </div>
         </div>
       ) : null}
 
       {activeTab === "fill" ? (
         <div className="space-y-4">
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Target column</label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Target column</span>
             <select value={fillForm.column} onChange={(event) => setFillForm((current) => ({ ...current, column: event.target.value }))} className={FIELD_CLASS}>
               {workingColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
             </select>
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Strategy</label>
+          </label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Strategy</span>
             <select value={fillForm.strategy} onChange={(event) => setFillForm((current) => ({ ...current, strategy: event.target.value as FillStrategy }))} className={FIELD_CLASS}>
               <option value="constant">Constant</option>
               <option value="mean">Mean</option>
@@ -314,68 +314,68 @@ export function WranglerFilters(props: WranglerFiltersProps) {
               <option value="forward-fill">Forward-fill</option>
               <option value="backward-fill">Backward-fill</option>
             </select>
-          </div>
+          </label>
           {fillForm.strategy === "constant" ? (
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Constant value</label>
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Constant value</span>
               <input value={fillForm.constantValue} onChange={(event) => setFillForm((current) => ({ ...current, constantValue: event.target.value }))} className={FIELD_CLASS} />
-            </div>
+            </label>
           ) : null}
         </div>
       ) : null}
 
       {activeTab === "dates" ? (
         <div className="space-y-4">
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Source column</label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Source column</span>
             <select value={dateForm.column} onChange={(event) => setDateForm((current) => ({ ...current, column: event.target.value, output: `${event.target.value || "date"}_parsed` }))} className={FIELD_CLASS}>
               {textColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
             </select>
-          </div>
+          </label>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Date format</label>
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Date format</span>
               <input value={dateForm.format} onChange={(event) => setDateForm((current) => ({ ...current, format: event.target.value }))} className={FIELD_CLASS} />
-            </div>
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Output column</label>
+            </label>
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Output column</span>
               <input value={dateForm.output} onChange={(event) => setDateForm((current) => ({ ...current, output: event.target.value }))} className={FIELD_CLASS} />
-            </div>
+            </label>
           </div>
         </div>
       ) : null}
 
       {activeTab === "regex" ? (
         <div className="space-y-4">
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Source column</label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Source column</span>
             <select value={regexForm.column} onChange={(event) => setRegexForm((current) => ({ ...current, column: event.target.value }))} className={FIELD_CLASS}>
               {textColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
             </select>
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Regex pattern</label>
+          </label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Regex pattern</span>
             <input value={regexForm.pattern} onChange={(event) => setRegexForm((current) => ({ ...current, pattern: event.target.value }))} className={FIELD_CLASS} placeholder="e.g. ^(\\w+)-(\\d+)$" />
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Output group names</label>
+          </label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Output group names</span>
             <input value={regexForm.groupNames} onChange={(event) => setRegexForm((current) => ({ ...current, groupNames: event.target.value }))} className={FIELD_CLASS} placeholder="prefix, sequence" />
-          </div>
+          </label>
         </div>
       ) : null}
 
       {activeTab === "trim" ? (
-        <div className="space-y-4">
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Columns to trim</label>
+        <fieldset className="space-y-4">
+          <legend className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Columns to trim</legend>
           <MultiColumnPicker columns={textColumns} selected={trimForm.columns} onToggle={(columnName) => toggleColumns(setTrimForm, columnName)} />
-        </div>
+        </fieldset>
       ) : null}
 
       {activeTab === "dedupe" ? (
-        <div className="space-y-4">
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Duplicate keys</label>
+        <fieldset className="space-y-4">
+          <legend className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Duplicate keys</legend>
           <MultiColumnPicker columns={workingColumns} selected={dedupeForm.columns} onToggle={(columnName) => toggleColumns(setDedupeForm, columnName)} />
-        </div>
+        </fieldset>
       ) : null}
 
       <div className="mt-6 flex flex-wrap gap-3">

@@ -356,10 +356,10 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
             </div>
 
             <div className="grid gap-3 md:grid-cols-3">
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Source
-                </label>
+                </span>
                 <select
                   value={safeSource}
                   onChange={(event) =>
@@ -373,12 +373,12 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Target
-                </label>
+                </span>
                 <select
                   value={safeTarget}
                   onChange={(event) =>
@@ -392,12 +392,12 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Value
-                </label>
+                </span>
                 <select
                   value={safeValue}
                   onChange={(event) =>
@@ -411,14 +411,14 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
             </div>
 
             <div className="grid gap-3 md:grid-cols-3">
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Color mode
-                </label>
+                </span>
                 <select
                   value={colorMode}
                   onChange={(event) =>
@@ -431,13 +431,13 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
                   <option value="source">Color by source</option>
                   <option value="target">Color by target</option>
                 </select>
-              </div>
+              </label>
 
               <label className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
-                <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <span className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   <span>Node width</span>
                   <span>{nodeWidth}px</span>
-                </div>
+                </span>
                 <input
                   type="range"
                   min={12}
@@ -451,10 +451,10 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
               </label>
 
               <label className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
-                <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <span className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   <span>Node gap</span>
                   <span>{nodeGap}px</span>
-                </div>
+                </span>
                 <input
                   type="range"
                   min={6}

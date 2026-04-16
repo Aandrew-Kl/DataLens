@@ -665,10 +665,10 @@ function BoxplotChartReady({ tableName, columns }: BoxplotChartProps) {
             </div>
 
             <div className="grid gap-3 md:grid-cols-3">
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Group by
-                </label>
+                </span>
                 <select
                   value={safeGroupBy}
                   onChange={(event) =>
@@ -683,12 +683,12 @@ function BoxplotChartReady({ tableName, columns }: BoxplotChartProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Orientation
-                </label>
+                </span>
                 <select
                   value={orientation}
                   onChange={(event) =>
@@ -699,7 +699,7 @@ function BoxplotChartReady({ tableName, columns }: BoxplotChartProps) {
                   <option value="vertical">Vertical</option>
                   <option value="horizontal">Horizontal</option>
                 </select>
-              </div>
+              </label>
 
               <label className="flex items-center justify-between rounded-2xl border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
                 <span>Overlay points</span>

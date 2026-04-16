@@ -919,10 +919,10 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
         </div>
 
         <div className="grid gap-3 xl:grid-cols-4">
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Cohort date
-            </label>
+            </span>
             <select
               aria-label="Cohort date"
               value={safeDateColumn}
@@ -937,11 +937,11 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
                 </option>
               ))}
             </select>
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+          </label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Metric
-            </label>
+            </span>
             <select
               aria-label="Metric"
               value={safeMetricColumn}
@@ -957,11 +957,11 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
                 </option>
               ))}
             </select>
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+          </label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Granularity
-            </label>
+            </span>
             <select
               aria-label="Granularity"
               value={granularity}
@@ -975,11 +975,11 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
               <option value="week">Week</option>
               <option value="month">Month</option>
             </select>
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+          </label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Aggregation
-            </label>
+            </span>
             <select
               aria-label="Aggregation"
               value={safeAggregation}
@@ -995,7 +995,7 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
               <option value="sum">Sum</option>
               <option value="average">Average</option>
             </select>
-          </div>
+          </label>
         </div>
 
         {result.entityColumn ? (

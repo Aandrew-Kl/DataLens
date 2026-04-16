@@ -813,10 +813,10 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
       >
         <div className="space-y-4">
           {/* Title */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <span>
               Chart Title (optional)
-            </label>
+            </span>
             <input
               type="text"
               value={newChartTitle}
@@ -832,13 +832,13 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
                 transition-colors
               "
             />
-          </div>
+          </label>
 
           {/* Chart type */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <div className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
               Chart Type
-            </label>
+            </div>
             <div className="flex flex-wrap gap-2">
               {(
                 ["bar", "line", "pie", "scatter", "area", "histogram"] as ChartType[]
@@ -869,10 +869,10 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
 
           {/* Axis selectors */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+              <span>
                 X-Axis Column
-              </label>
+              </span>
               <select
                 value={newXAxis}
                 onChange={(e) => setNewXAxis(e.target.value)}
@@ -892,12 +892,12 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+              <span>
                 Y-Axis Column
-              </label>
+              </span>
               <select
                 value={newYAxis}
                 onChange={(e) => setNewYAxis(e.target.value)}
@@ -917,15 +917,15 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
           </div>
 
           {/* Aggregation & Group By */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+              <span>
                 Aggregation
-              </label>
+              </span>
               <select
                 value={newAgg}
                 onChange={(e) =>
@@ -946,12 +946,12 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+              <span>
                 Group By (optional)
-              </label>
+              </span>
               <select
                 value={newGroupBy}
                 onChange={(e) => setNewGroupBy(e.target.value)}
@@ -971,7 +971,7 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
           </div>
 
           {/* Preview area */}

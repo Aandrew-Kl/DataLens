@@ -534,10 +534,10 @@ function ForecastReady({ tableName, columns }: DataForecastProps) {
             </div>
 
             <div className="grid gap-3 md:grid-cols-3">
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Date column
-                </label>
+                </span>
                 <select
                   value={safeDate}
                   onChange={(event) =>
@@ -551,12 +551,12 @@ function ForecastReady({ tableName, columns }: DataForecastProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Value column
-                </label>
+                </span>
                 <select
                   value={safeValue}
                   onChange={(event) =>
@@ -570,12 +570,12 @@ function ForecastReady({ tableName, columns }: DataForecastProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Forecast method
-                </label>
+                </span>
                 <select
                   value={method}
                   onChange={(event) =>
@@ -595,14 +595,14 @@ function ForecastReady({ tableName, columns }: DataForecastProps) {
                   <option value="exp_smoothing">Exponential smoothing</option>
                   <option value="linear">Linear extrapolation</option>
                 </select>
-              </div>
+              </label>
             </div>
 
             <label className="block rounded-2xl border border-white/15 bg-white/45 px-4 py-4 dark:bg-slate-950/35">
-              <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <span className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <span>Forecast horizon</span>
                 <span>{horizon} periods</span>
-              </div>
+              </span>
               <input
                 type="range"
                 min={1}

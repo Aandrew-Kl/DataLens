@@ -1,0 +1,41 @@
+---
+title: Security
+description: Security controls in DataLens, from JWT auth and rate limiting to local-first data handling.
+---
+
+# Security
+
+## Threat Model
+
+DataLens assumes the highest-risk paths are:
+
+- unauthorized access to saved datasets or user accounts
+- malicious input in API requests or AI-assisted query flows
+- browser-side attacks against a local-first analytics UI
+- abuse of expensive endpoints through repeated automated requests
+
+## Authentication
+
+The backend uses bearer JWTs for authenticated routes. Clients send the token in the `Authorization` header:
+
+```http
+Authorization: Bearer <jwt>
+```
+
+This protects routes such as dataset upload, AI actions, ML endpoints, and current-user profile reads.
+
+## SQL Injection Prevention
+
+On the frontend, query-building helpers constrain aggregation and expression generation through allowlisted functions instead of accepting arbitrary aggregate names from the UI. That reduces the risk of unsafe SQL generation in charting and transformation flows.
+
+## Content Security Policy
+
+DataLens uses strict security headers, including CSP and frame-ancestor restrictions. The frontend’s DuckDB-WASM path requires `wasm-unsafe-eval` in browser-facing policies so the WASM runtime can initialize safely, while the backend also sets CSP headers for API responses.
+
+## Rate Limiting
+
+The FastAPI service rate-limits API traffic in-memory with a 60-second window and response headers that expose remaining quota and reset time. Authentication also applies its own login-attempt throttling.
+
+## CSRF Protection
+
+The primary API model uses explicit bearer tokens instead of ambient cookie-only sessions, which materially reduces CSRF exposure. If you extend DataLens with cookie-bound auth, keep `SameSite` protections and explicit CSRF tokens in place at the edge or application layer.

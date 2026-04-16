@@ -487,10 +487,10 @@ function HeatmapChartReady({ tableName, columns }: HeatmapChartProps) {
             </div>
 
             <div className="grid gap-3 md:grid-cols-3">
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   X-axis
-                </label>
+                </span>
                 <select
                   value={safeX}
                   onChange={(event) =>
@@ -504,12 +504,12 @@ function HeatmapChartReady({ tableName, columns }: HeatmapChartProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Y-axis
-                </label>
+                </span>
                 <select
                   value={safeY}
                   onChange={(event) =>
@@ -523,12 +523,12 @@ function HeatmapChartReady({ tableName, columns }: HeatmapChartProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Value
-                </label>
+                </span>
                 <select
                   value={safeValue}
                   onChange={(event) =>
@@ -543,14 +543,14 @@ function HeatmapChartReady({ tableName, columns }: HeatmapChartProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
             </div>
 
             <div className="grid gap-3 md:grid-cols-4">
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Aggregation
-                </label>
+                </span>
                 <select
                   value={safeAggregation}
                   onChange={(event) =>
@@ -568,12 +568,12 @@ function HeatmapChartReady({ tableName, columns }: HeatmapChartProps) {
                   <option value="MIN">MIN</option>
                   <option value="MAX">MAX</option>
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Palette
-                </label>
+                </span>
                 <select
                   value={palette}
                   onChange={(event) =>
@@ -586,12 +586,12 @@ function HeatmapChartReady({ tableName, columns }: HeatmapChartProps) {
                   <option value="red">Sequential red</option>
                   <option value="diverging">Diverging</option>
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Sort rows
-                </label>
+                </span>
                 <select
                   value={ySort}
                   onChange={(event) =>
@@ -603,12 +603,12 @@ function HeatmapChartReady({ tableName, columns }: HeatmapChartProps) {
                   <option value="desc">High to low</option>
                   <option value="asc">Low to high</option>
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Sort columns
-                </label>
+                </span>
                 <select
                   value={xSort}
                   onChange={(event) =>
@@ -620,15 +620,15 @@ function HeatmapChartReady({ tableName, columns }: HeatmapChartProps) {
                   <option value="desc">High to low</option>
                   <option value="asc">Low to high</option>
                 </select>
-              </div>
+              </label>
             </div>
 
             <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
               <label className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
-                <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <span className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   <SlidersHorizontal className="h-3.5 w-3.5" />
                   Min color
-                </div>
+                </span>
                 <input
                   value={minOverride}
                   onChange={(event) => setMinOverride(event.target.value)}
@@ -638,10 +638,10 @@ function HeatmapChartReady({ tableName, columns }: HeatmapChartProps) {
               </label>
 
               <label className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
-                <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <span className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   <Palette className="h-3.5 w-3.5" />
                   Max color
-                </div>
+                </span>
                 <input
                   value={maxOverride}
                   onChange={(event) => setMaxOverride(event.target.value)}

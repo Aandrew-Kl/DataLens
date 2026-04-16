@@ -1,0 +1,56 @@
+---
+title: API Reference
+description: Key routes, auth expectations, and live OpenAPI documentation for the DataLens backend.
+---
+
+# API Reference
+
+The backend exposes live OpenAPI documentation through FastAPI.
+
+- Proxied deployments often surface it at `/docs`
+- The standalone backend in this repository serves it at `/api/docs`
+
+## Authentication
+
+Protected endpoints expect a bearer token in the `Authorization` header:
+
+```http
+Authorization: Bearer <jwt>
+```
+
+## Key Route Groups
+
+### `/auth`
+
+- register users
+- log in and receive JWTs
+- read the current user profile
+
+### `/datasets`
+
+- upload datasets
+- list saved datasets
+- fetch or delete a dataset by ID
+
+### `/ai`
+
+- summarize text data
+- analyze sentiment
+- generate SQL from natural language
+- explain SQL
+
+### `/ml`
+
+- regression
+- classification
+- clustering
+- anomaly detection
+- PCA
+- decision tree analysis
+
+### `/analytics`
+
+- churn prediction
+- cohort analysis
+- A/B testing
+- forecasting

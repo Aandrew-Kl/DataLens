@@ -618,10 +618,10 @@ function DataDiffReady({ tableName }: DataDiffProps) {
             </div>
 
             <div className="grid gap-3 md:grid-cols-3">
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Left dataset
-                </label>
+                </span>
                 <select
                   value={safeLeft}
                   onChange={(event) => {
@@ -646,12 +646,12 @@ function DataDiffReady({ tableName }: DataDiffProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Right dataset
-                </label>
+                </span>
                 <select
                   value={safeRight}
                   onChange={(event) => {
@@ -669,12 +669,12 @@ function DataDiffReady({ tableName }: DataDiffProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Diff key
-                </label>
+                </span>
                 <select
                   value={result.resolvedKey}
                   onChange={(event) => {
@@ -692,18 +692,18 @@ function DataDiffReady({ tableName }: DataDiffProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
             </div>
 
             {versionOptions.length > 1 ? (
               <label className="block rounded-2xl border border-white/15 bg-white/45 px-4 py-4 dark:bg-slate-950/35">
-                <div className="mb-3 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <span className="mb-3 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   <span className="flex items-center gap-2">
                     <Clock3 className="h-3.5 w-3.5" />
                     Version timeline
                   </span>
                   <span>{versionOptions[timelineIndex]?.label ?? "Snapshot"}</span>
-                </div>
+                </span>
                 <input
                   type="range"
                   min={0}
