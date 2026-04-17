@@ -1,21 +1,34 @@
+import { NextResponse } from "next/server";
 import { checkOllamaHealth, chat } from "@/lib/ai/ollama-client";
+import { requireAuth } from "@/lib/auth/require-auth";
 import { POST } from "@/app/api/ai/explain/route";
 
 jest.mock("next/server", () => {
-  class MockNextResponse {}
+  class MockNextResponse {
+    body: unknown;
+    status: number;
+
+    constructor(body: unknown, init?: { status?: number }) {
+      this.body = body;
+      this.status = init?.status ?? 200;
+    }
+
+    async json() {
+      return this.body;
+    }
+
+    static json = jest.fn((body: unknown, init?: { status?: number }) => {
+      return new MockNextResponse(body, init);
+    });
+  }
 
   return {
-    NextResponse: Object.assign(MockNextResponse, {
-      json: jest.fn((data, init) => ({
-        json: async () => data,
-        status: init?.status ?? 200,
-      })),
-    }),
+    NextResponse: MockNextResponse,
   };
 });
 
 jest.mock("@/lib/auth/require-auth", () => ({
-  requireAuth: jest.fn().mockResolvedValue({ userId: "test-user" }),
+  requireAuth: jest.fn(),
 }));
 
 jest.mock("@/lib/ai/ollama-client", () => ({
@@ -23,15 +36,42 @@ jest.mock("@/lib/ai/ollama-client", () => ({
   chat: jest.fn(),
 }));
 
+jest.mock("@/lib/logger", () => ({
+  logger: {
+    error: jest.fn(),
+    warn: jest.fn(),
+  },
+}));
+
+const mockRequireAuth = requireAuth as jest.Mock;
+
+const createRequest = (body: unknown) =>
+  ({
+    json: jest.fn().mockResolvedValue(body),
+  }) as unknown as Request;
+
 describe("POST /api/ai/explain", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockRequireAuth.mockResolvedValue({ userId: "test-user" });
+  });
+
+  it("returns 401 when authentication fails", async () => {
+    mockRequireAuth.mockResolvedValueOnce(
+      NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    );
+
+    const response = await POST(createRequest({}));
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body).toEqual({ error: "Unauthorized" });
+    expect(checkOllamaHealth).not.toHaveBeenCalled();
+    expect(chat).not.toHaveBeenCalled();
   });
 
   it("returns 400 when sql is missing", async () => {
-    const request = {
-      json: jest.fn().mockResolvedValue({}),
-    } as unknown as Request;
+    const request = createRequest({});
 
     const response = await POST(request);
     const body = await response.json();
@@ -43,9 +83,7 @@ describe("POST /api/ai/explain", () => {
   });
 
   it("returns AI explanation when Ollama is healthy", async () => {
-    const request = {
-      json: jest.fn().mockResolvedValue({ sql: "SELECT * FROM users" }),
-    } as unknown as Request;
+    const request = createRequest({ sql: "SELECT * FROM users" });
 
     (checkOllamaHealth as jest.Mock).mockResolvedValueOnce(true);
     (chat as jest.Mock).mockResolvedValueOnce("This query selects every row from users.");
@@ -73,9 +111,7 @@ describe("POST /api/ai/explain", () => {
   });
 
   it("returns fallback explanation when Ollama is unhealthy", async () => {
-    const request = {
-      json: jest.fn().mockResolvedValue({ sql: "SELECT * FROM users" }),
-    } as unknown as Request;
+    const request = createRequest({ sql: "SELECT * FROM users" });
 
     (checkOllamaHealth as jest.Mock).mockResolvedValueOnce(false);
 
@@ -93,9 +129,7 @@ describe("POST /api/ai/explain", () => {
   });
 
   it("falls back when Ollama is healthy but returns blank output", async () => {
-    const request = {
-      json: jest.fn().mockResolvedValue({ sql: "SELECT id FROM events" }),
-    } as unknown as Request;
+    const request = createRequest({ sql: "SELECT id FROM events" });
 
     (checkOllamaHealth as jest.Mock).mockResolvedValueOnce(true);
     (chat as jest.Mock).mockResolvedValueOnce("   ");
@@ -112,9 +146,7 @@ describe("POST /api/ai/explain", () => {
   });
 
   it("falls back when Ollama is healthy but chat throws", async () => {
-    const request = {
-      json: jest.fn().mockResolvedValue({ sql: "SELECT id FROM events" }),
-    } as unknown as Request;
+    const request = createRequest({ sql: "SELECT id FROM events" });
 
     (checkOllamaHealth as jest.Mock).mockResolvedValueOnce(true);
     (chat as jest.Mock).mockRejectedValueOnce(new Error("AI unavailable"));

@@ -1,23 +1,36 @@
+import { NextResponse } from "next/server";
 import { checkOllamaHealth } from "@/lib/ai/ollama-client";
 import { generateSQL } from "@/lib/ai/sql-generator";
 import { generateFallbackSQL } from "@/lib/ai/fallback";
+import { requireAuth } from "@/lib/auth/require-auth";
 import { POST } from "@/app/api/ai/query/route";
 
 jest.mock("next/server", () => {
-  class MockNextResponse {}
+  class MockNextResponse {
+    body: unknown;
+    status: number;
+
+    constructor(body: unknown, init?: { status?: number }) {
+      this.body = body;
+      this.status = init?.status ?? 200;
+    }
+
+    async json() {
+      return this.body;
+    }
+
+    static json = jest.fn((body: unknown, init?: { status?: number }) => {
+      return new MockNextResponse(body, init);
+    });
+  }
 
   return {
-    NextResponse: Object.assign(MockNextResponse, {
-      json: jest.fn((data, init) => ({
-        json: async () => data,
-        status: init?.status ?? 200,
-      })),
-    }),
+    NextResponse: MockNextResponse,
   };
 });
 
 jest.mock("@/lib/auth/require-auth", () => ({
-  requireAuth: jest.fn().mockResolvedValue({ userId: "test-user" }),
+  requireAuth: jest.fn(),
 }));
 
 jest.mock("@/lib/ai/ollama-client", () => ({
@@ -32,15 +45,41 @@ jest.mock("@/lib/ai/fallback", () => ({
   generateFallbackSQL: jest.fn(),
 }));
 
+jest.mock("@/lib/logger", () => ({
+  logger: {
+    error: jest.fn(),
+  },
+}));
+
+const mockRequireAuth = requireAuth as jest.Mock;
+
+const createRequest = (body: unknown) =>
+  ({
+    json: jest.fn().mockResolvedValue(body),
+  }) as unknown as Request;
+
 describe("POST /api/ai/query", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockRequireAuth.mockResolvedValue({ userId: "test-user" });
+  });
+
+  it("returns 401 when authentication fails", async () => {
+    mockRequireAuth.mockResolvedValueOnce(
+      NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    );
+
+    const response = await POST(createRequest({}));
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body).toEqual({ error: "Unauthorized" });
+    expect(checkOllamaHealth).not.toHaveBeenCalled();
+    expect(generateSQL).not.toHaveBeenCalled();
   });
 
   it("returns 400 when required fields missing (empty body)", async () => {
-    const request = {
-      json: jest.fn().mockResolvedValue({}),
-    } as unknown as Request;
+    const request = createRequest({});
 
     const response = await POST(request);
     const body = await response.json();
@@ -53,13 +92,11 @@ describe("POST /api/ai/query", () => {
   });
 
   it("returns SQL via AI when Ollama is healthy", async () => {
-    const request = {
-      json: jest.fn().mockResolvedValue({
-        question: "How many users?",
-        tableName: "users",
-        columns: [],
-      }),
-    } as unknown as Request;
+    const request = createRequest({
+      question: "How many users?",
+      tableName: "users",
+      columns: [],
+    });
 
     (checkOllamaHealth as jest.Mock).mockResolvedValueOnce(true);
     (generateSQL as jest.Mock).mockResolvedValueOnce("SELECT 1");
@@ -75,13 +112,11 @@ describe("POST /api/ai/query", () => {
   });
 
   it("returns fallback SQL when Ollama is unhealthy", async () => {
-    const request = {
-      json: jest.fn().mockResolvedValue({
-        question: "How many users?",
-        tableName: "users",
-        columns: [],
-      }),
-    } as unknown as Request;
+    const request = createRequest({
+      question: "How many users?",
+      tableName: "users",
+      columns: [],
+    });
 
     (checkOllamaHealth as jest.Mock).mockResolvedValueOnce(false);
     (generateFallbackSQL as jest.Mock).mockReturnValueOnce("SELECT *");
@@ -94,5 +129,22 @@ describe("POST /api/ai/query", () => {
     expect(checkOllamaHealth).toHaveBeenCalledTimes(1);
     expect(generateSQL).not.toHaveBeenCalled();
     expect(generateFallbackSQL).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns 500 when the upstream SQL generator throws", async () => {
+    const request = createRequest({
+      question: "How many users?",
+      tableName: "users",
+      columns: [],
+    });
+
+    (checkOllamaHealth as jest.Mock).mockResolvedValueOnce(true);
+    (generateSQL as jest.Mock).mockRejectedValueOnce(new Error("ollama offline"));
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body).toEqual({ error: "Failed to generate query. Is Ollama running?" });
   });
 });
