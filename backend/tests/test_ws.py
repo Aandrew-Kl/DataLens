@@ -12,9 +12,12 @@ from starlette.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
 
 import app.api.datasets as datasets_api
+import app.api.ws as ws_api
+from app.api.auth import _login_attempts
 from app.config import settings
 from app.database import Base, engine
 from app.main import app, rate_limiter
+from app.middleware.rate_limit import limiter
 
 
 async def _reset_database() -> None:
@@ -42,13 +45,17 @@ def ws_client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> TestClient:
     monkeypatch.setattr(settings, "UPLOADS_DIR", str(uploads_dir))
     monkeypatch.setattr(datasets_api, "UPLOAD_DIR", uploads_dir)
 
+    limiter.reset()
     rate_limiter.clear()
+    _login_attempts.clear()
     _run_async(_reset_database())
 
     with TestClient(app) as client:
         yield client
 
+    limiter.reset()
     rate_limiter.clear()
+    _login_attempts.clear()
     _run_async(_drop_database())
 
 
@@ -85,6 +92,16 @@ def _upload_csv_dataset(client: TestClient, token: str, csv_content: str) -> dic
     return upload_response.json()
 
 
+def _register_login_user_with_dataset(
+    client: TestClient,
+    *,
+    csv_content: str = "name,amount,category\nAlice,5,A\nBob,12,B\nCara,25,A\nDan,8,C\n",
+) -> tuple[str, dict[str, object]]:
+    token = _register_login_user(client)
+    dataset = _upload_csv_dataset(client, token, csv_content)
+    return token, dataset
+
+
 def _websocket_url(token: str, dataset_id: str, **params: object) -> str:
     query_params = {
         "token": token,
@@ -101,6 +118,22 @@ def _receive_until_complete(websocket) -> list[dict[str, object]]:
         messages.append(message)
         if message["type"] in {"complete", "error"}:
             return messages
+
+
+def test_ws_rejects_missing_token(ws_client: TestClient) -> None:
+    with pytest.raises(WebSocketDisconnect) as excinfo:
+        with ws_client.websocket_connect(f"/api/ws/data-stream?dataset_id={uuid.uuid4()}"):
+            pass
+
+    assert excinfo.value.code == 1008
+    assert excinfo.value.reason == [
+        {
+            "type": "missing",
+            "loc": ["query", "token"],
+            "msg": "Field required",
+            "input": None,
+        }
+    ]
 
 
 def test_ws_rejects_invalid_token(ws_client: TestClient) -> None:
@@ -127,13 +160,26 @@ def test_ws_rejects_missing_dataset(ws_client: TestClient) -> None:
     assert excinfo.value.reason == "Dataset not found or access denied."
 
 
+def test_ws_accepts_valid_token_and_starts_streaming(ws_client: TestClient) -> None:
+    token, dataset = _register_login_user_with_dataset(ws_client)
+
+    with ws_client.websocket_connect(
+        _websocket_url(
+            token=token,
+            dataset_id=str(dataset["id"]),
+            chunk_size=2,
+        )
+    ) as websocket:
+        assert websocket.receive_json() == {
+            "type": "profiling",
+            "percent": 0,
+            "rows_processed": 0,
+            "rows_total": 4,
+        }
+
+
 def test_ws_streams_csv_rows(ws_client: TestClient) -> None:
-    token = _register_login_user(ws_client)
-    dataset = _upload_csv_dataset(
-        ws_client,
-        token,
-        "name,amount,category\nAlice,5,A\nBob,12,B\nCara,25,A\nDan,8,C\n",
-    )
+    token, dataset = _register_login_user_with_dataset(ws_client)
 
     with ws_client.websocket_connect(
         _websocket_url(
@@ -174,12 +220,7 @@ def test_ws_streams_csv_rows(ws_client: TestClient) -> None:
 
 
 def test_ws_handles_query_filter(ws_client: TestClient) -> None:
-    token = _register_login_user(ws_client)
-    dataset = _upload_csv_dataset(
-        ws_client,
-        token,
-        "name,amount,category\nAlice,5,A\nBob,12,B\nCara,25,A\nDan,8,C\n",
-    )
+    token, dataset = _register_login_user_with_dataset(ws_client)
 
     with ws_client.websocket_connect(
         _websocket_url(
@@ -203,3 +244,58 @@ def test_ws_handles_query_filter(ws_client: TestClient) -> None:
     assert complete_message["rows_sent"] == 2
     assert complete_message["rows_total"] == 4
     assert complete_message["rows_sent"] < complete_message["rows_processed"]
+
+
+def test_ws_handles_disconnect_during_stream(ws_client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    token, dataset = _register_login_user_with_dataset(ws_client)
+    logged_messages: list[str] = []
+
+    async def _disconnecting_stream(*args, **kwargs) -> dict[str, int]:
+        raise WebSocketDisconnect(code=1001, reason="client disconnected")
+
+    def _capture_exception(message: str, *args, **kwargs) -> None:
+        logged_messages.append(message)
+
+    monkeypatch.setattr(ws_api, "stream_csv_rows", _disconnecting_stream)
+    monkeypatch.setattr(ws_api._ws_logger, "exception", _capture_exception)
+
+    with pytest.raises(WebSocketDisconnect) as excinfo:
+        with ws_client.websocket_connect(
+            _websocket_url(
+                token=token,
+                dataset_id=str(dataset["id"]),
+            )
+        ) as websocket:
+            websocket.receive_json()
+
+    assert excinfo.value.code == 1000
+    assert logged_messages == []
+
+
+def test_ws_returns_error_frame_for_invalid_query_expression(ws_client: TestClient) -> None:
+    token, dataset = _register_login_user_with_dataset(ws_client)
+    messages: list[dict[str, object]] = []
+
+    with pytest.raises(RuntimeError, match='Cannot call "send" once a close message has been sent.'):
+        with ws_client.websocket_connect(
+            _websocket_url(
+                token=token,
+                dataset_id=str(dataset["id"]),
+                query="__import__('os')",
+                chunk_size=2,
+            )
+        ) as websocket:
+            messages = _receive_until_complete(websocket)
+
+    assert messages == [
+        {
+            "type": "profiling",
+            "percent": 0,
+            "rows_processed": 0,
+            "rows_total": 4,
+        },
+        {
+            "type": "error",
+            "message": "Query expression contains disallowed patterns.",
+        },
+    ]
