@@ -1,359 +1,362 @@
-import { render, screen } from "@testing-library/react";
-import type React from "react";
+import {
+  act,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { Suspense, type ReactNode } from "react";
 
 import DataOpsPage from "@/app/(workspace)/data-ops/page";
-import type { DatasetMeta, ColumnProfile } from "@/types/dataset";
-
-type MockedStoreHook = jest.Mock & {
-  resetMockState: () => void;
-  setMockState: (patch: Record<string, unknown>) => void;
-  getMockState: () => Record<string, unknown>;
-  setState?: jest.Mock;
-};
-
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: jest.fn() }),
-  usePathname: () => "/data-ops",
-}));
+import {
+  DataLensSocket,
+  type ConnectionStateHandler,
+  type ProgressHandler,
+  type ProgressUpdate,
+  type SocketMessage,
+  type SocketMessageHandler,
+} from "@/lib/api/websocket";
+import { useDatasetStore } from "@/stores/dataset-store";
+import type { DatasetMeta } from "@/types/dataset";
 
 jest.mock("framer-motion", () => {
   const React = jest.requireActual<typeof import("react")>("react");
-  const MotionComponent = React.forwardRef(function MotionComponent(
-    props: { children?: React.ReactNode } & Record<string, unknown>,
-    ref: React.ForwardedRef<Element>,
-  ) {
-    return React.createElement("div", { ...props, ref }, props.children);
-  });
 
   return {
     __esModule: true,
     motion: new Proxy(
       {},
       {
-        get: () => MotionComponent,
+        get: (_target, tagName: string) =>
+          React.forwardRef(function MotionComponent(
+            props: { children?: React.ReactNode } & Record<string, unknown>,
+            ref: React.ForwardedRef<Element>,
+          ) {
+            return React.createElement(tagName, { ...props, ref }, props.children);
+          }),
       },
     ),
     AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
   };
 });
 
-jest.mock("echarts", () => ({}));
+jest.mock("@/lib/api/websocket", () => {
+  const actual = jest.requireActual("@/lib/api/websocket");
 
-jest.mock("echarts-for-react", () => ({
-  __esModule: true,
-  default: () => null,
-}));
+  return {
+    ...actual,
+    DataLensSocket: jest.fn(),
+  };
+});
 
-jest.mock("@/stores/dataset-store", () => {
-  const createState = () => ({
-    datasets: [] as DatasetMeta[],
-    activeDatasetId: null as string | null,
-    addDataset: jest.fn(),
-    removeDataset: jest.fn(),
-    setActiveDataset: jest.fn(),
-  });
-  const state = createState();
+interface MockSocket {
+  connect: jest.Mock<void, [token?: string]>;
+  disconnect: jest.Mock<void, []>;
+  send: jest.Mock<void, [payload: unknown]>;
+  onMessage: jest.Mock<void, [SocketMessageHandler]>;
+  onProgress: jest.Mock<void, [ProgressHandler]>;
+  onConnectionStateChange: jest.Mock<void, [ConnectionStateHandler]>;
+  emitMessage: (message: SocketMessage) => void;
+  emitProgress: (update: ProgressUpdate) => void;
+  emitConnection: (connected: boolean) => void;
+}
 
-  const useDatasetStore = Object.assign(
-    jest.fn((selector) => {
-      const snapshot = {
-        ...state,
-        getActiveDataset: () =>
-          state.datasets.find((dataset) => dataset.id === state.activeDatasetId) ?? null,
-      };
+function createMockSocket(): MockSocket {
+  let messageHandler: SocketMessageHandler | undefined;
+  let progressHandler: ProgressHandler | undefined;
+  let connectionHandler: ConnectionStateHandler | undefined;
 
-      return typeof selector === "function" ? selector(snapshot) : snapshot;
+  return {
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+    send: jest.fn(),
+    onMessage: jest.fn((callback: SocketMessageHandler) => {
+      messageHandler = callback;
     }),
-    {
-      resetMockState: () => {
-        Object.assign(state, createState());
-      },
-      setMockState: (patch: Record<string, unknown>) => {
-        Object.assign(state, patch);
-      },
-      getMockState: () => state,
-      setState: jest.fn((patch) => {
-        const snapshot = {
-          ...state,
-          getActiveDataset: () =>
-            state.datasets.find((dataset) => dataset.id === state.activeDatasetId) ?? null,
-        };
-        const nextState = typeof patch === "function" ? patch(snapshot) : patch;
-        Object.assign(state, nextState);
-      }),
+    onProgress: jest.fn((callback: ProgressHandler) => {
+      progressHandler = callback;
+    }),
+    onConnectionStateChange: jest.fn((callback: ConnectionStateHandler) => {
+      connectionHandler = callback;
+    }),
+    emitMessage: (message: SocketMessage) => {
+      messageHandler?.(message);
     },
+    emitProgress: (update: ProgressUpdate) => {
+      progressHandler?.(update);
+    },
+    emitConnection: (connected: boolean) => {
+      connectionHandler?.(connected);
+    },
+  };
+}
+
+function makeDataset(
+  id: string,
+  name: string,
+  overrides: Partial<DatasetMeta> = {},
+): DatasetMeta {
+  return {
+    id,
+    name,
+    fileName: `${id}.csv`,
+    rowCount: 100,
+    columnCount: 2,
+    columns: [
+      {
+        name: "region",
+        type: "string",
+        nullCount: 0,
+        uniqueCount: 3,
+        sampleValues: ["East", "West", "North"],
+      },
+      {
+        name: "revenue",
+        type: "number",
+        nullCount: 1,
+        uniqueCount: 4,
+        sampleValues: [100, 200, null, 400],
+      },
+    ],
+    uploadedAt: 1_700_000_000_000,
+    sizeBytes: 2_048,
+    ...overrides,
+  };
+}
+
+function TestProviders({ children }: { children: ReactNode }) {
+  return (
+    <Suspense fallback={<div role="status">Loading data ops page</div>}>
+      {children}
+    </Suspense>
   );
+}
 
-  return { useDatasetStore };
-});
-
-jest.mock("@/stores/query-store", () => {
-  const createState = () => ({
-    history: [],
-    lastResult: null,
-    isQuerying: false,
-    addToHistory: jest.fn(),
-    setLastResult: jest.fn(),
-    setIsQuerying: jest.fn(),
-  });
-  const state = createState();
-
-  const useQueryStore = Object.assign(
-    jest.fn((selector) => (typeof selector === "function" ? selector(state) : state)),
-    {
-      resetMockState: () => {
-        Object.assign(state, createState());
-      },
-      setMockState: (patch: Record<string, unknown>) => {
-        Object.assign(state, patch);
-      },
-      getMockState: () => state,
-    },
-  );
-
-  return { useQueryStore };
-});
-
-jest.mock("@/stores/chart-store", () => {
-  const createState = () => ({
-    savedCharts: [] as never[],
-    activeChartId: null as string | null,
-    chartHistory: [] as never[],
-    addChart: jest.fn(),
-    removeChart: jest.fn(),
-    updateChart: jest.fn(),
-    duplicateChart: jest.fn(),
-    reorderCharts: jest.fn(),
-    clearAll: jest.fn(),
-  });
-  const state = createState();
-
-  const useChartStore = Object.assign(
-    jest.fn((selector) => (typeof selector === "function" ? selector(state) : state)),
-    {
-      resetMockState: () => {
-        Object.assign(state, createState());
-      },
-      setMockState: (patch: Record<string, unknown>) => {
-        Object.assign(state, patch);
-      },
-      getMockState: () => state,
-      setState: jest.fn((patch) => {
-        const nextState = typeof patch === "function" ? patch(state) : patch;
-        Object.assign(state, nextState);
-      }),
-    },
-  );
-
-  return { useChartStore };
-});
-
-jest.mock("@/stores/workspace-store", () => {
-  const createState = () => ({
-    isLoading: false,
-    profileData: [] as ColumnProfile[],
-    loadError: null,
-    showUploader: false,
-    showSettings: false,
-    showCommandPalette: false,
-    showKeyboardShortcuts: false,
-    showExportWizard: false,
-    showSharePanel: false,
-    previewRows: [],
-    selectedPreviewRow: null,
-    selectedPreviewRowIndex: null,
-    selectedAdvancedColumn: null,
-    showColumnDetail: false,
-    analyticsColumnName: "",
-    savedCharts: [],
-    setProfileData: jest.fn(),
-    setIsLoading: jest.fn(),
-    setLoadError: jest.fn(),
-    toggleUploader: jest.fn(),
-    setShowUploader: jest.fn(),
-    toggleSettings: jest.fn(),
-    setShowSettings: jest.fn(),
-    toggleCommandPalette: jest.fn(),
-    setShowCommandPalette: jest.fn(),
-    toggleKeyboardShortcuts: jest.fn(),
-    setShowKeyboardShortcuts: jest.fn(),
-    toggleExportWizard: jest.fn(),
-    setShowExportWizard: jest.fn(),
-    toggleSharePanel: jest.fn(),
-    setShowSharePanel: jest.fn(),
-    setPreviewRows: jest.fn(),
-    setSelectedPreviewRow: jest.fn(),
-    clearPreviewSelection: jest.fn(),
-    setSelectedAdvancedColumn: jest.fn(),
-    setShowColumnDetail: jest.fn(),
-    setAnalyticsColumnName: jest.fn(),
-    setSavedCharts: jest.fn(),
-    addSavedChart: jest.fn(),
-    removeSavedChart: jest.fn(),
-  });
-  const state = createState();
-
-  const useWorkspaceStore = Object.assign(
-    jest.fn((selector) => (typeof selector === "function" ? selector(state) : state)),
-    {
-      resetMockState: () => {
-        Object.assign(state, createState());
-      },
-      setMockState: (patch: Record<string, unknown>) => {
-        Object.assign(state, patch);
-      },
-      getMockState: () => state,
-    },
-  );
-
-  return { useWorkspaceStore };
-});
-
-jest.mock("@/stores/pipeline-store", () => {
-  const createState = () => ({
-    pipelines: [] as never[],
-    activePipelineId: null as string | null,
-    executionHistory: [] as never[],
-    addPipeline: jest.fn(),
-    removePipeline: jest.fn(),
-    updatePipeline: jest.fn(),
-    executePipeline: jest.fn(async () => null),
-    clearHistory: jest.fn(),
-  });
-  const state = createState();
-
-  const usePipelineStore = Object.assign(
-    jest.fn((selector) => (typeof selector === "function" ? selector(state) : state)),
-    {
-      resetMockState: () => {
-        Object.assign(state, createState());
-      },
-      setMockState: (patch: Record<string, unknown>) => {
-        Object.assign(state, patch);
-      },
-      getMockState: () => state,
-    },
-  );
-
-  return { usePipelineStore };
-});
-
-jest.mock("@/stores/ui-store", () => {
-  const createState = () => ({
-    sidebarOpen: true,
-    theme: "light",
-    toggleSidebar: jest.fn(),
-    setTheme: jest.fn(),
-    toggleTheme: jest.fn(),
-  });
-  const state = createState();
-
-  const useUIStore = Object.assign(jest.fn(() => state), {
-    resetMockState: () => {
-      Object.assign(state, createState());
-    },
-    setMockState: (patch: Record<string, unknown>) => {
-      Object.assign(state, patch);
-    },
-    getMockState: () => state,
+function renderPage({
+  datasets = [salesDataset],
+  activeDatasetId = salesDataset.id,
+}: {
+  datasets?: DatasetMeta[];
+  activeDatasetId?: string | null;
+} = {}) {
+  act(() => {
+    useDatasetStore.setState({ datasets, activeDatasetId });
   });
 
-  return { useUIStore };
-});
+  return render(<DataOpsPage />, {
+    wrapper: TestProviders,
+  });
+}
 
-const activeDataset: DatasetMeta = {
-  id: "dataset-1",
-  name: "Sales",
+const salesDataset = makeDataset("sales", "Sales", {
   fileName: "sales.csv",
   rowCount: 420,
-  columnCount: 2,
+});
+
+const inventoryDataset = makeDataset("inventory", "Inventory", {
+  fileName: "inventory.csv",
+  rowCount: 64,
   columns: [
     {
-      name: "region",
+      name: "sku",
       type: "string",
       nullCount: 0,
-      uniqueCount: 4,
-      sampleValues: ["East", "West", "North"],
+      uniqueCount: 64,
+      sampleValues: ["A-100", "B-200", "C-300"],
     },
     {
-      name: "revenue",
-      type: "number",
+      name: "in_stock",
+      type: "boolean",
       nullCount: 0,
-      uniqueCount: 5,
-      sampleValues: [100, 200, 300],
+      uniqueCount: 2,
+      sampleValues: [true, false, true],
     },
   ],
-  uploadedAt: Date.now() - 60_000,
-  sizeBytes: 2048,
-};
+});
 
-const mockedDatasetStoreModule = jest.requireMock("@/stores/dataset-store") as {
-  useDatasetStore: MockedStoreHook;
-};
-const mockedQueryStoreModule = jest.requireMock("@/stores/query-store") as {
-  useQueryStore: MockedStoreHook;
-};
-const mockedChartStoreModule = jest.requireMock("@/stores/chart-store") as {
-  useChartStore: MockedStoreHook;
-};
-const mockedWorkspaceStoreModule = jest.requireMock("@/stores/workspace-store") as {
-  useWorkspaceStore: MockedStoreHook;
-};
-const mockedPipelineStoreModule = jest.requireMock("@/stores/pipeline-store") as {
-  usePipelineStore: MockedStoreHook;
-};
-const mockedUIStoreModule = jest.requireMock("@/stores/ui-store") as {
-  useUIStore: MockedStoreHook;
-};
-
-function resetStoreMocks() {
-  mockedDatasetStoreModule.useDatasetStore.resetMockState();
-  mockedQueryStoreModule.useQueryStore.resetMockState();
-  mockedChartStoreModule.useChartStore.resetMockState();
-  mockedWorkspaceStoreModule.useWorkspaceStore.resetMockState();
-  mockedPipelineStoreModule.usePipelineStore.resetMockState();
-  mockedUIStoreModule.useUIStore.resetMockState();
+function resetDatasetStore() {
+  act(() => {
+    useDatasetStore.setState(useDatasetStore.getInitialState());
+  });
 }
 
 describe("DataOpsPage", () => {
+  let socket: MockSocket;
+
   beforeEach(() => {
+    socket = createMockSocket();
     jest.clearAllMocks();
-    resetStoreMocks();
-    mockedDatasetStoreModule.useDatasetStore.setMockState({
-      datasets: [activeDataset],
-      activeDatasetId: activeDataset.id,
-    });
+    resetDatasetStore();
+    window.localStorage.clear();
+
+    const mockedConstructor = DataLensSocket as unknown as jest.Mock;
+    mockedConstructor.mockReset();
+    mockedConstructor.mockImplementation(() => socket);
   });
 
-  it("renders the data operations heading", () => {
-    render(<DataOpsPage />);
+  afterEach(() => {
+    resetDatasetStore();
+    window.localStorage.clear();
+  });
+
+  it("renders the page sections and dataset actions with accessible controls", () => {
+    renderPage({
+      datasets: [salesDataset, inventoryDataset],
+      activeDatasetId: salesDataset.id,
+    });
 
     expect(
       screen.getByRole("heading", { level: 1, name: "Data Operations" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Upload, manage and clean datasets before creating charts or dashboards."),
+      screen.getByRole("heading", { level: 2, name: "Dataset upload" }),
     ).toBeInTheDocument();
-  });
-
-  it("shows the dataset management UI for loaded datasets", () => {
-    render(<DataOpsPage />);
-
     expect(
       screen.getByRole("heading", { level: 2, name: "Dataset management" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Sales")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /rename/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /duplicate/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Active dataset profile" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Server-side data streaming" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Streaming Data Viewer" }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByLabelText("Select files")).toHaveAttribute("type", "file");
+    expect(screen.getByLabelText("WebSocket disconnected")).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "SQL query" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Stream" })).toBeDisabled();
+
+    const managementSection = screen
+      .getByRole("heading", { level: 2, name: "Dataset management" })
+      .closest("section");
+
+    expect(managementSection).not.toBeNull();
+    expect(within(managementSection as HTMLElement).getByRole("button", { name: "Active" })).toBeInTheDocument();
+    expect(within(managementSection as HTMLElement).getByRole("button", { name: "Activate" })).toBeInTheDocument();
+    expect(within(managementSection as HTMLElement).getAllByRole("button", { name: "Rename" })).toHaveLength(2);
+    expect(within(managementSection as HTMLElement).getAllByRole("button", { name: "Duplicate" })).toHaveLength(2);
+    expect(within(managementSection as HTMLElement).getAllByRole("button", { name: "Delete" })).toHaveLength(2);
+    expect(DataLensSocket).toHaveBeenCalledWith("ws://localhost:8000/ws/data-stream");
   });
 
-  it("shows the upload section and file picker control", () => {
-    render(<DataOpsPage />);
+  it("renders empty dataset states when no datasets are loaded", () => {
+    renderPage({
+      datasets: [],
+      activeDatasetId: null,
+    });
 
-    expect(screen.getByRole("heading", { level: 2, name: "Dataset upload" })).toBeInTheDocument();
+    const managementSection = screen
+      .getByRole("heading", { level: 2, name: "Dataset management" })
+      .closest("section");
+    const profileSection = screen
+      .getByRole("heading", { level: 2, name: "Active dataset profile" })
+      .closest("section");
+
+    expect(managementSection).not.toBeNull();
+    expect(profileSection).not.toBeNull();
     expect(
-      screen.getByText("Drag and drop CSV files here, or choose files from your device."),
+      within(managementSection as HTMLElement).getByText("No datasets available yet."),
     ).toBeInTheDocument();
-    expect(screen.getByText("Select files")).toBeInTheDocument();
+    expect(
+      within(profileSection as HTMLElement).getByText("No active dataset selected."),
+    ).toBeInTheDocument();
+    expect(within(managementSection as HTMLElement).queryByRole("button", { name: "Activate" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add URL dataset" })).toBeInTheDocument();
+  });
+
+  it("shows streaming progress while a query is in flight", async () => {
+    const user = userEvent.setup();
+
+    renderPage();
+
+    act(() => {
+      socket.emitConnection(true);
+    });
+
+    await user.type(
+      screen.getByRole("textbox", { name: "SQL query" }),
+      "SELECT * FROM sales",
+    );
+    await user.click(screen.getByRole("button", { name: "Stream" }));
+
+    act(() => {
+      socket.emitProgress({
+        percent: 42,
+        label: "Fetching batches",
+      });
+    });
+
+    expect(screen.getByLabelText("WebSocket connected")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Streaming..." })).toBeDisabled();
+    expect(screen.getByRole("progressbar", { name: "Streaming progress" })).toHaveAttribute(
+      "aria-valuenow",
+      "42",
+    );
+  });
+
+  it("surfaces streaming errors as alerts", async () => {
+    const user = userEvent.setup();
+
+    renderPage();
+
+    act(() => {
+      socket.emitConnection(true);
+    });
+
+    await user.type(
+      screen.getByRole("textbox", { name: "SQL query" }),
+      "SELECT * FROM broken_table",
+    );
+    await user.click(screen.getByRole("button", { name: "Stream" }));
+
+    act(() => {
+      socket.emitMessage({
+        type: "error",
+        message: "Failed to fetch streamed rows.",
+      });
+    });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Failed to fetch streamed rows.",
+    );
+    expect(screen.getByRole("button", { name: "Stream" })).toBeEnabled();
+  });
+
+  it("submits a query and renders streamed rows in the results table", async () => {
+    const user = userEvent.setup();
+
+    renderPage();
+
+    act(() => {
+      socket.emitConnection(true);
+    });
+
+    await user.type(
+      screen.getByRole("textbox", { name: "SQL query" }),
+      "SELECT id, region FROM sales LIMIT 2",
+    );
+    await user.click(screen.getByRole("button", { name: "Stream" }));
+
+    act(() => {
+      socket.emitMessage({
+        type: "rows",
+        rows: [
+          { id: 1, region: "East" },
+          { id: 2, region: "West" },
+        ],
+      });
+      socket.emitMessage({ status: "done" });
+    });
+
+    const resultsTable = await screen.findByRole("table");
+
+    expect(within(resultsTable).getByRole("columnheader", { name: "id" })).toBeInTheDocument();
+    expect(within(resultsTable).getByRole("columnheader", { name: "region" })).toBeInTheDocument();
+    expect(within(resultsTable).getAllByRole("row")).toHaveLength(3);
+    expect(screen.getByRole("button", { name: "Stream" })).toBeEnabled();
   });
 });
