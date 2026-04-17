@@ -36,7 +36,6 @@ import {
   FIELD_CLASS,
   GLASS_CARD_CLASS,
   GLASS_PANEL_CLASS,
-  isRecord,
   dataUrlToBytes,
   quoteIdentifier,
   toCount,
@@ -86,21 +85,26 @@ interface CohortResult {
   error: string | null;
 }
 
-type BackendCohortCell =
-  | number
-  | string
-  | {
-      cohort_size?: unknown;
-      active_entities?: unknown;
-      retention_rate?: unknown;
-      metric_value?: unknown;
-      metric?: unknown;
-      value?: unknown;
-    };
+interface BackendCohortRow {
+  cohort_period: string;
+  period_index: number;
+  cohort_size: number;
+  retained_users: number;
+  retention_rate: number;
+}
+
+interface BackendCohortSummary {
+  cohort_period: string;
+  cohort_size: number;
+  max_period_index: number;
+  first_period_retention: number | null;
+}
 
 interface BackendCohortResponse {
-  cohorts: Record<string, Record<string, BackendCohortCell>>;
-  periods: string[];
+  total_users: number;
+  cohort_count: number;
+  retention_rows: BackendCohortRow[];
+  summaries: BackendCohortSummary[];
 }
 
 function buildCohortModeLabel(aggregation: CohortAggregation) {
@@ -129,78 +133,34 @@ function buildBackendError(
   };
 }
 
-function toBackendNumber(value: unknown): number {
-  return toNumber(
-    isRecord(value)
-      ? value.retention_rate ?? value.metric_value ?? value.metric ?? value.value
-      : value,
-  ) ?? 0;
-}
-
-function toBackendActiveCount(value: unknown): number {
-  return toCount(
-    isRecord(value) ? value.active_entities ?? value.cohort_size : value,
-  );
-}
-
 function normalizeBackendResult(
   response: BackendCohortResponse,
-  aggregation: CohortAggregation,
   entityColumn: string | null,
+  granularity: CohortGranularity,
 ): CohortResult {
-  const periods = response.periods.filter((value) => typeof value === "string");
-  const cells = Object.entries(response.cohorts).flatMap((entry) => {
-    const [cohortBucket, periodValues] = entry;
-    const parsedCohortBucket = String(cohortBucket);
+  const cells = response.retention_rows.flatMap((row) => {
+    const cohortBucket = String(row.cohort_period ?? "");
+    const periodIndex = toCount(row.period_index);
+    const cohortSize = Math.max(1, toCount(row.cohort_size));
+    const retainedUsers = toCount(row.retained_users);
+    const retentionRate = toNumber(row.retention_rate) ?? 0;
 
-    if (!parsedCohortBucket || !isRecord(periodValues)) {
+    if (!cohortBucket) {
       return [];
     }
 
-    return Object.entries(periodValues).flatMap(([periodKey, rawValue]) => {
-      const parsedPeriod = Number(periodKey);
-      const fallbackPeriod = Number(periodKey.replace(/\D+/g, ""));
-      const periodIndex = Number.isFinite(parsedPeriod)
-        ? parsedPeriod
-        : Number.isFinite(fallbackPeriod)
-          ? fallbackPeriod
-          : periods.indexOf(periodKey);
-
-      if (periodIndex < 0) {
-        return [];
-      }
-
-      const metricValue = toBackendNumber(rawValue);
-      const retentionRate =
-        aggregation === "count"
-          ? toBackendNumber(
-              isRecord(rawValue)
-                ? {
-                    retention_rate:
-                      rawValue.retention_rate ?? rawValue.value ?? rawValue.metric_value,
-                    metric_value: rawValue.metric_value,
-                    metric: rawValue.metric,
-                    value: rawValue.value,
-                  }
-                : metricValue,
-            )
-          : 0;
-      const active = toBackendActiveCount(rawValue);
-      const cohortSize = toBackendActiveCount(rawValue) || toBackendNumber(rawValue);
-
-      return {
-        cohortLabel: formatCohortLabel(parsedCohortBucket),
-        cohortBucket: parsedCohortBucket,
+    return [
+      {
+        cohortLabel: formatCohortLabel(cohortBucket),
+        cohortBucket,
         periodIndex,
-        periodLabel:
-          periods[periodIndex] ??
-          `${parsedPeriod >= 0 ? "Period" : "Offset"} ${periodIndex}`,
-        metricValue,
-        activeEntities: active,
-        cohortSize: Math.max(1, cohortSize),
-        retentionRate: aggregation === "count" ? retentionRate : 0,
-      };
-    });
+        periodLabel: periodLabel(granularity, periodIndex),
+        metricValue: retainedUsers,
+        activeEntities: retainedUsers,
+        cohortSize,
+        retentionRate,
+      },
+    ];
   });
 
   const orderedCohorts = Array.from(new Set(cells.map((cell) => cell.cohortLabel))).sort(
@@ -208,27 +168,18 @@ function normalizeBackendResult(
   );
   const orderedPeriods = Array.from(new Set(cells.map((cell) => cell.periodLabel))).sort(
     (left, right) => {
-      const leftIndex = periods.indexOf(left);
-      const rightIndex = periods.indexOf(right);
-      if (leftIndex !== -1 && rightIndex !== -1) {
-        return leftIndex - rightIndex;
-      }
-
-      const parsePeriod = (value: string): number => {
-        const candidate = Number(value.replace(/\D+/g, ""));
-        return Number.isFinite(candidate) ? candidate : 0;
-      };
-
+      const parsePeriod = (value: string) => Number(value.split(" ").at(-1) ?? "0");
       return parsePeriod(left) - parsePeriod(right);
     },
   );
 
-  const matrixMax = Math.max(
-    ...cells.map((cell) =>
-      aggregation === "count" ? cell.retentionRate : cell.metricValue,
-    ),
-    1,
-  );
+  const matrixMax = Math.max(...cells.map((cell) => cell.retentionRate), 1);
+  const totalEntities = response.summaries.length > 0
+    ? response.summaries.reduce(
+        (sum, summary) => sum + toCount(summary.cohort_size),
+        0,
+      )
+    : toCount(response.total_users);
 
   return {
     entityColumn,
@@ -236,15 +187,9 @@ function normalizeBackendResult(
     periods: orderedPeriods,
     cohorts: orderedCohorts,
     matrixMax,
-    totalEntities: Array.from(
-      new Map(
-        cells
-          .filter((cell) => cell.periodIndex === 0)
-          .map((cell) => [cell.cohortBucket, cell.cohortSize]),
-      ).values(),
-    ).reduce((sum, value) => sum + value, 0),
-    cohortCount: orderedCohorts.length,
-    modeLabel: buildCohortModeLabel(aggregation),
+    totalEntities,
+    cohortCount: response.summaries.length || toCount(response.cohort_count),
+    modeLabel: buildCohortModeLabel("count"),
     error: cells.length === 0 ? "No cohort rows were returned from backend." : null,
   };
 }
@@ -717,7 +662,7 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
     }
 
     try {
-      if (useBackend && !backendFailed) {
+      if (useBackend && !backendFailed && safeAggregation === "count") {
         try {
           const rows = await runQuery(`
             SELECT
@@ -749,19 +694,12 @@ function CohortAnalysisReady({ tableName, columns }: CohortAnalysisProps) {
             recordData,
             safeDateColumn,
             userIdColumn ?? "user_id",
+            granularity === "week" ? "weekly" : "monthly",
           );
-          // Convert API CohortResult to component CohortResult
-          const periods = Object.keys(
-            Object.values(response.cohorts)[0] ?? {},
-          ).sort();
-          const adaptedResponse: BackendCohortResponse = {
-            cohorts: response.cohorts,
-            periods,
-          };
           const nextResult = normalizeBackendResult(
-            adaptedResponse,
-            safeAggregation,
+            response,
             userIdColumn ?? null,
+            granularity,
           );
           startTransition(() => {
             setResult(nextResult);

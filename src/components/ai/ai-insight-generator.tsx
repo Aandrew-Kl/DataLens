@@ -239,11 +239,11 @@ export default function AIInsightGenerator({
           const result = await summarize(data as Record<string, unknown>[], [textColumn]);
           startTransition(() => {
             const backendSections: InsightSection[] = [];
-            if (result.summary) {
+            if (result.summary_text) {
               backendSections.push({
                 category: "trends",
                 title: "Summary",
-                bullets: [result.summary],
+                bullets: [result.summary_text],
               });
             }
             if (result.top_terms.length > 0) {

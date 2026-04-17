@@ -85,11 +85,11 @@ describe("api client", () => {
     useAuthStore.getState().setToken("secret-token");
 
     await expect(
-      request("POST", "/api/v1/items", { id: 1, name: "alpha" }),
+      request("POST", "/api/items", { id: 1, name: "alpha" }),
     ).resolves.toEqual(responseBody);
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:8000/api/v1/items",
+      "http://localhost:8000/api/items",
       expect.objectContaining({
         method: "POST",
         headers: {
@@ -114,7 +114,7 @@ describe("api client", () => {
     const { request, ApiError, useAuthStore } = await loadClient();
     useAuthStore.getState().setToken("expired-token");
 
-    const protectedRequest = request("GET", "/api/v1/protected");
+    const protectedRequest = request("GET", "/api/protected");
 
     await expect(protectedRequest).rejects.toBeInstanceOf(ApiError);
     await expect(protectedRequest).rejects.toMatchObject({
@@ -145,7 +145,7 @@ describe("api client", () => {
 
     const { request, ApiError } = await loadClient();
 
-    const invalidRequest = request("POST", "/api/v1/items", { bad: true });
+    const invalidRequest = request("POST", "/api/items", { bad: true });
 
     await expect(invalidRequest).rejects.toBeInstanceOf(ApiError);
     await expect(invalidRequest).rejects.toMatchObject({
@@ -155,7 +155,7 @@ describe("api client", () => {
       body: { detail: "Validation failed" },
     });
 
-    const fallbackErrorRequest = request("GET", "/api/v1/fallback-error");
+    const fallbackErrorRequest = request("GET", "/api/fallback-error");
 
     await expect(fallbackErrorRequest).rejects.toBeInstanceOf(ApiError);
     await expect(fallbackErrorRequest).rejects.toMatchObject({
@@ -174,10 +174,10 @@ describe("api client", () => {
 
     const file = new File(["hello"], "example.txt", { type: "text/plain" });
 
-    await expect(uploadFile("/api/v1/files", file)).resolves.toEqual(responseBody);
+    await expect(uploadFile("/api/files", file)).resolves.toEqual(responseBody);
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://uploads.example.com/api/v1/files",
+      "https://uploads.example.com/api/files",
       expect.objectContaining({
         method: "POST",
         headers: {
@@ -209,7 +209,7 @@ describe("api client", () => {
 
     const { request } = await loadClient();
 
-    const requestPromise = request("GET", "/api/v1/retry-me");
+    const requestPromise = request("GET", "/api/retry-me");
     await jest.runAllTimersAsync();
 
     await expect(requestPromise).resolves.toEqual({ ok: true });
@@ -233,7 +233,7 @@ describe("api client", () => {
 
     const { request, ApiError } = await loadClient();
 
-    const requestPromise = request("GET", "/api/v1/slow", undefined, {
+    const requestPromise = request("GET", "/api/slow", undefined, {
       timeoutMs: 10,
     }).catch((error) => error);
     await jest.runAllTimersAsync();

@@ -382,7 +382,7 @@ export default function AnomalyDetector({
         const recordData = samples.map((s) => ({ [activeColumn]: s.value }));
         const backendResult = await anomalyDetect(recordData, [activeColumn]);
         const scoredRows = samples.map<MetricRow>((sample, index) => {
-          const score = Number(backendResult.scores[index]);
+          const score = Number(backendResult.anomaly_scores[index]);
           const resolvedScore = Number.isFinite(score) ? Math.abs(score) : 0;
 
           return {

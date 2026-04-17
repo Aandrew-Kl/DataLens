@@ -16,31 +16,44 @@ describe("ai API", () => {
     {
       name: "sentiment",
       invoke: () => sentiment(["The dashboard is excellent", "The export failed"]),
-      path: "/api/v1/ai/sentiment",
+      path: "/api/ai/sentiment",
       payload: {
-        texts: ["The dashboard is excellent", "The export failed"],
+        data: [
+          { text: "The dashboard is excellent" },
+          { text: "The export failed" },
+        ],
+        text_column: "text",
       },
       response: {
-        results: [
-          { text: "The dashboard is excellent", polarity: 0.8, subjectivity: 0.4, label: "positive" },
-          { text: "The export failed", polarity: -0.7, subjectivity: 0.6, label: "negative" },
+        text_column: "text",
+        row_count: 2,
+        aggregate: {
+          mean_polarity: 0.05,
+          median_polarity: 0.05,
+          mean_subjectivity: 0.5,
+          positive_share: 0.5,
+          negative_share: 0.5,
+        },
+        rows: [
+          { row_index: 0, text: "The dashboard is excellent", polarity: 0.8, subjectivity: 0.4, label: "positive" },
+          { row_index: 1, text: "The export failed", polarity: -0.7, subjectivity: 0.6, label: "negative" },
         ],
-        avg_polarity: 0.05,
-        avg_subjectivity: 0.5,
+        top_terms: [{ term: "dashboard", score: 0.8 }],
       },
     },
     {
       name: "summarize",
       invoke: () => summarize([{ region: "EMEA", revenue: 120 }], ["region", "revenue"]),
-      path: "/api/v1/ai/summarize",
+      path: "/api/ai/summarize",
       payload: {
         data: [{ region: "EMEA", revenue: 120 }],
-        columns: ["region", "revenue"],
+        text_columns: ["region", "revenue"],
       },
       response: {
-        summary: "Revenue is concentrated in EMEA.",
+        dataset_id: 0,
+        summary_text: "Revenue is concentrated in EMEA.",
         top_terms: [{ term: "EMEA", score: 0.93 }],
-        stats: { revenue: { mean: 120, min: 120, max: 120 } },
+        key_statistics: { revenue: { mean: 120, min: 120, max: 120 } },
       },
     },
     {
@@ -50,7 +63,7 @@ describe("ai API", () => {
           { name: "region", type: "text" },
           { name: "revenue", type: "number" },
         ]),
-      path: "/api/v1/ai/generate-query",
+      path: "/api/ai/generate-query",
       payload: {
         question: "Show revenue by region",
         table_name: "sales",

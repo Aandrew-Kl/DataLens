@@ -151,7 +151,7 @@ export default function SentimentAnalyzer({ tableName, columns }: SentimentAnaly
 
       const apiResult = await sentiment(values);
 
-      const sentimentRows: SentimentRow[] = apiResult.results.map((item) => ({
+      const sentimentRows: SentimentRow[] = apiResult.rows.map((item) => ({
         text: item.text,
         score: item.polarity,
         label:
@@ -170,7 +170,7 @@ export default function SentimentAnalyzer({ tableName, columns }: SentimentAnaly
 
       // Extract top sentiment words from the analyzed texts by frequency
       const wordCounts = new Map<string, SentimentWord>();
-      for (const item of apiResult.results) {
+      for (const item of apiResult.rows) {
         if (item.label === "positive" || item.label === "negative") {
           const tone = item.label as "positive" | "negative";
           const tokens = item.text
@@ -194,9 +194,10 @@ export default function SentimentAnalyzer({ tableName, columns }: SentimentAnaly
         .slice(0, 8);
 
       const nextResult: LocalSentimentResult = { rows: sentimentRows, counts, topWords };
+      const meanPolarity = Number(apiResult.aggregate.mean_polarity ?? 0);
       setResult(nextResult);
       setStatus(
-        `Scored ${formatNumber(nextResult.rows.length)} text rows across positive, neutral, and negative tones (avg polarity: ${apiResult.avg_polarity.toFixed(2)}).`,
+        `Scored ${formatNumber(nextResult.rows.length)} text rows across positive, neutral, and negative tones (avg polarity: ${meanPolarity.toFixed(2)}).`,
       );
     } catch (analysisError) {
       if (

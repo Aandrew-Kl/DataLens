@@ -21,37 +21,69 @@ describe("analytics API", () => {
     {
       name: "churnPredict",
       invoke: () => churnPredict(data, ["retained", "revenue"], "retained"),
-      path: "/api/v1/analytics/churn-predict",
+      path: "/api/analytics/churn-predict",
       payload: {
         data,
-        features: ["retained", "revenue"],
-        target: "retained",
+        feature_columns: ["retained", "revenue"],
+        target_column: "retained",
       },
       response: {
-        risk_scores: [0.12, 0.88],
+        row_count: 2,
+        metrics: {
+          accuracy: 0.89,
+          precision: 0.86,
+          recall: 0.9,
+          f1: 0.88,
+        },
+        risk_scores: [12, 88],
         feature_importance: { revenue: 0.7, retained: 0.3 },
-        accuracy: 0.89,
+        predictions: ["false", "true"],
       },
     },
     {
       name: "cohortAnalysis",
       invoke: () => cohortAnalysis(data, "signup_date", "user_id"),
-      path: "/api/v1/analytics/cohort",
+      path: "/api/analytics/cohort",
       payload: {
         data,
-        date_column: "signup_date",
-        user_column: "user_id",
+        entity_id_column: "user_id",
+        signup_date_column: "signup_date",
+        activity_date_column: "signup_date",
+        frequency: "monthly",
       },
       response: {
-        cohorts: {
-          "2026-01": { "0": 2, "1": 1 },
-        },
+        total_users: 2,
+        cohort_count: 1,
+        retention_rows: [
+          {
+            cohort_period: "2026-01",
+            period_index: 0,
+            cohort_size: 2,
+            retained_users: 2,
+            retention_rate: 100,
+          },
+          {
+            cohort_period: "2026-01",
+            period_index: 1,
+            cohort_size: 2,
+            retained_users: 1,
+            retention_rate: 50,
+          },
+        ],
+        summaries: [
+          {
+            cohort_period: "2026-01",
+            cohort_size: 2,
+            max_period_index: 1,
+            first_period_retention: 50,
+          },
+        ],
       },
     },
     {
       name: "abTest",
       invoke: () => abTest([1.2, 1.5, 1.7], [1.8, 2.1, 2.3]),
-      path: "/api/v1/analytics/ab-test",
+      path: "/api/analytics/ab-test",
       payload: {
         control: [1.2, 1.5, 1.7],
         treatment: [1.8, 2.1, 2.3],
@@ -66,7 +98,7 @@ describe("analytics API", () => {
     {
       name: "forecast",
       invoke: () => forecast(data, "signup_date", "revenue", 6),
-      path: "/api/v1/analytics/forecast",
+      path: "/api/analytics/forecast",
       payload: {
         data,
         date_column: "signup_date",

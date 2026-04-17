@@ -139,8 +139,16 @@ describe("RegisterForm", () => {
   it("submits registration successfully, shows confirmation, and redirects", async () => {
     const user = userEvent.setup();
     mockRegister.mockResolvedValue({
+      id: "user-123",
+      email: "new-user@example.com",
+      created_at: "2026-04-18T00:00:00Z",
       access_token: "token-123",
       token_type: "bearer",
+      user: {
+        id: "user-123",
+        email: "new-user@example.com",
+        created_at: "2026-04-18T00:00:00Z",
+      },
     });
 
     render(<RegisterForm redirectTo="/workspace" />);

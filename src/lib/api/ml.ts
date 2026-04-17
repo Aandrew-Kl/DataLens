@@ -7,7 +7,12 @@ export async function regression(
   features: string[],
   method: string = "linear",
 ): Promise<RegressionResult> {
-  return request<RegressionResult>("POST", "/api/v1/ml/regression", { data, target, features, method });
+  return request<RegressionResult>("POST", "/api/ml/regression", {
+    data,
+    feature_columns: features,
+    target_column: target,
+    algorithm: method,
+  });
 }
 
 export async function cluster(
@@ -16,7 +21,12 @@ export async function cluster(
   method: string = "kmeans",
   n_clusters: number = 3,
 ): Promise<ClusterResult> {
-  return request<ClusterResult>("POST", "/api/v1/ml/cluster", { data, features, method, n_clusters });
+  return request<ClusterResult>("POST", "/api/ml/cluster", {
+    data,
+    feature_columns: features,
+    algorithm: method,
+    n_clusters,
+  });
 }
 
 export async function classify(
@@ -25,7 +35,12 @@ export async function classify(
   features: string[],
   method: string = "random_forest",
 ): Promise<ClassificationResult> {
-  return request<ClassificationResult>("POST", "/api/v1/ml/classify", { data, target, features, method });
+  return request<ClassificationResult>("POST", "/api/ml/classify", {
+    data,
+    feature_columns: features,
+    target_column: target,
+    algorithm: method,
+  });
 }
 
 export async function anomalyDetect(
@@ -34,7 +49,12 @@ export async function anomalyDetect(
   method: string = "isolation_forest",
   contamination: number = 0.1,
 ): Promise<AnomalyResult> {
-  return request<AnomalyResult>("POST", "/api/v1/ml/anomaly-detect", { data, features, method, contamination });
+  return request<AnomalyResult>("POST", "/api/ml/anomaly-detect", {
+    data,
+    feature_columns: features,
+    algorithm: method,
+    contamination,
+  });
 }
 
 export async function pca(
@@ -42,5 +62,9 @@ export async function pca(
   features: string[],
   n_components: number = 2,
 ): Promise<PCAResult> {
-  return request<PCAResult>("POST", "/api/v1/ml/pca", { data, features, n_components });
+  return request<PCAResult>("POST", "/api/ml/pca", {
+    data,
+    feature_columns: features,
+    n_components,
+  });
 }

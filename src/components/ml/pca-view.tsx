@@ -356,19 +356,25 @@ export default function PCAView({ tableName, columns }: PCAViewProps): ReactNode
             return record;
           });
           const result = await pca(recordData, numericFeatures, nComponents);
+          const firstComponent = result.loadings.find(
+            (loading) => loading.component === "PC1",
+          );
+          const secondComponent = result.loadings.find(
+            (loading) => loading.component === "PC2",
+          );
           const nextResult: PCAResult = {
-            rowCount: recordData.length,
+            rowCount: result.row_count,
             selectedColumns: numericFeatures,
-            varianceRatios: result.explained_variance,
-            scores: result.transformed.map((row, rowIndex) => ({
+            varianceRatios: result.explained_variance_ratio,
+            scores: result.transformed_data.map((row, rowIndex) => ({
               rowIndex: rowIndex + 1,
               pc1: row[0] ?? 0,
               pc2: row[1] ?? 0,
             })),
-            loadings: numericFeatures.map((column, index) => ({
+            loadings: numericFeatures.map((column) => ({
               column,
-              pc1: result.loadings[0]?.[index] ?? 0,
-              pc2: result.loadings[1]?.[index] ?? 0,
+              pc1: Number(firstComponent?.[column] ?? 0),
+              pc2: Number(secondComponent?.[column] ?? 0),
             })),
           };
 

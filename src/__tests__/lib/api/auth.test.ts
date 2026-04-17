@@ -24,7 +24,7 @@ describe("auth API", () => {
 
     await expect(login("person@example.com", "secret")).resolves.toEqual(authToken);
 
-    expect(mockedRequest).toHaveBeenCalledWith("POST", "/api/v1/auth/login", {
+    expect(mockedRequest).toHaveBeenCalledWith("POST", "/api/auth/login", {
       email: "person@example.com",
       password: "secret",
     });
@@ -33,15 +33,23 @@ describe("auth API", () => {
   });
 
   test("register sends the correct payload and stores the returned token", async () => {
-    const authToken = {
+    const registerResponse = {
+      id: "user-123",
+      email: "new@example.com",
+      created_at: "2026-04-18T00:00:00Z",
       access_token: "register-token",
       token_type: "bearer",
+      user: {
+        id: "user-123",
+        email: "new@example.com",
+        created_at: "2026-04-18T00:00:00Z",
+      },
     };
-    mockedRequest.mockResolvedValue(authToken);
+    mockedRequest.mockResolvedValue(registerResponse);
 
-    await expect(register("new@example.com", "new-secret")).resolves.toEqual(authToken);
+    await expect(register("new@example.com", "new-secret")).resolves.toEqual(registerResponse);
 
-    expect(mockedRequest).toHaveBeenCalledWith("POST", "/api/v1/auth/register", {
+    expect(mockedRequest).toHaveBeenCalledWith("POST", "/api/auth/register", {
       email: "new@example.com",
       password: "new-secret",
     });
@@ -59,7 +67,7 @@ describe("auth API", () => {
 
     await expect(getMe()).resolves.toEqual(me);
 
-    expect(mockedRequest).toHaveBeenCalledWith("GET", "/api/v1/auth/me");
+    expect(mockedRequest).toHaveBeenCalledWith("GET", "/api/auth/me");
   });
 
   test("logout clears the current token", () => {
@@ -73,8 +81,8 @@ describe("auth API", () => {
   });
 
   test.each([
-    { name: "login", action: login, path: "/api/v1/auth/login" },
-    { name: "register", action: register, path: "/api/v1/auth/register" },
+    { name: "login", action: login, path: "/api/auth/login" },
+    { name: "register", action: register, path: "/api/auth/register" },
   ])("propagates $name error responses without persisting a token", async ({ action, path }) => {
     const error = {
       status: 400,

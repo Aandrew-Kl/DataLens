@@ -430,7 +430,7 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
 
           setCoefficients(nextCoefficients);
           setSamples(nextSamples);
-          setRSquared(apiResult.r2);
+          setRSquared(apiResult.metrics.r2);
           setAnova({
             sst,
             ssr,
