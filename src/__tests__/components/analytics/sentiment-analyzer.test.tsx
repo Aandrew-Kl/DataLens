@@ -14,9 +14,25 @@ jest.mock("@/lib/duckdb/client", () => ({
 
 jest.mock("@/lib/api/ai", () => ({
   sentiment: jest.fn().mockResolvedValue({
-    label: "Positive",
-    score: 0.9,
-    confidence: 0.95,
+    text_column: "text",
+    row_count: 1,
+    aggregate: {
+      mean_polarity: 0.9,
+      median_polarity: 0.9,
+      mean_subjectivity: 0.95,
+      positive_share: 1,
+      negative_share: 0,
+    },
+    rows: [
+      {
+        row_index: 0,
+        text: "hello",
+        polarity: 0.9,
+        subjectivity: 0.95,
+        label: "positive",
+      },
+    ],
+    top_terms: [{ term: "hello", score: 0.9 }],
   }),
 }));
 

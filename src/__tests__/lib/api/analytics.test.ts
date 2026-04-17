@@ -24,13 +24,20 @@ describe("analytics API", () => {
       path: "/api/v1/analytics/churn-predict",
       payload: {
         data,
-        features: ["retained", "revenue"],
-        target: "retained",
+        feature_columns: ["retained", "revenue"],
+        target_column: "retained",
       },
       response: {
-        risk_scores: [0.12, 0.88],
+        row_count: 2,
+        metrics: {
+          accuracy: 0.89,
+          precision: 0.86,
+          recall: 0.9,
+          f1: 0.88,
+        },
+        risk_scores: [12, 88],
         feature_importance: { revenue: 0.7, retained: 0.3 },
-        accuracy: 0.89,
+        predictions: ["false", "true"],
       },
     },
     {
@@ -39,13 +46,38 @@ describe("analytics API", () => {
       path: "/api/v1/analytics/cohort",
       payload: {
         data,
-        date_column: "signup_date",
-        user_column: "user_id",
+        entity_id_column: "user_id",
+        signup_date_column: "signup_date",
+        activity_date_column: "signup_date",
+        frequency: "monthly",
       },
       response: {
-        cohorts: {
-          "2026-01": { "0": 2, "1": 1 },
-        },
+        total_users: 2,
+        cohort_count: 1,
+        retention_rows: [
+          {
+            cohort_period: "2026-01",
+            period_index: 0,
+            cohort_size: 2,
+            retained_users: 2,
+            retention_rate: 100,
+          },
+          {
+            cohort_period: "2026-01",
+            period_index: 1,
+            cohort_size: 2,
+            retained_users: 1,
+            retention_rate: 50,
+          },
+        ],
+        summaries: [
+          {
+            cohort_period: "2026-01",
+            cohort_size: 2,
+            max_period_index: 1,
+            first_period_retention: 50,
+          },
+        ],
       },
     },
     {

@@ -424,15 +424,11 @@ export default function ClassificationView({
             "random_forest",
           );
 
-          const labels = Array.from(
-            { length: apiResult.confusion_matrix.length },
-            (_, index) => String(index),
-          );
-
-          const predictions: PredictionRow[] = rawSamples.slice(0, apiResult.confusion_matrix.flatMap((row) => row).reduce((a, b) => a + b, 0)).map((row) => ({
-            actual: String(row[activeTargetColumn] ?? ""),
-            predicted: String(row[activeTargetColumn] ?? ""),
-            correct: true,
+          const labels = apiResult.class_labels;
+          const predictions: PredictionRow[] = apiResult.predictions.map((predicted) => ({
+            actual: "",
+            predicted: String(predicted),
+            correct: false,
           }));
 
           startTransition(() => {
@@ -440,12 +436,12 @@ export default function ClassificationView({
               labels,
               predictions,
               confusion: apiResult.confusion_matrix,
-              accuracy: apiResult.accuracy,
-              precision: apiResult.precision,
-              recall: apiResult.recall,
+              accuracy: apiResult.metrics.accuracy,
+              precision: apiResult.metrics.precision,
+              recall: apiResult.metrics.recall,
             });
             setStatus(
-              `Classification completed with ${formatPercent(apiResult.accuracy * 100, 1)} accuracy (server-side).`,
+              `Classification completed with ${formatPercent(apiResult.metrics.accuracy * 100, 1)} accuracy across ${formatNumber(apiResult.predictions.length)} holdout predictions (server-side).`,
             );
           });
           return;

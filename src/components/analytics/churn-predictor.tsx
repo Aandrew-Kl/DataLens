@@ -181,7 +181,7 @@ async function computeChurnSnapshot(rows: Record<string, unknown>[]): Promise<Ch
   const users = userRecords
     .map<ChurnUserRow>((record, index) => {
       const riskScore = Math.round(
-        Math.min(100, Math.max(0, (apiResult.risk_scores[index] ?? 0) * 100)),
+        Math.min(100, Math.max(0, apiResult.risk_scores[index] ?? 0)),
       );
       const band = bandForRisk(riskScore);
 
