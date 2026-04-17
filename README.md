@@ -122,13 +122,25 @@ MIT — see [LICENSE](LICENSE). Use it, fork it, embed it, ship it.
 
 ## Screenshots
 
-> Screenshots and demo GIF coming with the v1.0 release.
+### SQL editor
+![SQL editor with query and results](docs-site/public/images/screenshots/01-sql-editor.png)
+Analytical SQL runs directly in the browser via DuckDB-WASM — no backend round-trip.
 
-- Hero: SQL editor + chart in the browser
-- AI assistant: NL → SQL with local Ollama
-- Dashboard builder: drag-and-drop multi-chart layouts
-- ML workflow: clustering and regression UIs
-- Architecture diagram: browser-first data flow
+### Chart builder
+![Chart builder](docs-site/public/images/screenshots/02-chart-builder.png)
+40+ chart types with a point-and-click builder on top of any query result.
+
+### Dashboard
+![Dashboard with multiple charts](docs-site/public/images/screenshots/03-dashboard.png)
+Compose multi-chart dashboards with saved layouts.
+
+### AI assistant
+![AI assistant converting natural language to SQL](docs-site/public/images/screenshots/04-ai-assistant.png)
+Natural-language → SQL via local Ollama. Nothing leaves your machine.
+
+### First-run experience
+![Sample datasets gallery](docs-site/public/images/screenshots/05-sample-gallery.png)
+Three realistic sample datasets pre-loaded for instant exploration.
 
 ---
 
