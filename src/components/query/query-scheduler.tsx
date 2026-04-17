@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -165,11 +166,6 @@ function readHistory() {
     return [];
   }
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function stripTrailingSemicolon(sql: string) {
   return sql.trim().replace(/;+$/, "");
 }

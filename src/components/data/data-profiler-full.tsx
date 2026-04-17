@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import {
   Suspense,
   startTransition,
@@ -112,11 +113,6 @@ function getDarkModeSnapshot() {
 function useDarkMode() {
   return useSyncExternalStore(subscribeDarkMode, getDarkModeSnapshot, () => false);
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function truncate(value: string, max = 28) {
   return value.length > max ? `${value.slice(0, max - 1)}…` : value;
 }

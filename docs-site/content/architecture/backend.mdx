@@ -1,0 +1,45 @@
+---
+title: Backend
+description: Review the FastAPI service, persistence layer, and server-side analytics responsibilities.
+---
+
+# Backend
+
+The backend is a FastAPI application backed by PostgreSQL and Alembic migrations.
+
+## Core Responsibilities
+
+- user registration, login, and bearer-token validation
+- dataset metadata persistence
+- machine learning and analytics endpoints
+- AI endpoints that broker local Ollama access
+- operational middleware for security headers, rate limiting, request IDs, and metrics
+
+## Key Route Groups
+
+- `/auth`
+- `/datasets`
+- `/ai`
+- `/ml`
+- `/analytics`
+
+## Persistence and Runtime
+
+- PostgreSQL stores users, datasets, and other durable backend records.
+- SQLAlchemy manages async database access.
+- Alembic applies schema migrations.
+- FastAPI auto-generates OpenAPI docs for the service.
+
+## Rate limits
+
+| Endpoint | Limit | Key |
+|---|---|---|
+| POST /auth/login | 5/min | IP |
+| POST /auth/register | 3/min | IP |
+| POST /ai/* | 20/min | User |
+| POST /ml/train | 5/min | User |
+| POST /ml/* | 10/min | User |
+| GET /* | 60/min | User or IP |
+| /health, /metrics | — | exempt |
+
+When the API returns `429 Too Many Requests`, clients should back off and honor the `Retry-After` response header before retrying.

@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Download, RotateCcw, Save, Wand2 } from "lucide-react";
@@ -20,11 +21,6 @@ interface RenameItem {
 const GLASS_PANEL =
   "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
 const PANEL_EASE = [0.22, 1, 0.36, 1] as const;
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function buildInitialDrafts(columns: ColumnProfile[]): Record<string, string> {
   return Object.fromEntries(columns.map((column) => [column.name, column.name]));
 }

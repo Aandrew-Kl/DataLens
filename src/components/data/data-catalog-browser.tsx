@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { startTransition, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -35,11 +36,6 @@ const PANEL_CLASS =
   "border border-white/20 bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 rounded-[1.75rem] shadow-xl shadow-slate-950/10";
 const FIELD_CLASS =
   "rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950/50 dark:text-slate-100";
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function quoteLiteral(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useMemo, useState } from "react";
 import type { EChartsOption } from "echarts";
 import * as echarts from "echarts";
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { formatNumber } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface GeoChartProps {
@@ -52,11 +54,6 @@ const USA_FRAME = {
   type: "FeatureCollection",
   features: [{ type: "Feature", properties: { name: "United States" }, geometry: { type: "Polygon", coordinates: [[[-125, 24], [-66, 24], [-66, 50], [-125, 50], [-125, 24]]] } }],
 } as unknown as Parameters<typeof echarts.registerMap>[1];
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function parseCentroids(value: string) {
   return Object.fromEntries(
     value.split(";").map((item) => {
@@ -236,7 +233,7 @@ export default function GeoChart({ tableName, columns }: GeoChartProps) {
       setLoading(true);
       setMessage(null);
       try {
-        const metric = aggregation === "COUNT" || !valueColumn ? "COUNT(*)" : `${aggregation}(CAST(${quoteIdentifier(valueColumn)} AS DOUBLE))`;
+        const metric = buildMetricExpression(aggregation, valueColumn || undefined, quoteIdentifier);
         const rows =
           activeMode.kind === "coordinates"
             ? await runQuery(`SELECT CAST(${quoteIdentifier(activeMode.longitudeColumn)} AS DOUBLE) AS longitude, CAST(${quoteIdentifier(activeMode.latitudeColumn)} AS DOUBLE) AS latitude, ${metric} AS metric_value FROM ${quoteIdentifier(tableName)} WHERE ${quoteIdentifier(activeMode.latitudeColumn)} IS NOT NULL AND ${quoteIdentifier(activeMode.longitudeColumn)} IS NOT NULL GROUP BY 1, 2 ORDER BY metric_value DESC LIMIT 500`)

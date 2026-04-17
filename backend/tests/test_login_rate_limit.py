@@ -12,14 +12,23 @@ async def test_login_rate_limit_blocks_after_max_attempts(client: AsyncClient) -
     register_resp = await client.post(
         "/auth/register",
         json={"email": email, "password": "CorrectPassword123"},
+        headers={"x-forwarded-for": "10.0.0.1"},
     )
     assert register_resp.status_code == 201
 
-    for _ in range(5):
-        resp = await client.post("/auth/login", json={"email": email, "password": "wrong"})
+    for attempt in range(5):
+        resp = await client.post(
+            "/auth/login",
+            json={"email": email, "password": "wrong"},
+            headers={"x-forwarded-for": f"10.0.1.{attempt}"},
+        )
         assert resp.status_code == 401
 
-    resp = await client.post("/auth/login", json={"email": email, "password": "wrong"})
+    resp = await client.post(
+        "/auth/login",
+        json={"email": email, "password": "wrong"},
+        headers={"x-forwarded-for": "10.0.1.99"},
+    )
     assert resp.status_code == 429
     assert "too many" in resp.json()["detail"].lower()
 
@@ -30,17 +39,37 @@ async def test_successful_login_resets_attempts(client: AsyncClient) -> None:
     email = "reset-test@example.com"
     password = "CorrectPassword123"
 
-    await client.post("/auth/register", json={"email": email, "password": password})
+    await client.post(
+        "/auth/register",
+        json={"email": email, "password": password},
+        headers={"x-forwarded-for": "10.0.0.2"},
+    )
 
-    for _ in range(3):
-        await client.post("/auth/login", json={"email": email, "password": "wrong"})
+    for attempt in range(3):
+        await client.post(
+            "/auth/login",
+            json={"email": email, "password": "wrong"},
+            headers={"x-forwarded-for": f"10.0.2.{attempt}"},
+        )
 
-    resp = await client.post("/auth/login", json={"email": email, "password": password})
+    resp = await client.post(
+        "/auth/login",
+        json={"email": email, "password": password},
+        headers={"x-forwarded-for": "10.0.2.99"},
+    )
     assert resp.status_code == 200
 
-    for _ in range(5):
-        resp = await client.post("/auth/login", json={"email": email, "password": "wrong"})
+    for attempt in range(5):
+        resp = await client.post(
+            "/auth/login",
+            json={"email": email, "password": "wrong"},
+            headers={"x-forwarded-for": f"10.0.3.{attempt}"},
+        )
         assert resp.status_code == 401
 
-    resp = await client.post("/auth/login", json={"email": email, "password": "wrong"})
+    resp = await client.post(
+        "/auth/login",
+        json={"email": email, "password": "wrong"},
+        headers={"x-forwarded-for": "10.0.3.99"},
+    )
     assert resp.status_code == 429

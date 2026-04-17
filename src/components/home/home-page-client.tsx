@@ -54,6 +54,7 @@ import FeatureShowcase from "@/components/home/FeatureShowcase";
 import DataUploadSection from "@/components/home/DataUploadSection";
 import QuickStartGuide from "@/components/home/QuickStartGuide";
 import HomeTabPanels from "@/components/home/HomeTabPanels";
+import SampleDatasetsGallery from "@/components/onboarding/sample-datasets-gallery";
 import type {
   AppTab,
   FileDropResult,
@@ -275,36 +276,42 @@ function DatasetSidebar({
             {datasets.map((dataset) => (
               <div
                 key={dataset.id}
-                onClick={() => setActiveDataset(dataset.id)}
-                className={`group flex cursor-pointer items-center gap-3 rounded-lg border px-2 py-2 transition-colors ${
+                className={`group flex items-center gap-3 rounded-lg border px-2 py-2 transition-colors ${
                   dataset.id === activeDatasetId
                     ? "border-indigo-200/60 bg-indigo-50 dark:border-indigo-800/40 dark:bg-indigo-950/30"
                     : "border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50"
                 }`}
               >
-                <Database
-                  className={`h-3.5 w-3.5 shrink-0 ${
-                    dataset.id === activeDatasetId
-                      ? "text-indigo-500"
-                      : "text-slate-400"
-                  }`}
-                />
-                <div className="min-w-0 flex-1">
-                  <p
-                    className={`truncate text-xs font-medium ${
-                      dataset.id === activeDatasetId
-                        ? "text-indigo-700 dark:text-indigo-300"
-                        : "text-slate-700 dark:text-slate-300"
-                    }`}
-                  >
-                    {dataset.fileName}
-                  </p>
-                  <p className="mt-0.5 text-[10px] text-slate-400 dark:text-slate-500">
-                    {formatNumber(dataset.rowCount)} rows &middot;{" "}
-                    {dataset.columnCount} cols
-                  </p>
-                </div>
                 <button
+                  type="button"
+                  onClick={() => setActiveDataset(dataset.id)}
+                  className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-left"
+                >
+                  <Database
+                    className={`h-3.5 w-3.5 shrink-0 ${
+                      dataset.id === activeDatasetId
+                        ? "text-indigo-500"
+                        : "text-slate-400"
+                    }`}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={`truncate text-xs font-medium ${
+                        dataset.id === activeDatasetId
+                          ? "text-indigo-700 dark:text-indigo-300"
+                          : "text-slate-700 dark:text-slate-300"
+                      }`}
+                    >
+                      {dataset.fileName}
+                    </p>
+                    <p className="mt-0.5 text-[10px] text-slate-400 dark:text-slate-500">
+                      {formatNumber(dataset.rowCount)} rows &middot;{" "}
+                      {dataset.columnCount} cols
+                    </p>
+                  </div>
+                </button>
+                <button
+                  type="button"
                   onClick={(event) => {
                     event.stopPropagation();
                     removeDataset(dataset.id);
@@ -1270,6 +1277,27 @@ export default function HomePageClient() {
                       </div>
 
                       <FileDropzone onFileLoaded={handleFileLoaded} />
+                      <div className="mt-4">
+                        <SampleDatasetsGallery
+                          onDatasetLoaded={async ({
+                            tableName,
+                            fileName,
+                            rowCount,
+                            columnCount,
+                          }) => {
+                            addDataset({
+                              id: generateId(),
+                              name: tableName,
+                              fileName,
+                              rowCount,
+                              columnCount,
+                              columns: [],
+                              uploadedAt: Date.now(),
+                              sizeBytes: 0,
+                            });
+                          }}
+                        />
+                      </div>
 
                       {isLoading && (
                         <div className="mt-4 flex items-center justify-center gap-3 text-sm text-slate-500">

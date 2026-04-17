@@ -1,0 +1,24 @@
+# Sample datasets
+
+Use the built-in CSVs to explore DataLens without preparing your own files. In the app, open the upload flow and click **Load dataset** on any sample card.
+
+## Ecommerce Orders
+
+Seasonal 2024 order volume with five merch categories, discounting behavior, and realistic shipping outcomes.
+
+- Schema: `order_id`, `customer_id`, `order_date`, `country`, `product_category`, `quantity`, `unit_price`, `discount_pct`, `total_amount`, `shipping_status`
+- Example question: Which countries and product categories generated the most revenue, and how did discount rates affect cancellations?
+
+## Stripe Payments
+
+Six months of recurring billing activity with retries, payment failures, and visible plan churn over time.
+
+- Schema: `payment_id`, `created_at`, `amount_cents`, `currency`, `status`, `customer_email_hash`, `card_country`, `plan_name`
+- Example question: Which plans show the highest failed-payment rate by month, and which card countries are driving the most retry volume?
+
+## Web Analytics
+
+Thirty days of session-level traffic, landing pages, referrers, and conversion signals across the core funnel.
+
+- Schema: `session_id`, `timestamp`, `user_id`, `page_path`, `referrer`, `device_type`, `session_duration_sec`, `events_count`, `converted`
+- Example question: Which landing pages convert best by referrer and device type, and where do mobile sessions drop off first?

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" fill="none">
+  <rect width="1280" height="720" rx="32" fill="#0F172A"/>
+  <rect x="56" y="56" width="1168" height="608" rx="28" fill="#111827" stroke="#334155" stroke-width="2"/>
+  <rect x="88" y="96" width="292" height="528" rx="20" fill="#0B1220"/>
+  <rect x="412" y="96" width="772" height="528" rx="20" fill="#020617"/>
+  <text x="128" y="154" fill="#E2E8F0" font-family="Arial, sans-serif" font-size="30" font-weight="700">Chart builder</text>
+  <text x="128" y="214" fill="#94A3B8" font-family="Arial, sans-serif" font-size="22">Type: Bar chart</text>
+  <text x="128" y="258" fill="#94A3B8" font-family="Arial, sans-serif" font-size="22">X-axis: region</text>
+  <text x="128" y="302" fill="#94A3B8" font-family="Arial, sans-serif" font-size="22">Y-axis: total_revenue</text>
+  <text x="128" y="346" fill="#94A3B8" font-family="Arial, sans-serif" font-size="22">Aggregation: SUM</text>
+  <path d="M500 544H1110" stroke="#475569" stroke-width="2"/>
+  <path d="M500 544V164" stroke="#475569" stroke-width="2"/>
+  <rect x="568" y="358" width="88" height="186" rx="12" fill="#38BDF8"/>
+  <rect x="706" y="282" width="88" height="262" rx="12" fill="#22C55E"/>
+  <rect x="844" y="232" width="88" height="312" rx="12" fill="#F59E0B"/>
+  <rect x="982" y="192" width="88" height="352" rx="12" fill="#A855F7"/>
+  <text x="810" y="608" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">Preview chart placeholder</text>
+</svg>

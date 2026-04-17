@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import ChartRenderer from "@/components/charts/chart-renderer";
 import DashboardBuilder from "@/components/charts/dashboard-builder";
+import RouteErrorBoundary from "@/components/workspace/route-error-boundary";
 import { runQuery } from "@/lib/duckdb/client";
 import { sanitizeTableName } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import { useChartStore } from "@/stores/chart-store";
 import { useDatasetStore } from "@/stores/dataset-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -96,7 +98,7 @@ const buildChartQuery = (chart: SavedChartConfig, dataset?: DatasetMeta | null) 
     )} WHERE ${quote(xAxis)} IS NOT NULL AND ${quote(yAxis)} IS NOT NULL LIMIT 500`;
   }
 
-  const metric = `${aggregation.toUpperCase()}(${quote(yAxis)})`;
+  const metric = buildMetricExpression(aggregation, yAxis, quote, { cast: false, preserveCase: true });
 
   if (groupBy) {
     return `SELECT ${quote(xAxis)} AS ${quote(xAxis)}, ${quote(groupBy)} AS ${quote(
@@ -217,125 +219,127 @@ export default function ChartsPage() {
   );
 
   return (
-    <main className="min-h-screen bg-slate-950/30 p-4 md:p-6">
-      <div className="mx-auto max-w-7xl space-y-4">
-        <section className="rounded-3xl border border-white/20 bg-white/10 px-4 py-5 shadow-2xl backdrop-blur-xl md:px-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-2xl font-semibold text-white">Charts</h1>
-            <button
-              type="button"
-              onClick={handleCreateChart}
-              disabled={!activeDataset || isWorkspaceLoading}
-              className="rounded-xl border border-cyan-300/40 bg-cyan-300/20 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/30 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              + New chart
-            </button>
-          </div>
-        </section>
-
-        <section className="grid gap-4 lg:grid-cols-[340px_1fr]">
-          <section className="rounded-3xl border border-white/20 bg-white/10 p-4 backdrop-blur-xl">
-            <div className="mb-3 text-sm font-medium text-slate-100">Saved charts</div>
-
-            <div className="max-h-[300px] space-y-2 overflow-y-auto pr-1">
-              {savedCharts.length === 0 ? (
-                <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200">
-                  No charts yet. Create one to get started.
-                </p>
-              ) : (
-                savedCharts.map((chart) => {
-                  const isActive = chart.id === activeChartId;
-
-                  return (
-                    <div
-                      key={chart.id}
-                      className={`flex items-center justify-between rounded-xl border px-3 py-2 transition ${
-                        isActive
-                          ? "border-cyan-200/60 bg-cyan-500/20"
-                          : "border-white/20 bg-white/5 hover:bg-white/10"
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => handleSelectChart(chart.id)}
-                        className="truncate text-left text-sm font-medium text-slate-100"
-                      >
-                        {chart.title || chart.id}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteChart(chart.id)}
-                        className="text-xs font-semibold text-red-100/90"
-                        title="Delete chart"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  );
-                })
-              )}
+    <RouteErrorBoundary scope="charts-route">
+      <main className="min-h-screen bg-slate-950/30 p-4 md:p-6">
+        <div className="mx-auto max-w-7xl space-y-4">
+          <section className="rounded-3xl border border-white/20 bg-white/10 px-4 py-5 shadow-2xl backdrop-blur-xl md:px-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h1 className="text-2xl font-semibold text-white">Charts</h1>
+              <button
+                type="button"
+                onClick={handleCreateChart}
+                disabled={!activeDataset || isWorkspaceLoading}
+                className="rounded-xl border border-cyan-300/40 bg-cyan-300/20 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/30 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                + New chart
+              </button>
             </div>
           </section>
 
-          <div className="space-y-4">
+          <section className="grid gap-4 lg:grid-cols-[340px_1fr]">
             <section className="rounded-3xl border border-white/20 bg-white/10 p-4 backdrop-blur-xl">
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-white">Chart preview</h2>
-                <button
-                  type="button"
-                  onClick={() => void refreshActiveChart()}
-                  disabled={loading || !activeChart || !activeDataset}
-                  className="rounded-lg border border-cyan-200/40 bg-cyan-300/20 px-3 py-1.5 text-xs font-semibold text-cyan-100 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  Refresh
-                </button>
+              <div className="mb-3 text-sm font-medium text-slate-100">Saved charts</div>
+
+              <div className="max-h-[300px] space-y-2 overflow-y-auto pr-1">
+                {savedCharts.length === 0 ? (
+                  <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200">
+                    No charts yet. Create one to get started.
+                  </p>
+                ) : (
+                  savedCharts.map((chart) => {
+                    const isActive = chart.id === activeChartId;
+
+                    return (
+                      <div
+                        key={chart.id}
+                        className={`flex items-center justify-between rounded-xl border px-3 py-2 transition ${
+                          isActive
+                            ? "border-cyan-200/60 bg-cyan-500/20"
+                            : "border-white/20 bg-white/5 hover:bg-white/10"
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => handleSelectChart(chart.id)}
+                          className="truncate text-left text-sm font-medium text-slate-100"
+                        >
+                          {chart.title || chart.id}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteChart(chart.id)}
+                          className="text-xs font-semibold text-red-100/90"
+                          title="Delete chart"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    );
+                  })
+                )}
               </div>
+            </section>
 
-              {(!activeDataset || !activeChart) && (
-                <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200">
-                  Pick a chart from the left or create a new one.
-                </p>
-              )}
-
-              {activeChart && activeDataset && loading && (
-                <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-10 text-center text-sm text-slate-200">
-                  Loading chart data…
+            <div className="space-y-4">
+              <section className="rounded-3xl border border-white/20 bg-white/10 p-4 backdrop-blur-xl">
+                <div className="mb-3 flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-white">Chart preview</h2>
+                  <button
+                    type="button"
+                    onClick={() => void refreshActiveChart()}
+                    disabled={loading || !activeChart || !activeDataset}
+                    className="rounded-lg border border-cyan-200/40 bg-cyan-300/20 px-3 py-1.5 text-xs font-semibold text-cyan-100 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Refresh
+                  </button>
                 </div>
-              )}
 
-              {error && !loading && (
-                <p className="mb-3 rounded-lg border border-rose-300/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-100">
-                  {error}
-                </p>
-              )}
+                {(!activeDataset || !activeChart) && (
+                  <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200">
+                    Pick a chart from the left or create a new one.
+                  </p>
+                )}
 
-              {activeChart && activeDataset && !loading && !error ? (
-                <ChartRenderer
-                  key={activeChart.id}
-                  config={activeChart}
-                  data={rows}
-                />
-              ) : null}
-            </section>
+                {activeChart && activeDataset && loading && (
+                  <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-10 text-center text-sm text-slate-200">
+                    Loading chart data…
+                  </div>
+                )}
 
-            <section className="rounded-3xl border border-white/20 bg-white/10 p-4 backdrop-blur-xl">
-              <h2 className="mb-3 text-lg font-semibold text-white">Dashboard builder</h2>
+                {error && !loading && (
+                  <p className="mb-3 rounded-lg border border-rose-300/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-100">
+                    {error}
+                  </p>
+                )}
 
-              {activeDataset ? (
-                <DashboardBuilder
-                  tableName={activeDataset.name ?? ""}
-                  columns={datasetColumns}
-                  rowCount={rowCount}
-                />
-              ) : (
-                <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200">
-                  Select an active dataset to access the dashboard builder.
-                </p>
-              )}
-            </section>
-          </div>
-        </section>
-      </div>
-    </main>
+                {activeChart && activeDataset && !loading && !error ? (
+                  <ChartRenderer
+                    key={activeChart.id}
+                    config={activeChart}
+                    data={rows}
+                  />
+                ) : null}
+              </section>
+
+              <section className="rounded-3xl border border-white/20 bg-white/10 p-4 backdrop-blur-xl">
+                <h2 className="mb-3 text-lg font-semibold text-white">Dashboard builder</h2>
+
+                {activeDataset ? (
+                  <DashboardBuilder
+                    tableName={activeDataset.name ?? ""}
+                    columns={datasetColumns}
+                    rowCount={rowCount}
+                  />
+                ) : (
+                  <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200">
+                    Select an active dataset to access the dashboard builder.
+                  </p>
+                )}
+              </section>
+            </div>
+          </section>
+        </div>
+      </main>
+    </RouteErrorBoundary>
   );
 }

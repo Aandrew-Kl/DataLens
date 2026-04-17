@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import ReactECharts from "echarts-for-react";
 import type { EChartsOption } from "echarts";
@@ -87,11 +88,6 @@ function getDarkModeSnapshot() {
 function useDarkMode() {
   return useSyncExternalStore(subscribeDarkMode, getDarkModeSnapshot, () => false);
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function toNumber(value: unknown) {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "bigint") return Number(value);

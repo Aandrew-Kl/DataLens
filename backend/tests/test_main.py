@@ -18,9 +18,6 @@ async def test_healthcheck_reports_application_and_database_status(client: Async
         "version": settings.APP_VERSION,
         "database": {"status": "ok"},
     }
-    assert response.headers["x-ratelimit-limit"] == "100"
-    assert response.headers["x-ratelimit-remaining"] == "99"
-    assert response.headers["x-ratelimit-reset"].isdigit()
 
 
 @pytest.mark.asyncio
@@ -39,20 +36,32 @@ async def test_cors_preflight_uses_configured_origins(client: AsyncClient) -> No
 
 
 @pytest.mark.asyncio
-async def test_rate_limiter_returns_429_after_100_requests(client: AsyncClient) -> None:
-    headers = {"x-forwarded-for": "rate-limit-test"}
+async def test_rate_limiter_returns_429_after_60_requests(client: AsyncClient) -> None:
+    route_path = f"/api/test-rate-limit-{uuid4()}"
 
-    for _ in range(100):
-        response = await client.get("/v1/health", headers=headers)
-        assert response.status_code == 200
+    async def limited_route() -> dict[str, str]:
+        return {"status": "ok"}
 
-    response = await client.get("/v1/health", headers=headers)
+    app.add_api_route(route_path, limited_route, methods=["GET"])
+    added_route = app.router.routes[-1]
+
+    try:
+        headers = {"x-forwarded-for": "rate-limit-test"}
+
+        for _ in range(60):
+            response = await client.get(route_path.removeprefix("/api"), headers=headers)
+            assert response.status_code == 200
+
+        response = await client.get(route_path.removeprefix("/api"), headers=headers)
+    finally:
+        app.router.routes.remove(added_route)
 
     assert response.status_code == 429
-    assert response.json() == {"detail": "Rate limit exceeded. Please retry later."}
-    assert response.headers["x-ratelimit-limit"] == "100"
+    assert "rate limit exceeded" in response.json()["error"].lower()
+    assert response.headers["x-ratelimit-limit"] == "60"
     assert response.headers["x-ratelimit-remaining"] == "0"
     assert response.headers["x-ratelimit-reset"].isdigit()
+    assert response.headers["retry-after"].isdigit()
 
 
 @pytest.mark.asyncio
@@ -132,9 +141,6 @@ async def test_request_size_limit_returns_413_for_large_payloads(
 
     assert response.status_code == 413
     assert response.json() == {"detail": "Request body too large."}
-    assert response.headers["x-ratelimit-limit"] == "100"
-    assert response.headers["x-ratelimit-remaining"].isdigit()
-    assert response.headers["x-ratelimit-reset"].isdigit()
 
 
 @pytest.mark.asyncio

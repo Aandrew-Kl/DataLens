@@ -1,5 +1,7 @@
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { NextResponse } from "next/server";
 import { chat, checkOllamaHealth } from "@/lib/ai/ollama-client";
+import { requireAuth } from "@/lib/auth/require-auth";
 import { logger } from "@/lib/logger";
 import type { ColumnProfile } from "@/types/dataset";
 
@@ -56,11 +58,6 @@ function stripCodeFences(value: string): string {
     .replace(/\s*```$/, "")
     .trim();
 }
-
-function quoteIdentifier(identifier: string): string {
-  return `"${identifier.replace(/"/g, "\"\"")}"`;
-}
-
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -393,6 +390,9 @@ function parseAiFixResponse(response: string): FixResult | null {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
     const {

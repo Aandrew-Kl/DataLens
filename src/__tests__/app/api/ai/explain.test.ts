@@ -1,13 +1,21 @@
 import { checkOllamaHealth, chat } from "@/lib/ai/ollama-client";
 import { POST } from "@/app/api/ai/explain/route";
 
-jest.mock("next/server", () => ({
-  NextResponse: {
-    json: jest.fn((data, init) => ({
-      json: async () => data,
-      status: init?.status ?? 200,
-    })),
-  },
+jest.mock("next/server", () => {
+  class MockNextResponse {}
+
+  return {
+    NextResponse: Object.assign(MockNextResponse, {
+      json: jest.fn((data, init) => ({
+        json: async () => data,
+        status: init?.status ?? 200,
+      })),
+    }),
+  };
+});
+
+jest.mock("@/lib/auth/require-auth", () => ({
+  requireAuth: jest.fn().mockResolvedValue({ userId: "test-user" }),
 }));
 
 jest.mock("@/lib/ai/ollama-client", () => ({

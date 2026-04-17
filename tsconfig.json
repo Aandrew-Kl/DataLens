@@ -19,6 +19,7 @@
       }
     ],
     "paths": {
+      "@/app/page": ["./src/components/home/home-page-client"],
       "@/*": ["./src/*"]
     }
   },
@@ -30,5 +31,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "docs-site"]
 }

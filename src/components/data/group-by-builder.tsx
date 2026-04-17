@@ -14,6 +14,7 @@ import {
 } from "@/lib/utils/advanced-analytics";
 import { downloadFile } from "@/lib/utils/export";
 import { formatNumber } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface GroupByBuilderProps {
@@ -47,7 +48,7 @@ function buildAggregateExpression(metric: AggregateMetric) {
   }
 
   const alias = `${metric.fn.toLowerCase()}_${metric.columnName}`;
-  return `${metric.fn}(${quoteIdentifier(metric.columnName)}) AS ${quoteIdentifier(alias)}`;
+  return `${buildMetricExpression(metric.fn, metric.columnName, quoteIdentifier, { cast: false })} AS ${quoteIdentifier(alias)}`;
 }
 
 function buildSql(

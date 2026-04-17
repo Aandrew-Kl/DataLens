@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -106,11 +107,6 @@ function subscribe(listener: () => void) {
 function emitChange() {
   listeners.forEach((listener) => listener());
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function readEntries(tableName: string): DataChangelogEntry[] {
   if (typeof window === "undefined") return [];
 

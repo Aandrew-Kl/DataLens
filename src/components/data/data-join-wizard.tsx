@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -56,11 +57,6 @@ const JOIN_OPTIONS: Array<{
   { value: "FULL OUTER", label: "Full", description: "Keep every row from both sides of each join." },
   { value: "CROSS", label: "Cross", description: "Produce the Cartesian product with no join key." },
 ] as const;
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function createJoinPairId(leftTable: string, rightTable: string): string {
   return `${leftTable}::${rightTable}`;
 }

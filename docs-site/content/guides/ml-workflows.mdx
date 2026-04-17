@@ -1,0 +1,36 @@
+---
+title: ML Workflows
+description: Train models, compare predictions, and evaluate analytical ML workflows in DataLens.
+---
+
+# ML Workflows
+
+## Available Models
+
+DataLens includes workflows for:
+
+- regression
+- classification
+- clustering
+- anomaly detection
+- PCA
+- forecasting
+
+You will also find decision-tree and related analytical helpers in the broader modeling surface.
+
+## Train a Model
+
+The standard loop is:
+
+1. profile the dataset
+2. choose target and feature columns
+3. run the model from the ML or analytics workspace
+4. inspect metrics, coefficients, feature importance, clusters, or anomaly scores
+
+## Make Predictions
+
+Prediction-oriented flows return scored rows, labels, or future points that can be exported, charted, or fed back into dashboards.
+
+## Cross-Validation
+
+Use holdout metrics as the first quality gate, then compare alternative feature sets and algorithms before promoting a workflow. If your process requires stricter k-fold cross-validation, export the prepared feature matrix and run the extended validation in your notebook or pipeline environment.

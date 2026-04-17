@@ -1,3 +1,4 @@
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { runQuery } from "@/lib/duckdb/client";
 
 export interface ExportOptions {
@@ -10,11 +11,6 @@ export interface ExportOptions {
 }
 
 type ExportFormat = "csv" | "json" | "sql" | "markdown" | "html";
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function buildSelectQuery(
   tableName: string,
   columns: string[],

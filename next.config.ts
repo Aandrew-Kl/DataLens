@@ -1,3 +1,4 @@
+import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const securityHeaders = [
@@ -20,7 +21,7 @@ const securityHeaders = [
   {
     key: "Content-Security-Policy",
     value:
-      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'none'",
+      "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss: https://api.github.com; frame-ancestors 'none'",
   },
 ] satisfies NonNullable<Awaited<ReturnType<NonNullable<NextConfig["headers"]>>>>[number]["headers"];
 
@@ -45,4 +46,13 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const sentryOptions = {
+  silent: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+  widenClientFileUpload: true,
+};
+
+export default process.env.NEXT_PUBLIC_SENTRY_DSN
+  ? withSentryConfig(nextConfig, sentryOptions)
+  : nextConfig;

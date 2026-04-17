@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -66,11 +67,6 @@ const STORAGE_KEY = "datalens:transform-recipes";
 const EASE = [0.22, 1, 0.36, 1] as const;
 const CARD_CLASS =
   "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function quoteLiteral(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;
 }

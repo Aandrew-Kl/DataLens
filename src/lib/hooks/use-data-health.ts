@@ -1,3 +1,4 @@
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useMemo, useState } from "react";
 import { runQuery } from "@/lib/duckdb/client";
 import type { ColumnProfile } from "@/types/dataset";
@@ -30,11 +31,6 @@ interface HealthState {
   key: string;
   value: Omit<DataHealth, "loading">;
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function asNumber(value: unknown) {
   const numeric = value == null ? Number.NaN : Number(value);
   return Number.isFinite(numeric) ? numeric : 0;

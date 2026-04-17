@@ -1,5 +1,7 @@
 import { clamp } from "@/lib/utils/formatters";
 
+export { quoteIdentifier } from "./sql";
+
 export const ANALYTICS_EASE = [0.22, 1, 0.36, 1] as const;
 
 export const GLASS_PANEL_CLASS =
@@ -13,10 +15,6 @@ export const FIELD_CLASS =
 
 export const BUTTON_CLASS =
   "inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/80 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-slate-950/55 dark:text-slate-100 dark:hover:bg-slate-900/90";
-
-export function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
 
 export function quoteLiteral(value: string) {
   return `'${value.replaceAll("'", "''")}'`;

@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { motion } from "framer-motion";
 import {
   Calculator,
@@ -25,6 +26,7 @@ import {
 import { runQuery } from "@/lib/duckdb/client";
 import { downloadFile } from "@/lib/utils/export";
 import { generateId } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface PivotConfiguratorProps {
@@ -113,13 +115,8 @@ const AGG_SQL: Record<AggFn, string> = {
   MIN: "MIN",
   MAX: "MAX",
   MEDIAN: "MEDIAN",
-  STDEV: "STDDEV_SAMP",
+  STDEV: "STDDEV",
 };
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function quoteLiteral(value: string) {
   return `'${value.replaceAll("'", "''")}'`;
 }
@@ -203,7 +200,12 @@ function buildPivotSql(
     const expression =
       field.aggregation === "COUNT"
         ? "COUNT(*)"
-        : `${AGG_SQL[field.aggregation]}(TRY_CAST(${quoteIdentifier(field.column)} AS DOUBLE))`;
+        : buildMetricExpression(
+            AGG_SQL[field.aggregation],
+            field.column,
+            (column) => `TRY_CAST(${quoteIdentifier(column)} AS DOUBLE)`,
+            { cast: false },
+          );
     return `${expression} AS ${quoteIdentifier(field.alias)}`;
   });
   const baseAliases = valueFields.map((field) => field.alias);

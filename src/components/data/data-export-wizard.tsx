@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -98,11 +99,6 @@ function escapeCsvCell(value: unknown) {
   }
   return text;
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function serializeCsv(rows: Record<string, unknown>[], includeHeaders: boolean) {
   const headers = Array.from(
     rows.reduce((set, row) => {

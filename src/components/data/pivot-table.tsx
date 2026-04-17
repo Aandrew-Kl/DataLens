@@ -16,6 +16,7 @@ import type { ColumnProfile } from "@/types/dataset";
 import { runQuery } from "@/lib/duckdb/client";
 import { formatNumber } from "@/lib/utils/formatters";
 import { downloadFile } from "@/lib/utils/export";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -119,7 +120,10 @@ export default function PivotTable({ tableName, columns }: PivotTableProps) {
       try {
         const rowCol = quote(config.rowDim);
         const valCol = quote(config.valueField);
-        const agg = `${config.aggFn}(${valCol})`;
+        const agg =
+          config.aggFn === "COUNT"
+            ? `COUNT(${valCol})`
+            : buildMetricExpression(config.aggFn, config.valueField, quote, { cast: false });
 
         let sql: string;
         if (config.colDim) {

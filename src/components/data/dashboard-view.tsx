@@ -23,6 +23,7 @@ import ChartRenderer from "@/components/charts/chart-renderer";
 import Modal from "@/components/ui/modal";
 import { runQuery } from "@/lib/duckdb/client";
 import { sanitizeTableName, formatNumber } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { DatasetMeta, ColumnProfile } from "@/types/dataset";
 import type {
   ChartConfig,
@@ -173,12 +174,14 @@ function buildChartSQL(
     return `SELECT ${safeY} FROM ${safeTable} LIMIT 2000`;
   }
 
+  const metric = agg === "count" ? `COUNT(${safeY})` : buildMetricExpression(agg, chart.yAxis, undefined, { cast: false, preserveCase: true });
+
   if (chart.groupBy) {
     const safeGroup = `"${chart.groupBy}"`;
-    return `SELECT ${safeX}, ${safeGroup}, ${agg}(${safeY}) AS value FROM ${safeTable} GROUP BY ${safeX}, ${safeGroup} ORDER BY value DESC LIMIT 50`;
+    return `SELECT ${safeX}, ${safeGroup}, ${metric} AS value FROM ${safeTable} GROUP BY ${safeX}, ${safeGroup} ORDER BY value DESC LIMIT 50`;
   }
 
-  return `SELECT ${safeX}, ${agg}(${safeY}) AS value FROM ${safeTable} GROUP BY ${safeX} ORDER BY value DESC LIMIT 20`;
+  return `SELECT ${safeX}, ${metric} AS value FROM ${safeTable} GROUP BY ${safeX} ORDER BY value DESC LIMIT 20`;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -810,10 +813,10 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
       >
         <div className="space-y-4">
           {/* Title */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <span>
               Chart Title (optional)
-            </label>
+            </span>
             <input
               type="text"
               value={newChartTitle}
@@ -829,13 +832,13 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
                 transition-colors
               "
             />
-          </div>
+          </label>
 
           {/* Chart type */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <div className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
               Chart Type
-            </label>
+            </div>
             <div className="flex flex-wrap gap-2">
               {(
                 ["bar", "line", "pie", "scatter", "area", "histogram"] as ChartType[]
@@ -866,10 +869,10 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
 
           {/* Axis selectors */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+              <span>
                 X-Axis Column
-              </label>
+              </span>
               <select
                 value={newXAxis}
                 onChange={(e) => setNewXAxis(e.target.value)}
@@ -889,12 +892,12 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+              <span>
                 Y-Axis Column
-              </label>
+              </span>
               <select
                 value={newYAxis}
                 onChange={(e) => setNewYAxis(e.target.value)}
@@ -914,15 +917,15 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
           </div>
 
           {/* Aggregation & Group By */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+              <span>
                 Aggregation
-              </label>
+              </span>
               <select
                 value={newAgg}
                 onChange={(e) =>
@@ -943,12 +946,12 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+              <span>
                 Group By (optional)
-              </label>
+              </span>
               <select
                 value={newGroupBy}
                 onChange={(e) => setNewGroupBy(e.target.value)}
@@ -968,7 +971,7 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
           </div>
 
           {/* Preview area */}

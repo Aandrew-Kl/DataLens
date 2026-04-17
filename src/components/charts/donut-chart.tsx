@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import {
   Suspense,
   startTransition,
@@ -87,11 +88,6 @@ function getDarkModeSnapshot() {
 function useDarkMode() {
   return useSyncExternalStore(subscribeDarkMode, getDarkModeSnapshot, () => false);
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function toNumber(value: unknown) {
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric : null;
@@ -386,10 +382,10 @@ function DonutChartReady({ tableName, columns }: DonutChartProps) {
             </div>
 
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Category
-                </label>
+                </span>
                 <select
                   value={safeCategory}
                   onChange={(event) => startTransition(() => setCategoryColumn(event.target.value))}
@@ -401,12 +397,12 @@ function DonutChartReady({ tableName, columns }: DonutChartProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Value
-                </label>
+                </span>
                 <select
                   value={safeValue}
                   onChange={(event) => startTransition(() => setValueColumn(event.target.value))}
@@ -419,12 +415,12 @@ function DonutChartReady({ tableName, columns }: DonutChartProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Labels
-                </label>
+                </span>
                 <select
                   value={labelMode}
                   onChange={(event) =>
@@ -438,13 +434,13 @@ function DonutChartReady({ tableName, columns }: DonutChartProps) {
                   <option value="percent">Percent only</option>
                   <option value="value">Value only</option>
                 </select>
-              </div>
+              </label>
 
               <label className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
-                <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <span className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   <CircleDashed className="h-3.5 w-3.5" />
                   Inner radius
-                </div>
+                </span>
                 <input
                   type="range"
                   min={24}
@@ -456,9 +452,9 @@ function DonutChartReady({ tableName, columns }: DonutChartProps) {
                   }
                   className="w-full accent-cyan-500"
                 />
-                <div className="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">
+                <span className="mt-2 block text-sm font-medium text-slate-900 dark:text-slate-100">
                   {innerRadius}%
-                </div>
+                </span>
               </label>
             </div>
           </div>

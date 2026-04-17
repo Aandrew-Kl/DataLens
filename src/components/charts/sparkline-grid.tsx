@@ -1,4 +1,5 @@
 "use client";
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { startTransition, useEffect, useMemo, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import type { EChartsOption } from "echarts";
@@ -20,9 +21,6 @@ const TYPE_META: Record<ColumnType, { icon: LucideIcon; label: string; tone: str
   boolean: { icon: Activity, label: "Boolean", tone: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950/60 dark:text-fuchsia-300" },
   unknown: { icon: Sigma, label: "Unknown", tone: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300" },
 };
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, "\"\"")}"`;
-}
 function toNumber(value: unknown) {
   const numeric = value == null ? Number.NaN : Number(value);
   return Number.isFinite(numeric) ? numeric : null;

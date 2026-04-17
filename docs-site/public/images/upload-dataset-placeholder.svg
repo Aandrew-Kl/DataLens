@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" fill="none">
+  <rect width="1280" height="720" rx="32" fill="#0F172A"/>
+  <rect x="64" y="64" width="1152" height="592" rx="28" fill="#111827" stroke="#334155" stroke-width="2"/>
+  <rect x="128" y="160" width="1024" height="400" rx="24" fill="#0B1220" stroke="#475569" stroke-dasharray="12 12" stroke-width="3"/>
+  <circle cx="640" cy="290" r="68" fill="#0EA5E9" fill-opacity="0.16" stroke="#38BDF8" stroke-width="2"/>
+  <path d="M640 250v94M640 250l-34 34M640 250l34 34" stroke="#7DD3FC" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+  <text x="640" y="410" fill="#E2E8F0" font-family="Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">Upload dataset</text>
+  <text x="640" y="456" fill="#94A3B8" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">CSV, JSON, or Excel placeholder screenshot</text>
+</svg>

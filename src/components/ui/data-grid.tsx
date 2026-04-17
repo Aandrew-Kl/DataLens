@@ -320,6 +320,11 @@ export default function DataGrid({
     setSelectedRowIndex(nextCell.rowIndex);
   }
 
+  function selectRow(rowIndex: number) {
+    setSelectedRowIndex(rowIndex);
+    setActiveCell({ rowIndex, columnIndex: 0 });
+  }
+
   function renderCell(
     column: DataGridColumn,
     row: DataGridRow,
@@ -462,9 +467,13 @@ export default function DataGrid({
                         : "bg-white/12 dark:bg-slate-950/10"
                   }`}
                   style={rowStyle}
-                  onClick={() => {
-                    setSelectedRowIndex(rowIndex);
-                    setActiveCell({ rowIndex, columnIndex: 0 });
+                  tabIndex={-1}
+                  onClick={() => selectRow(rowIndex)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      selectRow(rowIndex);
+                    }
                   }}
                 >
                   {columns.map((column, columnIndex) =>

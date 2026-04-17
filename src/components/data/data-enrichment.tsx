@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import {
   Suspense,
   startTransition,
@@ -56,11 +57,6 @@ const PANEL_CLASS =
   "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
 const FIELD_CLASS =
   "rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-100";
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function slugify(value: string) {
   return (
     value
@@ -560,10 +556,10 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
             </div>
 
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Operation
-                </label>
+                </span>
                 <select
                   value={operation}
                   onChange={(event) =>
@@ -578,12 +574,12 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                   <option value="lag_lead">Lag / lead</option>
                   <option value="running">Running aggregates</option>
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Source column
-                </label>
+                </span>
                 <select
                   value={safeSource}
                   onChange={(event) =>
@@ -597,26 +593,26 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   New column
-                </label>
+                </span>
                 <input
                   value={safeNewColumnName}
                   onChange={(event) => setNewColumnName(event.target.value)}
                   className={FIELD_CLASS}
                 />
-              </div>
+              </label>
             </div>
 
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {operation === "date_parts" ? (
-                <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <label className="block">
+                  <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Date part
-                  </label>
+                  </span>
                   <select
                     value={datePartMode}
                     onChange={(event) =>
@@ -629,14 +625,14 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                     <option value="day">Day</option>
                     <option value="weekday">Weekday</option>
                   </select>
-                </div>
+                </label>
               ) : null}
 
               {operation === "string_ops" ? (
-                <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <label className="block">
+                  <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     String mode
-                  </label>
+                  </span>
                   <select
                     value={stringMode}
                     onChange={(event) =>
@@ -648,15 +644,15 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                     <option value="word_count">Word count</option>
                     <option value="domain">Domain extraction</option>
                   </select>
-                </div>
+                </label>
               ) : null}
 
               {operation === "binning" ? (
                 <>
-                  <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                  <label className="block">
+                    <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       Binning mode
-                    </label>
+                    </span>
                     <select
                       value={binningMode}
                       onChange={(event) =>
@@ -668,12 +664,12 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                       <option value="equal_frequency">Equal frequency</option>
                       <option value="custom">Custom breakpoints</option>
                     </select>
-                  </div>
+                  </label>
                   <label className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
-                    <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                    <span className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       <span>Bin count</span>
                       <span>{binCount}</span>
-                    </div>
+                    </span>
                     <input
                       type="range"
                       min={2}
@@ -684,27 +680,27 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                     />
                   </label>
                   {binningMode === "custom" ? (
-                    <div className="md:col-span-2 xl:col-span-1">
-                      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                    <label className="block md:col-span-2 xl:col-span-1">
+                      <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                         Breakpoints
-                      </label>
+                      </span>
                       <input
                         value={customBreakpoints}
                         onChange={(event) => setCustomBreakpoints(event.target.value)}
                         className={FIELD_CLASS}
                         placeholder="10,25,50,100"
                       />
-                    </div>
+                    </label>
                   ) : null}
                 </>
               ) : null}
 
               {operation === "ranking" ? (
                 <>
-                  <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                  <label className="block">
+                    <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       Ranking mode
-                    </label>
+                    </span>
                     <select
                       value={rankingMode}
                       onChange={(event) =>
@@ -717,11 +713,11 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                       <option value="row_number">row_number</option>
                       <option value="percent_rank">percent_rank</option>
                     </select>
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                  </label>
+                  <label className="block">
+                    <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       Sort direction
-                    </label>
+                    </span>
                     <select
                       value={orderDirection}
                       onChange={(event) =>
@@ -732,16 +728,16 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                       <option value="desc">Descending</option>
                       <option value="asc">Ascending</option>
                     </select>
-                  </div>
+                  </label>
                 </>
               ) : null}
 
               {operation === "lag_lead" || operation === "running" ? (
                 <>
-                  <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                  <label className="block">
+                    <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       Order column
-                    </label>
+                    </span>
                     <select
                       value={safeOrder}
                       onChange={(event) =>
@@ -755,14 +751,14 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                         </option>
                       ))}
                     </select>
-                  </div>
+                  </label>
 
                   {operation === "lag_lead" ? (
                     <>
-                      <div>
-                        <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                      <label className="block">
+                        <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                           Mode
-                        </label>
+                        </span>
                         <select
                           value={lagLeadMode}
                           onChange={(event) =>
@@ -773,12 +769,12 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                           <option value="lag">Previous value</option>
                           <option value="lead">Next value</option>
                         </select>
-                      </div>
+                      </label>
                       <label className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
-                        <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        <span className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                           <span>Offset</span>
                           <span>{offset}</span>
-                        </div>
+                        </span>
                         <input
                           type="range"
                           min={1}
@@ -790,10 +786,10 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                       </label>
                     </>
                   ) : (
-                    <div>
-                      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                    <label className="block">
+                      <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                         Aggregate
-                      </label>
+                      </span>
                       <select
                         value={runningMode}
                         onChange={(event) =>
@@ -805,16 +801,16 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                         <option value="avg">Running average</option>
                         <option value="count">Running count</option>
                       </select>
-                    </div>
+                    </label>
                   )}
                 </>
               ) : null}
 
               {(operation === "ranking" || operation === "lag_lead" || operation === "running") ? (
-                <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <label className="block">
+                  <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Partition by
-                  </label>
+                  </span>
                   <select
                     value={safePartition}
                     onChange={(event) =>
@@ -829,7 +825,7 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                       </option>
                     ))}
                   </select>
-                </div>
+                </label>
               ) : null}
             </div>
           </div>

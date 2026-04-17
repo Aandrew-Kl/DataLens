@@ -17,9 +17,13 @@ export default defineConfig({
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
   },
-  projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-  ],
+  projects: isCI
+    ? [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }]
+    : [
+        { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+        { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+        { name: "webkit", use: { ...devices["Desktop Safari"] } },
+      ],
   webServer: {
     command: isCI ? "npm start" : "npm run dev",
     timeout: 120000,

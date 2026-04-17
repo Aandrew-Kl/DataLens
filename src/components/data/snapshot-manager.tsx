@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, Camera, CheckCircle2, Database, History, Loader2, RotateCcw, Trash2 } from "lucide-react";
@@ -22,11 +23,6 @@ type StatusState = { type: "success" | "error"; message: string } | null;
 
 const STORAGE_KEY = "datalens:snapshot-metadata";
 const container = "rounded-2xl border border-slate-200/70 bg-white/80 shadow-sm dark:border-slate-800/80 dark:bg-slate-950/55";
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function sanitizeSnapshotName(value: string) {
   return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40) || "snapshot";
 }

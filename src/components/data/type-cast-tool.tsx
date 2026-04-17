@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { startTransition, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -39,11 +40,6 @@ const TARGET_OPTIONS = [
   { value: "date", label: "Date", sql: "TIMESTAMP" },
   { value: "boolean", label: "Boolean", sql: "BOOLEAN" },
 ] satisfies Array<{ value: TargetType; label: string; sql: string }>;
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function formatCell(value: unknown): string {
   if (value === null || value === undefined) return "null";
   return String(value);

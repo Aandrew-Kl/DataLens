@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useMemo, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import {
@@ -70,11 +71,6 @@ interface OrderRule {
 const EASE = [0.22, 1, 0.36, 1] as const;
 const AGGREGATES: AggregateFn[] = ["NONE", "COUNT", "SUM", "AVG", "MIN", "MAX", "COUNT_DISTINCT"];
 const OPERATORS: Operator[] = ["=", "!=", ">", "<", ">=", "<=", "LIKE", "IN", "IS NULL", "IS NOT NULL"];
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function quoteLiteral(value: string) {
   return `'${value.replace(/'/g, "''")}'`;
 }

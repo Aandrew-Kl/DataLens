@@ -21,16 +21,21 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "screenshots": "tsx scripts/capture-screenshots.ts"
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.33.1-dev20.0",
+    "@sentry/nextjs": "^10.49.0",
     "echarts": "^6.0.0",
     "echarts-for-react": "^3.0.6",
     "framer-motion": "^12.38.0",
+    "jose": "^6.2.2",
     "lucide-react": "^1.7.0",
     "next": "16.2.2",
     "papaparse": "^5.5.3",
+    "posthog-js": "1.261.8",
+    "posthog-node": "5.8.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "xlsx": "^0.18.5",
@@ -49,10 +54,12 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
     "tailwindcss": "^4",
     "ts-jest": "^29.4.9",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

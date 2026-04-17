@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useMemo, useState } from "react";
 import { useDatasetStore } from "@/stores/dataset-store";
 import type { ColumnProfile, DatasetMeta } from "@/types/dataset";
@@ -136,11 +137,6 @@ const SQL_SNIPPETS: BaseSuggestion[] = [
 function normalize(value: string): string {
   return value.trim().toLowerCase();
 }
-
-function quoteIdentifier(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function getTextControlValue(): { value: string; cursor: number } | null {
   if (typeof document === "undefined") {
     return null;

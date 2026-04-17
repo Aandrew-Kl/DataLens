@@ -605,10 +605,10 @@ function SegmentComparisonReady({
         </div>
 
         <div className="grid gap-3 xl:grid-cols-[1.2fr_0.9fr_0.9fr]">
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Metric column
-            </label>
+            </span>
             <select
               aria-label="Metric column"
               value={safeMetricColumn}
@@ -623,11 +623,11 @@ function SegmentComparisonReady({
                 </option>
               ))}
             </select>
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+          </label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Aggregation
-            </label>
+            </span>
             <select
               aria-label="Aggregation"
               value={aggregation}
@@ -642,11 +642,11 @@ function SegmentComparisonReady({
               <option value="sum">Sum</option>
               <option value="count">Count</option>
             </select>
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+          </label>
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               View
-            </label>
+            </span>
             <select
               aria-label="View"
               value={view}
@@ -660,7 +660,7 @@ function SegmentComparisonReady({
               <option value="chart">Chart</option>
               <option value="table">Table</option>
             </select>
-          </div>
+          </label>
         </div>
 
         <div className="grid gap-4">

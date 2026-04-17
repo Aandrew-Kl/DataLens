@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -32,11 +33,6 @@ import { runQuery } from "@/lib/duckdb/client";
 import type { SavedChartConfig } from "@/stores/chart-store";
 
 const NO_DATASET_TITLE = "No active dataset";
-
-function quoteIdentifier(value: string): string {
-  return '"' + value.replace(/"/g, '""') + '"';
-}
-
 function getChartBadgeClass(type: SavedChartConfig["type"]) {
   if (type === "line") {
     return "bg-emerald-400/20 text-emerald-200 border-emerald-300/40";

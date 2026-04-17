@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import {
   startTransition,
   useEffect,
@@ -95,11 +96,6 @@ const cardVariants: Variants = {
     transition: { duration: 0.42, ease: [0.22, 1, 0.36, 1] as const },
   },
 };
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function asNumber(value: unknown) {
   const numeric = value == null ? Number.NaN : Number(value);
   return Number.isFinite(numeric) ? numeric : 0;

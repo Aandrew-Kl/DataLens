@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import {
   Suspense,
   startTransition,
@@ -28,6 +29,7 @@ import {
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { formatNumber } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ColumnProfile } from "@/types/dataset";
 
 echarts.use([LineChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);
@@ -96,11 +98,6 @@ function getDarkModeSnapshot() {
 function useDarkMode() {
   return useSyncExternalStore(subscribeDarkMode, getDarkModeSnapshot, () => false);
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function toNumber(value: unknown) {
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric : null;
@@ -154,7 +151,7 @@ async function loadAreaData(
   const groupProjection = safeGroup
     ? `COALESCE(CAST(${safeGroup} AS VARCHAR), 'Unknown') AS group_label`
     : "'All rows' AS group_label";
-  const aggregationExpression = `${aggregation}(metric_value)`;
+  const aggregationExpression = buildMetricExpression(aggregation, "metric_value", (column) => column, { cast: false });
 
   const rows = await runQuery(`
     WITH prepared AS (
@@ -528,10 +525,10 @@ function AreaChartReady({ tableName, columns }: AreaChartProps) {
             </div>
 
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   X-axis
-                </label>
+                </span>
                 <select
                   value={safeX}
                   onChange={(event) => startTransition(() => setXColumn(event.target.value))}
@@ -543,12 +540,12 @@ function AreaChartReady({ tableName, columns }: AreaChartProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Y-axis
-                </label>
+                </span>
                 <select
                   value={safeY}
                   onChange={(event) => startTransition(() => setYColumn(event.target.value))}
@@ -560,12 +557,12 @@ function AreaChartReady({ tableName, columns }: AreaChartProps) {
                     </option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Grouping
-                </label>
+                </span>
                 <select
                   value={safeGroup}
                   onChange={(event) => startTransition(() => setGroupColumn(event.target.value))}
@@ -576,16 +573,16 @@ function AreaChartReady({ tableName, columns }: AreaChartProps) {
                     .filter((column) => column.name !== safeX)
                     .map((column) => (
                       <option key={column.name} value={column.name}>
-                        {column.name}
-                      </option>
+                      {column.name}
+                    </option>
                     ))}
                 </select>
-              </div>
+              </label>
 
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Aggregation
-                </label>
+                </span>
                 <select
                   value={aggregation}
                   onChange={(event) =>
@@ -598,7 +595,7 @@ function AreaChartReady({ tableName, columns }: AreaChartProps) {
                   <option value="MIN">MIN</option>
                   <option value="MAX">MAX</option>
                 </select>
-              </div>
+              </label>
             </div>
 
             <label className="flex items-center justify-between rounded-3xl border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">

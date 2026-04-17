@@ -3,6 +3,13 @@ import * as duckdb from "@duckdb/duckdb-wasm";
 let db: duckdb.AsyncDuckDB | null = null;
 let conn: duckdb.AsyncDuckDBConnection | null = null;
 
+function validateTableName(name: string): string {
+  if (!/^[a-zA-Z_][a-zA-Z0-9_-]*$/.test(name)) {
+    throw new Error(`Invalid table name: ${name}`);
+  }
+  return name;
+}
+
 export async function initDuckDB(): Promise<duckdb.AsyncDuckDB> {
   if (db) return db;
 
@@ -44,11 +51,12 @@ export async function loadCSVIntoDB(
   tableName: string,
   csvContent: string
 ): Promise<void> {
+  const safeTableName = validateTableName(tableName);
   const database = await initDuckDB();
-  await database.registerFileText(`${tableName}.csv`, csvContent);
+  await database.registerFileText(`${safeTableName}.csv`, csvContent);
   const connection = await getConnection();
   await connection.query(
-    `CREATE OR REPLACE TABLE "${tableName}" AS SELECT * FROM read_csv_auto('${tableName}.csv', header=true, sample_size=-1)`
+    `CREATE OR REPLACE TABLE "${safeTableName}" AS SELECT * FROM read_csv_auto('${safeTableName}.csv', header=true, sample_size=-1)`
   );
 }
 
@@ -56,11 +64,12 @@ export async function loadJSONIntoDB(
   tableName: string,
   jsonContent: string
 ): Promise<void> {
+  const safeTableName = validateTableName(tableName);
   const database = await initDuckDB();
-  await database.registerFileText(`${tableName}.json`, jsonContent);
+  await database.registerFileText(`${safeTableName}.json`, jsonContent);
   const connection = await getConnection();
   await connection.query(
-    `CREATE OR REPLACE TABLE "${tableName}" AS SELECT * FROM read_json_auto('${tableName}.json')`
+    `CREATE OR REPLACE TABLE "${safeTableName}" AS SELECT * FROM read_json_auto('${safeTableName}.json')`
   );
 }
 

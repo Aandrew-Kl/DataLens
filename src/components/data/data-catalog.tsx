@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { startTransition, useMemo, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -82,11 +83,6 @@ let catalogSnapshot: CatalogSnapshot = {
   error: null,
   refreshedAt: null,
 };
-
-function quoteIdentifier(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
 function escapeLiteral(value: string) {
   return `'${value.replaceAll("'", "''")}'`;
 }

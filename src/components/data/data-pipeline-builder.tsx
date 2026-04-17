@@ -32,6 +32,7 @@ import {
 } from "@/lib/utils/advanced-analytics";
 import { downloadFile } from "@/lib/utils/export";
 import { formatNumber } from "@/lib/utils/formatters";
+import { buildMetricExpression } from "@/lib/utils/sql-safe";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface DataPipelineBuilderProps {
@@ -208,7 +209,12 @@ function buildAggregateExpression(step: PipelineStep) {
   if (step.aggregateFunction === "COUNT") {
     return "COUNT(*)";
   }
-  return `${step.aggregateFunction}(TRY_CAST(${quoteIdentifier(step.aggregateColumn)} AS DOUBLE))`;
+  return buildMetricExpression(
+    step.aggregateFunction,
+    step.aggregateColumn,
+    (column) => `TRY_CAST(${quoteIdentifier(column)} AS DOUBLE)`,
+    { cast: false },
+  );
 }
 
 function buildStepSql(step: PipelineStep, source: string) {

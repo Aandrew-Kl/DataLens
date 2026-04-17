@@ -1,0 +1,49 @@
+---
+title: SQL Editor
+description: Use the DuckDB SQL editor, autocomplete, and explain tools for fast local analysis.
+---
+
+# SQL Editor
+
+## DuckDB SQL Dialect
+
+DataLens runs analytics queries with DuckDB-WASM in the browser, so the editor follows DuckDB SQL semantics for:
+
+- `SELECT`, `JOIN`, `GROUP BY`, `HAVING`, and `CTE` workflows
+- analytical functions such as `MEDIAN`, `DATE_TRUNC`, `ROW_NUMBER`, `LAG`, and `LEAD`
+- local file-backed exploratory queries against uploaded tables
+
+## Autocomplete
+
+The autocomplete system blends:
+
+- SQL keywords
+- DuckDB functions
+- loaded table names
+- detected column names
+- starter snippets for common query shapes
+
+Suggestions are context-aware, so table names rank higher after `FROM`, columns after `SELECT`, and function names inside aggregate or expression contexts.
+
+## Run vs Explain
+
+Use the editor when you want to execute the statement and inspect rows immediately.
+
+Use the explain tools when you want to inspect how DuckDB plans or executes the query:
+
+- `EXPLAIN` for operator-level planning
+- `EXPLAIN ANALYZE` for execution timing and slow operator analysis
+
+## Saving Queries
+
+Frequently used SQL can be stored in the saved query manager, copied into share URLs, and reused as the basis for charts and dashboards.
+
+## Keyboard Shortcuts
+
+| Action | Shortcut |
+| --- | --- |
+| Run query | `Cmd/Ctrl + Enter` |
+| Save query | `Cmd/Ctrl + S` |
+| Open command palette | `Cmd/Ctrl + K` |
+| Show editor help and autocomplete hints | `Cmd/Ctrl + /` |
+| Export current view | `Cmd/Ctrl + Shift + E` |

@@ -13,6 +13,8 @@ import { generateId, sanitizeTableName } from "@/lib/utils/formatters";
 import { Sun, Moon, Menu, Upload, Settings, Search, X } from "lucide-react";
 import CommandPalette from "@/components/layout/command-palette";
 import SettingsPanel from "@/components/settings/settings-panel";
+import DemoBanner from "@/components/workspace/demo-banner";
+import WelcomeWizardHost from "./welcome-wizard-host";
 
 const TABS = [
   { href: "/profile", label: "Profile" },
@@ -223,6 +225,7 @@ export default function WorkspaceLayout({
         ) : null}
 
         <main className="flex-1 overflow-y-auto p-4">
+          <DemoBanner />
           <Suspense fallback={<WorkspaceContentFallback />}>{children}</Suspense>
         </main>
       </div>
@@ -232,6 +235,7 @@ export default function WorkspaceLayout({
         onClose={() => setShowCommandPalette(false)}
         onAction={handleCommandAction}
       />
+      <WelcomeWizardHost />
       <SettingsPanel
         open={showSettings}
         onClose={() => setShowSettings(false)}

@@ -275,6 +275,16 @@ export default function FileDropzone({
           (status === "idle" || status === "error") &&
           inputRef.current?.click()
         }
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            if (status === "idle" || status === "error") {
+              inputRef.current?.click();
+            }
+          }
+        }}
+        role="button"
+        tabIndex={0}
         aria-label="Upload data file"
         aria-describedby={helpTextId}
         className={`

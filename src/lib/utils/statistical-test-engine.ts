@@ -1,3 +1,4 @@
+import { quoteIdentifier } from "@/lib/utils/sql";
 import { runQuery } from "@/lib/duckdb/client";
 import { formatNumber } from "@/lib/utils/formatters";
 
@@ -42,11 +43,6 @@ export interface AnovaConfig {
   confidence: number;
   maxGroups: number;
 }
-
-function quoteIdentifier(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 function quoteLiteral(value: string) {
   return `'${value.replace(/'/g, "''")}'`;
 }
