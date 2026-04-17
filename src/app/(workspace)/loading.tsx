@@ -1,26 +1,41 @@
 export default function WorkspaceLoading() {
+  const block = "animate-pulse rounded-xl bg-white/40 dark:bg-slate-800/40";
+
   return (
-    <div className="flex min-h-[calc(100vh-8.5rem)] items-center justify-center p-4">
-      <div className="w-full max-w-4xl bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl p-6 animate-pulse">
-        <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
-          Loading workspace...
-        </p>
-        <div className="mt-4 space-y-3">
-          <div className="h-10 rounded-xl bg-white/70 dark:bg-slate-800/70" />
-          <div className="grid gap-3 md:grid-cols-3">
-            <div className="h-24 rounded-xl bg-white/70 dark:bg-slate-800/70" />
-            <div className="h-24 rounded-xl bg-white/70 dark:bg-slate-800/70" />
-            <div className="h-24 rounded-xl bg-white/70 dark:bg-slate-800/70" />
+    <main className="min-h-[calc(100vh-8rem)] p-4 md:p-6">
+      <div className="mx-auto grid max-w-7xl gap-4 lg:grid-cols-[280px_1fr]">
+        <aside className="rounded-[1.75rem] border border-white/15 bg-white/45 p-5 backdrop-blur-2xl dark:bg-slate-900/35">
+          <div className={`${block} h-7 w-28`} />
+          <div className="mt-5 space-y-3">
+            <div className={`${block} h-11 w-full`} />
+            <div className={`${block} h-11 w-full`} />
+            <div className={`${block} h-24 w-full`} />
+            <div className={`${block} h-32 w-full`} />
           </div>
-          <div className="grid gap-3 lg:grid-cols-[1.3fr_0.7fr]">
-            <div className="h-64 rounded-xl bg-white/70 dark:bg-slate-800/70" />
-            <div className="space-y-3">
-              <div className="h-24 rounded-xl bg-white/70 dark:bg-slate-800/70" />
-              <div className="h-36 rounded-xl bg-white/70 dark:bg-slate-800/70" />
-            </div>
+        </aside>
+
+        <section className="space-y-4">
+          <div className="rounded-[1.75rem] border border-white/15 bg-white/45 p-5 backdrop-blur-2xl dark:bg-slate-900/35">
+            <div className={`${block} h-8 w-40`} />
+            <div className={`${block} mt-3 h-4 w-72 max-w-full`} />
           </div>
-        </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {[0, 1, 2].map((card) => (
+              <article
+                key={card}
+                className="rounded-[1.3rem] border border-white/15 bg-white/45 p-5 backdrop-blur-xl dark:bg-slate-900/35"
+              >
+                <div className={`${block} h-10 w-10 rounded-2xl`} />
+                <div className={`${block} mt-4 h-5 w-28`} />
+                <div className={`${block} mt-3 h-4 w-full`} />
+                <div className={`${block} mt-2 h-4 w-4/5`} />
+                <div className={`${block} mt-5 h-36 w-full`} />
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
