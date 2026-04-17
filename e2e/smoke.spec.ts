@@ -6,13 +6,19 @@ test("landing page smoke test", async ({ page }) => {
   await page.goto("/");
 
   await expect(page).toHaveTitle(/DataLens/, { timeout: 30_000 });
-  await expect(page.getByText("Drop your data here")).toBeVisible({
-    timeout: 30_000,
-  });
 
-  const themeToggle = page.getByRole("button", {
-    name: "Toggle dark mode",
-  });
+  // Marketing hero CTA is the canonical "above the fold" call-to-action on
+  // the landing page — it's always rendered for unauthenticated visitors.
+  await expect(
+    page.getByRole("link", { name: /Try it free/i }).first()
+  ).toBeVisible({ timeout: 30_000 });
+
+  // Theme toggle on the marketing page swaps its aria-label based on the
+  // current theme. Match either direction so the test is resilient to the
+  // initial theme chosen by the system / prior visit.
+  const themeToggle = page
+    .getByRole("button", { name: /Switch to (dark|light) mode/ })
+    .first();
   await expect(themeToggle).toBeVisible({ timeout: 30_000 });
 
   const html = page.locator("html");
