@@ -159,4 +159,95 @@ describe("workspace-store", () => {
 
     expect(useWorkspaceStore.getState().analyticsColumnName).toBe("revenue");
   });
+
+  it("setLoadError stores and clears error string", () => {
+    useWorkspaceStore.getState().setLoadError("boom");
+    expect(useWorkspaceStore.getState().loadError).toBe("boom");
+
+    useWorkspaceStore.getState().setLoadError(null);
+    expect(useWorkspaceStore.getState().loadError).toBeNull();
+  });
+
+  it("explicit show setters override toggle state", () => {
+    const store = useWorkspaceStore.getState();
+
+    store.setShowUploader(true);
+    expect(useWorkspaceStore.getState().showUploader).toBe(true);
+    store.setShowUploader(false);
+    expect(useWorkspaceStore.getState().showUploader).toBe(false);
+
+    store.setShowSettings(true);
+    expect(useWorkspaceStore.getState().showSettings).toBe(true);
+
+    store.setShowCommandPalette(true);
+    expect(useWorkspaceStore.getState().showCommandPalette).toBe(true);
+
+    store.setShowKeyboardShortcuts(true);
+    expect(useWorkspaceStore.getState().showKeyboardShortcuts).toBe(true);
+
+    store.setShowExportWizard(true);
+    expect(useWorkspaceStore.getState().showExportWizard).toBe(true);
+
+    store.setShowSharePanel(true);
+    expect(useWorkspaceStore.getState().showSharePanel).toBe(true);
+  });
+
+  it("setPreviewRows replaces the preview array", () => {
+    const rows = [
+      { id: 1, name: "A" },
+      { id: 2, name: "B" },
+    ];
+
+    useWorkspaceStore.getState().setPreviewRows(rows);
+
+    expect(useWorkspaceStore.getState().previewRows).toEqual(rows);
+  });
+
+  it("setSelectedAdvancedColumn stores a column profile", () => {
+    const column: ColumnProfile = {
+      name: "score",
+      type: "number",
+      nullCount: 0,
+      uniqueCount: 42,
+      sampleValues: [0.1, 0.2, 0.3],
+    };
+
+    useWorkspaceStore.getState().setSelectedAdvancedColumn(column);
+
+    expect(useWorkspaceStore.getState().selectedAdvancedColumn).toEqual(column);
+
+    useWorkspaceStore.getState().setSelectedAdvancedColumn(null);
+    expect(useWorkspaceStore.getState().selectedAdvancedColumn).toBeNull();
+  });
+
+  it("setSavedCharts replaces the chart list wholesale", () => {
+    const charts = [
+      {
+        id: "c1",
+        label: "L1",
+        type: "bar",
+        config: {},
+        createdAt: "2026-01-01T00:00:00.000Z",
+      },
+    ];
+
+    useWorkspaceStore.getState().setSavedCharts(charts);
+
+    expect(useWorkspaceStore.getState().savedCharts).toEqual(charts);
+  });
+
+  it("removeSavedChart on a missing id leaves list unchanged", () => {
+    const chart = {
+      id: "keep",
+      label: "K",
+      type: "pie",
+      config: {},
+      createdAt: "2026-01-03T00:00:00.000Z",
+    };
+
+    useWorkspaceStore.getState().setSavedCharts([chart]);
+    useWorkspaceStore.getState().removeSavedChart("does-not-exist");
+
+    expect(useWorkspaceStore.getState().savedCharts).toEqual([chart]);
+  });
 });
