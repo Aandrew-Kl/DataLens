@@ -10,8 +10,6 @@ jest.mock("echarts-for-react");
 jest.mock("framer-motion");
 
 jest.mock("@/components/data/cleaner-history", () => {
-  const ReactModule = require("react") as typeof React;
-
   return {
     __esModule: true,
     CleanerHistory: ({
@@ -35,8 +33,6 @@ jest.mock("@/components/data/cleaner-history", () => {
 });
 
 jest.mock("@/components/data/cleaner-preview", () => {
-  const ReactModule = require("react") as typeof React;
-
   return {
     __esModule: true,
     CleanerPreview: ({
@@ -59,8 +55,6 @@ jest.mock("@/components/data/cleaner-preview", () => {
 });
 
 jest.mock("@/components/data/cleaner-rules", () => {
-  const ReactModule = require("react") as typeof React;
-
   return {
     __esModule: true,
     CleanerRules: ({
