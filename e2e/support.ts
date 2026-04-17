@@ -3,6 +3,12 @@ import path from "node:path";
 
 import { expect, type Page } from "@playwright/test";
 
+export const AUTH_COOKIE = {
+  name: "datalens-auth-token",
+  value: "e2e-auth-token",
+  url: "http://localhost:3000",
+} as const;
+
 const DUCKDB_DIST_DIR = path.join(
   process.cwd(),
   "node_modules",
@@ -54,6 +60,10 @@ export async function openLandingPage(page: Page) {
   await page.goto("/");
   await page.waitForLoadState("networkidle");
   await expect(page).toHaveTitle(/DataLens/i);
+}
+
+export async function loginAsTestUser(page: Page) {
+  await page.context().addCookies([AUTH_COOKIE]);
 }
 
 export async function uploadInlineCsv(

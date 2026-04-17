@@ -1,70 +1,119 @@
-import { test, expect } from "@playwright/test";
-import { openLandingPage, uploadInlineCsv, openWorkspaceTab } from "./support";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
-const AUTH_COOKIE = {
-  name: "datalens-auth-token",
-  value: "e2e-auth-token",
-  url: "http://localhost:3000",
+import { loginAsTestUser } from "./support";
+
+type WorkspacePageRoute = {
+  path: string;
+  navLabel: string;
+  rendered: (page: Page) => Locator;
 };
+
+const WORKSPACE_PAGE_ROUTES: WorkspacePageRoute[] = [
+  {
+    path: "/profile",
+    navLabel: "Profile",
+    rendered: (page) => page.getByRole("heading", { name: "Data Profile" }),
+  },
+  {
+    path: "/dashboard",
+    navLabel: "Dashboard",
+    rendered: (page) => page.getByText("Workspace dashboard"),
+  },
+  {
+    path: "/explore",
+    navLabel: "Explore",
+    rendered: (page) => page.getByRole("heading", { name: "Explore" }),
+  },
+  {
+    path: "/query",
+    navLabel: "Ask AI",
+    rendered: (page) => page.getByRole("heading", { name: "Ask AI" }),
+  },
+  {
+    path: "/sql",
+    navLabel: "SQL",
+    rendered: (page) => page.getByRole("heading", { name: "SQL Editor" }),
+  },
+  {
+    path: "/charts",
+    navLabel: "Charts",
+    rendered: (page) => page.getByRole("heading", { name: "Charts" }),
+  },
+  {
+    path: "/transforms",
+    navLabel: "Transforms",
+    rendered: (page) =>
+      page.getByRole("heading", { name: "Transform Pipelines" }),
+  },
+  {
+    path: "/ml",
+    navLabel: "ML",
+    rendered: (page) =>
+      page.getByRole("heading", { name: "Machine Learning" }),
+  },
+  {
+    path: "/analytics",
+    navLabel: "Analytics",
+    rendered: (page) => page.getByRole("heading", { name: "Analytics" }),
+  },
+  {
+    path: "/data-ops",
+    navLabel: "Data Ops",
+    rendered: (page) =>
+      page.getByRole("heading", { name: "Data Operations" }),
+  },
+  {
+    path: "/pivot",
+    navLabel: "Pivot",
+    rendered: (page) =>
+      page.getByRole("heading", { name: "Pivot Table Builder" }),
+  },
+  {
+    path: "/reports",
+    navLabel: "Reports",
+    rendered: (page) => page.getByRole("heading", { name: "Reports" }),
+  },
+  {
+    path: "/settings",
+    navLabel: "Settings",
+    rendered: (page) =>
+      page.getByRole("heading", { name: "Workspace Settings" }),
+  },
+];
 
 test.use({ colorScheme: "light" });
 
-test.describe("Workspace Pages", () => {
+test.describe("Workspace pages", () => {
   test.beforeEach(async ({ page }) => {
-    test.slow();
-    await page.context().addCookies([AUTH_COOKIE]);
-    await openLandingPage(page);
-    await uploadInlineCsv(page, { fileName: "workspace_test.csv" });
+    await loginAsTestUser(page);
   });
 
-  test("profile tab shows column statistics", async ({ page }) => {
-    await openWorkspaceTab(page, "Profile");
-    await expect(page.getByText("Column Profiles")).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByText("region")).toBeVisible({ timeout: 60_000 });
+  test("redirects /workspace to /dashboard", async ({ page }) => {
+    await page.goto("/workspace");
+
+    await expect(page).toHaveURL(/\/dashboard$/, { timeout: 30_000 });
+    await expect(page.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
+      "aria-current",
+      "page",
+      { timeout: 30_000 },
+    );
+    await expect(page.getByText("Workspace dashboard")).toBeVisible({
+      timeout: 30_000,
+    });
   });
 
-  test("dashboard tab loads", async ({ page }) => {
-    await openWorkspaceTab(page, "Dashboard");
-    await expect(page.getByText(/dashboard/i).first()).toBeVisible({ timeout: 60_000 });
-  });
+  for (const route of WORKSPACE_PAGE_ROUTES) {
+    test(`${route.path} renders its workspace page`, async ({ page }) => {
+      await page.goto(route.path);
 
-  test("charts tab shows chart builder", async ({ page }) => {
-    await openWorkspaceTab(page, "Charts");
-    await expect(page.getByText(/chart/i).first()).toBeVisible({ timeout: 60_000 });
-  });
-
-  test("ML tab loads machine learning tools", async ({ page }) => {
-    await openWorkspaceTab(page, "ML");
-    await expect(page.getByText(/machine learning|regression|cluster/i).first()).toBeVisible({ timeout: 60_000 });
-  });
-
-  test("analytics tab loads analytics tools", async ({ page }) => {
-    await openWorkspaceTab(page, "Analytics");
-    await expect(page.getByText(/analytics|churn|forecast/i).first()).toBeVisible({ timeout: 60_000 });
-  });
-
-  test("transforms tab loads pipeline builder", async ({ page }) => {
-    await openWorkspaceTab(page, "Transforms");
-    await expect(page.getByText(/transform|pipeline/i).first()).toBeVisible({ timeout: 60_000 });
-  });
-
-  test("reports tab loads", async ({ page }) => {
-    await openWorkspaceTab(page, "Reports");
-    await expect(page.getByText(/report/i).first()).toBeVisible({ timeout: 60_000 });
-  });
-
-  test("data-ops tab loads pipeline tools", async ({ page }) => {
-    await page.goto("/data-ops");
-    await expect(page.getByText(/data ops|pipeline|operation/i).first()).toBeVisible({ timeout: 60_000 });
-  });
-
-  test("query tab shows query interface", async ({ page }) => {
-    await page.goto("/query");
-    await expect(page.getByText(/query|sql|search/i).first()).toBeVisible({ timeout: 60_000 });
-  });
-
-  test("pivot tab loads pivot builder", async ({ page }) => {
-    await page.goto("/pivot");
-    await expect(page.getByText(/pivot|table|row|column/i).first()).toBeVisible({ timeout: 60_000 });
-  });
+      await expect(page).toHaveURL(new RegExp(`${route.path}$`), {
+        timeout: 30_000,
+      });
+      await expect(page.getByRole("main")).toBeVisible({ timeout: 30_000 });
+      await expect(
+        page.getByRole("link", { name: route.navLabel }),
+      ).toHaveAttribute("aria-current", "page", { timeout: 30_000 });
+      await expect(route.rendered(page)).toBeVisible({ timeout: 30_000 });
+    });
+  }
 });
