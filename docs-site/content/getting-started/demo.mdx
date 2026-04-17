@@ -1,0 +1,24 @@
+# Try the live demo
+
+[Open the live demo](https://datalens.dev).
+
+## What to try first
+
+1. Load the `ecommerce-orders` sample dataset.
+2. Run this SQL:
+
+```sql
+SELECT
+  country,
+  SUM(revenue) AS total_revenue
+FROM ecommerce_orders
+GROUP BY country
+ORDER BY total_revenue DESC;
+```
+
+3. Ask for "Top countries by revenue" in the AI workspace and compare the result.
+
+## Notes
+
+- Demo data resets on refresh.
+- To keep your own workspace running locally, use `docker-compose` from this repo.

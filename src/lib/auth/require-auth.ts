@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 import { AUTH_TOKEN_COOKIE_NAME } from "@/lib/auth/constants";
+import { getDemoUser, isDemoMode } from "./demo-mode";
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "dev-secret-change-in-production"
@@ -38,6 +39,10 @@ export async function requireAuth(
 export async function requireAuth(
   request: Request | NextRequest
 ): Promise<{ userId: string } | NextResponse> {
+  if (isDemoMode()) {
+    return { userId: getDemoUser().id };
+  }
+
   const token =
     getCookieValue(request, AUTH_TOKEN_COOKIE_NAME) ||
     getCookieValue(request, "token") ||

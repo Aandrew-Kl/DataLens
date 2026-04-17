@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AUTH_TOKEN_COOKIE_NAME } from "@/lib/auth/constants";
+import { isDemoMode } from "@/lib/auth/demo-mode";
 import MarketingPageClient from "./marketing-page-client";
 
 export const metadata: Metadata = {
@@ -22,6 +23,10 @@ export const metadata: Metadata = {
 };
 
 export default async function MarketingPage() {
+  if (isDemoMode()) {
+    redirect("/workspace");
+  }
+
   const cookieStore = await cookies();
 
   if (cookieStore.get(AUTH_TOKEN_COOKIE_NAME)?.value) {
