@@ -36,8 +36,11 @@ jobs:
       - name: Run linter
         run: npm run lint
 
-      - name: Run tests
-        run: npm test -- --ci --passWithNoTests
+      - name: Run tests with coverage threshold
+        # `--coverage` enforces jest.config.ts coverageThreshold (hard-fail).
+        # Ratchet floors prevent backslide while Phase 2/3/4 of quality-to-11
+        # raise real coverage numbers.
+        run: npm test -- --ci --coverage --passWithNoTests
 
       - name: Run TypeScript check
         run: npx tsc --noEmit
