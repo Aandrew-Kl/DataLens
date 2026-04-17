@@ -1,74 +1,125 @@
-import { render, screen } from "@testing-library/react";
-import { act } from "react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import QueryDebugger from "@/components/query/query-debugger";
+import { runQuery } from "@/lib/duckdb/client";
 import type { ColumnProfile } from "@/types/dataset";
 
 jest.mock("@/lib/duckdb/client", () => ({
-  runQuery: jest.fn().mockResolvedValue([]),
+  runQuery: jest.fn(),
 }));
 
+jest.mock("framer-motion");
+
+const mockRunQuery = jest.mocked(runQuery);
+
 const columns: ColumnProfile[] = [
-  { name: "id", type: "number", nullable: false, unique: 100 },
-  { name: "name", type: "string", nullable: false, unique: 80 },
-] as ColumnProfile[];
+  {
+    name: "id",
+    type: "number",
+    nullCount: 0,
+    uniqueCount: 100,
+    sampleValues: [1, 2],
+  },
+  {
+    name: "name",
+    type: "string",
+    nullCount: 0,
+    uniqueCount: 80,
+    sampleValues: ["Ada", "Grace"],
+  },
+];
 
 describe("QueryDebugger", () => {
-  it("renders the debugger heading and run button", async () => {
-    await act(async () => {
-      render(<QueryDebugger tableName="orders" columns={columns} />);
-    });
-
-    expect(screen.getByText("Query Debugger")).toBeInTheDocument();
-    expect(screen.getByText("Run EXPLAIN ANALYZE")).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "Inspect EXPLAIN ANALYZE output and slow operators",
-      ),
-    ).toBeInTheDocument();
+  beforeEach(() => {
+    mockRunQuery.mockReset();
   });
 
-  it("renders summary stat cards with default values", async () => {
-    await act(async () => {
-      render(<QueryDebugger tableName="orders" columns={columns} />);
-    });
-
-    expect(screen.getByText("Total time")).toBeInTheDocument();
-    expect(screen.getByText("Plan nodes")).toBeInTheDocument();
-    expect(screen.getByText("Slowest step")).toBeInTheDocument();
-    // Default values before running
-    expect(screen.getByText("0")).toBeInTheDocument();
-  });
-
-  it("shows empty state messages before running debugger", async () => {
-    await act(async () => {
-      render(<QueryDebugger tableName="orders" columns={columns} />);
-    });
-
-    expect(
-      screen.getByText("Run the debugger to inspect the plan tree."),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "Timing rows will appear here after the first debug run.",
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "The debugger will rank the slowest operators once a plan is available.",
-      ),
-    ).toBeInTheDocument();
-  });
-
-  it("has a textarea for SQL input with default query", async () => {
-    await act(async () => {
-      render(<QueryDebugger tableName="orders" columns={columns} />);
-    });
+  it("renders the default SQL and disables the run button for whitespace-only input", async () => {
+    render(<QueryDebugger tableName="orders" columns={columns} />);
 
     const textarea = screen.getByRole("textbox");
-    expect(textarea).toBeInTheDocument();
-    expect(textarea).toHaveValue(
-      'SELECT *\nFROM "orders"\nLIMIT 100;',
-    );
+    const runButton = screen.getByRole("button", { name: /run explain analyze/i });
+
+    expect(textarea).toHaveValue('SELECT *\nFROM "orders"\nLIMIT 100;');
+    expect(runButton).toBeEnabled();
+
+    fireEvent.change(textarea, { target: { value: "   " } });
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /run explain analyze/i }),
+      ).toBeDisabled();
+    });
+  });
+
+  it("parses EXPLAIN output and renders the plan tree, timings, and raw output", async () => {
+    const user = userEvent.setup();
+
+    mockRunQuery.mockResolvedValue([
+      {
+        explain_key: "plan",
+        explain_value: "SEQ_SCAN 8 ms\nrows=100",
+      },
+      {
+        explain_key: "plan",
+        explain_value: "FILTER 4 ms\nrows=50\nTotal Time: 12 ms",
+      },
+    ]);
+
+    render(<QueryDebugger tableName="orders" columns={columns} />);
+
+    await user.click(screen.getByRole("button", { name: /run explain analyze/i }));
+
+    await waitFor(() => {
+      expect(mockRunQuery).toHaveBeenCalledWith(
+        'EXPLAIN ANALYZE SELECT *\nFROM "orders"\nLIMIT 100;',
+      );
+    });
+
+    expect(await screen.findByText("Raw EXPLAIN ANALYZE output")).toBeInTheDocument();
+    expect(screen.getByText("Execution plan tree")).toBeInTheDocument();
+    expect(screen.getByText("Timing breakdown")).toBeInTheDocument();
+    expect(screen.getByText("Slow operations")).toBeInTheDocument();
+
+    expect(screen.getAllByText("SEQ_SCAN 8 ms").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("FILTER 4 ms").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/rows=100/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/rows=50/).length).toBeGreaterThan(0);
+
+    expect(screen.getByText("12ms")).toBeInTheDocument();
+    expect(screen.getAllByText("8ms").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("4ms").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Total Time: 12 ms/).length).toBeGreaterThan(0);
+  });
+
+  it("shows the DuckDB error message when EXPLAIN ANALYZE fails", async () => {
+    const user = userEvent.setup();
+
+    mockRunQuery.mockRejectedValue(new Error('Parser Error: syntax error at or near "FROM"'));
+
+    render(<QueryDebugger tableName="orders" columns={columns} />);
+
+    const textarea = screen.getByRole("textbox");
+
+    fireEvent.change(textarea, { target: { value: "SELECT FROM orders;" } });
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /run explain analyze/i }),
+      ).toBeEnabled();
+    });
+
+    await user.click(screen.getByRole("button", { name: /run explain analyze/i }));
+
+    await waitFor(() => {
+      expect(mockRunQuery).toHaveBeenCalledWith("EXPLAIN ANALYZE SELECT FROM orders;");
+    });
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Parser Error: syntax error at or near "FROM"/),
+      ).toBeInTheDocument();
+    });
+    expect(screen.queryByText("Raw EXPLAIN ANALYZE output")).not.toBeInTheDocument();
   });
 });
