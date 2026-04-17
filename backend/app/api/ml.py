@@ -1,8 +1,9 @@
 import pandas as pd
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
 from app.api.auth import get_current_user
 from app.api.docs import build_error_responses
+from app.middleware.rate_limit import limiter
 from app.models.user import User
 from app.schemas.ml import (
     AnomalyRequest,
@@ -34,7 +35,10 @@ router = APIRouter(prefix="/ml", tags=["ml"])
         bad_request="The regression request could not be processed with the provided dataset or parameters.",
     ),
 )
+@limiter.limit("10/minute")
 async def run_regression(
+    request: Request,
+    response: Response,
     payload: RegressionRequest,
     _current_user: User = Depends(get_current_user),
 ) -> dict:
@@ -56,7 +60,10 @@ async def run_regression(
         bad_request="The clustering request could not be processed with the provided dataset or parameters.",
     ),
 )
+@limiter.limit("10/minute")
 async def run_clustering(
+    request: Request,
+    response: Response,
     payload: ClusterRequest,
     _current_user: User = Depends(get_current_user),
 ) -> dict:
@@ -78,7 +85,10 @@ async def run_clustering(
         bad_request="The classification request could not be processed with the provided dataset or parameters.",
     ),
 )
+@limiter.limit("10/minute")
 async def run_classification(
+    request: Request,
+    response: Response,
     payload: ClassificationRequest,
     _current_user: User = Depends(get_current_user),
 ) -> dict:
@@ -100,7 +110,10 @@ async def run_classification(
         bad_request="The anomaly detection request could not be processed with the provided dataset or parameters.",
     ),
 )
+@limiter.limit("10/minute")
 async def run_anomaly_detection(
+    request: Request,
+    response: Response,
     payload: AnomalyRequest,
     _current_user: User = Depends(get_current_user),
 ) -> dict:
@@ -122,7 +135,10 @@ async def run_anomaly_detection(
         bad_request="The PCA request could not be processed with the provided dataset or parameters.",
     ),
 )
+@limiter.limit("10/minute")
 async def run_pca(
+    request: Request,
+    response: Response,
     payload: PCARequest,
     _current_user: User = Depends(get_current_user),
 ) -> dict:
@@ -144,7 +160,10 @@ async def run_pca(
         bad_request="The decision tree request could not be processed with the provided dataset or parameters.",
     ),
 )
+@limiter.limit("10/minute")
 async def run_decision_tree(
+    request: Request,
+    response: Response,
     payload: DecisionTreeRequest,
     _current_user: User = Depends(get_current_user),
 ) -> dict:

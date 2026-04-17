@@ -1,8 +1,9 @@
 import pandas as pd
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
 from app.api.auth import get_current_user
 from app.api.docs import build_error_responses
+from app.middleware.rate_limit import limiter
 from app.models.user import User
 from app.schemas.ai import (
     ExplainRequest,
@@ -31,7 +32,10 @@ router = APIRouter(prefix="/ai", tags=["ai"])
         bad_request="The sentiment analysis request could not be processed with the provided dataset or parameters.",
     ),
 )
+@limiter.limit("20/minute")
 async def analyze_sentiment(
+    request: Request,
+    response: Response,
     payload: SentimentRequest,
     _current_user: User = Depends(get_current_user),
 ) -> dict:
@@ -53,7 +57,10 @@ async def analyze_sentiment(
         bad_request="The summarization request could not be processed with the provided dataset or parameters.",
     ),
 )
+@limiter.limit("20/minute")
 async def summarize_data(
+    request: Request,
+    response: Response,
     payload: SummarizeRequest,
     _current_user: User = Depends(get_current_user),
 ) -> dict:
@@ -75,14 +82,17 @@ async def summarize_data(
         bad_request="The SQL generation request could not be processed with the provided prompt or dataset context.",
     ),
 )
+@limiter.limit("20/minute")
 async def generate_query(
+    request: Request,
+    response: Response,
     payload: QueryGenerateRequest,
     _current_user: User = Depends(get_current_user),
 ) -> dict:
     try:
         frame = pd.DataFrame(payload.data) if payload.data else pd.DataFrame()
-        request = NLQueryRequest(question=payload.question, use_ollama=payload.use_ollama)
-        return await nlp_service.generate_query(request, frame, payload.table_name)
+        query_request = NLQueryRequest(question=payload.question, use_ollama=payload.use_ollama)
+        return await nlp_service.generate_query(query_request, frame, payload.table_name)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
@@ -98,7 +108,10 @@ async def generate_query(
         bad_request="The SQL explanation request could not be processed with the provided statement.",
     ),
 )
+@limiter.limit("20/minute")
 async def explain_sql(
+    request: Request,
+    response: Response,
     payload: ExplainRequest,
     _current_user: User = Depends(get_current_user),
 ) -> dict:

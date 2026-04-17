@@ -11,12 +11,16 @@ from urllib.parse import urlsplit
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from sqlalchemy import text
 
 from app.api.router import api_router
 from app.config import settings
 from app.database import Base, engine
 from app.logging_config import setup_logging
+from app.middleware.rate_limit import exempt_paths, limiter
 from app.models import analysis, dataset, query_history, user  # noqa: F401
 
 
@@ -147,6 +151,16 @@ app = FastAPI(
     docs_url="/api/docs",
     redoc_url="/api/redoc",
 )
+app.state.limiter = limiter
+app.state.rate_limit_exempt_paths = exempt_paths() | {
+    "/api/docs",
+    "/api/redoc",
+    "/api/v1/health",
+    "/api/metrics",
+    "/health/metrics",
+}
+app.add_middleware(SlowAPIMiddleware)
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -189,6 +203,9 @@ async def request_size_limit_middleware(request: Request, call_next):
 
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
+    if getattr(request.app.state, "limiter", None) is not None:
+        return await call_next(request)
+
     if not request.url.path.startswith(API_PATH_PREFIX):
         return await call_next(request)
 
@@ -329,7 +346,13 @@ async def healthcheck() -> dict[str, object] | JSONResponse:
     }
 
 
+@app.get("/metrics", response_model=None)
 @app.get("/api/metrics", response_model=None)
 @app.get("/health/metrics", response_model=None)
 async def metrics() -> dict[str, object]:
     return await request_metrics.snapshot()
+
+
+for route in app.routes:
+    if getattr(route, "path", None) in app.state.rate_limit_exempt_paths and hasattr(route, "endpoint"):
+        limiter.exempt(route.endpoint)

@@ -3,7 +3,7 @@ import uuid
 from collections import defaultdict
 from time import monotonic
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from sqlalchemy import select
@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.api.docs import build_error_responses
+from app.middleware.rate_limit import limiter
 from app.models.user import User
 from app.schemas.user import Token, UserCreate, UserLogin, UserResponse
 from app.utils.security import create_access_token, decode_access_token, hash_password, verify_password
@@ -51,6 +52,7 @@ def _clear_login_attempts(email: str) -> None:
 
 
 async def get_current_user(
+    request: Request,
     token: str = Depends(oauth2_scheme),
     db: AsyncSession = Depends(get_db),
 ) -> User:
@@ -72,6 +74,7 @@ async def get_current_user(
     user = result.scalar_one_or_none()
     if user is None:
         raise credentials_error
+    request.state.user = user
     return user
 
 
@@ -86,7 +89,13 @@ async def get_current_user(
         extra={409: "A user with the same email address is already registered."},
     ),
 )
-async def register_user(payload: UserCreate, db: AsyncSession = Depends(get_db)) -> User:
+@limiter.limit("3/minute")
+async def register_user(
+    request: Request,
+    response: Response,
+    payload: UserCreate,
+    db: AsyncSession = Depends(get_db),
+) -> User:
     existing_user = await db.execute(select(User).where(User.email == payload.email))
     if existing_user.scalar_one_or_none() is not None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email is already registered.")
@@ -110,7 +119,13 @@ async def register_user(payload: UserCreate, db: AsyncSession = Depends(get_db))
         unauthorized="The provided email or password is invalid.",
     ),
 )
-async def login_user(payload: UserLogin, db: AsyncSession = Depends(get_db)) -> Token:
+@limiter.limit("5/minute")
+async def login_user(
+    request: Request,
+    response: Response,
+    payload: UserLogin,
+    db: AsyncSession = Depends(get_db),
+) -> Token:
     _check_login_rate_limit(payload.email)
 
     result = await db.execute(select(User).where(User.email == payload.email))

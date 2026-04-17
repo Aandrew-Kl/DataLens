@@ -7,7 +7,6 @@ import pytest
 import pytest_asyncio
 from datetime import datetime, timedelta
 from httpx import AsyncClient
-from pydantic import BaseModel
 
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
@@ -125,10 +124,14 @@ def sentiment_texts() -> list[str]:
 async def client():
     """Async HTTP client wired to the FastAPI application."""
     from httpx import ASGITransport, AsyncClient
+    from app.api.auth import _login_attempts
     from app.main import app, rate_limiter, request_metrics
     from app.database import Base, engine
+    from app.middleware.rate_limit import limiter
 
+    limiter.reset()
     rate_limiter.clear()
+    _login_attempts.clear()
     await request_metrics.reset()
 
     async with engine.begin() as conn:
@@ -138,7 +141,9 @@ async def client():
     async with AsyncClient(transport=transport, base_url="http://test/api") as ac:
         yield ac
 
+    limiter.reset()
     rate_limiter.clear()
+    _login_attempts.clear()
     await request_metrics.reset()
 
     async with engine.begin() as conn:
