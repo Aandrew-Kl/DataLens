@@ -102,6 +102,7 @@ jobs:
   e2e:
     needs: [frontend, backend]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
