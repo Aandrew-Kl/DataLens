@@ -16,6 +16,7 @@ import {
   ExternalLink,
   Command,
 } from "lucide-react";
+import { replayWelcomeTour } from "@/components/onboarding/use-welcome-wizard";
 
 interface SettingsPanelProps {
   open: boolean;
@@ -516,6 +517,26 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               <section>
                 <SectionHeader icon={Info} label="About" />
                 <div className="space-y-3">
+                  <div className="flex items-center justify-between rounded-lg border border-gray-200/60 bg-white/70 px-4 py-3 dark:border-gray-700/50 dark:bg-gray-800/40">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                        Replay welcome tour
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        Reopen the first-run onboarding modal.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        replayWelcomeTour();
+                        onClose();
+                      }}
+                      className="rounded-lg bg-purple-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors duration-150 hover:bg-purple-600"
+                    >
+                      Show tour
+                    </button>
+                  </div>
                   <div className="rounded-lg bg-gray-50 dark:bg-gray-800/60 px-4 py-3 space-y-2">
                     <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                       DataLens
