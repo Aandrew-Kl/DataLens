@@ -50,3 +50,4 @@ next-env.d.ts
 
 # Screenshot generation artifacts (optional — can be committed)
 # docs-site/public/images/screenshots/
+backend/.coverage
