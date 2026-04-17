@@ -1,9 +1,9 @@
 import { request } from "./client";
 import { useAuthStore } from "@/stores/auth-store";
-import type { AuthToken, UserInfo } from "./types";
+import type { AuthToken, RegisterResponse, UserInfo } from "./types";
 
-export async function register(email: string, password: string): Promise<AuthToken> {
-  const result = await request<AuthToken>("POST", "/api/v1/auth/register", { email, password });
+export async function register(email: string, password: string): Promise<RegisterResponse> {
+  const result = await request<RegisterResponse>("POST", "/api/v1/auth/register", { email, password });
   useAuthStore.getState().setToken(result.access_token);
   return result;
 }

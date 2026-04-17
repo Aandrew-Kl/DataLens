@@ -46,3 +46,10 @@ class UserResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class RegisterResponse(Token):
+    id: uuid.UUID
+    email: str
+    created_at: datetime
+    user: UserResponse

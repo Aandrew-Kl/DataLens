@@ -13,7 +13,7 @@ from app.database import get_db
 from app.api.docs import build_error_responses
 from app.middleware.rate_limit import limiter
 from app.models.user import User
-from app.schemas.user import Token, UserCreate, UserLogin, UserResponse
+from app.schemas.user import RegisterResponse, Token, UserCreate, UserLogin, UserResponse
 from app.utils.security import create_access_token, decode_access_token, hash_password, verify_password
 
 
@@ -51,6 +51,10 @@ def _clear_login_attempts(email: str) -> None:
     _login_attempts.pop(email, None)
 
 
+def _create_user_access_token(user: User) -> str:
+    return create_access_token({"sub": str(user.id), "email": user.email})
+
+
 async def get_current_user(
     request: Request,
     token: str = Depends(oauth2_scheme),
@@ -80,11 +84,11 @@ async def get_current_user(
 
 @router.post(
     "/register",
-    response_model=UserResponse,
+    response_model=RegisterResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Register a user",
     description="Create a new user account with an email address and password.",
-    response_description="The newly created user account.",
+    response_description="The newly created user account and bearer access token.",
     responses=build_error_responses(
         extra={409: "A user with the same email address is already registered."},
     ),
@@ -95,7 +99,7 @@ async def register_user(
     response: Response,
     payload: UserCreate,
     db: AsyncSession = Depends(get_db),
-) -> User:
+) -> RegisterResponse:
     existing_user = await db.execute(select(User).where(User.email == payload.email))
     if existing_user.scalar_one_or_none() is not None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email is already registered.")
@@ -104,8 +108,16 @@ async def register_user(
     db.add(user)
     await db.commit()
     await db.refresh(user)
+    access_token = _create_user_access_token(user)
     _auth_logger.info("new user registered email=%s user_id=%s", user.email, user.id)
-    return user
+    user_payload = UserResponse.model_validate(user)
+    return RegisterResponse(
+        id=user_payload.id,
+        email=user_payload.email,
+        created_at=user_payload.created_at,
+        access_token=access_token,
+        user=user_payload,
+    )
 
 
 @router.post(
@@ -134,7 +146,7 @@ async def login_user(
         _record_failed_login(payload.email)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password.")
 
-    access_token = create_access_token({"sub": str(user.id), "email": user.email})
+    access_token = _create_user_access_token(user)
     _clear_login_attempts(payload.email)
     _auth_logger.info("successful login for email=%s user_id=%s", payload.email, user.id)
     return Token(access_token=access_token)

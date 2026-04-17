@@ -33,13 +33,21 @@ describe("auth API", () => {
   });
 
   test("register sends the correct payload and stores the returned token", async () => {
-    const authToken = {
+    const registerResponse = {
+      id: "user-123",
+      email: "new@example.com",
+      created_at: "2026-04-18T00:00:00Z",
       access_token: "register-token",
       token_type: "bearer",
+      user: {
+        id: "user-123",
+        email: "new@example.com",
+        created_at: "2026-04-18T00:00:00Z",
+      },
     };
-    mockedRequest.mockResolvedValue(authToken);
+    mockedRequest.mockResolvedValue(registerResponse);
 
-    await expect(register("new@example.com", "new-secret")).resolves.toEqual(authToken);
+    await expect(register("new@example.com", "new-secret")).resolves.toEqual(registerResponse);
 
     expect(mockedRequest).toHaveBeenCalledWith("POST", "/api/v1/auth/register", {
       email: "new@example.com",

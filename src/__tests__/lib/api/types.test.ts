@@ -5,6 +5,7 @@ import type {
   ForecastResult,
   PCAResult,
   QueryGenerateResult,
+  RegisterResponse,
   SummarizeResult,
   UserInfo,
   AnomalyResult,
@@ -98,5 +99,22 @@ describe('API type contracts', () => {
     } satisfies AuthToken;
 
     expect(result.token_type).toBe('Bearer');
+  });
+
+  it('RegisterResponse includes token fields and user details', () => {
+    const result = {
+      id: 'user_123',
+      email: 'analyst@example.com',
+      created_at: '2026-04-03T00:00:00Z',
+      access_token: 'eyJtoken',
+      token_type: 'bearer',
+      user: {
+        id: 'user_123',
+        email: 'analyst@example.com',
+        created_at: '2026-04-03T00:00:00Z',
+      },
+    } satisfies RegisterResponse;
+
+    expect(result.user.email).toBe('analyst@example.com');
   });
 });

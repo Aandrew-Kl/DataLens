@@ -126,6 +126,10 @@ export interface UserInfo {
   created_at: string;
 }
 
+export interface RegisterResponse extends AuthToken, UserInfo {
+  user: UserInfo;
+}
+
 export interface DatasetInfo {
   id: string;
   name: string;

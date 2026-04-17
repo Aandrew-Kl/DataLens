@@ -21,7 +21,11 @@ async def test_register_login_and_me(client: AsyncClient) -> None:
         json={"email": "auth@example.com", "password": "StrongPass123"},
     )
     assert register_response.status_code == 201
-    assert register_response.json()["email"] == "auth@example.com"
+    register_payload = register_response.json()
+    assert register_payload["email"] == "auth@example.com"
+    assert register_payload["token_type"] == "bearer"
+    assert register_payload["access_token"]
+    assert register_payload["user"]["email"] == "auth@example.com"
 
     login_response = await client.post(
         "/auth/login",
