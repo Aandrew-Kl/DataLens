@@ -24,10 +24,13 @@ class ControlledArrayBufferFileReader {
     }
 
     const payload = ControlledArrayBufferFileReader.nextResult;
-    const result =
+    const result: ArrayBuffer | null | undefined =
       payload == null
         ? payload
-        : payload.buffer.slice(payload.byteOffset, payload.byteOffset + payload.byteLength);
+        : (payload.buffer.slice(
+            payload.byteOffset,
+            payload.byteOffset + payload.byteLength,
+          ) as ArrayBuffer);
 
     this.onload?.({
       target: {

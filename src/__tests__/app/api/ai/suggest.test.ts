@@ -67,7 +67,7 @@ const createCloneableRequest = (body: unknown) =>
     clone: jest.fn(() => ({
       json: jest.fn().mockResolvedValue(body),
     })),
-  }) as Request & { clone: jest.Mock };
+  }) as unknown as Request & { clone: jest.Mock };
 
 describe("POST /api/ai/suggest", () => {
   beforeEach(() => {
