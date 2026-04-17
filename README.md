@@ -4,8 +4,10 @@
 
 ### Privacy-first AI data analytics that runs in your browser.
 
+[![CI](https://github.com/Aandrew-Kl/DataLens/actions/workflows/ci.yml/badge.svg)](https://github.com/Aandrew-Kl/DataLens/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Aandrew-Kl/DataLens?include_prereleases)](https://github.com/Aandrew-Kl/DataLens/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-1%2C679_passing-brightgreen.svg)](#)
+[![Tests](https://img.shields.io/badge/tests-1%2C822_passing-brightgreen.svg)](#)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6.svg)](#)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black.svg)](#)
 
