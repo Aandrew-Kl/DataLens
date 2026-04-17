@@ -26,6 +26,7 @@ function loadTelemetryPreferencesModule(
   let moduleUnderTest: TelemetryPreferencesModule | undefined;
 
   jest.isolateModules(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     moduleUnderTest = require(TELEMETRY_MODULE_PATH) as TelemetryPreferencesModule;
   });
 
