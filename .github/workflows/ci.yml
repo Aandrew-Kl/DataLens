@@ -131,14 +131,8 @@ jobs:
       - name: Build app
         run: npm run build
 
-      - name: Run E2E tests (smoke only)
-        # Full e2e suite quarantined pending selector refresh against current
-        # UI (tracked for post-launch follow-up). Smoke covers title, hero
-        # CTA visibility, and dark-mode toggle on the marketing landing page
-        # — sufficient to gate releases on a functioning landing page.
-        # Unit/integration coverage remains comprehensive
-        # (1689 frontend + 133 backend).
-        run: npx playwright test smoke.spec.ts --reporter=list
+      - name: Run E2E tests (smoke + auth)
+        run: npx playwright test smoke.spec.ts auth.spec.ts --reporter=list
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
