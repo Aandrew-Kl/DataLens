@@ -16,7 +16,7 @@ describe("ai API", () => {
     {
       name: "sentiment",
       invoke: () => sentiment(["The dashboard is excellent", "The export failed"]),
-      path: "/api/v1/ai/sentiment",
+      path: "/api/ai/sentiment",
       payload: {
         data: [
           { text: "The dashboard is excellent" },
@@ -44,7 +44,7 @@ describe("ai API", () => {
     {
       name: "summarize",
       invoke: () => summarize([{ region: "EMEA", revenue: 120 }], ["region", "revenue"]),
-      path: "/api/v1/ai/summarize",
+      path: "/api/ai/summarize",
       payload: {
         data: [{ region: "EMEA", revenue: 120 }],
         text_columns: ["region", "revenue"],
@@ -63,7 +63,7 @@ describe("ai API", () => {
           { name: "region", type: "text" },
           { name: "revenue", type: "number" },
         ]),
-      path: "/api/v1/ai/generate-query",
+      path: "/api/ai/generate-query",
       payload: {
         question: "Show revenue by region",
         table_name: "sales",

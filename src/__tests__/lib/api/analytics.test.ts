@@ -21,7 +21,7 @@ describe("analytics API", () => {
     {
       name: "churnPredict",
       invoke: () => churnPredict(data, ["retained", "revenue"], "retained"),
-      path: "/api/v1/analytics/churn-predict",
+      path: "/api/analytics/churn-predict",
       payload: {
         data,
         feature_columns: ["retained", "revenue"],
@@ -43,7 +43,7 @@ describe("analytics API", () => {
     {
       name: "cohortAnalysis",
       invoke: () => cohortAnalysis(data, "signup_date", "user_id"),
-      path: "/api/v1/analytics/cohort",
+      path: "/api/analytics/cohort",
       payload: {
         data,
         entity_id_column: "user_id",
@@ -83,7 +83,7 @@ describe("analytics API", () => {
     {
       name: "abTest",
       invoke: () => abTest([1.2, 1.5, 1.7], [1.8, 2.1, 2.3]),
-      path: "/api/v1/analytics/ab-test",
+      path: "/api/analytics/ab-test",
       payload: {
         control: [1.2, 1.5, 1.7],
         treatment: [1.8, 2.1, 2.3],
@@ -98,7 +98,7 @@ describe("analytics API", () => {
     {
       name: "forecast",
       invoke: () => forecast(data, "signup_date", "revenue", 6),
-      path: "/api/v1/analytics/forecast",
+      path: "/api/analytics/forecast",
       payload: {
         data,
         date_column: "signup_date",

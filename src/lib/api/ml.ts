@@ -7,7 +7,7 @@ export async function regression(
   features: string[],
   method: string = "linear",
 ): Promise<RegressionResult> {
-  return request<RegressionResult>("POST", "/api/v1/ml/regression", {
+  return request<RegressionResult>("POST", "/api/ml/regression", {
     data,
     feature_columns: features,
     target_column: target,
@@ -21,7 +21,7 @@ export async function cluster(
   method: string = "kmeans",
   n_clusters: number = 3,
 ): Promise<ClusterResult> {
-  return request<ClusterResult>("POST", "/api/v1/ml/cluster", {
+  return request<ClusterResult>("POST", "/api/ml/cluster", {
     data,
     feature_columns: features,
     algorithm: method,
@@ -35,7 +35,7 @@ export async function classify(
   features: string[],
   method: string = "random_forest",
 ): Promise<ClassificationResult> {
-  return request<ClassificationResult>("POST", "/api/v1/ml/classify", {
+  return request<ClassificationResult>("POST", "/api/ml/classify", {
     data,
     feature_columns: features,
     target_column: target,
@@ -49,7 +49,7 @@ export async function anomalyDetect(
   method: string = "isolation_forest",
   contamination: number = 0.1,
 ): Promise<AnomalyResult> {
-  return request<AnomalyResult>("POST", "/api/v1/ml/anomaly-detect", {
+  return request<AnomalyResult>("POST", "/api/ml/anomaly-detect", {
     data,
     feature_columns: features,
     algorithm: method,
@@ -62,7 +62,7 @@ export async function pca(
   features: string[],
   n_components: number = 2,
 ): Promise<PCAResult> {
-  return request<PCAResult>("POST", "/api/v1/ml/pca", {
+  return request<PCAResult>("POST", "/api/ml/pca", {
     data,
     feature_columns: features,
     n_components,

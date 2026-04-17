@@ -6,7 +6,7 @@ export async function churnPredict(
   features: string[],
   target: string,
 ): Promise<ChurnResult> {
-  return request<ChurnResult>("POST", "/api/v1/analytics/churn-predict", {
+  return request<ChurnResult>("POST", "/api/analytics/churn-predict", {
     data,
     feature_columns: features,
     target_column: target,
@@ -19,7 +19,7 @@ export async function cohortAnalysis(
   userColumn: string,
   frequency: "weekly" | "monthly" = "monthly",
 ): Promise<CohortResult> {
-  return request<CohortResult>("POST", "/api/v1/analytics/cohort", {
+  return request<CohortResult>("POST", "/api/analytics/cohort", {
     data,
     entity_id_column: userColumn,
     signup_date_column: dateColumn,
@@ -32,7 +32,7 @@ export async function abTest(
   control: number[],
   treatment: number[],
 ): Promise<ABTestResult> {
-  return request<ABTestResult>("POST", "/api/v1/analytics/ab-test", { control, treatment });
+  return request<ABTestResult>("POST", "/api/analytics/ab-test", { control, treatment });
 }
 
 export async function forecast(
@@ -41,5 +41,5 @@ export async function forecast(
   value_column: string,
   periods: number = 12,
 ): Promise<ForecastResult> {
-  return request<ForecastResult>("POST", "/api/v1/analytics/forecast", { data, date_column, value_column, periods });
+  return request<ForecastResult>("POST", "/api/analytics/forecast", { data, date_column, value_column, periods });
 }

@@ -21,7 +21,7 @@ describe("ml API", () => {
     {
       name: "regression",
       invoke: () => regression(data, "target", ["feature_a", "feature_b"], "ridge"),
-      path: "/api/v1/ml/regression",
+      path: "/api/ml/regression",
       payload: {
         data,
         target_column: "target",
@@ -47,7 +47,7 @@ describe("ml API", () => {
     {
       name: "cluster",
       invoke: () => cluster(data, ["feature_a", "feature_b"], "dbscan", 5),
-      path: "/api/v1/ml/cluster",
+      path: "/api/ml/cluster",
       payload: {
         data,
         feature_columns: ["feature_a", "feature_b"],
@@ -66,7 +66,7 @@ describe("ml API", () => {
     {
       name: "classify",
       invoke: () => classify(data, "label", ["feature_a", "feature_b"], "svm"),
-      path: "/api/v1/ml/classify",
+      path: "/api/ml/classify",
       payload: {
         data,
         target_column: "label",
@@ -91,7 +91,7 @@ describe("ml API", () => {
     {
       name: "anomalyDetect",
       invoke: () => anomalyDetect(data, ["feature_a", "feature_b"], "lof", 0.2),
-      path: "/api/v1/ml/anomaly-detect",
+      path: "/api/ml/anomaly-detect",
       payload: {
         data,
         feature_columns: ["feature_a", "feature_b"],
@@ -109,7 +109,7 @@ describe("ml API", () => {
     {
       name: "pca",
       invoke: () => pca(data, ["feature_a", "feature_b"], 3),
-      path: "/api/v1/ml/pca",
+      path: "/api/ml/pca",
       payload: {
         data,
         feature_columns: ["feature_a", "feature_b"],
