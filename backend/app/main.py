@@ -11,9 +11,7 @@ from urllib.parse import urlsplit
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
-from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from slowapi.middleware import SlowAPIMiddleware
 from sqlalchemy import text
 
 from app.api.router import api_router
@@ -25,7 +23,8 @@ from app.models import analysis, dataset, query_history, user  # noqa: F401
 
 
 API_PATH_PREFIX = "/api"
-RATE_LIMIT_MAX_REQUESTS = 100
+# Aligned with slowapi's default_limits=["60/minute"] in app.middleware.rate_limit
+RATE_LIMIT_MAX_REQUESTS = 60
 RATE_LIMIT_WINDOW_SECONDS = 60
 HSTS_HEADER_VALUE = "max-age=63072000; includeSubDomains; preload"
 LOCALHOST_HOSTNAMES = {"localhost", "127.0.0.1", "::1", "test", "testserver"}
@@ -159,7 +158,30 @@ app.state.rate_limit_exempt_paths = exempt_paths() | {
     "/api/metrics",
     "/health/metrics",
 }
-app.add_middleware(SlowAPIMiddleware)
+async def _rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
+    """Return structured 429 with headers so clients can back off cleanly.
+
+    slowapi's default handler returns plain text without the rate-limit headers,
+    which breaks standard client behavior. We emit both a machine-readable body
+    (`error` key) and the full X-RateLimit-* / Retry-After headers.
+    """
+    limit_str = getattr(getattr(exc, "limit", None), "limit", None)
+    amount = getattr(limit_str, "amount", None) or 60
+    window = getattr(limit_str, "per", None) or 60
+    reset_epoch = int(time()) + int(window)
+
+    return JSONResponse(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        content={"error": f"Rate limit exceeded: {exc!s}"},
+        headers={
+            "X-RateLimit-Limit": str(amount),
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": str(reset_epoch),
+            "Retry-After": str(int(window)),
+        },
+    )
+
+
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(
     CORSMiddleware,
@@ -203,10 +225,12 @@ async def request_size_limit_middleware(request: Request, call_next):
 
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
-    if getattr(request.app.state, "limiter", None) is not None:
+    if not request.url.path.startswith(API_PATH_PREFIX):
         return await call_next(request)
 
-    if not request.url.path.startswith(API_PATH_PREFIX):
+    # Paths that are explicitly exempt from the default global limit
+    # (decorators via @limiter.limit still apply their own limits).
+    if request.url.path in app.state.rate_limit_exempt_paths:
         return await call_next(request)
 
     client_ip = get_client_ip(request)
@@ -215,7 +239,8 @@ async def rate_limit_middleware(request: Request, call_next):
     if not allowed:
         response = JSONResponse(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            content={"detail": "Rate limit exceeded. Please retry later."},
+            content={"error": "Rate limit exceeded. Please retry later."},
+            headers={"Retry-After": str(RATE_LIMIT_WINDOW_SECONDS)},
         )
     else:
         response = await call_next(request)
