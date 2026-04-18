@@ -105,6 +105,7 @@ export class DataLensSocket {
   private shouldReconnect = true;
   private isManualDisconnect = false;
   private lastToken: string | null = null;
+  private lastDatasetId: string | null = null;
   private _isConnected = false;
 
   private readonly url: string;
@@ -120,13 +121,16 @@ export class DataLensSocket {
     this.url = url;
   }
 
-  public connect(token?: string): void {
+  public connect(token?: string, datasetId?: string): void {
     if (typeof window === "undefined") {
       return;
     }
 
     if (typeof token === "string" && token.length > 0) {
       this.lastToken = token;
+    }
+    if (typeof datasetId === "string" && datasetId.length > 0) {
+      this.lastDatasetId = datasetId;
     }
 
     this.shouldReconnect = true;
@@ -143,7 +147,7 @@ export class DataLensSocket {
     }
 
     this.clearReconnectTimer();
-    const ws = new WebSocket(this.urlWithToken());
+    const ws = new WebSocket(this.urlWithConnectionParams());
     this.socket = ws;
     this.bindSocket(ws);
   }
@@ -251,7 +255,7 @@ export class DataLensSocket {
       if (!this.shouldReconnect || this.isManualDisconnect) {
         return;
       }
-      this.connect(this.lastToken ?? undefined);
+      this.connect(this.lastToken ?? undefined, this.lastDatasetId ?? undefined);
     }, delay);
   }
 
@@ -306,12 +310,22 @@ export class DataLensSocket {
     }
   }
 
-  private urlWithToken(): string {
-    if (!this.lastToken) {
+  private urlWithConnectionParams(): string {
+    const search = new URLSearchParams();
+
+    if (this.lastToken) {
+      search.set("token", this.lastToken);
+    }
+
+    if (this.lastDatasetId) {
+      search.set("dataset_id", this.lastDatasetId);
+    }
+
+    if (search.toString().length === 0) {
       return this.url;
     }
 
     const separator = this.url.includes("?") ? "&" : "?";
-    return `${this.url}${separator}token=${encodeURIComponent(this.lastToken)}`;
+    return `${this.url}${separator}${search.toString()}`;
   }
 }

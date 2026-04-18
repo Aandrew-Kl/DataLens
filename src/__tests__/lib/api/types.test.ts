@@ -41,12 +41,21 @@ describe('API type contracts', () => {
     expect(result.transformed_data).toHaveLength(2);
   });
 
-  it('ABTestResult has p_value, confidence_interval, effect_size, significant', () => {
+  it('ABTestResult has statistical metadata and summary fields', () => {
     const result = {
+      test_used: 'ttest_ind',
       p_value: 0.043,
+      statistic: 2.14,
       confidence_interval: [0.12, 0.58] as [number, number],
       effect_size: 0.35,
       significant: true,
+      summary: {
+        variant_a_count: 120,
+        variant_b_count: 118,
+        variant_a_mean: 0.22,
+        variant_b_mean: 0.27,
+        uplift: 0.05,
+      },
     } satisfies ABTestResult;
 
     expect(result.significant).toBe(true);
@@ -74,13 +83,21 @@ describe('API type contracts', () => {
     expect(result.id).toBe('user_123');
   });
 
-  it('ForecastResult has predictions and model', () => {
+  it('ForecastResult has method, forecast points, and metrics', () => {
     const result = {
-      predictions: [{ date: '2026-04-04', value: 102.3 }],
-      model: 'auto-arima',
+      method: 'holt_winters',
+      history_points: 12,
+      forecast_points: [{ date: '2026-04-04T00:00:00', forecast: 102.3, lower: 96.1, upper: 108.5 }],
+      metrics: {
+        rmse: 4.8,
+        mae: 3.9,
+        mape: 8.1,
+        last_actual: 99.4,
+        last_fitted: 98.7,
+      },
     } satisfies ForecastResult;
 
-    expect(result.predictions).toHaveLength(1);
+    expect(result.forecast_points).toHaveLength(1);
   });
 
   it('CohortResult has retention_rows and summaries', () => {

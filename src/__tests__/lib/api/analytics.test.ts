@@ -82,17 +82,46 @@ describe("analytics API", () => {
     },
     {
       name: "abTest",
-      invoke: () => abTest([1.2, 1.5, 1.7], [1.8, 2.1, 2.3]),
+      invoke: () =>
+        abTest(
+          [
+            { experiment_group: "control", conversion_rate: 1.2 },
+            { experiment_group: "control", conversion_rate: 1.5 },
+            { experiment_group: "treatment", conversion_rate: 1.8 },
+            { experiment_group: "treatment", conversion_rate: 2.1 },
+          ],
+          "experiment_group",
+          "conversion_rate",
+          "control",
+          "treatment",
+        ),
       path: "/api/analytics/ab-test",
       payload: {
-        control: [1.2, 1.5, 1.7],
-        treatment: [1.8, 2.1, 2.3],
+        data: [
+          { experiment_group: "control", conversion_rate: 1.2 },
+          { experiment_group: "control", conversion_rate: 1.5 },
+          { experiment_group: "treatment", conversion_rate: 1.8 },
+          { experiment_group: "treatment", conversion_rate: 2.1 },
+        ],
+        group_column: "experiment_group",
+        metric_column: "conversion_rate",
+        variant_a: "control",
+        variant_b: "treatment",
       },
       response: {
+        test_used: "ttest_ind",
         p_value: 0.03,
+        statistic: 2.31,
         confidence_interval: [0.1, 0.6] as [number, number],
         effect_size: 0.4,
         significant: true,
+        summary: {
+          variant_a_count: 2,
+          variant_b_count: 2,
+          variant_a_mean: 1.35,
+          variant_b_mean: 1.95,
+          uplift: 0.6,
+        },
       },
     },
     {
@@ -101,16 +130,24 @@ describe("analytics API", () => {
       path: "/api/analytics/forecast",
       payload: {
         data,
-        date_column: "signup_date",
-        value_column: "revenue",
+        date_col: "signup_date",
+        value_col: "revenue",
         periods: 6,
       },
       response: {
-        predictions: [
-          { date: "2026-02-01", value: 110 },
-          { date: "2026-03-01", value: 115 },
+        method: "holt_winters",
+        history_points: 12,
+        forecast_points: [
+          { date: "2026-02-01T00:00:00", forecast: 110, lower: 100, upper: 120 },
+          { date: "2026-03-01T00:00:00", forecast: 115, lower: 104, upper: 126 },
         ],
-        model: "arima",
+        metrics: {
+          rmse: 4.2,
+          mae: 3.6,
+          mape: 8.9,
+          last_actual: 101,
+          last_fitted: 99,
+        },
       },
     },
   ])("calls $name with the correct payload and returns the response", async ({

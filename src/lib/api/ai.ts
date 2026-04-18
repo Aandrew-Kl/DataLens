@@ -1,6 +1,19 @@
 import { request } from "./client";
 import type { SentimentResult, SummarizeResult, QueryGenerateResult } from "./types";
 
+export interface QuerySchemaColumn {
+  name: string;
+  type?: string;
+}
+
+export interface GenerateQueryPayload {
+  question: string;
+  table_name: string;
+  schema: QuerySchemaColumn[];
+  data: Record<string, unknown>[];
+  use_ollama?: boolean;
+}
+
 export async function sentiment(texts: string[]): Promise<SentimentResult> {
   return request<SentimentResult>("POST", "/api/ai/sentiment", {
     data: texts.map((text) => ({ text })),
@@ -19,9 +32,7 @@ export async function summarize(
 }
 
 export async function generateQuery(
-  question: string,
-  table_name: string,
-  columns: { name: string; type?: string }[],
+  payload: GenerateQueryPayload,
 ): Promise<QueryGenerateResult> {
-  return request<QueryGenerateResult>("POST", "/api/ai/generate-query", { question, table_name, columns });
+  return request<QueryGenerateResult>("POST", "/api/ai/generate-query", payload);
 }

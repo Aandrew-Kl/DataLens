@@ -29,17 +29,33 @@ export async function cohortAnalysis(
 }
 
 export async function abTest(
-  control: number[],
-  treatment: number[],
+  data: Record<string, unknown>[],
+  group_column: string,
+  metric_column: string,
+  variant_a: string,
+  variant_b: string,
 ): Promise<ABTestResult> {
-  return request<ABTestResult>("POST", "/api/analytics/ab-test", { control, treatment });
+  return request<ABTestResult>("POST", "/api/analytics/ab-test", {
+    data,
+    group_column,
+    metric_column,
+    variant_a,
+    variant_b,
+  });
 }
 
 export async function forecast(
   data: Record<string, unknown>[],
-  date_column: string,
-  value_column: string,
+  date_col: string,
+  value_col: string,
   periods: number = 12,
+  method?: string,
 ): Promise<ForecastResult> {
-  return request<ForecastResult>("POST", "/api/analytics/forecast", { data, date_column, value_column, periods });
+  return request<ForecastResult>("POST", "/api/analytics/forecast", {
+    data,
+    date_col,
+    value_col,
+    periods,
+    ...(method ? { method } : {}),
+  });
 }

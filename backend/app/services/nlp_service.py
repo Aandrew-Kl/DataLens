@@ -6,6 +6,7 @@ import logging
 import re
 from collections import Counter
 from time import perf_counter
+from typing import Any
 
 import pandas as pd
 import sqlparse
@@ -28,6 +29,8 @@ _ORDER_RE = re.compile(r"\bORDER\s+BY\b(.*?)(?:\bLIMIT\b|$)", re.IGNORECASE | re
 _WHERE_RE = re.compile(r"\bWHERE\b(.*?)(?:\bGROUP\b|\bORDER\b|\bLIMIT\b|$)", re.IGNORECASE | re.DOTALL)
 _LIMIT_RE = re.compile(r"\bLIMIT\b\s+(\d+)", re.IGNORECASE)
 _stemmer = SnowballStemmer("english")
+_NUMERIC_SCHEMA_TYPES = {"number", "integer", "int", "float", "double", "decimal"}
+_TEMPORAL_SCHEMA_TYPES = {"date", "datetime", "timestamp", "time"}
 
 
 def _analyzer(text: str) -> list[str]:
@@ -164,15 +167,116 @@ def summarize(frame: pd.DataFrame, dataset_id: int, text_columns: list[str], max
     }
 
 
-def _extract_entities(question: str, frame: pd.DataFrame) -> dict:
+def _normalize_schema_entry(entry: Any) -> tuple[str, str] | None:
+    """Normalize a schema entry into a column name and lower-cased type."""
+
+    if isinstance(entry, dict):
+        name = entry.get("name")
+        type_name = entry.get("type")
+    else:
+        name = getattr(entry, "name", None)
+        type_name = getattr(entry, "type", None)
+
+    if not isinstance(name, str):
+        return None
+
+    normalized_name = name.strip()
+    if not normalized_name:
+        return None
+
+    normalized_type = (
+        type_name.strip().lower()
+        if isinstance(type_name, str) and type_name.strip()
+        else "unknown"
+    )
+    return normalized_name, normalized_type
+
+
+def _schema_columns(schema: list[Any] | None) -> tuple[list[str], list[str], list[str]]:
+    """Extract ordered column names and coarse type buckets from schema metadata."""
+
+    columns: list[str] = []
+    numeric_columns: list[str] = []
+    categorical_columns: list[str] = []
+
+    for entry in schema or []:
+        normalized = _normalize_schema_entry(entry)
+        if normalized is None:
+            continue
+
+        column_name, type_name = normalized
+        if column_name in columns:
+            continue
+
+        columns.append(column_name)
+        if type_name in _NUMERIC_SCHEMA_TYPES:
+            numeric_columns.append(column_name)
+        else:
+            categorical_columns.append(column_name)
+
+    return columns, numeric_columns, categorical_columns
+
+
+def _build_context_frame(schema: list[Any] | None, data: list[dict[str, Any]] | None) -> pd.DataFrame:
+    """Build a frame from request data while preserving schema-only column context."""
+
+    frame = pd.DataFrame(data or [])
+    schema_columns, _, _ = _schema_columns(schema)
+
+    if not schema_columns:
+        return frame
+
+    dtype_map: dict[str, str] = {}
+    for entry in schema or []:
+        normalized = _normalize_schema_entry(entry)
+        if normalized is None:
+            continue
+
+        column_name, type_name = normalized
+        if type_name in _NUMERIC_SCHEMA_TYPES:
+            dtype_map[column_name] = "float64"
+        elif type_name in _TEMPORAL_SCHEMA_TYPES:
+            dtype_map[column_name] = "datetime64[ns]"
+        else:
+            dtype_map[column_name] = "object"
+
+    if frame.empty:
+        return pd.DataFrame(
+            {
+                column_name: pd.Series(dtype=dtype_map.get(column_name, "object"))
+                for column_name in schema_columns
+            }
+        )
+
+    for column_name in schema_columns:
+        if column_name not in frame.columns:
+            frame[column_name] = pd.Series(index=frame.index, dtype=dtype_map.get(column_name, "object"))
+
+    for column_name, dtype in dtype_map.items():
+        if column_name not in frame.columns:
+            continue
+        if dtype == "float64":
+            frame[column_name] = pd.to_numeric(frame[column_name], errors="coerce")
+        elif dtype == "datetime64[ns]":
+            frame[column_name] = pd.to_datetime(frame[column_name], errors="coerce")
+
+    ordered_columns = schema_columns + [column for column in frame.columns if column not in schema_columns]
+    return frame[ordered_columns]
+
+
+def _extract_entities(question: str, frame: pd.DataFrame, schema: list[Any] | None = None) -> dict:
     """Extract likely columns, operations, and filters from a natural-language question."""
 
     lowered = question.lower()
-    columns = list(frame.columns)
+    schema_columns, schema_numeric_columns, _ = _schema_columns(schema)
+    columns = schema_columns or list(frame.columns)
     matched_columns = [column for column in columns if column.lower() in lowered]
-    numeric_columns = [
-        column for column in columns if pd.api.types.is_numeric_dtype(frame[column])
+    inferred_numeric_columns = [
+        column
+        for column in columns
+        if column in frame.columns and pd.api.types.is_numeric_dtype(frame[column])
     ]
+    numeric_columns = list(dict.fromkeys([*schema_numeric_columns, *inferred_numeric_columns]))
     categorical_columns = [column for column in columns if column not in numeric_columns]
 
     aggregate = "count"
@@ -272,18 +376,40 @@ async def _generate_with_ollama(question: str, columns: list[str], table_name: s
         return None
 
 
-async def generate_query(request: NLQueryRequest, frame: pd.DataFrame, table_name: str) -> dict:
+async def generate_sql_from_question(
+    question: str,
+    *,
+    schema: list[Any] | None = None,
+    data: list[dict[str, Any]] | None = None,
+    table_name: str,
+    use_ollama: bool = False,
+) -> dict:
+    """Translate a natural-language question into SQL using schema and sample rows."""
+
+    frame = _build_context_frame(schema, data)
+    request = NLQueryRequest(question=question, use_ollama=use_ollama)
+    return await generate_query(request, frame, table_name=table_name, schema=schema)
+
+
+async def generate_query(
+    request: NLQueryRequest,
+    frame: pd.DataFrame,
+    table_name: str,
+    schema: list[Any] | None = None,
+) -> dict:
     """Translate a natural-language question into SQL."""
 
     logger.info("Generating SQL for: %s", request.question[:100])
 
     start = perf_counter()
-    entities = _extract_entities(request.question, frame)
+    schema_columns, _, _ = _schema_columns(schema)
+    context_columns = schema_columns or list(frame.columns)
+    entities = _extract_entities(request.question, frame, schema=schema)
     sql = _build_sql(entities, table_name)
     used_ollama = False
 
     if request.use_ollama:
-        ollama_sql = await _generate_with_ollama(request.question, list(frame.columns), table_name)
+        ollama_sql = await _generate_with_ollama(request.question, context_columns, table_name)
         if ollama_sql:
             sql = ollama_sql.strip().strip("`")
             used_ollama = True

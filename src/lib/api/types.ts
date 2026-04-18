@@ -120,15 +120,31 @@ export interface CohortResult {
 }
 
 export interface ABTestResult {
+  test_used: string;
   p_value: number;
+  statistic: number;
   confidence_interval: [number, number];
   effect_size: number;
   significant: boolean;
+  summary: Record<string, number>;
 }
 
 export interface ForecastResult {
-  predictions: { date: string; value: number }[];
-  model: string;
+  method: string;
+  history_points: number;
+  forecast_points: Array<{
+    date: string;
+    forecast: number;
+    lower: number;
+    upper: number;
+  }>;
+  metrics: {
+    rmse: number;
+    mae: number;
+    mape: number | null;
+    last_actual: number;
+    last_fitted: number;
+  };
 }
 
 export type ApiFieldErrors = Record<string, string>;

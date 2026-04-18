@@ -551,7 +551,10 @@ export default function DataOpsPage() {
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
           Execute a streaming query against the backend and inspect rows as they arrive from the server in real time.
         </p>
-        <StreamingDataViewer className="mt-4 border-white/20 bg-white/45 dark:bg-slate-950/45" />
+        <StreamingDataViewer
+          datasetId={activeDataset?.id ?? null}
+          className="mt-4 border-white/20 bg-white/45 dark:bg-slate-950/45"
+        />
       </section>
     </div>
   );

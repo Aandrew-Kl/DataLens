@@ -32,17 +32,18 @@ describe("StreamingDataViewer", () => {
   });
 
   it("renders the connection indicator", () => {
-    render(<StreamingDataViewer />);
+    render(<StreamingDataViewer datasetId="dataset-1" />);
 
     expect(mockUseStreamingQuery).toHaveBeenCalledWith(
       "ws://localhost:8000/ws/data-stream",
+      "dataset-1",
     );
     expect(screen.getByText("Connected")).toBeInTheDocument();
     expect(screen.getByLabelText("WebSocket connected")).toBeInTheDocument();
   });
 
   it("renders the query input and stream button", () => {
-    render(<StreamingDataViewer />);
+    render(<StreamingDataViewer datasetId="dataset-1" />);
 
     const input = screen.getByLabelText("SQL query");
     const button = screen.getByRole("button", { name: "Stream" });
@@ -63,7 +64,7 @@ describe("StreamingDataViewer", () => {
       }),
     );
 
-    render(<StreamingDataViewer />);
+    render(<StreamingDataViewer datasetId="dataset-1" />);
 
     expect(screen.getByRole("progressbar", { name: "Streaming progress" })).toBeInTheDocument();
     expect(screen.getByText("42%")).toBeInTheDocument();
@@ -80,7 +81,7 @@ describe("StreamingDataViewer", () => {
       }),
     );
 
-    render(<StreamingDataViewer />);
+    render(<StreamingDataViewer datasetId="dataset-1" />);
 
     expect(screen.getByRole("columnheader", { name: "id" })).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "name" })).toBeInTheDocument();
@@ -95,13 +96,13 @@ describe("StreamingDataViewer", () => {
       }),
     );
 
-    render(<StreamingDataViewer />);
+    render(<StreamingDataViewer datasetId="dataset-1" />);
 
     expect(screen.getByRole("alert")).toHaveTextContent("Stream failed");
   });
 
   it("shows the empty state", () => {
-    render(<StreamingDataViewer />);
+    render(<StreamingDataViewer datasetId="dataset-1" />);
 
     expect(screen.getByText("No results yet")).toBeInTheDocument();
     expect(

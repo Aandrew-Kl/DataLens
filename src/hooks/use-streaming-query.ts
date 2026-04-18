@@ -149,7 +149,10 @@ function isDone(payload: Record<string, unknown>): boolean {
  * All state transitions happen inside event callbacks (not synchronously in
  * useEffect bodies) so they comply with the React 19 rules-of-hooks.
  */
-export function useStreamingQuery(url = DEFAULT_WS_URL): UseStreamingQueryState {
+export function useStreamingQuery(
+  url = DEFAULT_WS_URL,
+  datasetId?: string | null,
+): UseStreamingQueryState {
   const socketRef = useRef<DataLensSocket | null>(null);
   const activeRef = useRef(false);
 
@@ -215,7 +218,9 @@ export function useStreamingQuery(url = DEFAULT_WS_URL): UseStreamingQueryState 
         ? undefined
         : window.localStorage.getItem("datalens_token") ?? undefined;
 
-    socket.connect(token);
+    if (datasetId) {
+      socket.connect(token, datasetId);
+    }
 
     return () => {
       socket.disconnect();
@@ -223,13 +228,20 @@ export function useStreamingQuery(url = DEFAULT_WS_URL): UseStreamingQueryState 
         socketRef.current = null;
       }
     };
-  }, [url]);
+  }, [datasetId, url]);
 
   const execute = useCallback(
     (query: string) => {
       const sql = query.trim();
       if (!sql) {
         setQueryError("Cannot execute empty query.");
+        setIsStreaming(false);
+        activeRef.current = false;
+        return;
+      }
+
+      if (!datasetId) {
+        setQueryError("Select a dataset before starting a streamed query.");
         setIsStreaming(false);
         activeRef.current = false;
         return;
@@ -251,7 +263,7 @@ export function useStreamingQuery(url = DEFAULT_WS_URL): UseStreamingQueryState 
         query: sql,
       });
     },
-    [isConnected],
+    [datasetId, isConnected],
   );
 
   return {

@@ -86,6 +86,17 @@ function sampleVariance(values: number[]) {
   return total / (values.length - 1);
 }
 
+function readSummaryMetric(summary: Record<string, number>, ...keys: string[]) {
+  for (const key of keys) {
+    const value = summary[key];
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
 function buildQuery(tableName: string, groupColumn: string, metricColumn: string) {
   return `
     SELECT
@@ -149,13 +160,29 @@ function buildAbTestResultFromBackend(
 ): AbTestResult {
   const control = summarizeGroup(controlValue, controlValues);
   const treatment = summarizeGroup(treatmentValue, treatmentValues);
+  const controlMean =
+    readSummaryMetric(backendResult.summary, "variant_a_mean", "variant_a_rate") ?? control.mean;
+  const treatmentMean =
+    readSummaryMetric(backendResult.summary, "variant_b_mean", "variant_b_rate") ?? treatment.mean;
+  const controlCount = readSummaryMetric(backendResult.summary, "variant_a_count") ?? control.count;
+  const treatmentCount = readSummaryMetric(backendResult.summary, "variant_b_count") ?? treatment.count;
+  const uplift =
+    readSummaryMetric(backendResult.summary, "uplift") ?? (treatmentMean - controlMean);
 
   return {
-    control,
-    treatment,
-    lift: backendResult.effect_size,
+    control: {
+      ...control,
+      count: controlCount,
+      mean: controlMean,
+    },
+    treatment: {
+      ...treatment,
+      count: treatmentCount,
+      mean: treatmentMean,
+    },
+    lift: controlMean === 0 ? 0 : uplift / controlMean,
     pValue: backendResult.p_value,
-    zScore: backendResult.effect_size / (backendResult.p_value > 0 ? backendResult.p_value : 1),
+    zScore: backendResult.statistic,
     significant: backendResult.significant,
     confidenceInterval: backendResult.confidence_interval,
   };
@@ -239,47 +266,54 @@ export default function AbTestAnalyzer({
 
     try {
       const rows = await runQuery(buildQuery(tableName, groupColumn, metricColumn));
-      const controlGroup = rows.filter((row) => row.experiment_group === controlValue);
-      const treatmentGroup = rows.filter((row) => row.experiment_group === treatmentValue);
-      const controlValues = controlGroup
-        .map((row) =>
-          Number(
-            (row as Record<string, unknown>)[metricColumn] ??
-              (row as Record<string, unknown>).metric_value ??
-              "",
-          ),
-        )
+      const analysisRows = rows.flatMap<Record<string, unknown>>((row) => {
+        const record = row as Record<string, unknown>;
+        const metricValue = Number(record[metricColumn] ?? record.metric_value ?? "");
+        const groupValue = String(record[groupColumn] ?? record.experiment_group ?? "");
+
+        if (!groupValue || !Number.isFinite(metricValue)) {
+          return [];
+        }
+
+        return [{ [groupColumn]: groupValue, [metricColumn]: metricValue }];
+      });
+      const controlValues = analysisRows
+        .filter((row) => row[groupColumn] === controlValue)
+        .map((row) => Number(row[metricColumn]))
         .filter((value) => Number.isFinite(value));
-      const treatmentValues = treatmentGroup
-        .map((row) =>
-          Number(
-            (row as Record<string, unknown>)[metricColumn] ??
-              (row as Record<string, unknown>).metric_value ??
-              "",
-          ),
-        )
+      const treatmentValues = analysisRows
+        .filter((row) => row[groupColumn] === treatmentValue)
+        .map((row) => Number(row[metricColumn]))
         .filter((value) => Number.isFinite(value));
+      let usedLocalFallback = useBackend && backendFailed;
 
       if (useBackend && !backendFailed) {
         try {
-          const result = await abTest(controlValues, treatmentValues);
+          const result = await abTest(
+            analysisRows,
+            groupColumn,
+            metricColumn,
+            controlValue,
+            treatmentValue,
+          );
 
           startTransition(() => {
-            setResult(
-              buildAbTestResultFromBackend(
-                result,
-                controlValues,
-                treatmentValues,
-                controlValue,
-                treatmentValue,
-              ),
+            const backendAnalysis = buildAbTestResultFromBackend(
+              result,
+              controlValues,
+              treatmentValues,
+              controlValue,
+              treatmentValue,
             );
+            setResult(backendAnalysis);
             setStatus(
-              `Backend analysis: Treatment improves ${metricColumn} by ${formatRate(result.effect_size)} with p=${result.p_value.toFixed(3)}.`,
+              `Backend analysis: Treatment improves ${metricColumn} by ${formatRate(backendAnalysis.lift)} with p=${result.p_value.toFixed(3)}.`,
             );
           });
           return;
-        } catch {
+        } catch (error) {
+          console.warn("A/B test backend unavailable; falling back to local compute.", error);
+          usedLocalFallback = true;
           startTransition(() => {
             setBackendFailed(true);
           });
@@ -299,7 +333,7 @@ export default function AbTestAnalyzer({
         startTransition(() => {
           setResult(nextResult);
           setStatus(
-            `Treatment improves ${metricColumn} by ${formatRate(nextResult.lift)} with p=${nextResult.pValue.toFixed(3)}.`,
+            `${usedLocalFallback ? "Local fallback: " : ""}Treatment improves ${metricColumn} by ${formatRate(nextResult.lift)} with p=${nextResult.pValue.toFixed(3)}.`,
           );
         });
       }

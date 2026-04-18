@@ -59,17 +59,29 @@ describe("ai API", () => {
     {
       name: "generateQuery",
       invoke: () =>
-        generateQuery("Show revenue by region", "sales", [
-          { name: "region", type: "text" },
-          { name: "revenue", type: "number" },
-        ]),
+        generateQuery({
+          question: "Show revenue by region",
+          table_name: "sales",
+          schema: [
+            { name: "region", type: "string" },
+            { name: "revenue", type: "number" },
+          ],
+          data: [
+            { region: "North", revenue: 120 },
+            { region: "South", revenue: 90 },
+          ],
+        }),
       path: "/api/ai/generate-query",
       payload: {
         question: "Show revenue by region",
         table_name: "sales",
-        columns: [
-          { name: "region", type: "text" },
+        schema: [
+          { name: "region", type: "string" },
           { name: "revenue", type: "number" },
+        ],
+        data: [
+          { region: "North", revenue: 120 },
+          { region: "South", revenue: 90 },
         ],
       },
       response: {

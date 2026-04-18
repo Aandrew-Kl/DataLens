@@ -46,7 +46,34 @@ async def test_ai_summarize_endpoint_returns_summary_and_top_terms(
     assert isinstance(payload["top_terms"], list)
 
 
-async def test_ai_generate_query_endpoint_returns_sql(
+async def test_ai_generate_query_endpoint_uses_sent_schema(
+    client: AsyncClient,
+    auth_headers: dict[str, str],
+) -> None:
+    response = await client.post(
+        "/ai/generate-query",
+        json={
+            "schema": [
+                {"name": "region", "type": "string"},
+                {"name": "revenue", "type": "number"},
+            ],
+            "data": [],
+            "question": "show revenue by region",
+            "table_name": "test_table",
+            "use_ollama": False,
+        },
+        headers=auth_headers,
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert "sql" in payload
+    assert 'SUM("revenue")' in payload["sql"]
+    assert '"region"' in payload["sql"]
+    assert "COUNT(*)" not in payload["sql"].upper()
+
+
+async def test_ai_generate_query_endpoint_returns_count_sql_from_rows(
     client: AsyncClient,
     auth_headers: dict[str, str],
 ) -> None:
@@ -56,6 +83,10 @@ async def test_ai_generate_query_endpoint_returns_sql(
             "data": [
                 {"name": "Ada", "age": 31},
                 {"name": "Linus", "age": 28},
+            ],
+            "schema": [
+                {"name": "name", "type": "string"},
+                {"name": "age", "type": "number"},
             ],
             "question": "how many rows",
             "table_name": "test_table",
