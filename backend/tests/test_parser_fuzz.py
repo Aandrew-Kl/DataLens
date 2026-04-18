@@ -21,7 +21,7 @@ def dataframe_payloads(draw):
     column_count = draw(st.integers(min_value=1, max_value=4))
     row_count = draw(st.integers(min_value=1, max_value=8))
     headers = draw(st.lists(st.text(min_size=0, max_size=12), min_size=column_count, max_size=column_count))
-    cell_strategy = st.oneof(
+    cell_strategy = st.one_of(
         st.text(max_size=32),
         st.integers(min_value=-10_000, max_value=10_000),
         st.floats(allow_nan=False, allow_infinity=False, width=32),
