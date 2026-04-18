@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useTransition, type FormEvent } from "react";
+import { useId, useState, useTransition, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { register } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/types";
+import { ToastProvider, useToast } from "@/components/ui/toast";
 
 interface RegisterFormProps {
   redirectTo?: string;
@@ -33,16 +35,19 @@ function buildAuthLink(pathname: string, redirectTo: string): string {
   return `${pathname}?redirect=${encodeURIComponent(redirectTo)}`;
 }
 
-export default function RegisterForm({
+function RegisterFormContent({
   redirectTo = "/",
   className = "",
   title = "Create your account",
 }: RegisterFormProps): React.ReactNode {
   const router = useRouter();
+  const { toast } = useToast();
+  const passwordErrorId = useId();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTransitioning, startTransition] = useTransition();
@@ -77,6 +82,14 @@ export default function RegisterForm({
     const validationError = validateForm();
     if (validationError) {
       startTransition(() => {
+        setSuccessMessage(null);
+        if (validationError.startsWith("Password must")) {
+          setPasswordError(validationError);
+          setError(null);
+          return;
+        }
+
+        setPasswordError(null);
         setError(validationError);
       });
       return;
@@ -84,6 +97,7 @@ export default function RegisterForm({
 
     startTransition(() => {
       setError(null);
+      setPasswordError(null);
       setSuccessMessage(null);
       setIsSubmitting(true);
     });
@@ -99,10 +113,30 @@ export default function RegisterForm({
         router.push(redirectTo);
       });
     } catch (err: unknown) {
+      const fieldErrors = err instanceof ApiError ? err.fieldErrors : undefined;
+      const nextErrorMessage = getErrorMessage(err);
+      const nextPasswordError = fieldErrors?.password;
+      const nextToastMessage =
+        Object.entries(fieldErrors ?? {}).find(([field]) => field !== "password")?.[1] ??
+        (nextPasswordError ? null : nextErrorMessage);
+
       startTransition(() => {
         setIsSubmitting(false);
-        setError(getErrorMessage(err));
+        setSuccessMessage(null);
+
+        if (nextPasswordError) {
+          setPasswordError(nextPasswordError);
+          setError(null);
+          return;
+        }
+
+        setPasswordError(null);
+        setError(null);
       });
+
+      if (nextToastMessage) {
+        toast(nextToastMessage, "error");
+      }
     }
   };
 
@@ -125,7 +159,12 @@ export default function RegisterForm({
             name="email"
             autoComplete="email"
             value={email}
-            onChange={(event): void => setEmail(event.target.value)}
+            onChange={(event): void => {
+              setEmail(event.target.value);
+              if (error) {
+                setError(null);
+              }
+            }}
             className="w-full rounded-xl border border-white/25 bg-white/60 px-4 py-3 text-slate-900 outline-none ring-0 transition focus:border-cyan-300 focus:shadow-sm focus:shadow-cyan-200 dark:bg-slate-900/60 dark:text-slate-100"
             placeholder="you@example.com"
             required
@@ -139,12 +178,32 @@ export default function RegisterForm({
             name="password"
             autoComplete="new-password"
             value={password}
-            onChange={(event): void => setPassword(event.target.value)}
-            className="w-full rounded-xl border border-white/25 bg-white/60 px-4 py-3 text-slate-900 outline-none ring-0 transition focus:border-cyan-300 focus:shadow-sm focus:shadow-cyan-200 dark:bg-slate-900/60 dark:text-slate-100"
+            onChange={(event): void => {
+              setPassword(event.target.value);
+              if (passwordError) {
+                setPasswordError(null);
+              }
+            }}
+            aria-invalid={passwordError ? true : undefined}
+            aria-describedby={passwordError ? passwordErrorId : undefined}
+            className={`w-full rounded-xl border bg-white/60 px-4 py-3 text-slate-900 outline-none ring-0 transition focus:border-cyan-300 focus:shadow-sm focus:shadow-cyan-200 dark:bg-slate-900/60 dark:text-slate-100 ${
+              passwordError
+                ? "border-red-300 dark:border-red-700"
+                : "border-white/25"
+            }`}
             placeholder="Min 8 chars, uppercase, lowercase, digit"
             required
           />
         </label>
+        {passwordError ? (
+          <p
+            id={passwordErrorId}
+            role="alert"
+            className="-mt-2 text-sm text-red-700 dark:text-red-300"
+          >
+            {passwordError}
+          </p>
+        ) : null}
 
         <label className="block">
           <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">Confirm password</span>
@@ -153,7 +212,12 @@ export default function RegisterForm({
             name="confirmPassword"
             autoComplete="new-password"
             value={confirmPassword}
-            onChange={(event): void => setConfirmPassword(event.target.value)}
+            onChange={(event): void => {
+              setConfirmPassword(event.target.value);
+              if (error) {
+                setError(null);
+              }
+            }}
             className="w-full rounded-xl border border-white/25 bg-white/60 px-4 py-3 text-slate-900 outline-none ring-0 transition focus:border-cyan-300 focus:shadow-sm focus:shadow-cyan-200 dark:bg-slate-900/60 dark:text-slate-100"
             placeholder="Repeat your password"
             required
@@ -198,5 +262,13 @@ export default function RegisterForm({
         </Link>
       </p>
     </section>
+  );
+}
+
+export default function RegisterForm(props: RegisterFormProps): React.ReactNode {
+  return (
+    <ToastProvider>
+      <RegisterFormContent {...props} />
+    </ToastProvider>
   );
 }

@@ -39,22 +39,7 @@ function isRetriableError(error: ApiError): boolean {
 }
 
 function getErrorMessage(body: unknown, fallback: string): string {
-  if (typeof body === "string" && body.trim()) {
-    return body;
-  }
-
-  if (body && typeof body === "object") {
-    const record = body as Record<string, unknown>;
-
-    for (const key of ["message", "detail", "error"]) {
-      const value = record[key];
-      if (typeof value === "string" && value.trim()) {
-        return value;
-      }
-    }
-  }
-
-  return fallback;
+  return new ApiError(0, fallback, body).message;
 }
 
 async function readResponseBody(response: Response): Promise<unknown> {

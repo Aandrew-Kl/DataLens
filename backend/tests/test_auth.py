@@ -7,8 +7,11 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from httpx import AsyncClient
 from jose import jwt
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.config import settings
+from app.database import get_db
+from app.main import app
 from app.utils.security import hash_password, verify_password
 
 
@@ -54,6 +57,45 @@ async def test_register_duplicate_email(client: AsyncClient) -> None:
     duplicate_response = await client.post("/auth/register", json=payload)
     assert duplicate_response.status_code == 409
     assert duplicate_response.json()["detail"] == "Email is already registered."
+
+
+@pytest.mark.asyncio
+async def test_register_db_error_returns_friendly_message(client: AsyncClient) -> None:
+    class DummyResult:
+        def scalar_one_or_none(self) -> None:
+            return None
+
+    class FailingSession:
+        async def execute(self, _statement):
+            return DummyResult()
+
+        def add(self, _instance) -> None:
+            return None
+
+        async def commit(self) -> None:
+            raise SQLAlchemyError("database unavailable")
+
+        async def rollback(self) -> None:
+            return None
+
+        async def refresh(self, _instance) -> None:
+            raise AssertionError("refresh should not run after commit failure")
+
+    async def override_get_db():
+        yield FailingSession()
+
+    app.dependency_overrides[get_db] = override_get_db
+
+    try:
+        response = await client.post(
+            "/auth/register",
+            json={"email": "db-error@example.com", "password": "StrongPass123"},
+        )
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Account creation failed. Try again."}
 
 
 @pytest.mark.asyncio

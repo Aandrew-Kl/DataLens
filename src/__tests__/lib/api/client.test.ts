@@ -164,6 +164,49 @@ describe("api client", () => {
     });
   });
 
+  test("maps FastAPI validation arrays to field errors", async () => {
+    const fetchMock = jest.mocked(globalThis.fetch);
+    fetchMock.mockResolvedValue(
+      createJsonResponse(
+        {
+          detail: [
+            {
+              type: "value_error",
+              loc: ["body", "password"],
+              msg: "Password must contain at least one digit.",
+            },
+          ],
+        },
+        { ok: false, status: 422, statusText: "Unprocessable Entity" },
+      ),
+    );
+
+    const { request, ApiError } = await loadClient();
+
+    const invalidRequest = request("POST", "/api/auth/register", {
+      email: "new-user@example.com",
+      password: "NoDigitsHere",
+    });
+
+    await expect(invalidRequest).rejects.toBeInstanceOf(ApiError);
+    await expect(invalidRequest).rejects.toMatchObject({
+      status: 422,
+      message: "Password must contain at least one digit.",
+      detail: "Password must contain at least one digit.",
+      fieldErrors: {
+        password: "Password must contain at least one digit.",
+      },
+      body: {
+        detail: [
+          expect.objectContaining({
+            loc: ["body", "password"],
+            msg: "Password must contain at least one digit.",
+          }),
+        ],
+      },
+    });
+  });
+
   test("uploads files as form data and preserves auth headers", async () => {
     const responseBody = { id: "upload-1" };
     const fetchMock = jest.mocked(globalThis.fetch);

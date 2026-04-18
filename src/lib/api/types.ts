@@ -131,6 +131,62 @@ export interface ForecastResult {
   model: string;
 }
 
+export type ApiFieldErrors = Record<string, string>;
+
+function getApiErrorFieldKey(loc: unknown): string | undefined {
+  if (!Array.isArray(loc) || loc.length === 0) {
+    return undefined;
+  }
+
+  const path = loc
+    .filter((part): part is string | number => typeof part === "string" || typeof part === "number")
+    .map((part) => String(part));
+
+  if (path.length === 0) {
+    return undefined;
+  }
+
+  const bodyIndex = path.indexOf("body");
+  const fieldPath = bodyIndex >= 0 ? path.slice(bodyIndex + 1) : path;
+
+  if (fieldPath.length === 0) {
+    return undefined;
+  }
+
+  return fieldPath.join(".");
+}
+
+export function getApiFieldErrors(body: unknown): ApiFieldErrors | undefined {
+  if (!body || typeof body !== "object") {
+    return undefined;
+  }
+
+  const detail = (body as Record<string, unknown>).detail;
+  if (!Array.isArray(detail)) {
+    return undefined;
+  }
+
+  const fieldErrors: ApiFieldErrors = {};
+
+  for (const issue of detail) {
+    if (!issue || typeof issue !== "object") {
+      continue;
+    }
+
+    const record = issue as Record<string, unknown>;
+    const field = getApiErrorFieldKey(record.loc);
+    const message = typeof record.msg === "string" ? record.msg.trim() : "";
+
+    if (!field || !message || fieldErrors[field]) {
+      continue;
+    }
+
+    fieldErrors[field] = message;
+  }
+
+  return Object.keys(fieldErrors).length > 0 ? fieldErrors : undefined;
+}
+
 function getApiErrorDetail(body: unknown): string | undefined {
   if (typeof body === "string" && body.trim()) {
     return body;
@@ -149,6 +205,20 @@ function getApiErrorDetail(body: unknown): string | undefined {
     }
   }
 
+  const fieldErrors = getApiFieldErrors(body);
+  if (!fieldErrors) {
+    return undefined;
+  }
+
+  return Object.values(fieldErrors)[0];
+}
+
+function getApiErrorMessage(body: unknown): string | undefined {
+  const detail = getApiErrorDetail(body);
+  if (detail) {
+    return detail;
+  }
+
   return undefined;
 }
 
@@ -156,13 +226,15 @@ export class ApiError extends Error {
   readonly status: number;
   readonly body: unknown;
   readonly detail?: string;
+  readonly fieldErrors?: ApiFieldErrors;
 
   constructor(status: number, message: string, body: unknown = null) {
-    super(message);
+    super(getApiErrorMessage(body) ?? message);
     this.name = "ApiError";
     this.status = status;
     this.body = body;
     this.detail = getApiErrorDetail(body);
+    this.fieldErrors = getApiFieldErrors(body);
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }
