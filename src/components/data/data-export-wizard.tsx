@@ -14,7 +14,6 @@ import {
   FileText,
   Loader2,
 } from "lucide-react";
-import * as XLSX from "xlsx";
 import { runQuery } from "@/lib/duckdb/client";
 import { downloadFile } from "@/lib/utils/export";
 import { formatNumber } from "@/lib/utils/formatters";
@@ -132,6 +131,47 @@ function serializeParquetPayload(
     null,
     2,
   );
+}
+
+function collectHeaders(rows: Record<string, unknown>[]) {
+  const headers = new Set<string>();
+
+  for (const row of rows) {
+    Object.keys(row).forEach((key) => headers.add(key));
+  }
+
+  return Array.from(headers);
+}
+
+function normalizeSheetName(sheetName: string) {
+  const sanitized = sheetName.replace(/[\\/*?:[\]]/g, "").trim();
+  return (sanitized || "DataLensExport").slice(0, 31);
+}
+
+async function buildExcelWorkbook(
+  rows: Record<string, unknown>[],
+  sheetName: string,
+) {
+  const ExcelJS = await import("exceljs");
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet(normalizeSheetName(sheetName));
+  const headers = collectHeaders(rows);
+
+  if (headers.length > 0) {
+    worksheet.columns = headers.map((header) => ({
+      header,
+      key: header,
+    }));
+
+    rows.forEach((row) => {
+      const normalizedRow = Object.fromEntries(
+        headers.map((header) => [header, row[header] ?? null]),
+      );
+      worksheet.addRow(normalizedRow);
+    });
+  }
+
+  return workbook.xlsx.writeBuffer();
 }
 
 function buildPreviewQuery(tableName: string, rowLimit: number) {
@@ -273,10 +313,7 @@ export default function DataExportWizard({
           "application/octet-stream",
         );
       } else {
-        const workbook = XLSX.utils.book_new();
-        const worksheet = XLSX.utils.json_to_sheet(rows);
-        XLSX.utils.book_append_sheet(workbook, worksheet, sheetName || "DataLensExport");
-        const workbookData = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const workbookData = await buildExcelWorkbook(rows, sheetName);
         downloadFile(
           workbookData,
           `${fileBase}.xlsx`,

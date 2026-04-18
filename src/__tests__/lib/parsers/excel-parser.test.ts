@@ -1,51 +1,62 @@
-import * as XLSX from "xlsx";
 import { parseExcel } from "../../../lib/parsers/excel-parser";
 
-jest.mock("xlsx", () => ({
-  read: jest.fn().mockReturnValue({
-    SheetNames: ["Sheet1"],
-    Sheets: { Sheet1: {} },
-  }),
-  utils: {
-    sheet_to_csv: jest.fn().mockReturnValue("a,b\n1,2"),
+const load = jest.fn();
+const workbook = {
+  xlsx: {
+    load,
   },
+  worksheets: [
+    {
+      rowCount: 2,
+      actualColumnCount: 2,
+      getRow: (index: number) => ({
+        getCell: (cellIndex: number) => {
+          const values = [
+            ["a", "b"],
+            ["1", "2"],
+          ];
+          return { value: values[index - 1]?.[cellIndex - 1] ?? "" };
+        },
+      }),
+    },
+  ],
+};
+const Workbook = jest.fn(() => workbook);
+
+jest.mock("exceljs", () => ({
+  Workbook,
 }));
 
-class MockFileReader {
-  onload: ((event: { target: { result: ArrayBuffer | null } }) => void) | null = null;
-  onerror: (() => void) | null = null;
-
-  readAsArrayBuffer(file: File): void {
-    void file;
-    if (this.onload) {
-      this.onload({ target: { result: new ArrayBuffer(8) } });
-    }
-  }
+function createFile(name = "report.xlsx") {
+  return {
+    name,
+    arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(8)),
+  } as unknown as File;
 }
-
-beforeAll(() => {
-  (globalThis as unknown as { FileReader: typeof MockFileReader }).FileReader =
-    MockFileReader;
-});
 
 describe("parseExcel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    load.mockResolvedValue(undefined);
   });
 
   it("resolves with CSV string", async () => {
-    const file = {} as unknown as File;
+    const file = createFile();
     await expect(parseExcel(file)).resolves.toBe("a,b\n1,2");
   });
 
-  it("rejects when XLSX.read throws", async () => {
-    (XLSX.read as jest.Mock).mockImplementation(() => {
-      throw new Error("read failed");
-    });
+  it("rejects when workbook loading throws", async () => {
+    load.mockRejectedValue(new Error("read failed"));
 
-    const file = {} as unknown as File;
+    const file = createFile();
     await expect(parseExcel(file)).rejects.toThrow(
       "Failed to parse Excel: Error: read failed"
+    );
+  });
+
+  it("rejects legacy .xls uploads with a clear error", async () => {
+    await expect(parseExcel(createFile("report.xls"))).rejects.toThrow(
+      "Legacy .xls spreadsheets are not supported for in-browser parsing."
     );
   });
 });

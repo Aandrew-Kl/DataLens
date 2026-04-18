@@ -115,9 +115,9 @@ export default function WorkspaceTabs({ tabs, activeTab, onChange }: WorkspaceTa
     [activeTab, selectTab, tabs],
   );
   return (
-    <div className="flex items-center gap-2" onKeyDown={handleKeyDown}>
+    <div className="flex items-center gap-2">
       <div ref={scrollRef} className="relative min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div role="tablist" aria-orientation="horizontal" className="relative flex min-w-max items-center gap-1 rounded-2xl border border-gray-200/70 bg-white/75 p-1 shadow-sm dark:border-gray-700/70 dark:bg-gray-900/65">
+        <div role="tablist" aria-orientation="horizontal" onKeyDown={handleKeyDown} className="relative flex min-w-max items-center gap-1 rounded-2xl border border-gray-200/70 bg-white/75 p-1 shadow-sm dark:border-gray-700/70 dark:bg-gray-900/65">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = tab.id === activeTab;

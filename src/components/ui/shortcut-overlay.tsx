@@ -5,6 +5,7 @@ import {
   useDeferredValue,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -208,6 +209,7 @@ export default function ShortcutOverlay() {
   const [query, setQuery] = useState("");
   const [isMac] = useState(() => detectMacPlatform());
   const deferredQuery = useDeferredValue(query);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   function closeOverlay() {
     setOpen(false);
@@ -244,6 +246,14 @@ export default function ShortcutOverlay() {
     return () => {
       document.body.style.overflow = previousOverflow;
     };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    searchInputRef.current?.focus();
   }, [open]);
 
   const filteredShortcuts = useMemo(() => {
@@ -329,7 +339,7 @@ export default function ShortcutOverlay() {
                   <label className="relative block min-w-[16rem]">
                     <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                     <input
-                      autoFocus
+                      ref={searchInputRef}
                       type="search"
                       value={query}
                       onChange={(event) => setQuery(event.target.value)}

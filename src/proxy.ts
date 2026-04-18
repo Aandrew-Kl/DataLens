@@ -5,7 +5,7 @@ import { AUTH_TOKEN_COOKIE_NAME } from "@/lib/auth/constants";
 const PUBLIC_ROUTES = new Set(["/", "/login", "/register"]);
 const PUBLIC_API_ROUTES = new Set(["/api/health"]);
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const hasToken = Boolean(request.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value);
   const isApiRoute = pathname.startsWith("/api/");

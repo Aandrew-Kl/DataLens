@@ -1,6 +1,13 @@
 "use client";
 
-import { startTransition, useCallback, useMemo, useState } from "react";
+import {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle, Command, Keyboard, RotateCcw } from "lucide-react";
 import {
@@ -106,6 +113,7 @@ export default function ShortcutSettings({
   const [editValue, setEditValue] = useState("");
   const [conflict, setConflict] = useState<string | null>(null);
   const [status, setStatus] = useState("Keyboard shortcuts are stored locally.");
+  const editInputRef = useRef<HTMLInputElement>(null);
 
   const shortcutList = useMemo(
     () =>
@@ -115,6 +123,14 @@ export default function ShortcutSettings({
       })),
     [shortcuts],
   );
+
+  useEffect(() => {
+    if (!editingId) {
+      return;
+    }
+
+    editInputRef.current?.focus();
+  }, [editingId]);
 
   const handleEdit = useCallback((id: string, currentKeys: string) => {
     setEditingId(id);
@@ -208,6 +224,7 @@ export default function ShortcutSettings({
             {editingId === shortcut.id ? (
               <div className="flex items-center gap-2">
                 <input
+                  ref={editInputRef}
                   type="text"
                   value={editValue}
                   onChange={(e) => {
@@ -219,7 +236,6 @@ export default function ShortcutSettings({
                     if (e.key === "Escape") handleCancel();
                   }}
                   className="w-40 rounded-xl border border-white/20 bg-white/80 px-3 py-1.5 text-sm text-slate-700 outline-none focus:border-amber-400 dark:border-white/10 dark:bg-slate-950/55 dark:text-slate-100"
-                  autoFocus
                 />
                 <button
                   type="button"

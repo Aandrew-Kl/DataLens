@@ -12,6 +12,7 @@ import {
   X,
   Loader2,
 } from "lucide-react";
+import { parseExcel } from "@/lib/parsers/excel-parser";
 import { getFileExtension, formatBytes } from "@/lib/utils/formatters";
 
 interface FileDropResult {
@@ -142,11 +143,7 @@ export default function FileDropzone({
 
           case "xlsx":
           case "xls": {
-            const { read, utils } = await import("xlsx");
-            const buffer = await file.arrayBuffer();
-            const wb = read(buffer, { type: "array" });
-            const sheet = wb.Sheets[wb.SheetNames[0]];
-            csvContent = utils.sheet_to_csv(sheet);
+            csvContent = await parseExcel(file);
             break;
           }
 

@@ -6,6 +6,7 @@ import {
   useEffect,
   useEffectEvent,
   useMemo,
+  useRef,
   useState,
   type ComponentType,
 } from "react";
@@ -195,6 +196,7 @@ export default function CommandBar({ commands, onExecute }: CommandBarProps) {
   const [recentIds, setRecentIds] = useState<string[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const deferredQuery = useDeferredValue(query);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const { recent, sections } = useMemo(
     () => buildSections(commands, recentIds, deferredQuery),
@@ -293,6 +295,14 @@ export default function CommandBar({ commands, onExecute }: CommandBarProps) {
     return () => window.removeEventListener("keydown", handleWindowKeyDown);
   }, []);
 
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    searchInputRef.current?.focus();
+  }, [open]);
+
   return (
     <>
       <button
@@ -315,12 +325,16 @@ export default function CommandBar({ commands, onExecute }: CommandBarProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             className="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/45 px-4 py-20 backdrop-blur-md"
-            onMouseDown={(event) => {
-              if (event.target === event.currentTarget) {
-                closeBar();
-              }
-            }}
           >
+            <motion.button
+              type="button"
+              aria-label="Close command bar"
+              className="absolute inset-0"
+              onClick={closeBar}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
             <motion.div
               initial={{ opacity: 0, y: -20, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -332,7 +346,7 @@ export default function CommandBar({ commands, onExecute }: CommandBarProps) {
                 <div className="flex items-center gap-3 rounded-[1.2rem] border border-white/12 bg-white/20 px-4 py-3 dark:bg-white/5">
                   <Search className="h-5 w-5 text-cyan-500" />
                   <input
-                    autoFocus
+                    ref={searchInputRef}
                     value={query}
                     onChange={(event) => {
                       startTransition(() => {

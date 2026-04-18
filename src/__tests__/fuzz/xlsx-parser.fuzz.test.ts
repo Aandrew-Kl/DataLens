@@ -5,46 +5,20 @@ const PARSER_TIMEOUT_MESSAGE = "Parser did not settle";
 
 jest.setTimeout(30000);
 
-type FileReaderArrayBufferResult = Uint8Array | null | undefined;
+type ExcelArrayBufferResult = ArrayBuffer | null | undefined;
 
-class ControlledArrayBufferFileReader {
-  static nextResult: FileReaderArrayBufferResult = new Uint8Array(0);
-  static failNextRead = false;
-
-  onload: ((event: { target: { result: ArrayBuffer | null | undefined } }) => void) | null = null;
-  onerror: (() => void) | null = null;
-
-  readAsArrayBuffer(file: Blob): void {
-    void file;
-
-    if (ControlledArrayBufferFileReader.failNextRead) {
-      ControlledArrayBufferFileReader.failNextRead = false;
-      this.onerror?.();
-      return;
-    }
-
-    const payload = ControlledArrayBufferFileReader.nextResult;
-    const result: ArrayBuffer | null | undefined =
-      payload == null
-        ? payload
-        : (payload.buffer.slice(
-            payload.byteOffset,
-            payload.byteOffset + payload.byteLength,
-          ) as ArrayBuffer);
-
-    this.onload?.({
-      target: {
-        result,
-      },
-    });
-  }
+function toArrayBuffer(payload: Uint8Array) {
+  return payload.buffer.slice(
+    payload.byteOffset,
+    payload.byteOffset + payload.byteLength,
+  ) as ArrayBuffer;
 }
 
-const xlsxLikeInputs = fc.oneof<FileReaderArrayBufferResult>(
-  fc.uint8Array({ maxLength: 4096 }),
-  fc.constant(new Uint8Array(0)),
-  fc.constant(new Uint8Array([0x50, 0x4b, 0x03, 0x04])),
-  fc.constant(new Uint8Array([0xff, 0xfe, 0xfd, 0xfc])),
+const xlsxLikeInputs = fc.oneof<ExcelArrayBufferResult>(
+  fc.uint8Array({ maxLength: 4096 }).map(toArrayBuffer),
+  fc.constant(new Uint8Array(0).buffer),
+  fc.constant(new Uint8Array([0x50, 0x4b, 0x03, 0x04]).buffer),
+  fc.constant(new Uint8Array([0xff, 0xfe, 0xfd, 0xfc]).buffer),
   fc.constant(null),
   fc.constant(undefined)
 );
@@ -83,28 +57,15 @@ const expectHandledParserOutcome = async <T>(
 };
 
 describe("excel parser fuzz coverage", () => {
-  const originalFileReader = global.FileReader;
-
-  beforeAll(() => {
-    global.FileReader = ControlledArrayBufferFileReader as unknown as typeof FileReader;
-  });
-
-  afterAll(() => {
-    global.FileReader = originalFileReader;
-  });
-
-  beforeEach(() => {
-    ControlledArrayBufferFileReader.nextResult = new Uint8Array(0);
-    ControlledArrayBufferFileReader.failNextRead = false;
-  });
-
   it("parseExcel settles with either CSV text or an Error for fuzzed workbook payloads", async () => {
     await fc.assert(
       fc.property(xlsxLikeInputs, async (input) => {
-        ControlledArrayBufferFileReader.nextResult = input;
-
         await expectHandledParserOutcome(
-          () => parseExcel({} as File),
+          () =>
+            parseExcel({
+              name: "fuzz.xlsx",
+              arrayBuffer: async () => input as ArrayBuffer,
+            } as File),
           (result) => {
             expect(typeof result).toBe("string");
           }
@@ -114,14 +75,19 @@ describe("excel parser fuzz coverage", () => {
     );
   });
 
-  it("parseExcel rejects with an Error when FileReader fails mid-read", async () => {
+  it("parseExcel rejects with an Error when file reading fails", async () => {
     await fc.assert(
       fc.property(fc.uint8Array({ maxLength: 32 }), async () => {
-        ControlledArrayBufferFileReader.failNextRead = true;
         await expectHandledParserOutcome(
-          () => parseExcel({} as File),
+          () =>
+            parseExcel({
+              name: "fuzz.xlsx",
+              arrayBuffer: async () => {
+                throw new Error("read failed");
+              },
+            } as File),
           () => {
-            throw new Error("parseExcel should not resolve after a FileReader error");
+            throw new Error("parseExcel should not resolve after a file read error");
           }
         );
       }),
