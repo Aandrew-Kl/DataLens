@@ -161,6 +161,37 @@ describe("POST /api/ai/suggest", () => {
     expect(autoDashboardPrompt).not.toHaveBeenCalled();
   });
 
+  it("returns an AI dashboard when Ollama is healthy and the payload is fenced JSON", async () => {
+    const request = createRequest({
+      type: "dashboard",
+      tableName: "events",
+      columns: [{ name: "event", type: "string" }],
+      rowCount: 45,
+    });
+
+    (checkOllamaHealth as jest.Mock).mockResolvedValueOnce(true);
+    (autoDashboardPrompt as jest.Mock).mockReturnValueOnce([
+      { role: "user", content: "dashboard prompt" },
+    ]);
+    (chat as jest.Mock).mockResolvedValueOnce(
+      '```json\n{"title":"Overview","widgets":[{"type":"metric"}]}\n```',
+    );
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(body).toEqual({
+      title: "Overview",
+      widgets: [{ type: "metric" }],
+      mode: "ai",
+    });
+    expect(autoDashboardPrompt).toHaveBeenCalledWith(
+      "events",
+      [{ name: "event", type: "string" }],
+      45,
+    );
+  });
+
   it("returns 400 when type is invalid", async () => {
     const request = createRequest({
       type: "invalid",
@@ -175,6 +206,32 @@ describe("POST /api/ai/suggest", () => {
     expect(response.status).toBe(400);
     expect(body).toEqual({ error: "Invalid type" });
     expect(chat).not.toHaveBeenCalled();
+  });
+
+  it("falls back to generated questions when AI returns invalid JSON", async () => {
+    const request = createRequest({
+      type: "questions",
+      tableName: "users",
+      columns: [{ name: "id", type: "number" }],
+      rowCount: 20,
+    });
+
+    (checkOllamaHealth as jest.Mock).mockResolvedValueOnce(true);
+    (suggestQuestionsPrompt as jest.Mock).mockReturnValueOnce([
+      { role: "user", content: "prompt" },
+    ]);
+    (chat as jest.Mock).mockResolvedValueOnce("{ definitely not json");
+    (generateFallbackQuestions as jest.Mock).mockReturnValueOnce([
+      "Fallback question",
+    ]);
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(body).toEqual({
+      questions: ["Fallback question"],
+      mode: "ai",
+    });
   });
 
   it("falls back when the upstream AI call fails after auth succeeds", async () => {
@@ -201,6 +258,22 @@ describe("POST /api/ai/suggest", () => {
       questions: ["Fallback question"],
       mode: "fallback",
     });
+    expect(request.clone).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns 500 when the request body and cloned body both fail to parse", async () => {
+    const request = {
+      json: jest.fn().mockRejectedValueOnce(new Error("bad payload")),
+      clone: jest.fn(() => ({
+        json: jest.fn().mockRejectedValueOnce(new Error("still bad")),
+      })),
+    } as unknown as Request & { clone: jest.Mock };
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body).toEqual({ error: "Failed to generate suggestions." });
     expect(request.clone).toHaveBeenCalledTimes(1);
   });
 });

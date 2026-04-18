@@ -152,4 +152,89 @@ describe("DashboardBuilder", () => {
       await screen.findByText("Widget preview failed"),
     ).toBeInTheDocument();
   });
+
+  it("builds KPI and scatter preview queries for added widgets", async () => {
+    const user = userEvent.setup();
+
+    mockRunQuery.mockImplementation(async (sql) => {
+      if (sql.includes("COUNT(*) AS value")) {
+        return [{ value: 120 }];
+      }
+      if (sql.includes("AS x_value, \"revenue\" AS y_value")) {
+        return [{ x_value: 20, y_value: 100 }];
+      }
+      if (sql.includes("SELECT \"region\", \"revenue\", \"profit\" FROM \"sales\" LIMIT 8")) {
+        return [{ region: "East", revenue: 100, profit: 20 }];
+      }
+      return [{ label: "East", value: 100 }];
+    });
+
+    render(
+      <DashboardBuilder tableName="sales" columns={columns} rowCount={120} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /add widget/i }));
+    await user.click(screen.getByRole("button", { name: /KPI Card/i }));
+
+    fireEvent.change(screen.getByDisplayValue("SUM"), {
+      target: { value: "count" },
+    });
+
+    await waitFor(() => {
+      expect(mockRunQuery).toHaveBeenCalledWith(
+        expect.stringContaining("COUNT(*) AS value"),
+      );
+    });
+
+    await user.click(screen.getByRole("button", { name: /add widget/i }));
+    await user.click(screen.getByRole("button", { name: /Scatter Plot/i }));
+
+    await waitFor(() => {
+      expect(mockRunQuery).toHaveBeenCalledWith(
+        expect.stringContaining('SELECT "region" AS x_value, "revenue" AS y_value'),
+      );
+    });
+  });
+
+  it("builds table preview queries for table widgets", async () => {
+    const user = userEvent.setup();
+
+    mockRunQuery.mockImplementation(async (sql) => {
+      if (sql.includes('SELECT "region", "revenue", "profit" FROM "sales" LIMIT 8')) {
+        return [{ region: "East", revenue: 100, profit: 20 }];
+      }
+      return [{ label: "East", value: 100 }];
+    });
+
+    render(
+      <DashboardBuilder tableName="sales" columns={columns} rowCount={120} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /add widget/i }));
+    await user.click(screen.getByRole("button", { name: /Table Widget/i }));
+
+    await waitFor(() => {
+      expect(mockRunQuery).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'SELECT "region", "revenue", "profit" FROM "sales" LIMIT 8',
+        ),
+      );
+    });
+  });
+
+  it("surfaces load failures when saved dashboard state is invalid", async () => {
+    const user = userEvent.setup();
+
+    window.localStorage.setItem("datalens-dashboard:sales", "{bad json");
+
+    render(
+      <DashboardBuilder tableName="sales" columns={columns} rowCount={120} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /load dashboard/i }));
+
+    expect(
+      await screen.findByText(/Expected property name/),
+    ).toBeInTheDocument();
+  });
 });

@@ -131,6 +131,78 @@ describe("ChartRenderer", () => {
     });
   });
 
+  it("builds pie options and uses the fallback aria label when no title is present", async () => {
+    const config: ChartConfig = {
+      id: "chart-4",
+      type: "pie",
+      title: "",
+      xAxis: "region",
+      yAxis: "revenue",
+    };
+
+    render(<ChartRenderer config={config} data={groupedData} />);
+
+    await waitFor(() => {
+      const option = getOption();
+      const legend = option.legend as Record<string, unknown>;
+      const series = option.series as Array<Record<string, unknown>>;
+
+      expect(legend.type).toBe("scroll");
+      expect(series[0]?.type).toBe("pie");
+      expect(screen.getByRole("img")).toHaveAttribute(
+        "aria-label",
+        "pie chart (pie chart)",
+      );
+    });
+  });
+
+  it("adds area styling for area charts and omits grouped legends for a single series", async () => {
+    const config: ChartConfig = {
+      id: "chart-5",
+      type: "area",
+      title: "Revenue area",
+      xAxis: "region",
+      yAxis: "revenue",
+    };
+
+    render(<ChartRenderer config={config} data={groupedData} />);
+
+    await waitFor(() => {
+      const option = getOption();
+      const legend = option.legend as Record<string, unknown>;
+      const series = option.series as Array<Record<string, unknown>>;
+
+      expect(legend.show).toBe(false);
+      expect(series[0]?.type).toBe("line");
+      expect(series[0]?.areaStyle).toEqual(
+        expect.objectContaining({ opacity: 0.12 }),
+      );
+    });
+  });
+
+  it("falls back to a bar option for heatmap configs while preserving the chart label", async () => {
+    const config = {
+      id: "chart-6",
+      type: "heatmap",
+      title: "",
+      xAxis: "region",
+      yAxis: "revenue",
+    } as ChartConfig;
+
+    render(<ChartRenderer config={config} data={groupedData} />);
+
+    await waitFor(() => {
+      const option = getOption();
+      const series = option.series as Array<Record<string, unknown>>;
+
+      expect(series[0]?.type).toBe("bar");
+      expect(screen.getByRole("img")).toHaveAttribute(
+        "aria-label",
+        "heatmap chart (heatmap chart)",
+      );
+    });
+  });
+
   it("reacts to dark mode changes in the rendered option", async () => {
     render(<ChartRenderer config={groupedConfig} data={groupedData} />);
 

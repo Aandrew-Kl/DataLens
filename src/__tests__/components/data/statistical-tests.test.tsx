@@ -3,7 +3,10 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import StatisticalTests from "@/components/data/statistical-tests";
 import { runQuery } from "@/lib/duckdb/client";
 import {
+  runAnova,
   runChiSquare,
+  runKolmogorovSmirnov,
+  runMannWhitney,
   runTTest,
 } from "@/lib/utils/statistical-test-engine";
 import type { ColumnProfile } from "@/types/dataset";
@@ -40,6 +43,11 @@ jest.mock("@/lib/utils/statistical-test-engine", () => {
 const mockRunQuery = runQuery as jest.MockedFunction<typeof runQuery>;
 const mockRunTTest = runTTest as jest.MockedFunction<typeof runTTest>;
 const mockRunChiSquare = runChiSquare as jest.MockedFunction<typeof runChiSquare>;
+const mockRunAnova = runAnova as jest.MockedFunction<typeof runAnova>;
+const mockRunMannWhitney =
+  runMannWhitney as jest.MockedFunction<typeof runMannWhitney>;
+const mockRunKolmogorovSmirnov =
+  runKolmogorovSmirnov as jest.MockedFunction<typeof runKolmogorovSmirnov>;
 
 const columns: ColumnProfile[] = [
   {
@@ -93,6 +101,9 @@ describe("StatisticalTests", () => {
     mockRunQuery.mockReset();
     mockRunTTest.mockReset();
     mockRunChiSquare.mockReset();
+    mockRunAnova.mockReset();
+    mockRunMannWhitney.mockReset();
+    mockRunKolmogorovSmirnov.mockReset();
     window.sessionStorage.clear();
 
     mockRunQuery.mockImplementation(async (sql) => {
@@ -221,6 +232,131 @@ describe("StatisticalTests", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Test execution failed")).toBeInTheDocument();
+    });
+  });
+
+  it("loads session history and restores a previous non-significant result", async () => {
+    window.sessionStorage.setItem(
+      "datalens:statistical-tests:orders",
+      JSON.stringify([
+        makeResult({
+          id: "stored-1",
+          type: "anova",
+          title: "revenue by channel",
+          significant: false,
+          interpretation: "No clear segment-level signal was detected.",
+        }),
+      ]),
+    );
+
+    render(
+      <StatisticalTests tableName="orders" columns={columns} rowCount={100} />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Session history")).toBeInTheDocument();
+      expect(screen.getAllByText("revenue by channel").length).toBeGreaterThan(0);
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /revenue by channel/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("No strong signal")).toBeInTheDocument();
+      expect(
+        screen.getByText("No clear segment-level signal was detected."),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("shows an informational notice when group values cannot be loaded", async () => {
+    mockRunQuery.mockRejectedValueOnce(new Error("DuckDB unavailable"));
+
+    render(
+      <StatisticalTests tableName="orders" columns={columns} rowCount={100} />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          "Some group values could not be loaded. You can still run tests with the current selections.",
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("switches to ANOVA and renders a non-significant result", async () => {
+    mockRunAnova.mockResolvedValueOnce(
+      makeResult({
+        id: "anova-1",
+        type: "anova",
+        title: "revenue by segment",
+        statisticLabel: "F statistic",
+        effectLabel: "Eta squared",
+        significant: false,
+        interpretation:
+          "The observed group means for revenue stay within the range expected from within-group variation.",
+      }),
+    );
+
+    render(
+      <StatisticalTests tableName="orders" columns={columns} rowCount={100} />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Loaded group values for segment: Retail, Enterprise")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /ANOVA/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Run test" }));
+
+    await waitFor(() => {
+      expect(mockRunAnova).toHaveBeenCalledWith(
+        "orders",
+        expect.objectContaining({
+          measure: "revenue",
+          group: "segment",
+        }),
+      );
+      expect(screen.getAllByText("revenue by segment")).toHaveLength(2);
+      expect(screen.getByText("No strong signal")).toBeInTheDocument();
+    });
+  });
+
+  it("switches to the Kolmogorov-Smirnov test and runs the distribution comparison", async () => {
+    mockRunKolmogorovSmirnov.mockResolvedValueOnce(
+      makeResult({
+        id: "ks-1",
+        type: "kolmogorov-smirnov",
+        title: "revenue: Retail vs Enterprise",
+        statisticLabel: "D statistic",
+        effectLabel: "Distribution distance",
+        confidenceInterval: null,
+        interpretation: "The distributions stay close across the selected groups.",
+      }),
+    );
+
+    render(
+      <StatisticalTests tableName="orders" columns={columns} rowCount={100} />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Loaded group values for segment: Retail, Enterprise")).toBeInTheDocument();
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /Kolmogorov-Smirnov/i }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Run test" }));
+
+    await waitFor(() => {
+      expect(mockRunKolmogorovSmirnov).toHaveBeenCalledWith(
+        "orders",
+        expect.objectContaining({
+          measure: "revenue",
+          group: "segment",
+        }),
+      );
+      expect(screen.getByText("Distribution distance")).toBeInTheDocument();
     });
   });
 });

@@ -127,4 +127,108 @@ describe("generateReportHTML", () => {
       '<pre class="sql-block">SELECT * FROM &quot;sales&quot;</pre>',
     );
   });
+
+  it("formats metric widgets across percent, compact, default, and non-numeric values", () => {
+    const config = makeConfig({
+      widgets: [
+        {
+          id: "metric-percent",
+          type: "metric",
+          label: "Conversion",
+          sql: "SELECT 0.125",
+          format: "percent",
+        },
+        {
+          id: "metric-compact",
+          type: "metric",
+          label: "Visitors",
+          sql: "SELECT 1200000",
+          format: "compact",
+        },
+        {
+          id: "metric-default",
+          type: "metric",
+          label: "Orders",
+          sql: "SELECT 1000",
+        },
+        {
+          id: "metric-boolean",
+          type: "metric",
+          label: "Enabled",
+          sql: "SELECT false",
+        },
+        {
+          id: "metric-object",
+          type: "metric",
+          label: "Payload",
+          sql: "SELECT payload",
+        },
+      ],
+    });
+
+    const html = generateReportHTML(config, {
+      "metric-percent": [{ ratio: "0.125" }],
+      "metric-compact": [{ total: 1_200_000 }],
+      "metric-default": [{ total: 1000 }],
+      "metric-boolean": [{ enabled: false }],
+      "metric-object": [{ payload: { region: "East" } }],
+    });
+
+    expect(html).toContain("12.5%");
+    expect(html).toContain("1.2M");
+    expect(html).toContain(">1,000<");
+    expect(html).toContain(">No<");
+    expect(html).toContain("{&quot;region&quot;:&quot;East&quot;}");
+  });
+
+  it("renders chart empty and zero-width visual states for missing or non-numeric values", () => {
+    const config = makeConfig({
+      widgets: [
+        {
+          id: "chart-empty",
+          type: "chart",
+          chartType: "bar",
+          title: "No rows",
+          sql: "SELECT * FROM sales",
+          xAxis: "region",
+          yAxis: "revenue",
+        },
+        {
+          id: "chart-weird",
+          type: "chart",
+          chartType: "bar",
+          title: "Mixed values",
+          sql: "SELECT * FROM sales",
+          xAxis: "region",
+          yAxis: "revenue",
+        },
+        {
+          id: "chart-no-visual",
+          type: "chart",
+          chartType: "bar",
+          title: "Missing metric key",
+          sql: "SELECT * FROM sales",
+          xAxis: "region",
+          yAxis: "missing_metric",
+        },
+      ],
+    });
+
+    const html = generateReportHTML(config, {
+      "chart-empty": [],
+      "chart-weird": [
+        { region: "East", revenue: "0.1" },
+        { region: "West", revenue: "oops" },
+        { region: "South", revenue: -5 },
+      ],
+      "chart-no-visual": [{ region: "North" }],
+    });
+
+    expect(html).toContain("No rows returned for this widget.");
+    expect(html).toContain("style=\"width:2%\"");
+    expect(html).toContain("style=\"width:0%\"");
+    expect(html).toContain("style=\"width:100%\"");
+    expect(html).toContain("Missing metric key");
+    expect(html.match(/<th>Visual<\/th>/g) ?? []).toHaveLength(1);
+  });
 });

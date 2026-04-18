@@ -85,6 +85,49 @@ describe("statistical-test-engine", () => {
     expect(mockRunQuery).not.toHaveBeenCalled();
   });
 
+  it("supports one-sided t-tests at lower confidence levels", async () => {
+    mockRunQuery.mockResolvedValueOnce([
+      { grp: "control", n: 5, mean: 5, variance: 1 },
+      { grp: "variant", n: 5, mean: 6, variance: 1 },
+    ]);
+
+    const result = await runTTest("orders", {
+      measure: "revenue",
+      group: "segment",
+      groupA: "control",
+      groupB: "variant",
+      confidence: 0.8,
+      alternative: "less",
+    });
+
+    expect(result.significant).toBe(true);
+    expect(result.pValue).not.toBeNull();
+    expect(result.confidenceInterval).not.toBeNull();
+    expect(result.confidenceInterval?.[0]).toBeCloseTo(-1.81, 1);
+    expect(result.confidenceInterval?.[1]).toBeCloseTo(-0.19, 1);
+  });
+
+  it("uses the 90% confidence critical value for t-tests", async () => {
+    mockRunQuery.mockResolvedValueOnce([
+      { grp: "control", n: 5, mean: 6, variance: 1 },
+      { grp: "variant", n: 5, mean: 5, variance: 1 },
+    ]);
+
+    const result = await runTTest("orders", {
+      measure: "revenue",
+      group: "segment",
+      groupA: "control",
+      groupB: "variant",
+      confidence: 0.9,
+      alternative: "greater",
+    });
+
+    expect(result.significant).toBe(true);
+    expect(result.confidenceInterval).not.toBeNull();
+    expect(result.confidenceInterval?.[0]).toBeCloseTo(-0.04, 1);
+    expect(result.confidenceInterval?.[1]).toBeCloseTo(2.04, 1);
+  });
+
   it("runs a chi-square test and reports association strength", async () => {
     mockRunQuery.mockResolvedValueOnce([
       { left_value: "A", right_value: "X", cell_count: 30 },
@@ -151,6 +194,24 @@ describe("statistical-test-engine", () => {
     );
   });
 
+  it("rejects ANOVA inputs that cannot estimate within-group variance", async () => {
+    mockRunQuery.mockResolvedValueOnce([
+      { grp: "A", n: 1, mean: 5, variance: 0 },
+      { grp: "B", n: 1, mean: 5, variance: 0 },
+    ]);
+
+    await expect(
+      runAnova("orders", {
+        measure: "revenue",
+        group: "segment",
+        confidence: 0.95,
+        maxGroups: 4,
+      }),
+    ).rejects.toThrow(
+      "There is not enough data to estimate within-group variance.",
+    );
+  });
+
   it("runs a Mann-Whitney U test and reports a rank-based effect size", async () => {
     mockRunQuery.mockResolvedValueOnce([
       { grp: "control", n: 5, rank_sum: 40, mean_value: 10 },
@@ -180,6 +241,26 @@ describe("statistical-test-engine", () => {
         { label: "variant rows", value: "5" },
       ]),
     );
+  });
+
+  it("handles non-significant one-sided Mann-Whitney results", async () => {
+    mockRunQuery.mockResolvedValueOnce([
+      { grp: "control", n: 1, rank_sum: 1, mean_value: 10 },
+      { grp: "variant", n: 1, rank_sum: 2, mean_value: 10 },
+    ]);
+
+    const result = await runMannWhitney("orders", {
+      measure: "revenue",
+      group: "segment",
+      groupA: "control",
+      groupB: "variant",
+      confidence: 0.95,
+      alternative: "greater",
+    });
+
+    expect(result.significant).toBe(false);
+    expect(result.interpretation).toContain("similar rank distributions");
+    expect(result.pValue).toBeGreaterThan(0.5);
   });
 
   it("runs a Kolmogorov-Smirnov test and reports the distribution distance", async () => {
@@ -213,5 +294,22 @@ describe("statistical-test-engine", () => {
         { label: "Confidence level", value: "95%" },
       ]),
     );
+  });
+
+  it("rejects Kolmogorov-Smirnov inputs when one group is missing", async () => {
+    mockRunQuery.mockResolvedValueOnce([
+      { d_stat: 0.2, n1: 5, n2: 0 },
+    ]);
+
+    await expect(
+      runKolmogorovSmirnov("orders", {
+        measure: "revenue",
+        group: "segment",
+        groupA: "control",
+        groupB: "variant",
+        confidence: 0.95,
+        alternative: "two-sided",
+      }),
+    ).rejects.toThrow("Each group needs data to compare distributions.");
   });
 });

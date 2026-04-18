@@ -110,6 +110,23 @@ describe("POST /api/ai/explain", () => {
     expect(messages[1]?.content).toContain("SELECT * FROM users");
   });
 
+  it("strips fenced AI explanations before returning them", async () => {
+    const request = createRequest({ sql: "SELECT * FROM users" });
+
+    (checkOllamaHealth as jest.Mock).mockResolvedValueOnce(true);
+    (chat as jest.Mock).mockResolvedValueOnce(
+      "```markdown\nThis query selects every row from users.\n```",
+    );
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(body).toEqual({
+      explanation: "This query selects every row from users.",
+      mode: "ai",
+    });
+  });
+
   it("returns fallback explanation when Ollama is unhealthy", async () => {
     const request = createRequest({ sql: "SELECT * FROM users" });
 
@@ -161,6 +178,31 @@ describe("POST /api/ai/explain", () => {
       mode: "fallback",
     });
     expect(chat).toHaveBeenCalledTimes(1);
+  });
+
+  it("builds a detailed fallback explanation for joins, grouping, sorting, and limits", async () => {
+    const request = createRequest({
+      sql: [
+        "SELECT COUNT(*)",
+        "FROM `orders`",
+        "JOIN [users] ON orders.user_id = users.id",
+        "WHERE users.active = true",
+        "GROUP BY users.region",
+        "ORDER BY users.region",
+        "LIMIT 5",
+      ].join(" "),
+    });
+
+    (checkOllamaHealth as jest.Mock).mockResolvedValueOnce(false);
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(body).toEqual({
+      explanation:
+        'This query is fetching data from "orders" and "users". It is also combining data from multiple tables, filtering rows, and grouping similar records. It additionally handles sorting the results, calculating summary values, and limiting how many rows are returned.',
+      mode: "fallback",
+    });
   });
 
   it("returns 500 when request parsing fails", async () => {

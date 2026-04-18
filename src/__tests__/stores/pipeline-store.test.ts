@@ -89,6 +89,23 @@ describe("usePipelineStore", () => {
     expect(state.pipelines[0]?.steps[0]).not.toBe(draftSteps[0]);
   });
 
+  it("uses structuredClone when available while adding pipelines", () => {
+    const originalStructuredClone = global.structuredClone;
+    const structuredCloneSpy = jest.fn((value: unknown) =>
+      JSON.parse(JSON.stringify(value)),
+    ) as typeof structuredClone;
+
+    global.structuredClone = structuredCloneSpy;
+
+    usePipelineStore.getState().addPipeline(makePipeline());
+
+    expect(structuredCloneSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "pipeline-1" }),
+    );
+
+    global.structuredClone = originalStructuredClone;
+  });
+
   it("updates a pipeline and keeps a cloned step list", () => {
     // Build test data BEFORE mocking Date.now (createPipelineStep calls Date.now internally)
     const pipelineDraft = makePipeline({ id: "pipeline-1", name: "Original" });
@@ -143,6 +160,23 @@ describe("usePipelineStore", () => {
     expect(state.activePipelineId).toBe("pipeline-1");
   });
 
+  it("updates metadata without replacing the current steps when no new steps are provided", () => {
+    usePipelineStore.getState().addPipeline(makePipeline({ id: "pipeline-1" }));
+
+    const originalSteps = usePipelineStore.getState().pipelines[0]?.steps ?? [];
+
+    usePipelineStore.getState().updatePipeline("pipeline-1", {
+      name: "Renamed only",
+    });
+
+    const saved = usePipelineStore.getState().pipelines[0];
+
+    expect(saved?.name).toBe("Renamed only");
+    expect(saved?.steps).toEqual(originalSteps);
+    expect(saved?.steps).not.toBe(originalSteps);
+    expect(saved?.steps[0]).not.toBe(originalSteps[0]);
+  });
+
   it("removes a pipeline and falls back to the next available one", () => {
     usePipelineStore.getState().addPipeline(makePipeline({ id: "pipeline-a", name: "A" }));
     usePipelineStore.getState().addPipeline(makePipeline({ id: "pipeline-b", name: "B" }));
@@ -164,6 +198,15 @@ describe("usePipelineStore", () => {
       "pipeline-1",
     ]);
     expect(usePipelineStore.getState().activePipelineId).toBe("pipeline-1");
+  });
+
+  it("clears the active pipeline when removing the final pipeline", () => {
+    usePipelineStore.getState().addPipeline(makePipeline({ id: "pipeline-1" }));
+
+    usePipelineStore.getState().removePipeline("pipeline-1");
+
+    expect(usePipelineStore.getState().pipelines).toEqual([]);
+    expect(usePipelineStore.getState().activePipelineId).toBeNull();
   });
 
   it("records a failed execution when the pipeline cannot be found", async () => {
@@ -230,6 +273,24 @@ describe("usePipelineStore", () => {
     expect(record?.sql).toContain('SELECT * FROM "orders" WHERE "region" = \'East\'');
     expect(usePipelineStore.getState().activePipelineId).toBe("pipeline-1");
     expect(usePipelineStore.getState().executionHistory[0]).toEqual(record);
+  });
+
+  it("falls back to a generic error message for non-Error execution failures", async () => {
+    mockRunQuery.mockRejectedValueOnce("boom");
+
+    usePipelineStore.getState().addPipeline(makePipeline());
+
+    const record = await usePipelineStore.getState().executePipeline({
+      pipelineId: "pipeline-1",
+      tableName: "orders",
+      columns,
+    });
+
+    expect(record).toMatchObject({
+      pipelineId: "pipeline-1",
+      status: "error",
+      errorMessage: "Pipeline execution failed.",
+    });
   });
 
   it("keeps execution history bounded to the most recent 20 runs", async () => {
