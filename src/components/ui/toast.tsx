@@ -5,13 +5,20 @@ import {
   useContext,
   useState,
   useCallback,
+  useEffect,
   type ReactNode,
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from "lucide-react";
+import {
+  addToast,
+  subscribeToToasts,
+  type ToastVariant,
+} from "@/lib/ui/toast-bus";
+export { addToast } from "@/lib/ui/toast-bus";
 
 /* ─── Types ─── */
-type ToastType = "success" | "error" | "warning" | "info";
+type ToastType = ToastVariant;
 
 interface Toast {
   id: string;
@@ -70,14 +77,21 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const toast = useCallback(
     (message: string, type: ToastType = "info", duration: number = 4000) => {
-      const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      setToasts((prev) => {
-        const next = [...prev, { id, type, message, duration }];
-        // Keep only last MAX_VISIBLE
-        return next.slice(-MAX_VISIBLE);
-      });
-      setTimeout(() => removeToast(id), duration);
+      addToast({ message, variant: type, duration });
     },
+    [],
+  );
+
+  useEffect(
+    () =>
+      subscribeToToasts(({ message, variant, duration }) => {
+        const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        setToasts((prev) => {
+          const next = [...prev, { id, type: variant, message, duration }];
+          return next.slice(-MAX_VISIBLE);
+        });
+        setTimeout(() => removeToast(id), duration);
+      }),
     [removeToast],
   );
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bookmark,
@@ -13,6 +13,12 @@ import {
   Trash2,
   Upload,
 } from "lucide-react";
+import {
+  clearSyncFlag,
+  createSyncFailureNotifier,
+  hasPendingSync,
+  markPendingSync,
+} from "@/lib/sync-feedback";
 import { downloadFile } from "@/lib/utils/export";
 import { generateId } from "@/lib/utils/formatters";
 import type { ColumnProfile } from "@/types/dataset";
@@ -43,6 +49,7 @@ interface ViewBookmark {
   description: string;
   timestamp: number;
   state: ViewState;
+  synced?: boolean;
 }
 
 type Notice = string | null;
@@ -50,6 +57,7 @@ type Notice = string | null;
 const EASE = [0.22, 1, 0.36, 1] as const;
 const listeners = new Set<() => void>();
 const tabs = ["overview", "table", "quality", "charts", "transforms"];
+const notifyBookmarkSyncFailure = createSyncFailureNotifier("bookmark");
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
@@ -79,9 +87,26 @@ function readBookmarks(tableName: string): ViewBookmark[] {
 }
 
 function writeBookmarks(tableName: string, bookmarks: ViewBookmark[]) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(bookmarksKey(tableName), JSON.stringify(bookmarks));
-  emitChange();
+  if (typeof window === "undefined") return true;
+
+  try {
+    window.localStorage.setItem(bookmarksKey(tableName), JSON.stringify(bookmarks));
+    emitChange();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function clearBookmarkSyncState(bookmarks: ViewBookmark[]): ViewBookmark[] {
+  return bookmarks.map((bookmark) => clearSyncFlag(bookmark));
+}
+
+function markBookmarksPending(bookmarks: ViewBookmark[], ids: string[]) {
+  const pendingIds = new Set(ids);
+  return bookmarks.map((bookmark) =>
+    pendingIds.has(bookmark.id) ? markPendingSync(bookmark) : bookmark,
+  );
 }
 
 function defaultViewState(columns: ColumnProfile[]): ViewState {
@@ -121,16 +146,21 @@ function formatTimestamp(timestamp: number) {
 }
 
 export default function DataBookmarks({ tableName, columns }: DataBookmarksProps) {
-  const bookmarks = useSyncExternalStore(subscribe, () => readBookmarks(tableName), () => []);
   const currentView = useSyncExternalStore(
     subscribe,
     () => readViewState(tableName, columns),
     () => defaultViewState(columns),
   );
+  const [bookmarks, setBookmarks] = useState<ViewBookmark[]>(() => readBookmarks(tableName));
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<Notice>(null);
+  const pendingBookmarkCount = bookmarks.filter(hasPendingSync).length;
+
+  useEffect(() => {
+    setBookmarks(readBookmarks(tableName));
+  }, [tableName]);
 
   function updateView(nextState: ViewState) {
     writeViewState(tableName, nextState);
@@ -184,11 +214,28 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
       ? bookmarks.map((entry) => (entry.id === editingId ? bookmark : entry))
       : [bookmark, ...bookmarks];
 
-    writeBookmarks(tableName, nextBookmarks);
+    const syncedBookmarks = clearBookmarkSyncState(nextBookmarks);
+    const didSync = writeBookmarks(tableName, syncedBookmarks);
+
+    if (didSync) {
+      setBookmarks(syncedBookmarks);
+    } else {
+      notifyBookmarkSyncFailure();
+      setBookmarks(markBookmarksPending(nextBookmarks, [bookmark.id]));
+    }
+
     setEditingId(null);
     setName("");
     setDescription("");
-    setNotice(editingId ? "Bookmark updated." : "Bookmark saved.");
+    setNotice(
+      didSync
+        ? editingId
+          ? "Bookmark updated."
+          : "Bookmark saved."
+        : editingId
+          ? "Bookmark updated locally. Sync pending."
+          : "Bookmark saved locally. Sync pending.",
+    );
   }
 
   function restoreBookmark(bookmark: ViewBookmark) {
@@ -204,13 +251,23 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
   }
 
   function deleteBookmark(bookmarkId: string) {
-    writeBookmarks(tableName, bookmarks.filter((bookmark) => bookmark.id !== bookmarkId));
+    const nextBookmarks = bookmarks.filter((bookmark) => bookmark.id !== bookmarkId);
+    const syncedBookmarks = clearBookmarkSyncState(nextBookmarks);
+    const didSync = writeBookmarks(tableName, syncedBookmarks);
+
+    if (didSync) {
+      setBookmarks(syncedBookmarks);
+    } else {
+      notifyBookmarkSyncFailure();
+      setBookmarks(markBookmarksPending(bookmarks, [bookmarkId]));
+    }
+
     if (editingId === bookmarkId) {
       setEditingId(null);
       setName("");
       setDescription("");
     }
-    setNotice("Bookmark deleted.");
+    setNotice(didSync ? "Bookmark deleted." : "Bookmark delete could not be synced.");
   }
 
   function exportBookmarks() {
@@ -225,9 +282,38 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
       setNotice("Bookmark import must be a JSON array.");
       return;
     }
-    writeBookmarks(tableName, [...parsed, ...bookmarks]);
-    setNotice(`Imported ${parsed.length} bookmark${parsed.length === 1 ? "" : "s"}.`);
+    const nextBookmarks = [...parsed, ...bookmarks];
+    const syncedBookmarks = clearBookmarkSyncState(nextBookmarks);
+    const didSync = writeBookmarks(tableName, syncedBookmarks);
+
+    if (didSync) {
+      setBookmarks(syncedBookmarks);
+    } else {
+      notifyBookmarkSyncFailure(parsed.length);
+      setBookmarks(markBookmarksPending(nextBookmarks, parsed.map((bookmark) => bookmark.id)));
+    }
+
+    setNotice(
+      didSync
+        ? `Imported ${parsed.length} bookmark${parsed.length === 1 ? "" : "s"}.`
+        : `Imported ${parsed.length} bookmark${parsed.length === 1 ? "" : "s"} locally. Sync pending.`,
+    );
     event.target.value = "";
+  }
+
+  function syncPendingBookmarks() {
+    if (pendingBookmarkCount === 0) {
+      return;
+    }
+
+    const syncedBookmarks = clearBookmarkSyncState(bookmarks);
+    if (writeBookmarks(tableName, syncedBookmarks)) {
+      setBookmarks(syncedBookmarks);
+      setNotice("Bookmarks synced.");
+      return;
+    }
+
+    notifyBookmarkSyncFailure(pendingBookmarkCount);
   }
 
   return (
@@ -242,9 +328,20 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
             <h2 className="mt-1 text-xl font-semibold text-slate-950 dark:text-slate-50">Saved views for {tableName}</h2>
           </div>
         </div>
-        <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-          Capture the current tab, filters, sort order, and visible columns into reusable named views stored in localStorage.
-        </p>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+            Capture the current tab, filters, sort order, and visible columns into reusable named views stored in localStorage.
+          </p>
+          <button
+            type="button"
+            onClick={syncPendingBookmarks}
+            disabled={pendingBookmarkCount === 0}
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white/40 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-200"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Sync now
+          </button>
+        </div>
       </div>
 
       <div className="space-y-5 px-5 py-5">
@@ -346,7 +443,9 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Saved bookmarks</h3>
-            <span className="text-xs text-slate-500 dark:text-slate-400">{bookmarks.length} stored locally</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              {bookmarks.length} stored locally{pendingBookmarkCount > 0 ? ` • ${pendingBookmarkCount} need sync` : ""}
+            </span>
           </div>
           <AnimatePresence initial={false}>
             {bookmarks.length === 0 ? (
@@ -361,6 +460,11 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
                       <div className="flex items-center gap-2">
                         <FileJson className="h-4 w-4 text-fuchsia-600 dark:text-fuchsia-300" />
                         <h4 className="text-base font-semibold text-slate-950 dark:text-slate-50">{bookmark.name}</h4>
+                        {bookmark.synced === false ? (
+                          <span role="img" aria-label="Needs sync" title="Needs sync">
+                            🔄
+                          </span>
+                        ) : null}
                       </div>
                       <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{bookmark.description || "No description."}</p>
                       <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">

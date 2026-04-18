@@ -19,4 +19,5 @@ export interface SavedQuery {
   sql: string;
   datasetId: string;
   createdAt: number;
+  synced?: boolean;
 }

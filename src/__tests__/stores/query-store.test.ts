@@ -1,5 +1,13 @@
 import { useQueryStore } from "@/stores/query-store";
+import { addToast } from "@/lib/ui/toast-bus";
 import type { QueryResult, SavedQuery } from "@/types/query";
+
+jest.mock("@/lib/ui/toast-bus", () => ({
+  addToast: jest.fn(),
+}));
+
+const STORAGE_KEY = "datalens-query-history";
+const mockAddToast = addToast as jest.MockedFunction<typeof addToast>;
 
 function makeSavedQuery(
   index: number,
@@ -28,6 +36,9 @@ function makeResult(overrides: Partial<QueryResult> = {}): QueryResult {
 
 describe("useQueryStore", () => {
   beforeEach(() => {
+    window.localStorage.clear();
+    mockAddToast.mockReset();
+    jest.useRealTimers();
     useQueryStore.setState(useQueryStore.getInitialState());
   });
 
@@ -106,5 +117,70 @@ describe("useQueryStore", () => {
       lastResult: null,
       isQuerying: false,
     });
+  });
+
+  it("marks failed writes as unsynced and emits a toast", () => {
+    jest.useFakeTimers();
+    const setItemSpy = jest
+      .spyOn(Storage.prototype, "setItem")
+      .mockImplementation(() => {
+        throw new Error("No storage");
+      });
+
+    useQueryStore.getState().addToHistory(makeSavedQuery(1));
+
+    expect(useQueryStore.getState().history).toEqual([
+      expect.objectContaining({
+        id: "query-1",
+        synced: false,
+      }),
+    ]);
+
+    jest.runAllTimers();
+    expect(mockAddToast).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variant: "error",
+        message: "Failed to sync 1 query. Retry manually.",
+      }),
+    );
+
+    setItemSpy.mockRestore();
+  });
+
+  it("syncPending retries only queries marked as unsynced", () => {
+    useQueryStore.setState({
+      history: [
+        makeSavedQuery(2, { synced: false }),
+        makeSavedQuery(1),
+      ],
+      lastResult: null,
+      isQuerying: false,
+    });
+
+    useQueryStore.getState().syncPending();
+
+    expect(useQueryStore.getState().history).toEqual([
+      makeSavedQuery(2),
+      makeSavedQuery(1),
+    ]);
+    expect(JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "[]")).toEqual([
+      makeSavedQuery(2),
+      makeSavedQuery(1),
+    ]);
+  });
+
+  it("removes history entries through the persisted store action", () => {
+    useQueryStore.setState({
+      history: [makeSavedQuery(1), makeSavedQuery(2)],
+      lastResult: null,
+      isQuerying: false,
+    });
+
+    useQueryStore.getState().removeFromHistory("query-1");
+
+    expect(useQueryStore.getState().history).toEqual([makeSavedQuery(2)]);
+    expect(JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "[]")).toEqual([
+      makeSavedQuery(2),
+    ]);
   });
 });

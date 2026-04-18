@@ -3,6 +3,12 @@
 import { create } from "zustand";
 import { runQuery } from "@/lib/duckdb/client";
 import {
+  clearSyncFlag,
+  createSyncFailureNotifier,
+  hasPendingSync,
+  markPendingSync,
+} from "@/lib/sync-feedback";
+import {
   compilePipeline,
   type PipelineStep,
   type SavedPipeline,
@@ -10,6 +16,8 @@ import {
 import type { ColumnProfile } from "@/types/dataset";
 
 const MAX_EXECUTION_HISTORY = 20;
+const STORAGE_KEY = "datalens-pipeline-store";
+const notifyPipelineSyncFailure = createSyncFailureNotifier("pipeline");
 
 export interface PipelineExecutionRecord {
   id: string;
@@ -43,6 +51,12 @@ interface PipelineStore {
     input: ExecutePipelineInput,
   ) => Promise<PipelineExecutionRecord | null>;
   clearHistory: () => void;
+  syncPending: () => void;
+}
+
+interface PipelineStorageSnapshot {
+  pipelines: SavedPipeline[];
+  activePipelineId: string | null;
 }
 
 function createExecutionId(): string {
@@ -64,9 +78,93 @@ function appendExecution(
   return [record, ...history].slice(0, MAX_EXECUTION_HISTORY);
 }
 
+function isSavedPipeline(candidate: unknown): candidate is SavedPipeline {
+  if (!candidate || typeof candidate !== "object") return false;
+
+  const pipeline = candidate as Partial<SavedPipeline>;
+  return (
+    typeof pipeline.id === "string" &&
+    typeof pipeline.name === "string" &&
+    typeof pipeline.savedAt === "number" &&
+    Number.isFinite(pipeline.savedAt) &&
+    Array.isArray(pipeline.steps) &&
+    (typeof pipeline.synced === "undefined" || typeof pipeline.synced === "boolean")
+  );
+}
+
+function normalizePipelineSnapshot(
+  snapshot: PipelineStorageSnapshot,
+): PipelineStorageSnapshot {
+  return {
+    pipelines: snapshot.pipelines.map((pipeline) => clearSyncFlag(pipeline)),
+    activePipelineId: snapshot.activePipelineId,
+  };
+}
+
+function markPipelinesPending(
+  pipelines: SavedPipeline[],
+  ids: string[],
+): SavedPipeline[] {
+  const pendingIds = new Set(ids);
+  return pipelines.map((pipeline) =>
+    pendingIds.has(pipeline.id) ? markPendingSync(pipeline) : pipeline,
+  );
+}
+
+function readPipelineSnapshot(): PipelineStorageSnapshot {
+  if (typeof window === "undefined") {
+    return { pipelines: [], activePipelineId: null };
+  }
+
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return { pipelines: [], activePipelineId: null };
+    }
+
+    const parsed = JSON.parse(raw) as unknown;
+
+    if (Array.isArray(parsed)) {
+      const pipelines = parsed.filter(isSavedPipeline);
+      return { pipelines, activePipelineId: pipelines[0]?.id ?? null };
+    }
+
+    if (!parsed || typeof parsed !== "object") {
+      return { pipelines: [], activePipelineId: null };
+    }
+
+    const candidate = parsed as Partial<PipelineStorageSnapshot>;
+    const pipelines = Array.isArray(candidate.pipelines)
+      ? candidate.pipelines.filter(isSavedPipeline)
+      : [];
+    const activePipelineId =
+      typeof candidate.activePipelineId === "string" &&
+      pipelines.some((pipeline) => pipeline.id === candidate.activePipelineId)
+        ? candidate.activePipelineId
+        : pipelines[0]?.id ?? null;
+
+    return { pipelines, activePipelineId };
+  } catch {
+    return { pipelines: [], activePipelineId: null };
+  }
+}
+
+function persistPipelineSnapshot(snapshot: PipelineStorageSnapshot): boolean {
+  if (typeof window === "undefined") return true;
+
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const initialSnapshot = readPipelineSnapshot();
+
 export const usePipelineStore = create<PipelineStore>((set, get) => ({
-  pipelines: [],
-  activePipelineId: null,
+  pipelines: initialSnapshot.pipelines,
+  activePipelineId: initialSnapshot.activePipelineId,
   executionHistory: [],
 
   addPipeline: (pipeline) =>
@@ -77,19 +175,45 @@ export const usePipelineStore = create<PipelineStore>((set, get) => ({
         savedAt: Date.now(),
       };
 
+      const nextPipelines = [
+        nextPipeline,
+        ...state.pipelines.filter((existing) => existing.id !== nextPipeline.id),
+      ];
+      const nextActivePipelineId = nextPipeline.id;
+      const syncedSnapshot = normalizePipelineSnapshot({
+        pipelines: nextPipelines,
+        activePipelineId: nextActivePipelineId,
+      });
+
+      if (persistPipelineSnapshot(syncedSnapshot)) {
+        return syncedSnapshot;
+      }
+
+      notifyPipelineSyncFailure();
       return {
-        pipelines: [nextPipeline, ...state.pipelines],
-        activePipelineId: nextPipeline.id,
+        pipelines: markPipelinesPending(nextPipelines, [nextPipeline.id]),
+        activePipelineId: nextActivePipelineId,
       };
     }),
 
   removePipeline: (id) =>
     set((state) => {
       const nextPipelines = state.pipelines.filter((pipeline) => pipeline.id !== id);
-      return {
+      const nextActivePipelineId =
+        state.activePipelineId === id ? nextPipelines[0]?.id ?? null : state.activePipelineId;
+      const syncedSnapshot = normalizePipelineSnapshot({
         pipelines: nextPipelines,
-        activePipelineId:
-          state.activePipelineId === id ? nextPipelines[0]?.id ?? null : state.activePipelineId,
+        activePipelineId: nextActivePipelineId,
+      });
+
+      if (persistPipelineSnapshot(syncedSnapshot)) {
+        return syncedSnapshot;
+      }
+
+      notifyPipelineSyncFailure();
+      return {
+        pipelines: markPipelinesPending(state.pipelines, [id]),
+        activePipelineId: state.activePipelineId,
       };
     }),
 
@@ -111,8 +235,18 @@ export const usePipelineStore = create<PipelineStore>((set, get) => ({
           : pipeline,
       );
 
-      return {
+      const syncedSnapshot = normalizePipelineSnapshot({
         pipelines: nextPipelines,
+        activePipelineId: id,
+      });
+
+      if (persistPipelineSnapshot(syncedSnapshot)) {
+        return syncedSnapshot;
+      }
+
+      notifyPipelineSyncFailure();
+      return {
+        pipelines: markPipelinesPending(nextPipelines, [id]),
         activePipelineId: id,
       };
     }),
@@ -192,4 +326,23 @@ export const usePipelineStore = create<PipelineStore>((set, get) => ({
   },
 
   clearHistory: () => set({ executionHistory: [] }),
+
+  syncPending: () => {
+    const pendingPipelines = get().pipelines.filter(hasPendingSync);
+    if (pendingPipelines.length === 0) {
+      return;
+    }
+
+    const syncedSnapshot = normalizePipelineSnapshot({
+      pipelines: get().pipelines,
+      activePipelineId: get().activePipelineId,
+    });
+
+    if (persistPipelineSnapshot(syncedSnapshot)) {
+      set(syncedSnapshot);
+      return;
+    }
+
+    notifyPipelineSyncFailure(pendingPipelines.length);
+  },
 }));

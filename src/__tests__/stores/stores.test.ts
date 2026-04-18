@@ -6,6 +6,7 @@ import type { SavedQuery } from "@/types/query";
 
 // Reset stores before each test
 beforeEach(() => {
+  window.localStorage.clear();
   useDatasetStore.setState({ datasets: [], activeDatasetId: null });
   useQueryStore.setState({ history: [], lastResult: null, isQuerying: false });
   useUIStore.setState({ sidebarOpen: true, theme: "light" });

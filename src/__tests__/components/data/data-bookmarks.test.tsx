@@ -228,4 +228,38 @@ describe("DataBookmarks", () => {
       "application/json;charset=utf-8",
     );
   });
+
+  it("marks failed bookmark writes as needing sync and retries them manually", async () => {
+    const user = userEvent.setup();
+    const setItemSpy = jest
+      .spyOn(Storage.prototype, "setItem")
+      .mockImplementation(() => {
+        throw new Error("No storage");
+      });
+
+    render(<DataBookmarks tableName="orders" columns={columns} />);
+
+    fireEvent.change(screen.getByPlaceholderText("Bookmark name"), {
+      target: { value: "Needs sync" },
+    });
+
+    await user.click(screen.getByRole("button", { name: "Save bookmark" }));
+
+    expect(await screen.findByText("Bookmark saved locally. Sync pending.")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Needs sync" })).toBeInTheDocument();
+
+    setItemSpy.mockRestore();
+
+    await user.click(screen.getByRole("button", { name: "Sync now" }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole("img", { name: "Needs sync" })).not.toBeInTheDocument();
+    });
+
+    expect(JSON.parse(window.localStorage.getItem("datalens:bookmarks:orders") ?? "[]")).toEqual([
+      expect.objectContaining({
+        name: "Needs sync",
+      }),
+    ]);
+  });
 });

@@ -1,6 +1,12 @@
 import { useBookmarkStore, type Bookmark } from "@/stores/bookmark-store";
+import { addToast } from "@/lib/ui/toast-bus";
+
+jest.mock("@/lib/ui/toast-bus", () => ({
+  addToast: jest.fn(),
+}));
 
 const STORAGE_KEY = "datalens-bookmarks";
+const mockAddToast = addToast as jest.MockedFunction<typeof addToast>;
 
 function makeBookmark(
   id: string,
@@ -24,7 +30,9 @@ async function loadFreshBookmarkStore() {
 describe("useBookmarkStore", () => {
   beforeEach(() => {
     window.localStorage.clear();
+    mockAddToast.mockReset();
     jest.restoreAllMocks();
+    jest.useRealTimers();
     useBookmarkStore.setState(useBookmarkStore.getInitialState());
   });
 
@@ -130,7 +138,8 @@ describe("useBookmarkStore", () => {
     expect(window.localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify([]));
   });
 
-  it("keeps in-memory state when localStorage writes fail", () => {
+  it("marks bookmarks as unsynced and emits a toast when localStorage writes fail", () => {
+    jest.useFakeTimers();
     const setItemSpy = jest
       .spyOn(Storage.prototype, "setItem")
       .mockImplementation(() => {
@@ -141,8 +150,36 @@ describe("useBookmarkStore", () => {
 
     useBookmarkStore.getState().addBookmark(bookmark);
 
-    expect(useBookmarkStore.getState().bookmarks).toEqual([bookmark]);
+    expect(useBookmarkStore.getState().bookmarks).toEqual([
+      { ...bookmark, synced: false },
+    ]);
+
+    jest.runAllTimers();
+    expect(mockAddToast).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variant: "error",
+        message: "Failed to sync 1 bookmark. Retry manually.",
+      }),
+    );
 
     setItemSpy.mockRestore();
+  });
+
+  it("syncPending retries only bookmarks marked as unsynced", () => {
+    const synced = makeBookmark("synced");
+    const pending = makeBookmark("pending", { synced: false });
+
+    useBookmarkStore.setState({ bookmarks: [pending, synced] });
+
+    useBookmarkStore.getState().syncPending();
+
+    expect(useBookmarkStore.getState().bookmarks).toEqual([
+      makeBookmark("pending"),
+      synced,
+    ]);
+    expect(JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "[]")).toEqual([
+      makeBookmark("pending"),
+      synced,
+    ]);
   });
 });

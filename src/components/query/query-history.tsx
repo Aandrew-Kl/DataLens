@@ -78,6 +78,8 @@ function getSqlPreview(sql: string): string {
 export default function QueryHistory({ datasetId, onSelectQuery }: QueryHistoryProps) {
   const history = useQueryStore((state) => state.history);
   const clearHistory = useQueryStore((state) => state.clearHistory);
+  const removeFromHistory = useQueryStore((state) => state.removeFromHistory);
+  const clearDatasetHistoryStore = useQueryStore((state) => state.clearDatasetHistory);
   const [search, setSearch] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const deferredSearch = useDeferredValue(search);
@@ -103,9 +105,7 @@ export default function QueryHistory({ datasetId, onSelectQuery }: QueryHistoryP
   const groupedHistory = useMemo(() => buildGroups(filteredHistory), [filteredHistory]);
 
   const removeEntry = (id: string) => {
-    useQueryStore.setState((state) => ({
-      history: state.history.filter((entry) => entry.id !== id),
-    }));
+    removeFromHistory(id);
   };
 
   const clearDatasetHistory = () => {
@@ -116,9 +116,7 @@ export default function QueryHistory({ datasetId, onSelectQuery }: QueryHistoryP
       return;
     }
 
-    useQueryStore.setState((state) => ({
-      history: state.history.filter((entry) => entry.datasetId !== datasetId),
-    }));
+    clearDatasetHistoryStore(datasetId);
   };
 
   const handleCopy = async (id: string, sql: string) => {

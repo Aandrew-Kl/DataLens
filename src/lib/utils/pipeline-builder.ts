@@ -50,6 +50,7 @@ export interface SavedPipeline {
   name: string;
   savedAt: number;
   steps: PipelineStep[];
+  synced?: boolean;
 }
 
 export interface CompiledPipeline {

@@ -8,6 +8,7 @@ jest.mock("framer-motion");
 
 describe("QueryHistory", () => {
   beforeEach(() => {
+    window.localStorage.clear();
     useQueryStore.setState({
       history: [],
       lastResult: null,

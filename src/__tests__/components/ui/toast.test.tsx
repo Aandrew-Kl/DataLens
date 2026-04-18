@@ -1,7 +1,7 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { ToastProvider, useToast } from "@/components/ui/toast";
+import { ToastProvider, addToast, useToast } from "@/components/ui/toast";
 
 jest.mock("framer-motion");
 
@@ -71,5 +71,19 @@ describe("ToastProvider", () => {
     await waitFor(() => {
       expect(screen.queryByText("Please try again")).not.toBeInTheDocument();
     });
+  });
+
+  it("renders toasts added through the shared addToast API", async () => {
+    render(
+      <ToastProvider>
+        <p>App content</p>
+      </ToastProvider>,
+    );
+
+    act(() => {
+      addToast({ message: "Sync failed", variant: "error", duration: 10000 });
+    });
+
+    expect(await screen.findByText("Sync failed")).toBeInTheDocument();
   });
 });

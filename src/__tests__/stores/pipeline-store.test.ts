@@ -4,14 +4,20 @@ import {
   type PipelineStep,
   type SavedPipeline,
 } from "@/lib/utils/pipeline-builder";
+import { addToast } from "@/lib/ui/toast-bus";
 import { usePipelineStore } from "@/stores/pipeline-store";
 import type { ColumnProfile } from "@/types/dataset";
 
 jest.mock("@/lib/duckdb/client", () => ({
   runQuery: jest.fn().mockResolvedValue([]),
 }));
+jest.mock("@/lib/ui/toast-bus", () => ({
+  addToast: jest.fn(),
+}));
 
 const mockRunQuery = runQuery as jest.MockedFunction<typeof runQuery>;
+const mockAddToast = addToast as jest.MockedFunction<typeof addToast>;
+const STORAGE_KEY = "datalens-pipeline-store";
 
 const columns: ColumnProfile[] = [
   {
@@ -54,10 +60,13 @@ function makePipeline(overrides: Partial<DraftPipeline> = {}): DraftPipeline {
 
 describe("usePipelineStore", () => {
   beforeEach(() => {
+    window.localStorage.clear();
     usePipelineStore.setState(usePipelineStore.getInitialState());
     mockRunQuery.mockReset();
     mockRunQuery.mockResolvedValue([]);
+    mockAddToast.mockReset();
     jest.restoreAllMocks();
+    jest.useRealTimers();
   });
 
   it("has correct initial state", () => {
@@ -207,6 +216,63 @@ describe("usePipelineStore", () => {
 
     expect(usePipelineStore.getState().pipelines).toEqual([]);
     expect(usePipelineStore.getState().activePipelineId).toBeNull();
+  });
+
+  it("marks pipelines as unsynced and emits a toast when persistence fails", () => {
+    jest.useFakeTimers();
+    const setItemSpy = jest
+      .spyOn(Storage.prototype, "setItem")
+      .mockImplementation(() => {
+        throw new Error("No storage");
+      });
+
+    usePipelineStore.getState().addPipeline(makePipeline());
+
+    expect(usePipelineStore.getState().pipelines[0]).toMatchObject({
+      id: "pipeline-1",
+      synced: false,
+    });
+
+    jest.runAllTimers();
+    expect(mockAddToast).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variant: "error",
+        message: "Failed to sync 1 pipeline. Retry manually.",
+      }),
+    );
+
+    setItemSpy.mockRestore();
+  });
+
+  it("syncPending retries only pipelines marked as unsynced", () => {
+    const syncedPipeline = { ...makePipeline({ id: "pipeline-1" }), savedAt: 1 };
+    const pendingPipeline = {
+      ...makePipeline({ id: "pipeline-2" }),
+      savedAt: 2,
+      synced: false,
+    };
+
+    usePipelineStore.setState({
+      pipelines: [pendingPipeline, syncedPipeline],
+      activePipelineId: "pipeline-2",
+      executionHistory: [],
+    });
+
+    usePipelineStore.getState().syncPending();
+
+    expect(usePipelineStore.getState().pipelines).toEqual([
+      { ...makePipeline({ id: "pipeline-2" }), savedAt: 2 },
+      syncedPipeline,
+    ]);
+    expect(
+      JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "{}"),
+    ).toEqual({
+      pipelines: [
+        { ...makePipeline({ id: "pipeline-2" }), savedAt: 2 },
+        syncedPipeline,
+      ],
+      activePipelineId: "pipeline-2",
+    });
   });
 
   it("records a failed execution when the pipeline cannot be found", async () => {
