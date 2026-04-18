@@ -1,5 +1,6 @@
 type Arbitrary<T> = {
   generate: (rng: Random) => T;
+  map: <U>(project: (value: T) => U) => Arbitrary<U>;
 };
 
 type PropertyOptions = {
@@ -82,48 +83,49 @@ const TEXT_CHARSET = [
   "\u2029",
 ] as const;
 
-export function constant<T>(value: T): Arbitrary<T> {
+function createArbitrary<T>(generate: (rng: Random) => T): Arbitrary<T> {
   return {
-    generate: () => value,
+    generate,
+    map<U>(project: (value: T) => U): Arbitrary<U> {
+      return createArbitrary((rng) => project(generate(rng)));
+    },
   };
+}
+
+export function constant<T>(value: T): Arbitrary<T> {
+  return createArbitrary(() => value);
 }
 
 export function string(options: { minLength?: number; maxLength?: number } = {}): Arbitrary<string> {
   const minLength = options.minLength ?? 0;
   const maxLength = options.maxLength ?? 64;
 
-  return {
-    generate: (rng) => {
+  return createArbitrary((rng) => {
       const length = rng.integer(minLength, maxLength);
       let value = "";
       for (let index = 0; index < length; index += 1) {
         value += rng.pick(TEXT_CHARSET);
       }
       return value;
-    },
-  };
+    });
 }
 
 export function uint8Array(options: { minLength?: number; maxLength?: number } = {}): Arbitrary<Uint8Array> {
   const minLength = options.minLength ?? 0;
   const maxLength = options.maxLength ?? 512;
 
-  return {
-    generate: (rng) => {
+  return createArbitrary((rng) => {
       const length = rng.integer(minLength, maxLength);
       const value = new Uint8Array(length);
       for (let index = 0; index < length; index += 1) {
         value[index] = rng.integer(0, 255);
       }
       return value;
-    },
-  };
+    });
 }
 
 export function oneof<T>(...arbitraries: Arbitrary<T>[]): Arbitrary<T> {
-  return {
-    generate: (rng) => rng.pick(arbitraries).generate(rng),
-  };
+  return createArbitrary((rng) => rng.pick(arbitraries).generate(rng));
 }
 
 export function property<T>(

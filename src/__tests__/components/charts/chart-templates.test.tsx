@@ -165,4 +165,69 @@ describe("ChartTemplates", () => {
 
     expect(mockRunQuery).not.toHaveBeenCalled();
   });
+
+  it("shows a compatibility note when required builder fields are cleared", async () => {
+    const user = userEvent.setup();
+
+    render(<ChartTemplates tableName="sales" columns={columns} />);
+
+    await user.click(screen.getByRole("button", { name: /Revenue over time/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("combobox", { name: "Y axis" })).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Y axis" }), {
+      target: { value: "" },
+    });
+
+    expect(
+      await screen.findByText(
+        "This template needs more compatible columns. Adjust the builder fields to continue.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("shows preview query failures from DuckDB", async () => {
+    const user = userEvent.setup();
+    mockRunQuery.mockRejectedValue(new Error("Preview query failed"));
+
+    render(<ChartTemplates tableName="sales" columns={columns} />);
+
+    await user.click(screen.getByRole("button", { name: /Bubble chart/i }));
+
+    expect(await screen.findByText("Preview query failed")).toBeInTheDocument();
+  });
+
+  it("reopens a saved template into the active draft editor", async () => {
+    const user = userEvent.setup();
+
+    window.localStorage.setItem(
+      "datalens:chart-templates",
+      JSON.stringify([
+        {
+          id: "saved-2",
+          name: "Bubble revisit",
+          kind: "bubble",
+          title: "Bubble revisit",
+          xAxis: "revenue",
+          yAxis: "profit",
+          groupBy: "region",
+          sizeAxis: "revenue",
+          geoField: "country",
+          sourceTemplateId: "bubble-chart",
+          createdAt: 2,
+        },
+      ]),
+    );
+
+    render(<ChartTemplates tableName="sales" columns={columns} />);
+
+    await user.click(screen.getByRole("button", { name: /Bubble revisit/i }));
+
+    expect(await screen.findByDisplayValue("Bubble revisit")).toBeInTheDocument();
+    expect(
+      screen.getByRole("combobox", { name: "Bubble size" }),
+    ).toHaveValue("revenue");
+  });
 });

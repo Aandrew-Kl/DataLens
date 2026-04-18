@@ -323,13 +323,26 @@ export default function SchemaViewer({ tableName, columns, rowCount }: SchemaVie
               const expanded = expandedRows.has(col.name);
               return (
                 <tr key={col.name} className="group">
-                  <td className="pl-3 pr-1 py-2.5 cursor-pointer" onClick={() => toggleExpand(col.name)}>
-                    <motion.div animate={{ rotate: expanded ? 90 : 0 }} transition={{ duration: 0.15 }}>
-                      <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                    </motion.div>
+                  <td className="pl-3 pr-1 py-2.5">
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(col.name)}
+                      aria-label={`${expanded ? "Collapse" : "Expand"} details for ${col.name}`}
+                      className="rounded-md p-1 text-gray-400 transition hover:bg-gray-100 dark:text-gray-500 dark:hover:bg-gray-800"
+                    >
+                      <motion.div animate={{ rotate: expanded ? 90 : 0 }} transition={{ duration: 0.15 }}>
+                        <ChevronRight className="w-4 h-4" />
+                      </motion.div>
+                    </button>
                   </td>
-                  <td className="px-4 py-2.5 font-medium text-gray-900 dark:text-white cursor-pointer" onClick={() => toggleExpand(col.name)}>
-                    {col.name}
+                  <td className="px-4 py-2.5 font-medium text-gray-900 dark:text-white">
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(col.name)}
+                      className="text-left transition hover:text-cyan-600 dark:hover:text-cyan-400"
+                    >
+                      {col.name}
+                    </button>
                   </td>
                   <td className="px-4 py-2.5">
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${badge.bg} ${badge.text}`}>

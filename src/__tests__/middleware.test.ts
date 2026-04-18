@@ -1,4 +1,4 @@
-import { middleware, config } from "@/middleware";
+import { proxy, config } from "@/proxy";
 import { NextResponse } from "next/server";
 
 jest.mock("next/server", () => {
@@ -38,7 +38,7 @@ const createMockRequest = (pathname: string, hasToken = false) => {
   } as const;
 };
 
-describe("middleware", () => {
+describe("proxy", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -54,7 +54,7 @@ describe("middleware", () => {
 
     publicRoutes.forEach((pathname) => {
       const request = createMockRequest(pathname);
-      const response = middleware(request as unknown as Parameters<typeof middleware>[0]);
+      const response = proxy(request as unknown as Parameters<typeof proxy>[0]);
 
       expect(response).toEqual({ type: "next" });
       expect(NextResponse.next).toHaveBeenCalled();
@@ -63,7 +63,7 @@ describe("middleware", () => {
 
   it("redirects to /login when accessing a protected route without token", () => {
     const request = createMockRequest("/dashboard");
-    const response = middleware(request as unknown as Parameters<typeof middleware>[0]);
+    const response = proxy(request as unknown as Parameters<typeof proxy>[0]);
 
     expect(NextResponse.redirect).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -79,7 +79,7 @@ describe("middleware", () => {
 
   it("allows public API routes without token", () => {
     const request = createMockRequest("/api/health");
-    const response = middleware(request as unknown as Parameters<typeof middleware>[0]);
+    const response = proxy(request as unknown as Parameters<typeof proxy>[0]);
 
     expect(response).toEqual({ type: "next" });
     expect(NextResponse.next).toHaveBeenCalled();
@@ -87,7 +87,7 @@ describe("middleware", () => {
 
   it("returns 401 JSON for protected API routes without token", () => {
     const request = createMockRequest("/api/ai/query");
-    const response = middleware(request as unknown as Parameters<typeof middleware>[0]);
+    const response = proxy(request as unknown as Parameters<typeof proxy>[0]);
 
     expect(NextResponse.json).toHaveBeenCalledWith(
       { error: "Unauthorized" },
@@ -102,7 +102,7 @@ describe("middleware", () => {
 
   it("allows public auth routes even when a token exists", () => {
     const request = createMockRequest("/login", true);
-    const response = middleware(request as unknown as Parameters<typeof middleware>[0]);
+    const response = proxy(request as unknown as Parameters<typeof proxy>[0]);
 
     expect(response).toEqual({ type: "next" });
     expect(NextResponse.next).toHaveBeenCalled();
@@ -110,7 +110,7 @@ describe("middleware", () => {
 
   it("allows protected routes when the auth cookie exists", () => {
     const request = createMockRequest("/dashboard", true);
-    const response = middleware(request as unknown as Parameters<typeof middleware>[0]);
+    const response = proxy(request as unknown as Parameters<typeof proxy>[0]);
 
     expect(response).toEqual({ type: "next" });
     expect(NextResponse.next).toHaveBeenCalled();

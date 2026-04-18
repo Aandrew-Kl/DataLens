@@ -1,6 +1,13 @@
 "use client";
 
-import { Fragment, useDeferredValue, useEffect, useMemo, useState, type ElementType } from "react";
+import {
+  Fragment,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+  type ElementType,
+} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BarChart3, Calendar, ChevronRight, Database, Download, FileText, Hash, HelpCircle, Pencil, Search, ToggleLeft, Type } from "lucide-react";
 import type { ColumnProfile, ColumnType } from "@/types/dataset";
@@ -223,15 +230,26 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
                 const stats = getStats(column, column.detectedType, rowCount);
                 return (
                   <Fragment key={column.name}>
-                    <motion.tr initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.02 }} className="cursor-pointer transition hover:bg-cyan-50/60 dark:hover:bg-cyan-950/20" onClick={() => toggleRow(column.name)}>
+                    <motion.tr initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.02 }} className="transition hover:bg-cyan-50/60 dark:hover:bg-cyan-950/20">
                       <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
-                        <ChevronRight className={`h-4 w-4 transition ${isExpanded ? "rotate-90 text-cyan-600 dark:text-cyan-400" : ""}`} />
+                        <button
+                          type="button"
+                          onClick={() => toggleRow(column.name)}
+                          aria-label={`${isExpanded ? "Collapse" : "Expand"} details for ${column.name}`}
+                          className="rounded-md p-1 transition hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          <ChevronRight className={`h-4 w-4 transition ${isExpanded ? "rotate-90 text-cyan-600 dark:text-cyan-400" : ""}`} />
+                        </button>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="space-y-1">
-                          <p className="font-medium text-gray-900 dark:text-white">{column.name}</p>
+                        <button
+                          type="button"
+                          onClick={() => toggleRow(column.name)}
+                          className="space-y-1 text-left"
+                        >
+                          <p className="font-medium text-gray-900 transition hover:text-cyan-700 dark:text-white dark:hover:text-cyan-300">{column.name}</p>
                           <p className="max-w-xl text-sm text-gray-500 dark:text-gray-400">{column.description || "No description yet. Expand this row to document the column."}</p>
-                        </div>
+                        </button>
                       </td>
                       <td className="px-4 py-3"><TypeBadge type={column.detectedType} /></td>
                       <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{column.sampleValues.length ? formatValue(column.sampleValues[0]) : "—"}</td>

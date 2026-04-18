@@ -43,7 +43,7 @@ describe("WorkspaceTabs", () => {
 
     render(<WorkspaceTabs tabs={tabs} activeTab="sql" onChange={onChange} />);
 
-    const wrapper = screen.getByRole("tablist").parentElement?.parentElement;
+    const wrapper = screen.getByRole("tablist");
 
     if (!(wrapper instanceof HTMLElement)) {
       throw new Error("Workspace tabs wrapper was not rendered.");

@@ -12,10 +12,14 @@ const eslintConfig = defineConfig([
   jsxA11yRecommended,
   {
     rules: {
+      // TODO(wave3): 35 label-has-associated-control violations pre-existed;
+      // demoted to warn here to unblock Wave 2 PR. Wave 3 will convert
+      // wrapping <label><input /></label> pattern to htmlFor/id pairs in
+      // src/components/settings/* and fix the rule back to error.
       "jsx-a11y/label-has-associated-control": "warn",
-      "jsx-a11y/no-static-element-interactions": "warn",
-      "jsx-a11y/no-autofocus": "warn",
-      "jsx-a11y/interactive-supports-focus": "warn",
+      "jsx-a11y/no-static-element-interactions": "error",
+      "jsx-a11y/no-autofocus": "error",
+      "jsx-a11y/interactive-supports-focus": "error",
     },
   },
   // Override default ignores of eslint-config-next.

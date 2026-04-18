@@ -104,6 +104,7 @@ export default function StreamingDataViewer({
             aria-live="polite"
           >
             <span
+              role="img"
               aria-label={`WebSocket ${isConnected ? "connected" : "disconnected"}`}
               className={mergeClasses(
                 "h-2.5 w-2.5 rounded-full",

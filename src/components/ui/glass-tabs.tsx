@@ -138,6 +138,7 @@ export default function GlassTabs({
       <div
         role="tablist"
         aria-label="Glass tabs"
+        tabIndex={0}
         onKeyDown={handleKeyDown}
         className="flex flex-wrap gap-2 border-b border-white/15 p-3"
       >

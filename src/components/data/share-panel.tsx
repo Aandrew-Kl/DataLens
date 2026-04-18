@@ -198,7 +198,15 @@ export default function SharePanel({ open, onClose, dataset, currentTab, current
     <AnimatePresence>
       {open ? (
         <motion.div className="fixed inset-0 z-50 flex justify-end" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
-          <motion.div className="absolute inset-0 bg-black/45 backdrop-blur-sm" onClick={handleClose} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+          <motion.button
+            type="button"
+            aria-label="Close share panel"
+            className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+            onClick={handleClose}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          />
           <motion.aside
             className="relative flex h-full w-full max-w-2xl flex-col border-l border-gray-200/60 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-gray-700/60 dark:bg-gray-900/95"
             initial={{ x: "100%" }}
