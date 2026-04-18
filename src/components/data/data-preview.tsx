@@ -603,10 +603,13 @@ function DataPreviewReady({
       {contextMenu ? (
         <div
           className="fixed inset-0 z-50"
+          role="presentation"
           onMouseDown={closeContextMenu}
         >
           <div
             className="absolute rounded-2xl border border-white/15 bg-white/88 p-2 shadow-[0_18px_54px_-34px_rgba(15,23,42,0.8)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/94"
+            role="menu"
+            tabIndex={-1}
             style={{ left: contextMenu.x, top: contextMenu.y }}
             onMouseDown={(event) => event.stopPropagation()}
           >

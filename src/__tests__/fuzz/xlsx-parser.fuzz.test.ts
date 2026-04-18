@@ -85,7 +85,7 @@ describe("excel parser fuzz coverage", () => {
               arrayBuffer: async () => {
                 throw new Error("read failed");
               },
-            } as File),
+            } as unknown as File),
           () => {
             throw new Error("parseExcel should not resolve after a file read error");
           }

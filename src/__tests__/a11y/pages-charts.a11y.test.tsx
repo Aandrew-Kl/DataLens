@@ -141,7 +141,7 @@ async function renderDataOpsPage(): Promise<RenderResult> {
     });
   });
 
-  return render(<DataOpsPage />, { wrapper: TestProviders });
+  return render(<DataOpsPage />, { wrapper: TestProviders }) as RenderResult;
 }
 
 async function renderStackedBarChart(): Promise<RenderResult> {
