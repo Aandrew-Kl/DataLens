@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
     OLLAMA_URL: str = "http://localhost:11434"
     LOG_LEVEL: str = "INFO"
-    APP_VERSION: str = "1.0.0"
+    APP_VERSION: str = "0.9.0-beta.1"
     UPLOADS_DIR: str = "./uploads"
     MAX_UPLOAD_SIZE: int = 50 * 1024 * 1024
 
