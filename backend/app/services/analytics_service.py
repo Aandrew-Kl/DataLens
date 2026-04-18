@@ -27,6 +27,12 @@ def churn_predict(frame: pd.DataFrame, request: ChurnPredictRequest) -> dict:
     logger.info("Churn prediction on %d rows", frame.shape[0])
 
     ensure_columns_exist(frame, request.feature_columns + [request.target_column])
+    if request.target_column in request.feature_columns:
+        raise ValueError(
+            "Target column cannot also appear in feature_columns — this "
+            "produces trivial label leakage and the resulting risk scores "
+            "would not reflect genuine churn behavior."
+        )
     working = frame[request.feature_columns + [request.target_column]].dropna(subset=[request.target_column]).copy()
     _require_rows(working, minimum=20)
     y = working[request.target_column].astype(str)

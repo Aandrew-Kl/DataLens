@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 
 import pandas as pd
+import pytest
 
 from app.services.analytics_service import ab_test, churn_predict, cohort_analysis, forecast
 
@@ -34,6 +35,18 @@ def test_churn_predict(classification_data: list[dict[str, object]]) -> None:
     assert "feature_importance" in result
     assert isinstance(result["risk_scores"], list)
     assert isinstance(result["feature_importance"], dict)
+
+
+def test_churn_predict_rejects_target_in_features(
+    classification_data: list[dict[str, object]],
+) -> None:
+    request = SimpleNamespace(
+        feature_columns=["feature_a", "churned"],
+        target_column="churned",
+        test_size=0.25,
+    )
+    with pytest.raises(ValueError, match="label leakage"):
+        churn_predict(pd.DataFrame(classification_data), request)
 
 
 def test_cohort_analysis(cohort_data: list[dict[str, object]]) -> None:
