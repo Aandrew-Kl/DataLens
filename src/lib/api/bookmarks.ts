@@ -38,6 +38,8 @@ export interface BookmarkMutation {
   viewState?: Record<string, unknown> | null;
 }
 
+export type BookmarkUpdateMutation = Omit<BookmarkMutation, "id">;
+
 function fromBackend(record: BackendBookmarkRecord): BookmarkRecord {
   return {
     id: record.id,
@@ -55,7 +57,7 @@ function fromBackend(record: BackendBookmarkRecord): BookmarkRecord {
 
 function toBackend(payload: BookmarkMutation) {
   return {
-    id: payload.id,
+    ...(payload.id ? { id: payload.id } : {}),
     dataset_id: payload.datasetId ?? null,
     table_name: payload.tableName ?? null,
     label: payload.label,
@@ -76,6 +78,15 @@ export const bookmarksApi = {
     const record = await request<BackendBookmarkRecord>(
       "POST",
       "/api/bookmarks",
+      toBackend(payload),
+    );
+    return fromBackend(record);
+  },
+
+  async update(id: string, payload: BookmarkUpdateMutation): Promise<BookmarkRecord> {
+    const record = await request<BackendBookmarkRecord>(
+      "PATCH",
+      `/api/bookmarks/${id}`,
       toBackend(payload),
     );
     return fromBackend(record);

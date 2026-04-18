@@ -17,6 +17,7 @@ jest.mock("@/lib/api/pipelines", () => ({
   pipelinesApi: {
     list: jest.fn(),
     create: jest.fn(),
+    update: jest.fn(),
     delete: jest.fn(),
   },
 }));
@@ -59,6 +60,7 @@ function makePipeline(overrides: Partial<DraftPipeline> = {}): DraftPipeline {
     id: "pipeline-1",
     name: "Regional Filter",
     steps: [makeStep()],
+    synced: false,
     ...overrides,
   };
 }
@@ -71,6 +73,7 @@ describe("usePipelineStore", () => {
     mockRunQuery.mockResolvedValue([]);
     mockedPipelinesApi.list.mockReset();
     mockedPipelinesApi.create.mockReset();
+    mockedPipelinesApi.update.mockReset();
     mockedPipelinesApi.delete.mockReset();
     useAuthStore.setState({ token: null, isAuthenticated: false });
     jest.restoreAllMocks();
@@ -104,6 +107,7 @@ describe("usePipelineStore", () => {
         id: "remote-pipeline",
         name: "Remote pipeline",
         savedAt: 1_900_000_000_000,
+        synced: true,
       }),
     ]);
   });
@@ -163,9 +167,43 @@ describe("usePipelineStore", () => {
       name: "Regional Filter",
       steps: [expect.objectContaining({ id: "step-1" })],
     });
+    expect(mockedPipelinesApi.update).not.toHaveBeenCalled();
     expect(usePipelineStore.getState().pipelines[0]).toMatchObject({
       id: "pipeline-1",
       savedAt: 1_900_000_000_000,
+      synced: true,
+    });
+  });
+
+  it("updates synced pipelines with PATCH when authenticated", async () => {
+    useAuthStore.setState({ token: "auth-token", isAuthenticated: true });
+    usePipelineStore.setState({
+      pipelines: [{ ...makePipeline({ id: "pipeline-1", name: "Original", synced: true }), savedAt: 1 }],
+      activePipelineId: "pipeline-1",
+      executionHistory: [],
+    });
+    mockedPipelinesApi.update.mockResolvedValue({
+      id: "pipeline-1",
+      name: "Regional Filter v2",
+      steps: [makeStep({ id: "step-2", type: "sort", column: "sales" })],
+      createdAt: 1_800_000_000_000,
+      savedAt: 1_900_000_000_000,
+    });
+
+    await usePipelineStore.getState().updatePipeline("pipeline-1", {
+      name: "Regional Filter v2",
+      steps: [makeStep({ id: "step-2", type: "sort", column: "sales" })],
+    });
+
+    expect(mockedPipelinesApi.update).toHaveBeenCalledWith("pipeline-1", {
+      name: "Regional Filter v2",
+      steps: [expect.objectContaining({ id: "step-2", type: "sort", column: "sales" })],
+    });
+    expect(mockedPipelinesApi.create).not.toHaveBeenCalled();
+    expect(usePipelineStore.getState().pipelines[0]).toMatchObject({
+      id: "pipeline-1",
+      name: "Regional Filter v2",
+      synced: true,
     });
   });
 

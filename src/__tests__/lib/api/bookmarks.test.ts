@@ -82,6 +82,42 @@ describe("bookmarks API", () => {
     });
   });
 
+  test("updates a bookmark with backend field names", async () => {
+    mockedRequest.mockResolvedValue({
+      id: "bookmark-1",
+      user_id: "user-1",
+      dataset_id: "dataset-1",
+      table_name: "orders",
+      label: "Revenue view updated",
+      description: "Saved view",
+      column_name: "sales",
+      sql_text: "SELECT * FROM orders",
+      view_state: { selectedTab: "table" },
+      created_at: "2026-04-18T12:00:00Z",
+      updated_at: "2026-04-18T13:00:00Z",
+    });
+
+    await bookmarksApi.update("bookmark-1", {
+      datasetId: "dataset-1",
+      tableName: "orders",
+      label: "Revenue view updated",
+      description: "Saved view",
+      columnName: "sales",
+      sql: "SELECT * FROM orders",
+      viewState: { selectedTab: "table" },
+    });
+
+    expect(mockedRequest).toHaveBeenCalledWith("PATCH", "/api/bookmarks/bookmark-1", {
+      dataset_id: "dataset-1",
+      table_name: "orders",
+      label: "Revenue view updated",
+      description: "Saved view",
+      column_name: "sales",
+      sql_text: "SELECT * FROM orders",
+      view_state: { selectedTab: "table" },
+    });
+  });
+
   test("deletes a bookmark", async () => {
     mockedRequest.mockResolvedValue(undefined);
 

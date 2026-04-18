@@ -24,6 +24,8 @@ export interface PipelineMutation {
   steps: PipelineStep[];
 }
 
+export type PipelineUpdateMutation = Omit<PipelineMutation, "id">;
+
 function fromBackend(record: BackendPipelineRecord): PipelineRecord {
   return {
     id: record.id,
@@ -36,7 +38,7 @@ function fromBackend(record: BackendPipelineRecord): PipelineRecord {
 
 function toBackend(payload: PipelineMutation) {
   return {
-    id: payload.id,
+    ...(payload.id ? { id: payload.id } : {}),
     name: payload.name,
     steps: payload.steps,
   };
@@ -52,6 +54,15 @@ export const pipelinesApi = {
     const record = await request<BackendPipelineRecord>(
       "POST",
       "/api/pipelines",
+      toBackend(payload),
+    );
+    return fromBackend(record);
+  },
+
+  async update(id: string, payload: PipelineUpdateMutation): Promise<PipelineRecord> {
+    const record = await request<BackendPipelineRecord>(
+      "PATCH",
+      `/api/pipelines/${id}`,
       toBackend(payload),
     );
     return fromBackend(record);

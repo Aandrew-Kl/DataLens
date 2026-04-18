@@ -6,6 +6,7 @@ jest.mock("@/lib/api/bookmarks", () => ({
   bookmarksApi: {
     list: jest.fn(),
     create: jest.fn(),
+    update: jest.fn(),
     delete: jest.fn(),
   },
 }));
@@ -23,6 +24,7 @@ function makeBookmark(
     tableName: "orders",
     label: `Bookmark ${id}`,
     createdAt: 1_700_000_000_000,
+    synced: false,
     ...overrides,
   };
 }
@@ -38,6 +40,7 @@ describe("useBookmarkStore", () => {
     jest.restoreAllMocks();
     mockedBookmarksApi.list.mockReset();
     mockedBookmarksApi.create.mockReset();
+    mockedBookmarksApi.update.mockReset();
     mockedBookmarksApi.delete.mockReset();
     useAuthStore.setState({ token: null, isAuthenticated: false });
     useBookmarkStore.setState(useBookmarkStore.getInitialState());
@@ -186,6 +189,7 @@ describe("useBookmarkStore", () => {
         label: "Remote bookmark",
         createdAt: 1_800_000_000_000,
         sql: "SELECT * FROM orders",
+        synced: true,
       }),
     ]);
   });
@@ -216,9 +220,56 @@ describe("useBookmarkStore", () => {
       columnName: null,
       sql: null,
     });
+    expect(mockedBookmarksApi.update).not.toHaveBeenCalled();
     expect(useBookmarkStore.getState().bookmarks[0]).toMatchObject({
       id: "remote-write",
       createdAt: 1_900_000_000_000,
+      synced: true,
+    });
+  });
+
+  it("updates synced bookmarks with PATCH when authenticated", async () => {
+    useAuthStore.setState({ token: "auth-token", isAuthenticated: true });
+    useBookmarkStore.setState({
+      bookmarks: [
+        makeBookmark("remote-write", {
+          label: "Original",
+          synced: true,
+        }),
+      ],
+    });
+    mockedBookmarksApi.update.mockResolvedValue({
+      id: "remote-write",
+      datasetId: "dataset-1",
+      tableName: "orders",
+      label: "Bookmark remote-write updated",
+      description: null,
+      columnName: null,
+      sql: null,
+      viewState: null,
+      createdAt: 1_900_000_000_000,
+      updatedAt: 1_900_000_000_100,
+    });
+
+    await useBookmarkStore.getState().addBookmark(
+      makeBookmark("remote-write", {
+        label: "Bookmark remote-write updated",
+        synced: true,
+      }),
+    );
+
+    expect(mockedBookmarksApi.update).toHaveBeenCalledWith("remote-write", {
+      datasetId: "dataset-1",
+      tableName: "orders",
+      label: "Bookmark remote-write updated",
+      columnName: null,
+      sql: null,
+    });
+    expect(mockedBookmarksApi.create).not.toHaveBeenCalled();
+    expect(useBookmarkStore.getState().bookmarks[0]).toMatchObject({
+      id: "remote-write",
+      label: "Bookmark remote-write updated",
+      synced: true,
     });
   });
 

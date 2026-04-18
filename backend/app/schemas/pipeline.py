@@ -15,6 +15,11 @@ class PipelineCreate(BaseModel):
     steps: list[dict[str, Any]] = Field(default_factory=list)
 
 
+class PipelineUpdate(BaseModel):
+    name: str = Field(min_length=1, max_length=255)
+    steps: list[dict[str, Any]] = Field(default_factory=list)
+
+
 class PipelineRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

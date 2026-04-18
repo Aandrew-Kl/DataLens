@@ -79,7 +79,8 @@ function readPipelines(): SavedPipeline[] {
           typeof candidate.id === "string" &&
           typeof candidate.name === "string" &&
           typeof candidate.savedAt === "number" &&
-          Array.isArray(candidate.steps)
+          Array.isArray(candidate.steps) &&
+          (typeof candidate.synced === "undefined" || typeof candidate.synced === "boolean")
         );
       })
       .map((pipeline) => ({
@@ -155,6 +156,7 @@ export const usePipelineStore = create<PipelineStore>((set, get) => ({
           name: pipeline.name,
           savedAt: pipeline.savedAt,
           steps: pipeline.steps.map((step) => ({ ...step })),
+          synced: true,
         })),
       );
 
@@ -182,6 +184,7 @@ export const usePipelineStore = create<PipelineStore>((set, get) => ({
       ...cloneValue(pipeline),
       steps: pipeline.steps.map((step) => ({ ...step })),
       savedAt: Date.now(),
+      synced: false,
     };
     const nextPipelines = sortPipelines([nextPipeline, ...get().pipelines.filter((item) => item.id !== nextPipeline.id)]);
     persistPipelines(nextPipelines);
@@ -205,6 +208,7 @@ export const usePipelineStore = create<PipelineStore>((set, get) => ({
         name: remotePipeline.name,
         savedAt: remotePipeline.savedAt,
         steps: remotePipeline.steps.map((step) => ({ ...step })),
+        synced: true,
       };
       const syncedPipelines = sortPipelines(
         syncPipeline(get().pipelines, nextPipeline.savedAt, syncedPipeline),
@@ -249,6 +253,7 @@ export const usePipelineStore = create<PipelineStore>((set, get) => ({
         ? patch.steps.map((step) => ({ ...step }))
         : currentPipeline.steps.map((step) => ({ ...step })),
       savedAt: Date.now(),
+      synced: currentPipeline.synced ?? false,
     };
     const nextPipelines = sortPipelines(
       get().pipelines.map((pipeline) =>
@@ -266,16 +271,22 @@ export const usePipelineStore = create<PipelineStore>((set, get) => ({
     }
 
     try {
-      const remotePipeline = await pipelinesApi.create({
-        id: optimisticPipeline.id,
-        name: optimisticPipeline.name,
-        steps: optimisticPipeline.steps,
-      });
+      const remotePipeline = currentPipeline.synced
+        ? await pipelinesApi.update(optimisticPipeline.id, {
+            name: optimisticPipeline.name,
+            steps: optimisticPipeline.steps,
+          })
+        : await pipelinesApi.create({
+            id: optimisticPipeline.id,
+            name: optimisticPipeline.name,
+            steps: optimisticPipeline.steps,
+          });
       const syncedPipeline: SavedPipeline = {
         id: remotePipeline.id,
         name: remotePipeline.name,
         savedAt: remotePipeline.savedAt,
         steps: remotePipeline.steps.map((step) => ({ ...step })),
+        synced: true,
       };
       const syncedPipelines = sortPipelines(
         syncPipeline(get().pipelines, optimisticPipeline.savedAt, syncedPipeline),

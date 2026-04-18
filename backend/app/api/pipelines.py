@@ -14,7 +14,7 @@ from app.database import get_db
 from app.middleware.rate_limit import limiter
 from app.models.pipeline import Pipeline
 from app.models.user import User
-from app.schemas.pipeline import PipelineCreate, PipelineRead
+from app.schemas.pipeline import PipelineCreate, PipelineRead, PipelineUpdate
 
 
 router = APIRouter(prefix="/pipelines", tags=["pipelines"])
@@ -49,21 +49,62 @@ async def list_pipelines(
     "",
     response_model=PipelineRead,
     status_code=status.HTTP_201_CREATED,
-    summary="Create or update a pipeline",
-    description="Create a new pipeline or replace an existing pipeline owned by the authenticated user.",
-    response_description="The persisted pipeline.",
+    summary="Create a pipeline",
+    description="Create a new saved pipeline for the authenticated user.",
+    response_description="The created pipeline.",
     responses=build_error_responses(
-        unauthorized="Authentication is required to save pipelines.",
+        unauthorized="Authentication is required to create pipelines.",
+        extra={409: "A pipeline with the provided identifier already exists."},
     ),
 )
 @limiter.limit("30/minute")
-async def create_or_update_pipeline(
+async def create_pipeline(
     request: Request,
     payload: PipelineCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> Pipeline:
     pipeline_id = payload.id or str(uuid4())
+    if payload.id is not None:
+        result = await db.execute(select(Pipeline).where(Pipeline.id == pipeline_id))
+        existing_pipeline = result.scalar_one_or_none()
+        if existing_pipeline is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Pipeline already exists.",
+            )
+
+    pipeline = Pipeline(id=pipeline_id, user_id=current_user.id)
+    db.add(pipeline)
+
+    pipeline.name = payload.name
+    pipeline.steps = payload.steps
+
+    await db.commit()
+    await db.refresh(pipeline)
+    return pipeline
+
+
+@router.patch(
+    "/{pipeline_id}",
+    response_model=PipelineRead,
+    status_code=status.HTTP_200_OK,
+    summary="Update a pipeline",
+    description="Update an existing saved pipeline that belongs to the authenticated user.",
+    response_description="The updated pipeline.",
+    responses=build_error_responses(
+        unauthorized="Authentication is required to update pipelines.",
+        not_found="No pipeline was found for the provided identifier.",
+    ),
+)
+@limiter.limit("30/minute")
+async def update_pipeline(
+    request: Request,
+    pipeline_id: str,
+    payload: PipelineUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Pipeline:
     result = await db.execute(
         select(Pipeline).where(
             Pipeline.id == pipeline_id,
@@ -71,10 +112,8 @@ async def create_or_update_pipeline(
         )
     )
     pipeline = result.scalar_one_or_none()
-
     if pipeline is None:
-        pipeline = Pipeline(id=pipeline_id, user_id=current_user.id)
-        db.add(pipeline)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pipeline not found.")
 
     pipeline.name = payload.name
     pipeline.steps = payload.steps

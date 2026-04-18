@@ -70,11 +70,10 @@ async def test_bookmark_crud_round_trip(client: AsyncClient) -> None:
     assert create_response.status_code == 201
     assert create_response.json()["label"] == "Revenue view"
 
-    update_response = await client.post(
-        "/bookmarks",
+    update_response = await client.patch(
+        "/bookmarks/bookmark-1",
         headers=headers,
         json={
-            "id": "bookmark-1",
             "dataset_id": str(dataset_id),
             "table_name": "orders",
             "label": "Revenue view updated",
@@ -82,7 +81,7 @@ async def test_bookmark_crud_round_trip(client: AsyncClient) -> None:
             "view_state": {"selectedTab": "table", "filters": []},
         },
     )
-    assert update_response.status_code == 201
+    assert update_response.status_code == 200
     assert update_response.json()["label"] == "Revenue view updated"
 
     list_response = await client.get("/bookmarks", headers=headers)
@@ -102,6 +101,45 @@ async def test_bookmark_crud_round_trip(client: AsyncClient) -> None:
     assert final_list_response.json() == []
 
 
+async def test_bookmark_create_conflicts_when_id_already_exists(client: AsyncClient) -> None:
+    headers = await _register_and_login(client)
+
+    create_response = await client.post(
+        "/bookmarks",
+        headers=headers,
+        json={
+            "id": "bookmark-1",
+            "label": "Revenue view",
+        },
+    )
+    assert create_response.status_code == 201
+
+    conflict_response = await client.post(
+        "/bookmarks",
+        headers=headers,
+        json={
+            "id": "bookmark-1",
+            "label": "Revenue view duplicate",
+        },
+    )
+    assert conflict_response.status_code == 409
+    assert conflict_response.json()["detail"] == "Bookmark already exists."
+
+
+async def test_bookmark_update_returns_not_found_for_missing_record(client: AsyncClient) -> None:
+    headers = await _register_and_login(client)
+
+    response = await client.patch(
+        "/bookmarks/missing-bookmark",
+        headers=headers,
+        json={
+            "label": "Revenue view",
+        },
+    )
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Bookmark not found."
+
+
 async def test_pipeline_crud_round_trip(client: AsyncClient) -> None:
     headers = await _register_and_login(client)
 
@@ -117,16 +155,15 @@ async def test_pipeline_crud_round_trip(client: AsyncClient) -> None:
     assert create_response.status_code == 201
     assert create_response.json()["name"] == "Regional filter"
 
-    update_response = await client.post(
-        "/pipelines",
+    update_response = await client.patch(
+        "/pipelines/pipeline-1",
         headers=headers,
         json={
-            "id": "pipeline-1",
             "name": "Regional filter v2",
             "steps": [{"id": "step-1", "type": "sort", "column": "sales"}],
         },
     )
-    assert update_response.status_code == 201
+    assert update_response.status_code == 200
     assert update_response.json()["name"] == "Regional filter v2"
 
     list_response = await client.get("/pipelines", headers=headers)
@@ -142,6 +179,48 @@ async def test_pipeline_crud_round_trip(client: AsyncClient) -> None:
     final_list_response = await client.get("/pipelines", headers=headers)
     assert final_list_response.status_code == 200
     assert final_list_response.json() == []
+
+
+async def test_pipeline_create_conflicts_when_id_already_exists(client: AsyncClient) -> None:
+    headers = await _register_and_login(client)
+
+    create_response = await client.post(
+        "/pipelines",
+        headers=headers,
+        json={
+            "id": "pipeline-1",
+            "name": "Regional filter",
+            "steps": [],
+        },
+    )
+    assert create_response.status_code == 201
+
+    conflict_response = await client.post(
+        "/pipelines",
+        headers=headers,
+        json={
+            "id": "pipeline-1",
+            "name": "Regional filter duplicate",
+            "steps": [],
+        },
+    )
+    assert conflict_response.status_code == 409
+    assert conflict_response.json()["detail"] == "Pipeline already exists."
+
+
+async def test_pipeline_update_returns_not_found_for_missing_record(client: AsyncClient) -> None:
+    headers = await _register_and_login(client)
+
+    response = await client.patch(
+        "/pipelines/missing-pipeline",
+        headers=headers,
+        json={
+            "name": "Regional filter",
+            "steps": [],
+        },
+    )
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Pipeline not found."
 
 
 async def test_query_history_crud_and_limit(client: AsyncClient) -> None:
@@ -181,9 +260,11 @@ async def test_query_history_crud_and_limit(client: AsyncClient) -> None:
     [
         ("get", "/bookmarks", None),
         ("post", "/bookmarks", {"label": "Bookmark", "table_name": "orders"}),
+        ("patch", "/bookmarks/bookmark-1", {"label": "Bookmark", "table_name": "orders"}),
         ("delete", "/bookmarks/bookmark-1", None),
         ("get", "/pipelines", None),
         ("post", "/pipelines", {"name": "Pipeline", "steps": []}),
+        ("patch", "/pipelines/pipeline-1", {"name": "Pipeline", "steps": []}),
         ("delete", "/pipelines/pipeline-1", None),
         ("get", "/history", None),
         ("post", "/history", {"dataset_id": str(uuid4()), "sql_text": "SELECT 1"}),

@@ -12,6 +12,7 @@ export interface Bookmark {
   sql?: string;
   label: string;
   createdAt: number;
+  synced?: boolean;
 }
 
 interface BookmarkStore {
@@ -45,7 +46,8 @@ function readBookmarks(): Bookmark[] {
         (typeof candidate.sql === "undefined" || typeof candidate.sql === "string") &&
         typeof candidate.label === "string" &&
         typeof candidate.createdAt === "number" &&
-        Number.isFinite(candidate.createdAt)
+        Number.isFinite(candidate.createdAt) &&
+        (typeof candidate.synced === "undefined" || typeof candidate.synced === "boolean")
       );
     });
   } catch {
@@ -97,6 +99,7 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
           sql: bookmark.sql ?? undefined,
           label: bookmark.label,
           createdAt: bookmark.createdAt,
+          synced: true,
         }));
 
       const next = sortBookmarks(remoteBookmarks);
@@ -108,9 +111,14 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
   },
 
   addBookmark: async (bookmark) => {
+    const existingBookmark = get().bookmarks.find((existing) => existing.id === bookmark.id);
+    const optimisticBookmark: Bookmark = {
+      ...bookmark,
+      synced: existingBookmark?.synced ?? bookmark.synced ?? false,
+    };
     const next = sortBookmarks([
-        bookmark,
-        ...get().bookmarks.filter((existing) => existing.id !== bookmark.id),
+      optimisticBookmark,
+      ...get().bookmarks.filter((existing) => existing.id !== bookmark.id),
     ]);
     persistBookmarks(next);
     set({ bookmarks: next });
@@ -120,26 +128,35 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     }
 
     try {
-      const remoteBookmark = await bookmarksApi.create({
-        id: bookmark.id,
-        datasetId: bookmark.datasetId,
-        tableName: bookmark.tableName,
-        label: bookmark.label,
-        columnName: bookmark.columnName ?? null,
-        sql: bookmark.sql ?? null,
-      });
+      const remoteBookmark = existingBookmark?.synced
+        ? await bookmarksApi.update(optimisticBookmark.id, {
+            datasetId: optimisticBookmark.datasetId,
+            tableName: optimisticBookmark.tableName,
+            label: optimisticBookmark.label,
+            columnName: optimisticBookmark.columnName ?? null,
+            sql: optimisticBookmark.sql ?? null,
+          })
+        : await bookmarksApi.create({
+            id: optimisticBookmark.id,
+            datasetId: optimisticBookmark.datasetId,
+            tableName: optimisticBookmark.tableName,
+            label: optimisticBookmark.label,
+            columnName: optimisticBookmark.columnName ?? null,
+            sql: optimisticBookmark.sql ?? null,
+          });
       const syncedBookmark: Bookmark = {
         id: remoteBookmark.id,
-        datasetId: remoteBookmark.datasetId ?? bookmark.datasetId,
-        tableName: remoteBookmark.tableName ?? bookmark.tableName,
+        datasetId: remoteBookmark.datasetId ?? optimisticBookmark.datasetId,
+        tableName: remoteBookmark.tableName ?? optimisticBookmark.tableName,
         columnName: remoteBookmark.columnName ?? undefined,
         sql: remoteBookmark.sql ?? undefined,
         label: remoteBookmark.label,
         createdAt: remoteBookmark.createdAt,
+        synced: true,
       };
       const synced = sortBookmarks([
         syncedBookmark,
-        ...get().bookmarks.filter((existing) => existing.id !== bookmark.id),
+        ...get().bookmarks.filter((existing) => existing.id !== optimisticBookmark.id),
       ]);
       persistBookmarks(synced);
       set({ bookmarks: synced });

@@ -59,4 +59,25 @@ describe("pipelines API", () => {
       steps: [],
     });
   });
+
+  test("updates a pipeline with backend field names", async () => {
+    mockedRequest.mockResolvedValue({
+      id: "pipeline-1",
+      user_id: "user-1",
+      name: "Regional filter v2",
+      steps: [{ id: "step-1", type: "sort", column: "sales" }],
+      created_at: "2026-04-18T12:00:00Z",
+      updated_at: "2026-04-18T13:00:00Z",
+    });
+
+    await pipelinesApi.update("pipeline-1", {
+      name: "Regional filter v2",
+      steps: [{ id: "step-1", type: "sort", column: "sales" }],
+    });
+
+    expect(mockedRequest).toHaveBeenCalledWith("PATCH", "/api/pipelines/pipeline-1", {
+      name: "Regional filter v2",
+      steps: [{ id: "step-1", type: "sort", column: "sales" }],
+    });
+  });
 });
