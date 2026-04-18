@@ -1,9 +1,11 @@
 import { runQuery } from "@/lib/duckdb/client";
+import { pipelinesApi } from "@/lib/api/pipelines";
 import {
   createPipelineStep,
   type PipelineStep,
   type SavedPipeline,
 } from "@/lib/utils/pipeline-builder";
+import { useAuthStore } from "@/stores/auth-store";
 import { usePipelineStore } from "@/stores/pipeline-store";
 import type { ColumnProfile } from "@/types/dataset";
 
@@ -11,7 +13,16 @@ jest.mock("@/lib/duckdb/client", () => ({
   runQuery: jest.fn().mockResolvedValue([]),
 }));
 
+jest.mock("@/lib/api/pipelines", () => ({
+  pipelinesApi: {
+    list: jest.fn(),
+    create: jest.fn(),
+    delete: jest.fn(),
+  },
+}));
+
 const mockRunQuery = runQuery as jest.MockedFunction<typeof runQuery>;
+const mockedPipelinesApi = pipelinesApi as jest.Mocked<typeof pipelinesApi>;
 
 const columns: ColumnProfile[] = [
   {
@@ -54,9 +65,14 @@ function makePipeline(overrides: Partial<DraftPipeline> = {}): DraftPipeline {
 
 describe("usePipelineStore", () => {
   beforeEach(() => {
+    window.localStorage.clear();
     usePipelineStore.setState(usePipelineStore.getInitialState());
     mockRunQuery.mockReset();
     mockRunQuery.mockResolvedValue([]);
+    mockedPipelinesApi.list.mockReset();
+    mockedPipelinesApi.create.mockReset();
+    mockedPipelinesApi.delete.mockReset();
+    useAuthStore.setState({ token: null, isAuthenticated: false });
     jest.restoreAllMocks();
   });
 
@@ -66,6 +82,30 @@ describe("usePipelineStore", () => {
     expect(state.pipelines).toEqual([]);
     expect(state.activePipelineId).toBeNull();
     expect(state.executionHistory).toEqual([]);
+  });
+
+  it("hydrates pipelines from the backend when authenticated", async () => {
+    useAuthStore.setState({ token: "auth-token", isAuthenticated: true });
+    mockedPipelinesApi.list.mockResolvedValue([
+      {
+        id: "remote-pipeline",
+        name: "Remote pipeline",
+        steps: [makeStep({ id: "remote-step" })],
+        createdAt: 1_800_000_000_000,
+        savedAt: 1_900_000_000_000,
+      },
+    ]);
+
+    await usePipelineStore.getState().hydrate();
+
+    expect(mockedPipelinesApi.list).toHaveBeenCalledTimes(1);
+    expect(usePipelineStore.getState().pipelines).toEqual([
+      expect.objectContaining({
+        id: "remote-pipeline",
+        name: "Remote pipeline",
+        savedAt: 1_900_000_000_000,
+      }),
+    ]);
   });
 
   it("adds a pipeline, clones its steps, and marks it active", () => {
@@ -104,6 +144,29 @@ describe("usePipelineStore", () => {
     );
 
     global.structuredClone = originalStructuredClone;
+  });
+
+  it("syncs pipeline writes to the backend when authenticated", async () => {
+    useAuthStore.setState({ token: "auth-token", isAuthenticated: true });
+    mockedPipelinesApi.create.mockResolvedValue({
+      id: "pipeline-1",
+      name: "Regional Filter",
+      steps: [makeStep()],
+      createdAt: 1_800_000_000_000,
+      savedAt: 1_900_000_000_000,
+    });
+
+    await usePipelineStore.getState().addPipeline(makePipeline());
+
+    expect(mockedPipelinesApi.create).toHaveBeenCalledWith({
+      id: "pipeline-1",
+      name: "Regional Filter",
+      steps: [expect.objectContaining({ id: "step-1" })],
+    });
+    expect(usePipelineStore.getState().pipelines[0]).toMatchObject({
+      id: "pipeline-1",
+      savedAt: 1_900_000_000_000,
+    });
   });
 
   it("updates a pipeline and keeps a cloned step list", () => {

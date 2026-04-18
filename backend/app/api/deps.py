@@ -57,6 +57,7 @@ async def save_query(
     *,
     user_id: uuid.UUID,
     dataset_id: uuid.UUID,
+    question: str | None = None,
     sql_text: str,
     duration_ms: int,
 ) -> None:
@@ -66,6 +67,7 @@ async def save_query(
         QueryHistory(
             user_id=user_id,
             dataset_id=dataset_id,
+            question=question,
             sql_text=sql_text,
             duration_ms=duration_ms,
         )

@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { bookmarksApi } from "@/lib/api/bookmarks";
+import { useAuthStore } from "@/stores/auth-store";
 
 const STORAGE_KEY = "datalens-bookmarks";
 
@@ -14,10 +16,11 @@ export interface Bookmark {
 
 interface BookmarkStore {
   bookmarks: Bookmark[];
-  addBookmark: (bookmark: Bookmark) => void;
-  removeBookmark: (id: string) => void;
+  hydrate: () => Promise<void>;
+  addBookmark: (bookmark: Bookmark) => Promise<void>;
+  removeBookmark: (id: string) => Promise<void>;
   getBookmarksByDataset: (datasetId: string) => Bookmark[];
-  clearBookmarks: () => void;
+  clearBookmarks: () => Promise<void>;
 }
 
 function readBookmarks(): Bookmark[] {
@@ -60,33 +63,127 @@ function persistBookmarks(bookmarks: Bookmark[]): void {
   }
 }
 
+function hasAuthToken(): boolean {
+  return Boolean(useAuthStore.getState().token);
+}
+
+function sortBookmarks(bookmarks: Bookmark[]): Bookmark[] {
+  return [...bookmarks].sort((left, right) => right.createdAt - left.createdAt);
+}
+
 export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
   bookmarks: readBookmarks(),
 
-  addBookmark: (bookmark) =>
-    set((state) => {
-      const next = [
-        bookmark,
-        ...state.bookmarks.filter((existing) => existing.id !== bookmark.id),
-      ];
-      persistBookmarks(next);
-      return { bookmarks: next };
-    }),
+  hydrate: async () => {
+    const localBookmarks = sortBookmarks(readBookmarks());
 
-  removeBookmark: (id) =>
-    set((state) => {
-      const next = state.bookmarks.filter((bookmark) => bookmark.id !== id);
+    if (!hasAuthToken()) {
+      set({ bookmarks: localBookmarks });
+      return;
+    }
+
+    try {
+      const remoteBookmarks = (await bookmarksApi.list())
+        .filter(
+          (bookmark): bookmark is Bookmark & { datasetId: string; tableName: string } =>
+            typeof bookmark.datasetId === "string" &&
+            typeof bookmark.tableName === "string",
+        )
+        .map((bookmark) => ({
+          id: bookmark.id,
+          datasetId: bookmark.datasetId,
+          tableName: bookmark.tableName,
+          columnName: bookmark.columnName ?? undefined,
+          sql: bookmark.sql ?? undefined,
+          label: bookmark.label,
+          createdAt: bookmark.createdAt,
+        }));
+
+      const next = sortBookmarks(remoteBookmarks);
       persistBookmarks(next);
-      return { bookmarks: next };
-    }),
+      set({ bookmarks: next });
+    } catch {
+      set({ bookmarks: localBookmarks });
+    }
+  },
+
+  addBookmark: async (bookmark) => {
+    const next = sortBookmarks([
+        bookmark,
+        ...get().bookmarks.filter((existing) => existing.id !== bookmark.id),
+    ]);
+    persistBookmarks(next);
+    set({ bookmarks: next });
+
+    if (!hasAuthToken()) {
+      return;
+    }
+
+    try {
+      const remoteBookmark = await bookmarksApi.create({
+        id: bookmark.id,
+        datasetId: bookmark.datasetId,
+        tableName: bookmark.tableName,
+        label: bookmark.label,
+        columnName: bookmark.columnName ?? null,
+        sql: bookmark.sql ?? null,
+      });
+      const syncedBookmark: Bookmark = {
+        id: remoteBookmark.id,
+        datasetId: remoteBookmark.datasetId ?? bookmark.datasetId,
+        tableName: remoteBookmark.tableName ?? bookmark.tableName,
+        columnName: remoteBookmark.columnName ?? undefined,
+        sql: remoteBookmark.sql ?? undefined,
+        label: remoteBookmark.label,
+        createdAt: remoteBookmark.createdAt,
+      };
+      const synced = sortBookmarks([
+        syncedBookmark,
+        ...get().bookmarks.filter((existing) => existing.id !== bookmark.id),
+      ]);
+      persistBookmarks(synced);
+      set({ bookmarks: synced });
+    } catch {
+      // Preserve local-only behavior when remote persistence is unavailable.
+    }
+  },
+
+  removeBookmark: async (id) => {
+    const next = get().bookmarks.filter((bookmark) => bookmark.id !== id);
+    persistBookmarks(next);
+    set({ bookmarks: next });
+
+    if (!hasAuthToken()) {
+      return;
+    }
+
+    try {
+      await bookmarksApi.delete(id);
+    } catch {
+      // Keep the local removal if the backend is unavailable.
+    }
+  },
 
   getBookmarksByDataset: (datasetId) =>
     get()
       .bookmarks.filter((bookmark) => bookmark.datasetId === datasetId)
       .sort((a, b) => b.createdAt - a.createdAt),
 
-  clearBookmarks: () => {
+  clearBookmarks: async () => {
+    const bookmarkIds = get().bookmarks.map((bookmark) => bookmark.id);
     persistBookmarks([]);
     set({ bookmarks: [] });
+
+    if (!hasAuthToken()) {
+      return;
+    }
+
+    await Promise.all(
+      bookmarkIds.map((id) =>
+        bookmarksApi.delete(id).catch(() => {
+          // Preserve local-only behavior when remote persistence is unavailable.
+        }),
+      ),
+    );
   },
 }));

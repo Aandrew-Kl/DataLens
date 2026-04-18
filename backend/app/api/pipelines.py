@@ -1,0 +1,111 @@
+"""Pipeline persistence routes."""
+
+from __future__ import annotations
+
+from uuid import uuid4
+
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.api.auth import get_current_user
+from app.api.docs import build_error_responses
+from app.database import get_db
+from app.models.pipeline import Pipeline
+from app.models.user import User
+from app.schemas.pipeline import PipelineCreate, PipelineRead
+
+
+router = APIRouter(prefix="/pipelines", tags=["pipelines"])
+
+
+@router.get(
+    "",
+    response_model=list[PipelineRead],
+    status_code=status.HTTP_200_OK,
+    summary="List pipelines",
+    description="Return all saved pipelines that belong to the authenticated user.",
+    response_description="The authenticated user's saved pipelines.",
+    responses=build_error_responses(
+        unauthorized="Authentication is required to list pipelines.",
+    ),
+)
+async def list_pipelines(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> list[Pipeline]:
+    result = await db.execute(
+        select(Pipeline)
+        .where(Pipeline.user_id == current_user.id)
+        .order_by(Pipeline.updated_at.desc(), Pipeline.created_at.desc())
+    )
+    return list(result.scalars().all())
+
+
+@router.post(
+    "",
+    response_model=PipelineRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create or update a pipeline",
+    description="Create a new pipeline or replace an existing pipeline owned by the authenticated user.",
+    response_description="The persisted pipeline.",
+    responses=build_error_responses(
+        unauthorized="Authentication is required to save pipelines.",
+    ),
+)
+async def create_or_update_pipeline(
+    payload: PipelineCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Pipeline:
+    pipeline_id = payload.id or str(uuid4())
+    result = await db.execute(
+        select(Pipeline).where(
+            Pipeline.id == pipeline_id,
+            Pipeline.user_id == current_user.id,
+        )
+    )
+    pipeline = result.scalar_one_or_none()
+
+    if pipeline is None:
+        pipeline = Pipeline(id=pipeline_id, user_id=current_user.id)
+        db.add(pipeline)
+
+    pipeline.name = payload.name
+    pipeline.steps = payload.steps
+
+    await db.commit()
+    await db.refresh(pipeline)
+    return pipeline
+
+
+@router.delete(
+    "/{pipeline_id}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a pipeline",
+    description="Delete a pipeline that belongs to the authenticated user.",
+    response_description="The pipeline was deleted successfully.",
+    responses=build_error_responses(
+        unauthorized="Authentication is required to delete pipelines.",
+        not_found="No pipeline was found for the provided identifier.",
+    ),
+)
+async def delete_pipeline(
+    pipeline_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Response:
+    result = await db.execute(
+        select(Pipeline).where(
+            Pipeline.id == pipeline_id,
+            Pipeline.user_id == current_user.id,
+        )
+    )
+    pipeline = result.scalar_one_or_none()
+    if pipeline is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pipeline not found.")
+
+    await db.delete(pipeline)
+    await db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

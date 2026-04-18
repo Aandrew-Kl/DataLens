@@ -1,6 +1,17 @@
 import { useBookmarkStore, type Bookmark } from "@/stores/bookmark-store";
+import { bookmarksApi } from "@/lib/api/bookmarks";
+import { useAuthStore } from "@/stores/auth-store";
+
+jest.mock("@/lib/api/bookmarks", () => ({
+  bookmarksApi: {
+    list: jest.fn(),
+    create: jest.fn(),
+    delete: jest.fn(),
+  },
+}));
 
 const STORAGE_KEY = "datalens-bookmarks";
+const mockedBookmarksApi = bookmarksApi as jest.Mocked<typeof bookmarksApi>;
 
 function makeBookmark(
   id: string,
@@ -25,6 +36,10 @@ describe("useBookmarkStore", () => {
   beforeEach(() => {
     window.localStorage.clear();
     jest.restoreAllMocks();
+    mockedBookmarksApi.list.mockReset();
+    mockedBookmarksApi.create.mockReset();
+    mockedBookmarksApi.delete.mockReset();
+    useAuthStore.setState({ token: null, isAuthenticated: false });
     useBookmarkStore.setState(useBookmarkStore.getInitialState());
   });
 
@@ -144,5 +159,76 @@ describe("useBookmarkStore", () => {
     expect(useBookmarkStore.getState().bookmarks).toEqual([bookmark]);
 
     setItemSpy.mockRestore();
+  });
+
+  it("hydrates bookmarks from the backend when authenticated", async () => {
+    useAuthStore.setState({ token: "auth-token", isAuthenticated: true });
+    mockedBookmarksApi.list.mockResolvedValue([
+      {
+        id: "remote-1",
+        datasetId: "dataset-1",
+        tableName: "orders",
+        label: "Remote bookmark",
+        description: null,
+        columnName: null,
+        sql: "SELECT * FROM orders",
+        viewState: null,
+        createdAt: 1_800_000_000_000,
+        updatedAt: 1_800_000_000_000,
+      },
+    ]);
+
+    await useBookmarkStore.getState().hydrate();
+
+    expect(mockedBookmarksApi.list).toHaveBeenCalledTimes(1);
+    expect(useBookmarkStore.getState().bookmarks).toEqual([
+      makeBookmark("remote-1", {
+        label: "Remote bookmark",
+        createdAt: 1_800_000_000_000,
+        sql: "SELECT * FROM orders",
+      }),
+    ]);
+  });
+
+  it("syncs bookmark writes to the backend when authenticated", async () => {
+    useAuthStore.setState({ token: "auth-token", isAuthenticated: true });
+    const bookmark = makeBookmark("remote-write");
+    mockedBookmarksApi.create.mockResolvedValue({
+      id: "remote-write",
+      datasetId: "dataset-1",
+      tableName: "orders",
+      label: "Bookmark remote-write",
+      description: null,
+      columnName: null,
+      sql: null,
+      viewState: null,
+      createdAt: 1_900_000_000_000,
+      updatedAt: 1_900_000_000_000,
+    });
+
+    await useBookmarkStore.getState().addBookmark(bookmark);
+
+    expect(mockedBookmarksApi.create).toHaveBeenCalledWith({
+      id: "remote-write",
+      datasetId: "dataset-1",
+      tableName: "orders",
+      label: "Bookmark remote-write",
+      columnName: null,
+      sql: null,
+    });
+    expect(useBookmarkStore.getState().bookmarks[0]).toMatchObject({
+      id: "remote-write",
+      createdAt: 1_900_000_000_000,
+    });
+  });
+
+  it("keeps local bookmarks when backend sync fails", async () => {
+    useAuthStore.setState({ token: "auth-token", isAuthenticated: true });
+    const bookmark = makeBookmark("fallback");
+    mockedBookmarksApi.create.mockRejectedValue(new Error("offline"));
+
+    await useBookmarkStore.getState().addBookmark(bookmark);
+
+    expect(useBookmarkStore.getState().bookmarks).toEqual([bookmark]);
   });
 });

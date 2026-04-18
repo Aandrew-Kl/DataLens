@@ -18,4 +18,6 @@ class User(Base):
 
     datasets: Mapped[list["Dataset"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     analyses: Mapped[list["SavedAnalysis"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    bookmarks: Mapped[list["Bookmark"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    pipelines: Mapped[list["Pipeline"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     query_history: Mapped[list["QueryHistory"]] = relationship(back_populates="user", cascade="all, delete-orphan")

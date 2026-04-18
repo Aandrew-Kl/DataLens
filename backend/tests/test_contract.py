@@ -22,6 +22,16 @@ EXPECTED_FE_PATHS: list[tuple[str, str]] = [
     ("POST", "/api/auth/register"),
     ("POST", "/api/auth/login"),
     ("GET", "/api/auth/me"),
+    # persistence
+    ("GET", "/api/bookmarks"),
+    ("POST", "/api/bookmarks"),
+    ("DELETE", "/api/bookmarks/{bookmark_id}"),
+    ("GET", "/api/pipelines"),
+    ("POST", "/api/pipelines"),
+    ("DELETE", "/api/pipelines/{pipeline_id}"),
+    ("GET", "/api/history"),
+    ("POST", "/api/history"),
+    ("DELETE", "/api/history/{history_id}"),
     # AI
     ("POST", "/api/ai/sentiment"),
     ("POST", "/api/ai/summarize"),
