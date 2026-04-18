@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import uuid
 from collections import defaultdict, deque
+from contextlib import asynccontextmanager
 from pathlib import Path
 from time import monotonic, time
 from urllib.parse import urlsplit
@@ -14,9 +16,10 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy import text
 
+from app.alembic_utils import get_current_revision, get_current_revisions, get_head_revisions
 from app.api.router import api_router
 from app.config import settings
-from app.database import Base, engine
+from app.database import engine
 from app.logging_config import setup_logging
 from app.middleware.rate_limit import exempt_paths, limiter
 from app.models import analysis, dataset, query_history, user  # noqa: F401
@@ -143,14 +146,87 @@ rate_limiter = InMemoryRateLimiter(
 )
 request_metrics = RequestMetrics()
 
+
+def get_runtime_environment() -> str:
+    return (os.getenv("ENV") or settings.ENVIRONMENT).strip().lower()
+
+
+def migration_guard_mode() -> str:
+    development_environments = {"development", "dev", "local", "test", "testing"}
+    return "warn" if get_runtime_environment() in development_environments else "error"
+
+
+def format_revision_set(revisions: tuple[str, ...]) -> str:
+    return ", ".join(revisions) if revisions else "<none>"
+
+
+async def alembic_current() -> str | None:
+    async with engine.connect() as connection:
+        return await connection.run_sync(get_current_revision)
+
+
+async def verify_database_schema(app: FastAPI) -> None:
+    expected_heads = get_head_revisions(settings.DATABASE_URL)
+
+    async with engine.connect() as connection:
+        current_heads = await connection.run_sync(get_current_revisions)
+        current_revision = await connection.run_sync(get_current_revision)
+
+    app.state.database_current_revision = current_revision
+    app.state.database_expected_heads = expected_heads
+    app.state.database_status = "ok"
+
+    if set(current_heads) == set(expected_heads):
+        return
+
+    message = (
+        "Database schema does not match the latest Alembic head. "
+        "Run `alembic upgrade head` before starting the backend."
+    )
+
+    if migration_guard_mode() == "error":
+        app.state.database_status = "error"
+        health_logger.error(
+            "%s current=%s expected=%s",
+            message,
+            format_revision_set(current_heads),
+            format_revision_set(expected_heads),
+        )
+        raise RuntimeError(message)
+
+    app.state.database_status = "migration_drift"
+    health_logger.warning(
+        "%s current=%s expected=%s",
+        message,
+        format_revision_set(current_heads),
+        format_revision_set(expected_heads),
+    )
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        await request_metrics.reset()
+        Path(settings.UPLOADS_DIR).mkdir(parents=True, exist_ok=True)
+        await verify_database_schema(app)
+        health_logger.info("application lifespan startup complete")
+        yield
+    finally:
+        health_logger.info("application lifespan shutdown")
+        await engine.dispose()
+
 app = FastAPI(
     title="DataLens Backend",
     description="AI-powered data exploration and analysis API",
     version=settings.APP_VERSION,
     docs_url="/api/docs",
     redoc_url="/api/redoc",
+    lifespan=lifespan,
 )
 app.state.limiter = limiter
+app.state.database_status = "unknown"
+app.state.database_current_revision = None
+app.state.database_expected_heads = ()
 app.state.rate_limit_exempt_paths = exempt_paths() | {
     "/api/docs",
     "/api/redoc",
@@ -158,6 +234,8 @@ app.state.rate_limit_exempt_paths = exempt_paths() | {
     "/api/metrics",
     "/health/metrics",
 }
+
+
 async def _rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
     """Return structured 429 with headers so clients can back off cleanly.
 
@@ -324,19 +402,6 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
     )
 
 
-@app.on_event("startup")
-async def on_startup() -> None:
-    await request_metrics.reset()
-    Path(settings.UPLOADS_DIR).mkdir(parents=True, exist_ok=True)
-    async with engine.begin() as connection:
-        await connection.run_sync(Base.metadata.create_all)
-
-
-@app.on_event("shutdown")
-async def on_shutdown() -> None:
-    await engine.dispose()
-
-
 @app.get("/docs", include_in_schema=False)
 async def legacy_docs_redirect() -> RedirectResponse:
     return RedirectResponse(url="/api/docs")
@@ -355,6 +420,23 @@ async def healthcheck() -> dict[str, object] | JSONResponse:
             await connection.execute(text("SELECT 1"))
     except Exception:
         health_logger.warning("database connectivity check failed during healthcheck", exc_info=True)
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "status": "degraded",
+                "version": settings.APP_VERSION,
+                "database": {"status": "error"},
+            },
+        )
+
+    if app.state.database_status == "migration_drift":
+        return {
+            "status": "degraded",
+            "version": settings.APP_VERSION,
+            "database": {"status": "migration_drift"},
+        }
+
+    if app.state.database_status == "error":
         return JSONResponse(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             content={

@@ -13,6 +13,21 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
+
+@pytest_asyncio.fixture(scope="session", autouse=True)
+async def _migrate_once_for_tests():
+    """Run Alembic migrations once per session so tests that use their own
+    TestClient (not the async `client` fixture) still find the schema in place.
+    Without this, the lifespan's migration guard is skipped in those tests
+    and the in-memory SQLite stays empty."""
+    from app.alembic_utils import downgrade_database, upgrade_database
+    from app.database import engine
+
+    async with engine.begin() as conn:
+        await conn.run_sync(upgrade_database)
+    yield
+
+
 @pytest.fixture
 def regression_data() -> list[dict[str, object]]:
     rng = np.random.default_rng(12)
@@ -124,19 +139,27 @@ def sentiment_texts() -> list[str]:
 async def client():
     """Async HTTP client wired to the FastAPI application."""
     from httpx import ASGITransport, AsyncClient
+    from app.alembic_utils import downgrade_database, upgrade_database
     from app.api.auth import _login_attempts
     from app.main import app, rate_limiter, request_metrics
-    from app.database import Base, engine
+    from app.database import engine
     from app.middleware.rate_limit import limiter
 
     limiter.reset()
     rate_limiter.clear()
     _login_attempts.clear()
-    await request_metrics.reset()
 
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(downgrade_database)
+        await conn.run_sync(upgrade_database)
 
+    # Do not enter lifespan_context here: the tests rely on caplog capturing
+    # request_logger output through pytest's stdlib logging plumbing, and the
+    # ASGI lifespan context reconfigures handlers in a way that breaks caplog.
+    # The explicit migration above stands in for the startup path; the
+    # lifespan's engine.dispose() at exit would also drop the in-memory
+    # SQLite schema mid-teardown.
+    await request_metrics.reset()
     transport = ASGITransport(app=app, raise_app_exceptions=False)
     async with AsyncClient(transport=transport, base_url="http://test/api") as ac:
         yield ac
@@ -146,8 +169,13 @@ async def client():
     _login_attempts.clear()
     await request_metrics.reset()
 
+    # Re-migrate instead of drop: we're on a StaticPool in-memory SQLite and
+    # other sync-TestClient tests later in the session rely on the schema
+    # staying in place. A full downgrade→upgrade cycle reimposes a clean
+    # state without leaving the next test with an empty DB.
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(downgrade_database)
+        await conn.run_sync(upgrade_database)
 
 
 @pytest_asyncio.fixture

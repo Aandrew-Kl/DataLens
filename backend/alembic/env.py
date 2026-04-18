@@ -51,6 +51,11 @@ def run_migrations(connection) -> None:
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode using async engine."""
 
+    existing_connection = config.attributes.get("connection")
+    if existing_connection is not None:
+        run_migrations(existing_connection)
+        return
+
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",

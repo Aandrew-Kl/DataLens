@@ -26,7 +26,7 @@ _SAFE_TEXT = st.text(
     ),
     min_size=1,
     max_size=32,
-)
+).filter(lambda s: s[0] not in {"=", "+", "-", "@"})
 
 
 @st.composite

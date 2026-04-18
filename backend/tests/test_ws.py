@@ -13,26 +13,25 @@ from starlette.websockets import WebSocketDisconnect
 
 import app.api.datasets as datasets_api
 import app.api.ws as ws_api
+from app.alembic_utils import downgrade_database, upgrade_database
 from app.api.auth import _login_attempts
 from app.config import settings
-from app.database import Base, engine
+from app.database import engine
 from app.main import app, rate_limiter
 from app.middleware.rate_limit import limiter
 
 
 async def _reset_database() -> None:
-    await engine.dispose()
+    # Do not dispose() the engine — for in-memory SQLite + StaticPool the
+    # single-connection pool holds the DB, and disposing drops the schema.
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
-    await engine.dispose()
+        await conn.run_sync(downgrade_database)
+        await conn.run_sync(upgrade_database)
 
 
 async def _drop_database() -> None:
-    await engine.dispose()
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-    await engine.dispose()
+        await conn.run_sync(downgrade_database)
 
 
 def _run_async(coro) -> None:
