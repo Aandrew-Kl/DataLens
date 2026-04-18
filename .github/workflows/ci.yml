@@ -110,7 +110,7 @@ jobs:
   e2e:
     needs: [frontend, backend]
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -132,7 +132,9 @@ jobs:
         run: npm run build
 
       - name: Run E2E tests (smoke + auth)
-        run: npx playwright test smoke.spec.ts auth.spec.ts --reporter=list
+        run: >-
+          npx playwright test smoke.spec.ts auth.spec.ts landing.spec.ts
+          navigation.spec.ts sql.spec.ts --reporter=list
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4

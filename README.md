@@ -127,6 +127,17 @@ DataLens ships with **zero telemetry** by default. Optional Sentry error trackin
 
 PRs welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) and [docs-site/content/contributing.mdx](./docs-site/content/contributing.mdx). Good first issues tagged `good-first-issue`.
 
+## Required CI checks
+
+Maintainers should keep the `main` branch protection rule configured to require the `frontend`, `backend`, and `e2e` GitHub Actions checks before merging. The `e2e` job is the Playwright smoke gate and currently runs `smoke.spec.ts`, `auth.spec.ts`, `landing.spec.ts`, `navigation.spec.ts`, and `sql.spec.ts`.
+
+To enable the gate in GitHub:
+
+1. Open `Settings` for `Aandrew-Kl/DataLens`, then go to `Branches`.
+2. Edit the branch protection rule for `main`.
+3. Turn on `Require status checks to pass before merging`.
+4. Add `frontend`, `backend`, and `e2e` to the required checks list.
+
 ## License
 
 MIT — see [LICENSE](LICENSE). Use it, fork it, embed it, ship it.
