@@ -30,7 +30,7 @@ Think Metabase or Tableau, but privacy-first and self-hosted by design.
 | Data stays on-device | No | No | **Yes** |
 | Works offline | No | No | **Yes** |
 | AI without OpenAI | No | No | **Yes** (local Ollama) |
-| Self-host in one command | Complex | No | **`docker-compose up`** |
+| Self-host in one command | Complex | No | **`docker compose up`** |
 | License | AGPL / Proprietary | Proprietary | **MIT** |
 
 ## Features
@@ -43,19 +43,28 @@ Think Metabase or Tableau, but privacy-first and self-hosted by design.
 - **Data pipelines** — 11 transform types, preview-at-each-stage, reusable pipeline definitions
 - **Sample datasets built-in** — 4,600+ rows of realistic ecommerce, payments, and web analytics data
 - **Privacy defaults** — no telemetry, no tracking, PII-scrubbed optional Sentry
-- **One-command self-host** — `docker-compose up` and you're running
+- **One-command self-host** — `docker compose up` and you're running
 
 ## Quick start
+
+### Prerequisites
+
+- Python 3.12+ (3.11 may work but is unsupported for local dev)
+- Node.js 20+
+- Docker 24+ (for the one-command deploy)
 
 ### Option A — Docker (recommended)
 
 ```bash
 git clone https://github.com/Aandrew-Kl/DataLens
 cd DataLens
-docker-compose up
+cp .env.example .env
+docker compose up
 ```
 
-Then visit http://localhost:3000. The app comes with 3 sample datasets pre-loaded — click one to start exploring.
+Then visit http://localhost:3000. The default `.env.example` works out of the box. Edit `.env` if you want a different `JWT_SECRET`, database URL, or public hostnames. If you change `NEXT_PUBLIC_*`, rebuild the frontend image with `docker compose up --build`.
+
+For a production reverse-proxy layout, see [docs/deploy.md](./docs/deploy.md).
 
 ### Option B — local dev
 
