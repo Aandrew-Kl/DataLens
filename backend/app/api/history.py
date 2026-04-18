@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,6 +10,7 @@ from app.api.auth import get_current_user
 from app.api.deps import get_owned_dataset
 from app.api.docs import build_error_responses
 from app.database import get_db
+from app.middleware.rate_limit import limiter
 from app.models.query_history import QueryHistory
 from app.models.user import User
 from app.schemas.history import QueryHistoryCreate, QueryHistoryRead
@@ -31,11 +32,13 @@ router = APIRouter(prefix="/history", tags=["history"])
         unauthorized="Authentication is required to list query history.",
     ),
 )
+@limiter.limit("60/minute")
 async def list_query_history(
+    request: Request,
     limit: int = MAX_HISTORY_ITEMS,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> list[QueryHistory]:
+) -> list[QueryHistoryRead]:
     safe_limit = max(1, min(limit, MAX_HISTORY_ITEMS))
     result = await db.execute(
         select(QueryHistory)
@@ -58,7 +61,9 @@ async def list_query_history(
         not_found="The referenced dataset was not found.",
     ),
 )
+@limiter.limit("60/minute")
 async def create_query_history_entry(
+    request: Request,
     payload: QueryHistoryCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -107,7 +112,9 @@ async def create_query_history_entry(
         not_found="No query history entry was found for the provided identifier.",
     ),
 )
+@limiter.limit("30/minute")
 async def delete_query_history_entry(
+    request: Request,
     history_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),

@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.auth import get_current_user
 from app.api.docs import build_error_responses
 from app.database import get_db
+from app.middleware.rate_limit import limiter
 from app.models.pipeline import Pipeline
 from app.models.user import User
 from app.schemas.pipeline import PipelineCreate, PipelineRead
@@ -30,10 +31,12 @@ router = APIRouter(prefix="/pipelines", tags=["pipelines"])
         unauthorized="Authentication is required to list pipelines.",
     ),
 )
+@limiter.limit("60/minute")
 async def list_pipelines(
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> list[Pipeline]:
+) -> list[PipelineRead]:
     result = await db.execute(
         select(Pipeline)
         .where(Pipeline.user_id == current_user.id)
@@ -53,7 +56,9 @@ async def list_pipelines(
         unauthorized="Authentication is required to save pipelines.",
     ),
 )
+@limiter.limit("30/minute")
 async def create_or_update_pipeline(
+    request: Request,
     payload: PipelineCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -91,7 +96,9 @@ async def create_or_update_pipeline(
         not_found="No pipeline was found for the provided identifier.",
     ),
 )
+@limiter.limit("30/minute")
 async def delete_pipeline(
+    request: Request,
     pipeline_id: str,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),

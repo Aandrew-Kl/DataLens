@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,6 +12,7 @@ from app.api.auth import get_current_user
 from app.api.deps import get_owned_dataset
 from app.api.docs import build_error_responses
 from app.database import get_db
+from app.middleware.rate_limit import limiter
 from app.models.bookmark import Bookmark
 from app.models.user import User
 from app.schemas.bookmark import BookmarkCreate, BookmarkRead
@@ -31,10 +32,12 @@ router = APIRouter(prefix="/bookmarks", tags=["bookmarks"])
         unauthorized="Authentication is required to list bookmarks.",
     ),
 )
+@limiter.limit("60/minute")
 async def list_bookmarks(
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> list[Bookmark]:
+) -> list[BookmarkRead]:
     result = await db.execute(
         select(Bookmark)
         .where(Bookmark.user_id == current_user.id)
@@ -55,7 +58,9 @@ async def list_bookmarks(
         not_found="The referenced dataset was not found.",
     ),
 )
+@limiter.limit("30/minute")
 async def create_or_update_bookmark(
+    request: Request,
     payload: BookmarkCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -101,7 +106,9 @@ async def create_or_update_bookmark(
         not_found="No bookmark was found for the provided identifier.",
     ),
 )
+@limiter.limit("30/minute")
 async def delete_bookmark(
+    request: Request,
     bookmark_id: str,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
