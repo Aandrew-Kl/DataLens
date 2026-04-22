@@ -1,5 +1,5 @@
 import { runQuery } from "@/lib/duckdb/client";
-import { exportToFormat } from "@/lib/utils/data-export";
+import { exportToFormat } from "@/lib/utils/export";
 
 jest.mock("@/lib/duckdb/client", () => ({
   runQuery: jest.fn().mockResolvedValue([]),

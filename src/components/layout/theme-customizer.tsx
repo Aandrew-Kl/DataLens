@@ -440,11 +440,15 @@ export default function ThemeCustomizer() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
-              <label className="block text-sm font-semibold text-slate-900 dark:text-slate-50">
+              <label
+                htmlFor="theme-customizer-accent-color"
+                className="block text-sm font-semibold text-slate-900 dark:text-slate-50"
+              >
                 Accent color
               </label>
               <div className="mt-3 flex items-center gap-3">
                 <input
+                  id="theme-customizer-accent-color"
                   type="color"
                   value={theme.accentColor}
                   onChange={(event) =>

@@ -508,10 +508,14 @@ function DistributionAnalyzerReady({
 
         <div className="grid gap-3 xl:grid-cols-[1.2fr_0.9fr_0.9fr]">
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="distribution-analyzer-numeric-column"
+              className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+            >
               Numeric column
             </label>
             <select
+              id="distribution-analyzer-numeric-column"
               aria-label="Numeric column"
               value={safeColumn}
               onChange={(event) =>
@@ -550,10 +554,14 @@ function DistributionAnalyzerReady({
             </div>
           </label>
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="distribution-analyzer-view"
+              className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+            >
               View
             </label>
             <select
+              id="distribution-analyzer-view"
               aria-label="View"
               value={view}
               onChange={(event) =>

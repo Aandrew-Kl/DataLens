@@ -400,10 +400,14 @@ function TextColumnAnalyzerReady({
 
         <div className="grid gap-3 xl:grid-cols-[1.2fr_1fr_1fr]">
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="text-column-analyzer-text-column"
+              className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+            >
               Text column
             </label>
             <select
+              id="text-column-analyzer-text-column"
               aria-label="Text column"
               value={safeColumn}
               onChange={(event) =>

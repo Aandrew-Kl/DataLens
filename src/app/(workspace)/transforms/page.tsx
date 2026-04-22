@@ -277,11 +277,15 @@ export default function TransformsPage() {
           <div className="space-y-4">
             <div className="flex flex-wrap items-end gap-3">
               <form onSubmit={renameActivePipeline} className="flex-1 min-w-72">
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
+                <label
+                  htmlFor="transforms-pipeline-name"
+                  className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200"
+                >
                   Pipeline name
                 </label>
                 <div className="flex gap-2">
                   <input
+                    id="transforms-pipeline-name"
                     value={pipelineName}
                     onChange={(event) => setPipelineName(event.target.value)}
                     className={FIELD_CLASS}

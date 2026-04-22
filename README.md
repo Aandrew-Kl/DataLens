@@ -12,7 +12,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6.svg)](#)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black.svg)](#)
 
-**[Live Demo](<!-- LIVE_URL -->) · [Docs](./docs-site) · [Architecture](./docs-site/content/architecture) · [Changelog](./CHANGELOG.md) · [Report an Issue](https://github.com/Aandrew-Kl/DataLens/issues)**
+**[Live Demo](https://aandrew-kl.github.io/DataLens/) · [Docs](./docs-site) · [Architecture](./docs-site/content/architecture) · [Changelog](./CHANGELOG.md) · [Report an Issue](https://github.com/Aandrew-Kl/DataLens/issues)**
 
 </div>
 

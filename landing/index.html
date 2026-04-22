@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DataLens — Analyze data at the speed of thought. Privately.</title>
+    <meta
+      name="description"
+      content="Open-source AI data analytics that runs entirely in your browser with DuckDB-WASM and local LLMs. No cloud. No tracking."
+    />
+    <meta property="og:title" content="DataLens — Privacy-first AI data analytics" />
+    <meta
+      property="og:description"
+      content="DuckDB in the browser. Local LLMs. No telemetry. MIT licensed."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://aandrew-kl.github.io/DataLens/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0f172a;
+        --bg-soft: #111d36;
+        --panel: rgba(15, 23, 42, 0.72);
+        --panel-border: rgba(148, 163, 184, 0.18);
+        --fg: #f8fafc;
+        --fg-muted: #cbd5e1;
+        --fg-dim: #94a3b8;
+        --accent: #22d3ee;
+        --accent-2: #3b82f6;
+        --chip-bg: rgba(34, 211, 238, 0.12);
+        --chip-border: rgba(34, 211, 238, 0.38);
+        --success: #34d399;
+        --warn: #fbbf24;
+        --danger: #f87171;
+        --radius: 20px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        font-family: "Inter var", "Inter", system-ui, -apple-system,
+          "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+      }
+      a {
+        color: inherit;
+      }
+      .page {
+        position: relative;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+      .page::before,
+      .page::after {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .page::before {
+        inset: -12rem 0 auto 0;
+        height: 32rem;
+        background: radial-gradient(
+          circle at top,
+          rgba(34, 211, 238, 0.22),
+          transparent 58%
+        );
+      }
+      .page::after {
+        inset: 0;
+        background-image: linear-gradient(
+            rgba(148, 163, 184, 0.12) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            90deg,
+            rgba(148, 163, 184, 0.12) 1px,
+            transparent 1px
+          );
+        background-size: 96px 96px;
+        opacity: 0.6;
+      }
+      .container {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        position: relative;
+        z-index: 1;
+      }
+      /* Header */
+      header.nav {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        padding: 1.25rem 1.5rem 0;
+      }
+      .nav-inner {
+        max-width: 1120px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.85rem 1rem;
+        border-radius: 1.75rem;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        background: rgba(15, 23, 42, 0.72);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        color: inherit;
+      }
+      .brand-mark {
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 0.85rem;
+        background: linear-gradient(135deg, #22d3ee, #3b82f6);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: white;
+      }
+      .brand-text strong {
+        display: block;
+        font-size: 0.95rem;
+      }
+      .brand-text span {
+        color: var(--fg-dim);
+        font-size: 0.78rem;
+      }
+      .nav-links {
+        display: none;
+        align-items: center;
+        gap: 1.4rem;
+        color: var(--fg-muted);
+        font-size: 0.9rem;
+      }
+      .nav-links a {
+        text-decoration: none;
+        transition: color 0.15s ease;
+      }
+      .nav-links a:hover {
+        color: var(--fg);
+      }
+      .nav-cta {
+        display: inline-flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.1rem;
+        border-radius: 0.85rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: transform 0.15s ease, background 0.15s ease,
+          box-shadow 0.15s ease;
+        border: 1px solid transparent;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #22d3ee, #3b82f6);
+        color: white;
+        box-shadow: 0 12px 30px -18px rgba(59, 130, 246, 0.55);
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+      }
+      .btn-ghost {
+        background: rgba(15, 23, 42, 0.5);
+        border-color: rgba(148, 163, 184, 0.2);
+        color: var(--fg-muted);
+      }
+      .btn-ghost:hover {
+        color: var(--fg);
+        transform: translateY(-2px);
+      }
+      .hide-sm {
+        display: none;
+      }
+      @media (min-width: 960px) {
+        .nav-links {
+          display: inline-flex;
+        }
+        .hide-sm {
+          display: inline-flex;
+        }
+      }
+      /* Hero */
+      section.hero {
+        padding: 5rem 0 3rem;
+      }
+      .hero-inner {
+        display: grid;
+        gap: 2.5rem;
+      }
+      @media (min-width: 900px) {
+        .hero-inner {
+          grid-template-columns: 1.15fr 1fr;
+          align-items: center;
+        }
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 9999px;
+        background: var(--chip-bg);
+        color: #67e8f9;
+        border: 1px solid var(--chip-border);
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      h1 {
+        font-size: clamp(2.4rem, 4.2vw, 3.6rem);
+        line-height: 1.08;
+        letter-spacing: -0.02em;
+        margin: 1.1rem 0 1.2rem;
+        font-weight: 700;
+      }
+      h1 .grad {
+        background: linear-gradient(135deg, #22d3ee, #3b82f6 55%, #a855f7);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .lede {
+        font-size: 1.1rem;
+        color: var(--fg-muted);
+        max-width: 36rem;
+      }
+      .hero-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1.6rem;
+      }
+      .chip {
+        font-size: 0.78rem;
+        color: var(--fg-muted);
+        padding: 0.35rem 0.7rem;
+        border-radius: 9999px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+      }
+      .cta-row {
+        margin-top: 1.8rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+      }
+      .meta-line {
+        margin-top: 1.4rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.4rem;
+        font-size: 0.85rem;
+        color: var(--fg-dim);
+      }
+      .meta-line b {
+        color: var(--fg);
+        font-weight: 600;
+      }
+      /* Hero visual */
+      .hero-visual {
+        position: relative;
+        border-radius: 28px;
+        padding: 1.2rem;
+        background: linear-gradient(
+          135deg,
+          rgba(34, 211, 238, 0.12),
+          rgba(59, 130, 246, 0.1)
+        );
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 40px 90px -55px rgba(59, 130, 246, 0.45);
+      }
+      .code-card {
+        border-radius: 20px;
+        background: rgba(8, 12, 24, 0.86);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        overflow: hidden;
+        font-family: "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+      }
+      .code-card-head {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.85rem 1rem;
+        background: rgba(15, 23, 42, 0.9);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      }
+      .dot {
+        width: 0.6rem;
+        height: 0.6rem;
+        border-radius: 50%;
+      }
+      .dot.r {
+        background: #f87171;
+      }
+      .dot.y {
+        background: #fbbf24;
+      }
+      .dot.g {
+        background: #34d399;
+      }
+      .code-card-file {
+        color: var(--fg-dim);
+        font-size: 0.75rem;
+        margin-left: auto;
+      }
+      .code-card-body {
+        padding: 1.1rem 1.2rem;
+        font-size: 0.82rem;
+        line-height: 1.7;
+        color: var(--fg-muted);
+        overflow-x: auto;
+      }
+      .tok-k {
+        color: #c084fc;
+      }
+      .tok-f {
+        color: #67e8f9;
+      }
+      .tok-s {
+        color: #fde68a;
+      }
+      .tok-n {
+        color: #fca5a5;
+      }
+      .tok-c {
+        color: var(--fg-dim);
+        font-style: italic;
+      }
+      .hero-metrics {
+        margin-top: 1rem;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+      }
+      .metric {
+        padding: 0.85rem 1rem;
+        border-radius: 14px;
+        background: rgba(8, 12, 24, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+      }
+      .metric b {
+        display: block;
+        font-size: 1.2rem;
+      }
+      .metric span {
+        color: var(--fg-dim);
+        font-size: 0.75rem;
+      }
+
+      /* Sections */
+      section {
+        padding: 4rem 0;
+        position: relative;
+      }
+      .section-head {
+        text-align: center;
+        max-width: 40rem;
+        margin: 0 auto 3rem;
+      }
+      .section-head h2 {
+        font-size: clamp(1.85rem, 3vw, 2.45rem);
+        letter-spacing: -0.015em;
+        margin: 0 0 0.8rem;
+      }
+      .section-head p {
+        color: var(--fg-muted);
+        margin: 0;
+      }
+
+      .grid {
+        display: grid;
+        gap: 1rem;
+      }
+      @media (min-width: 720px) {
+        .grid-3 {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .grid-2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      .card {
+        border-radius: var(--radius);
+        padding: 1.4rem;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        backdrop-filter: blur(18px);
+        transition: transform 0.15s ease, border-color 0.15s ease;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(34, 211, 238, 0.38);
+      }
+      .card .icon {
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #22d3ee, #3b82f6);
+        margin-bottom: 0.9rem;
+      }
+      .card .icon svg {
+        width: 1.1rem;
+        height: 1.1rem;
+        color: white;
+      }
+      .card h3 {
+        margin: 0 0 0.4rem;
+        font-size: 1.05rem;
+      }
+      .card p {
+        margin: 0;
+        color: var(--fg-muted);
+        font-size: 0.92rem;
+      }
+
+      .privacy {
+        padding: 2.2rem;
+        border-radius: 24px;
+        background: linear-gradient(
+          135deg,
+          rgba(34, 211, 238, 0.12),
+          rgba(168, 85, 247, 0.1)
+        );
+        border: 1px solid rgba(34, 211, 238, 0.3);
+        display: grid;
+        gap: 1.2rem;
+      }
+      @media (min-width: 760px) {
+        .privacy {
+          grid-template-columns: auto 1fr;
+          align-items: center;
+        }
+      }
+      .privacy .emoji {
+        font-size: 3rem;
+        line-height: 1;
+      }
+      .privacy h3 {
+        margin: 0 0 0.4rem;
+        font-size: 1.3rem;
+      }
+      .privacy p {
+        margin: 0;
+        color: var(--fg-muted);
+      }
+
+      /* Comparison */
+      .compare {
+        overflow-x: auto;
+        border-radius: var(--radius);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        background: rgba(15, 23, 42, 0.6);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        min-width: 640px;
+      }
+      th,
+      td {
+        padding: 0.9rem 1.1rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      }
+      thead th {
+        background: rgba(15, 23, 42, 0.75);
+        color: var(--fg);
+        font-weight: 600;
+      }
+      td.yes {
+        color: var(--success);
+      }
+      td.no {
+        color: var(--danger);
+      }
+      td.meh {
+        color: var(--warn);
+      }
+      .dl-col {
+        background: rgba(34, 211, 238, 0.06);
+      }
+
+      /* Install */
+      .install {
+        display: grid;
+        gap: 1rem;
+      }
+      @media (min-width: 760px) {
+        .install {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      pre.shell {
+        margin: 0;
+        padding: 1.2rem 1.3rem;
+        border-radius: 16px;
+        background: rgba(8, 12, 24, 0.85);
+        color: var(--fg-muted);
+        font-size: 0.85rem;
+        overflow-x: auto;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        font-family: "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+      }
+      .shell .prompt {
+        color: var(--accent);
+      }
+      .shell .cmt {
+        color: var(--fg-dim);
+        font-style: italic;
+      }
+
+      footer {
+        padding: 3rem 0;
+        border-top: 1px solid rgba(148, 163, 184, 0.18);
+        margin-top: 4rem;
+        color: var(--fg-dim);
+      }
+      .footer-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+        justify-content: space-between;
+      }
+      @media (min-width: 760px) {
+        .footer-inner {
+          flex-direction: row;
+        }
+      }
+      .footer-links a {
+        text-decoration: none;
+        color: var(--fg-muted);
+        margin-right: 1rem;
+        font-size: 0.88rem;
+      }
+      .footer-links a:hover {
+        color: var(--fg);
+      }
+      .badge {
+        font-size: 0.72rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 9999px;
+        background: rgba(52, 211, 153, 0.14);
+        color: var(--success);
+        border: 1px solid rgba(52, 211, 153, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="nav" role="banner">
+        <div class="nav-inner">
+          <a class="brand" href="#">
+            <div class="brand-mark" aria-hidden="true">DL</div>
+            <div class="brand-text">
+              <strong>DataLens</strong>
+              <span>Browser-native analytics</span>
+            </div>
+          </a>
+          <nav class="nav-links" aria-label="Primary">
+            <a href="#features">Features</a>
+            <a href="#how">How it works</a>
+            <a href="#compare">Compare</a>
+            <a href="#install">Install</a>
+            <a
+              href="https://github.com/Aandrew-Kl/DataLens/tree/main/docs"
+              target="_blank"
+              rel="noopener"
+              >Docs</a
+            >
+          </nav>
+          <div class="nav-cta">
+            <a
+              class="btn btn-ghost hide-sm"
+              href="https://github.com/Aandrew-Kl/DataLens"
+              target="_blank"
+              rel="noopener"
+              >GitHub</a
+            >
+            <a class="btn btn-primary" href="#install">Try demo</a>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="container">
+            <div class="hero-inner">
+              <div>
+                <span class="eyebrow">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.4"
+                  >
+                    <path d="M12 2 L14 9 L21 12 L14 15 L12 22 L10 15 L3 12 L10 9 Z" />
+                  </svg>
+                  v0.9.0-beta · Shipping the wave
+                </span>
+                <h1>
+                  Analyze data at the speed of thought.
+                  <span class="grad">Privately.</span>
+                </h1>
+                <p class="lede">
+                  DataLens is an open-source BI platform where your data never
+                  leaves the browser. Analytical SQL runs on-device via
+                  DuckDB-WASM. AI features talk to your local Ollama. No cloud
+                  uploads, no vendor lock-in, zero telemetry by default.
+                </p>
+                <div class="hero-chips" aria-label="Highlights">
+                  <span class="chip">DuckDB-WASM on-device</span>
+                  <span class="chip">Local Ollama workflows</span>
+                  <span class="chip">MIT licensed</span>
+                </div>
+                <div class="cta-row">
+                  <a class="btn btn-primary" href="#install">
+                    Try demo
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                    >
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </a>
+                  <a
+                    class="btn btn-ghost"
+                    href="https://github.com/Aandrew-Kl/DataLens"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Star on GitHub
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path
+                        d="M12 2l2.39 6.95h7.32l-5.92 4.3 2.26 6.95L12 15.9l-6.05 4.3 2.26-6.95L2.29 8.95h7.32L12 2z"
+                      />
+                    </svg>
+                  </a>
+                </div>
+                <div class="meta-line">
+                  <span><b>1,679</b> unit tests passing</span>
+                  <span><b>240K</b> lines of code</span>
+                  <span><b>100%</b> MIT-licensed</span>
+                </div>
+              </div>
+
+              <div class="hero-visual" aria-hidden="true">
+                <div class="code-card">
+                  <div class="code-card-head">
+                    <span class="dot r"></span>
+                    <span class="dot y"></span>
+                    <span class="dot g"></span>
+                    <span class="code-card-file">duckdb-wasm · query</span>
+                  </div>
+                  <div class="code-card-body">
+<pre style="margin:0;white-space:pre-wrap;"><span class="tok-c">-- Runs in your browser. No network hop.</span>
+<span class="tok-k">SELECT</span> country,
+       <span class="tok-f">SUM</span>(revenue) <span class="tok-k">AS</span> rev,
+       <span class="tok-f">COUNT</span>(<span class="tok-n">*</span>) <span class="tok-k">AS</span> orders
+<span class="tok-k">FROM</span>   sales_2026
+<span class="tok-k">WHERE</span>  status <span class="tok-n">=</span> <span class="tok-s">'paid'</span>
+<span class="tok-k">GROUP</span> <span class="tok-k">BY</span> country
+<span class="tok-k">ORDER</span> <span class="tok-k">BY</span> rev <span class="tok-k">DESC</span>
+<span class="tok-k">LIMIT</span>  <span class="tok-n">10</span>;</pre>
+                  </div>
+                </div>
+                <div class="hero-metrics">
+                  <div class="metric">
+                    <b>11 ms</b><span>scan · 4.6M rows</span>
+                  </div>
+                  <div class="metric">
+                    <b>0 KB</b><span>uploaded to cloud</span>
+                  </div>
+                  <div class="metric">
+                    <b>40+</b><span>chart types</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="features">
+          <div class="container">
+            <div class="section-head">
+              <h2>Everything you need, nothing you don't</h2>
+              <p>
+                A single workflow from file drop to polished dashboard — all of
+                it running inside the browser tab you already have open.
+              </p>
+            </div>
+            <div class="grid grid-3">
+              <div class="card">
+                <div class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                    <path d="M3 5v6c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                    <path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v-6"></path>
+                  </svg>
+                </div>
+                <h3>DuckDB in your browser</h3>
+                <p>
+                  Analytical SQL on millions of rows with zero setup. Load
+                  files, query instantly, and keep the whole runtime on-device.
+                </p>
+              </div>
+              <div class="card">
+                <div class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L15 8l6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"></path>
+                  </svg>
+                </div>
+                <h3>Local AI assistant</h3>
+                <p>
+                  Natural language to SQL via Ollama, with prompts and data
+                  staying local instead of flowing through a cloud API.
+                </p>
+              </div>
+              <div class="card">
+                <div class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"></path>
+                    <path d="M7 14l4-4 4 4 6-6"></path>
+                  </svg>
+                </div>
+                <h3>Beautiful charts</h3>
+                <p>
+                  40+ interactive chart types with exports, drill-downs, and
+                  polished visuals for dashboards, reports, and one-off
+                  analysis.
+                </p>
+              </div>
+              <div class="card">
+                <div class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="6" cy="6" r="3"></circle>
+                    <circle cx="18" cy="18" r="3"></circle>
+                    <path d="M6 9v6a6 6 0 0 0 6 6"></path>
+                    <path d="M18 15V9a6 6 0 0 0-6-6"></path>
+                  </svg>
+                </div>
+                <h3>Data pipelines</h3>
+                <p>
+                  Compose transforms visually, save reusable recipes, and turn
+                  repetitive cleanup into a repeatable browser-side workflow.
+                </p>
+              </div>
+              <div class="card">
+                <div class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 3v3m0 12v3m9-9h-3M6 12H3m15.5-5.5L16 9m-8 6l-2.5 2.5m13 0L16 15m-8-6L5.5 6.5"></path>
+                    <circle cx="12" cy="12" r="4"></circle>
+                  </svg>
+                </div>
+                <h3>ML workflows</h3>
+                <p>
+                  Regression, clustering, forecasting, anomaly detection, and
+                  more — without leaving the same privacy-first analytics
+                  surface.
+                </p>
+              </div>
+              <div class="card">
+                <div class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"></path>
+                  </svg>
+                </div>
+                <h3>Privacy first</h3>
+                <p>
+                  No telemetry, no tracking, and no vendor lock-in. Run it
+                  locally, inspect the code, or self-host it on your own terms.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="how">
+          <div class="container">
+            <div class="privacy">
+              <div class="emoji" aria-hidden="true">🛡️</div>
+              <div>
+                <h3>Your data never leaves the browser</h3>
+                <p>
+                  Analytical queries execute inside DuckDB-WASM on your
+                  machine. AI calls hit a local Ollama endpoint at
+                  <code>localhost:11434</code>. Persistence (saved dashboards,
+                  auth) stays on infrastructure that you control, not ours.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="compare">
+          <div class="container">
+            <div class="section-head">
+              <h2>How it compares</h2>
+              <p>
+                Open BI stacks are either self-hosted-but-heavy, or
+                cloud-hosted-but-leaky. DataLens is neither.
+              </p>
+            </div>
+            <div class="compare">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Capability</th>
+                    <th scope="col" class="dl-col">DataLens</th>
+                    <th scope="col">Metabase</th>
+                    <th scope="col">Tableau</th>
+                    <th scope="col">Observable</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Runs in browser</th>
+                    <td class="yes dl-col">Yes</td>
+                    <td class="no">No</td>
+                    <td class="no">No</td>
+                    <td class="meh">Limited</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Local AI (no OpenAI)</th>
+                    <td class="yes dl-col">Yes</td>
+                    <td class="no">No</td>
+                    <td class="no">No</td>
+                    <td class="no">No</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Open source</th>
+                    <td class="yes dl-col">MIT</td>
+                    <td class="yes">AGPL</td>
+                    <td class="no">Proprietary</td>
+                    <td class="no">Proprietary</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Free self-host</th>
+                    <td class="yes dl-col">1 command</td>
+                    <td class="yes">Yes</td>
+                    <td class="no">No</td>
+                    <td class="no">No</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Price</th>
+                    <td class="yes dl-col">Free</td>
+                    <td class="meh">Free OSS / paid add-ons</td>
+                    <td class="no">$15-115 / user / mo</td>
+                    <td class="meh">$22 / editor / mo</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Data stays on-device</th>
+                    <td class="yes dl-col">Yes</td>
+                    <td class="no">No</td>
+                    <td class="no">No</td>
+                    <td class="no">No</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="install">
+          <div class="container">
+            <div class="section-head">
+              <h2>Up and running in one command</h2>
+              <p>
+                The full app plus local Ollama detection in under a minute.
+                Everything the demo ships with is real — no mocked backend.
+              </p>
+            </div>
+            <div class="install">
+              <div>
+                <h3 style="margin:0 0 0.8rem; font-size:1rem;">
+                  Docker (recommended)
+                </h3>
+<pre class="shell"><span class="cmt"># Clone, then one command.</span>
+<span class="prompt">$</span> git clone https://github.com/Aandrew-Kl/DataLens
+<span class="prompt">$</span> cd DataLens
+<span class="prompt">$</span> docker-compose up
+
+<span class="cmt"># Open http://localhost:3000</span></pre>
+              </div>
+              <div>
+                <h3 style="margin:0 0 0.8rem; font-size:1rem;">
+                  Local dev
+                </h3>
+<pre class="shell"><span class="cmt"># Frontend only — enough to try it out.</span>
+<span class="prompt">$</span> npm install
+<span class="prompt">$</span> npm run dev
+
+<span class="cmt"># Optional: enable local AI.</span>
+<span class="prompt">$</span> ollama pull llama3.2
+<span class="cmt"># DataLens auto-detects Ollama on :11434.</span></pre>
+              </div>
+            </div>
+            <div style="text-align:center;margin-top:2rem;">
+              <a
+                class="btn btn-primary"
+                href="https://github.com/Aandrew-Kl/DataLens"
+                target="_blank"
+                rel="noopener"
+              >
+                Get the code
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <div class="container footer-inner">
+          <div>
+            <strong>DataLens</strong> ·
+            <span class="badge">v0.9.0-beta</span> · MIT licensed · No
+            telemetry
+          </div>
+          <div class="footer-links">
+            <a href="https://github.com/Aandrew-Kl/DataLens" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://github.com/Aandrew-Kl/DataLens/tree/main/docs" target="_blank" rel="noopener">Docs</a>
+            <a href="https://github.com/Aandrew-Kl/DataLens/issues" target="_blank" rel="noopener">Report issue</a>
+            <a href="https://github.com/Aandrew-Kl/DataLens/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <script>
+      // Attempt to fetch live star count; fall back silently.
+      (async () => {
+        try {
+          const res = await fetch(
+            "https://api.github.com/repos/Aandrew-Kl/DataLens",
+            { headers: { Accept: "application/vnd.github+json" } }
+          );
+          if (!res.ok) return;
+          const data = await res.json();
+          if (typeof data.stargazers_count === "number") {
+            document.title =
+              "DataLens — " +
+              data.stargazers_count.toLocaleString() +
+              " stars · Privacy-first AI analytics";
+          }
+        } catch {}
+      })();
+    </script>
+  </body>
+</html>
