@@ -589,7 +589,7 @@ function DashboardBuilder({ tableName, columns, rowCount }: DashboardBuilderProp
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => setPanelOpen((current) => !current)} className="inline-flex items-center gap-2 rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-500">
+            <button type="button" onClick={() => setPanelOpen(true)} className="inline-flex items-center gap-2 rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-500">
               <Plus className="h-4 w-4" />
               Add Widget
             </button>
