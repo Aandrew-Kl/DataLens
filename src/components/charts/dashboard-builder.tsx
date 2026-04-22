@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { runQuery } from "@/lib/duckdb/client";
 import { formatNumber, generateId } from "@/lib/utils/formatters";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression } from "@/lib/utils/sql";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface DashboardBuilderProps {

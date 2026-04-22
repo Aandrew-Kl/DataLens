@@ -1,6 +1,5 @@
 "use client";
 
-import { quoteIdentifier } from "@/lib/utils/sql";
 import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { EChartsOption } from "echarts";
 import ReactECharts from "echarts-for-react";
@@ -13,8 +12,8 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
-import { useDuckDBQuery } from "@/hooks/use-duckdb-query";
+import { buildMetricExpression, quoteIdentifier } from "@/lib/utils/sql";
+import { useQuery } from "@/hooks/use-query";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface ChartAnnotatorProps {
@@ -164,7 +163,7 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
     loading,
     error: queryError,
     refetch,
-  } = useDuckDBQuery(querySql);
+  } = useQuery(querySql);
   const rows = queryRows ?? EMPTY_ROWS;
   const notice =
     manualNotice

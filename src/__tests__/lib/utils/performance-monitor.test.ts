@@ -3,7 +3,7 @@ import {
   getPerformanceReport,
   measureQuery,
   measureRender,
-} from "@/lib/utils/performance-monitor";
+} from "@/lib/utils/performance";
 
 interface MockPerformanceApi extends Performance {
   clearMarks: (markName?: string) => void;
