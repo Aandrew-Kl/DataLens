@@ -142,7 +142,15 @@ async function readBlobText(blob: Blob): Promise<string> {
   if (typeof blob.text === "function") {
     return blob.text();
   }
-  return new Response(blob).text();
+  // Fallback for jsdom versions that lack Blob.text() — read via
+  // FileReader which is implemented. Response is not defined in jsdom
+  // until Node 20+ installs it on the global, so avoid it.
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error ?? new Error("blob read failed"));
+    reader.onload = () => resolve(String(reader.result ?? ""));
+    reader.readAsText(blob);
+  });
 }
 
 async function renderExportedGridFromLatestBlob(): Promise<HTMLDivElement> {
@@ -179,6 +187,14 @@ beforeEach(() => {
   window.localStorage.clear();
   window.sessionStorage.clear();
   document.documentElement.className = "";
+  // The dashboard-export test appends a `<div id="grid">` host into
+  // document.body and never removes it. Without this cleanup the grid
+  // (and the payloads it contains) leaks into the next test's DOM and
+  // causes false "Found multiple elements" failures for overlapping
+  // XSS payloads like confirmImage.
+  document
+    .querySelectorAll('div:has(> #grid), #grid')
+    .forEach((node) => node.remove());
   useDatasetStore.setState({
     datasets: [],
     activeDatasetId: null,
@@ -267,8 +283,7 @@ describe("XSS hardening", () => {
     expectNoExecutableMarkup();
   });
 
-  // TODO(wave3): flaky under React 19 + jsdom defer — re-enable with stable pattern
-  it.skip("renders SQL history, editor input, and query errors safely", async () => {
+  it("renders SQL history, editor input, and query errors safely", async () => {
     const user = userEvent.setup();
     const dataset = makeDatasetMeta();
 
@@ -289,18 +304,22 @@ describe("XSS hardening", () => {
       lastResult: null,
       isQuerying: false,
     });
-    mockRunQuery.mockRejectedValueOnce(new Error(PAYLOADS.svgOnload));
+    // mockResolvedValue/mockRejectedValue (no "Once") so StrictMode's
+    // double-invoke or any retry still sees the same error.
+    mockRunQuery.mockRejectedValue(new Error(PAYLOADS.svgOnload));
 
     render(<SqlPage />);
 
     expect(await screen.findByText(PAYLOADS.iframeSrcdoc)).toBeInTheDocument();
+    // The payload renders in both the inner <p> text node and the outer
+    // <button> wrapper's textContent, so match-any is correct here.
     expect(
-      screen.getByText(textContentIncludes(PAYLOADS.brokenImageQuote)),
-    ).toBeInTheDocument();
+      screen.getAllByText(textContentIncludes(PAYLOADS.brokenImageQuote)).length,
+    ).toBeGreaterThan(0);
 
     await user.click(screen.getByText(PAYLOADS.iframeSrcdoc));
     expect(
-      screen.getByDisplayValue(`SELECT '${PAYLOADS.brokenImageQuote}' AS payload;`),
+      await screen.findByDisplayValue(`SELECT '${PAYLOADS.brokenImageQuote}' AS payload;`),
     ).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("SQL editor"), {
@@ -347,7 +366,7 @@ describe("XSS hardening", () => {
     expectNoExecutableMarkup();
   });
 
-  it.skip("escapes exported dashboard HTML before innerHTML rendering runs", async () => {
+  it("escapes exported dashboard HTML before innerHTML rendering runs", async () => {
     const user = userEvent.setup();
 
     window.localStorage.setItem(
@@ -392,9 +411,16 @@ describe("XSS hardening", () => {
       }),
     );
 
-    mockRunQuery
-      .mockResolvedValueOnce([{ value: 7 }])
-      .mockResolvedValueOnce([{ [PAYLOADS.iframeSrcdoc]: PAYLOADS.confirmImage }]);
+    // mockResolvedValue (no "Once") — StrictMode's double-invoke can drain
+    // Once-based chains before the UI commits the load. We route based on
+    // the SQL shape: KPI widget queries use "AS value" aggregates; table
+    // widget queries use SELECT <col> FROM ... LIMIT.
+    mockRunQuery.mockImplementation(async (sql: string) => {
+      if (/AS\s+value\b/i.test(sql)) {
+        return [{ value: 7 }];
+      }
+      return [{ [PAYLOADS.iframeSrcdoc]: PAYLOADS.confirmImage }];
+    });
 
     render(
       <DashboardBuilder tableName="sales" columns={sampleColumns} rowCount={25} />,
@@ -424,7 +450,7 @@ describe("XSS hardening", () => {
     expectNoExecutableMarkup(grid);
   });
 
-  it.skip("keeps chart titles, labels, and series values as text in ChartRenderer", () => {
+  it("keeps chart titles, labels, and series values as text in ChartRenderer", async () => {
     const config: ChartConfig = {
       id: "chart-1",
       type: "bar",
@@ -443,22 +469,37 @@ describe("XSS hardening", () => {
 
     render(<ChartRenderer config={config} data={data} />);
 
-    const chart = screen.getByRole("img");
+    // Use findBy* so the assertion awaits the commit under React 19
+    // StrictMode's double-render. Use getAllByText and length > 0 because
+    // the payloads render as text in multiple nested nodes (description
+    // list dt/dd wrappers all include the same substring).
+    const chart = await screen.findByRole("img");
     expect(chart.getAttribute("aria-label")).toContain(PAYLOADS.svgScript);
-    expect(screen.getByText(textContentIncludes(PAYLOADS.videoSource))).toBeInTheDocument();
-    expect(screen.getByText(textContentIncludes(PAYLOADS.marquee))).toBeInTheDocument();
-    expect(screen.getByText(textContentIncludes(PAYLOADS.divOnclick))).toBeInTheDocument();
+    expect(
+      screen.getAllByText(textContentIncludes(PAYLOADS.videoSource)).length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(textContentIncludes(PAYLOADS.marquee)).length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(textContentIncludes(PAYLOADS.divOnclick)).length,
+    ).toBeGreaterThan(0);
+    // The mock echarts renderer serializes the option object with
+    // JSON.stringify, so embedded double quotes in each payload appear
+    // escaped (e.g. `\"`). Slice off the surrounding quotes to assert the
+    // escaped body is present.
+    const jsonInner = (value: string) => JSON.stringify(value).slice(1, -1);
     expect(screen.getByTestId("echarts")).toHaveAttribute(
       "data-option",
-      expect.stringContaining(PAYLOADS.svgScript),
+      expect.stringContaining(jsonInner(PAYLOADS.svgScript)),
     );
     expect(screen.getByTestId("echarts")).toHaveAttribute(
       "data-option",
-      expect.stringContaining(PAYLOADS.anchorJavascript),
+      expect.stringContaining(jsonInner(PAYLOADS.anchorJavascript)),
     );
     expect(screen.getByTestId("echarts")).toHaveAttribute(
       "data-option",
-      expect.stringContaining(PAYLOADS.confirmImage),
+      expect.stringContaining(jsonInner(PAYLOADS.confirmImage)),
     );
     expectNoExecutableMarkup();
   });
@@ -676,7 +717,7 @@ describe("XSS hardening", () => {
     expectNoExecutableMarkup();
   });
 
-  it.skip("renders workspace metadata, column names, and user messages safely in AiAssistant", async () => {
+  it("renders workspace metadata, column names, and user messages safely in AiAssistant", async () => {
     const user = userEvent.setup();
 
     render(
@@ -700,13 +741,22 @@ describe("XSS hardening", () => {
     );
     await user.click(screen.getByRole("button", { name: "What columns are there?" }));
 
-    expect(await screen.findByText(textContentIncludes(PAYLOADS.divOnclick))).toBeInTheDocument();
-    expect(screen.getByText(textContentIncludes(PAYLOADS.img))).toBeInTheDocument();
+    // Use getAllByText because each payload appears in nested DOM nodes
+    // whose textContent all match the fragment (outer wrapper + inner
+    // text span). findAllByText also awaits the deferred render commit.
+    expect(
+      (await screen.findAllByText(textContentIncludes(PAYLOADS.divOnclick))).length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(textContentIncludes(PAYLOADS.img)).length,
+    ).toBeGreaterThan(0);
 
     const assistantInput = screen.getByPlaceholderText(
       "Ask about rows, columns, nulls, quality, or chart suggestions...",
     );
-    await user.type(assistantInput, PAYLOADS.javascriptUrl);
+    // fireEvent.change bypasses userEvent.type's per-keystroke scheduling
+    // which can race with StrictMode's double-render in React 19.
+    fireEvent.change(assistantInput, { target: { value: PAYLOADS.javascriptUrl } });
     await user.click(
       assistantInput.closest("form")?.querySelector('button[type="submit"]') as HTMLButtonElement,
     );
