@@ -50,7 +50,7 @@ jest.mock("@/lib/api/websocket", () => {
 });
 
 interface MockSocket {
-  connect: jest.Mock<void, [token?: string]>;
+  connect: jest.Mock<void, [token?: string, datasetId?: string]>;
   disconnect: jest.Mock<void, []>;
   send: jest.Mock<void, [payload: unknown]>;
   onMessage: jest.Mock<void, [SocketMessageHandler]>;
@@ -240,6 +240,7 @@ describe("DataOpsPage", () => {
     expect(within(managementSection as HTMLElement).getAllByRole("button", { name: "Duplicate" })).toHaveLength(2);
     expect(within(managementSection as HTMLElement).getAllByRole("button", { name: "Delete" })).toHaveLength(2);
     expect(DataLensSocket).toHaveBeenCalledWith("ws://localhost:8000/ws/data-stream");
+    expect(socket.connect).toHaveBeenCalledWith(undefined, salesDataset.id);
   });
 
   it("renders empty dataset states when no datasets are loaded", () => {
@@ -266,6 +267,7 @@ describe("DataOpsPage", () => {
     expect(within(managementSection as HTMLElement).queryByRole("button", { name: "Activate" })).not.toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Add URL dataset" })).toBeInTheDocument();
+    expect(socket.connect).not.toHaveBeenCalled();
   });
 
   it("shows streaming progress while a query is in flight", async () => {

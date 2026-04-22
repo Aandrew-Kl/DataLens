@@ -15,7 +15,7 @@ from alembic.config import Config
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 ALEMBIC_DIR = BACKEND_ROOT / "alembic"
 ALEMBIC_INI = BACKEND_ROOT / "alembic.ini"
-EXPECTED_TABLES = {"users", "datasets", "saved_analyses", "query_history"}
+EXPECTED_TABLES = {"users", "datasets", "saved_analyses", "bookmarks", "pipelines", "query_history"}
 
 
 def _sqlite_table_names(database_path: Path) -> set[str]:

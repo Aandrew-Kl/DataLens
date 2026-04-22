@@ -78,6 +78,7 @@ function getSqlPreview(sql: string): string {
 export default function QueryHistory({ datasetId, onSelectQuery }: QueryHistoryProps) {
   const history = useQueryStore((state) => state.history);
   const clearHistory = useQueryStore((state) => state.clearHistory);
+  const removeFromHistory = useQueryStore((state) => state.removeFromHistory);
   const [search, setSearch] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const deferredSearch = useDeferredValue(search);
@@ -102,23 +103,9 @@ export default function QueryHistory({ datasetId, onSelectQuery }: QueryHistoryP
 
   const groupedHistory = useMemo(() => buildGroups(filteredHistory), [filteredHistory]);
 
-  const removeEntry = (id: string) => {
-    useQueryStore.setState((state) => ({
-      history: state.history.filter((entry) => entry.id !== id),
-    }));
-  };
-
   const clearDatasetHistory = () => {
     if (datasetHistory.length === 0) return;
-
-    if (datasetHistory.length === history.length) {
-      clearHistory();
-      return;
-    }
-
-    useQueryStore.setState((state) => ({
-      history: state.history.filter((entry) => entry.datasetId !== datasetId),
-    }));
+    void clearHistory(datasetId);
   };
 
   const handleCopy = async (id: string, sql: string) => {
@@ -282,7 +269,7 @@ export default function QueryHistory({ datasetId, onSelectQuery }: QueryHistoryP
                                 type="button"
                                 onClick={(event) => {
                                   event.stopPropagation();
-                                  removeEntry(entry.id);
+                                  void removeFromHistory(entry.id);
                                 }}
                                 className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:text-gray-500 dark:hover:bg-red-950/40 dark:hover:text-red-400"
                                 aria-label={`Delete ${entry.question}`}

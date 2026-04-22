@@ -19,7 +19,7 @@ from app.config import settings
 from app.database import Base, engine
 from app.logging_config import setup_logging
 from app.middleware.rate_limit import exempt_paths, limiter
-from app.models import analysis, dataset, query_history, user  # noqa: F401
+from app.models import analysis, bookmark, dataset, pipeline, query_history, user  # noqa: F401
 
 
 API_PATH_PREFIX = "/api"

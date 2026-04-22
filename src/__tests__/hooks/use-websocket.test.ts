@@ -13,7 +13,7 @@ jest.mock("@/lib/api/websocket", () => ({
 
 interface MockSocketInstance {
   url: string;
-  connect: jest.Mock<void, [string | undefined]>;
+  connect: jest.Mock<void, [string | undefined, string | undefined]>;
   disconnect: jest.Mock<void, []>;
   send: jest.Mock<void, [unknown]>;
   onMessage: jest.Mock<void, [(message: SocketMessage) => void]>;
@@ -106,22 +106,28 @@ describe("useWebSocket", () => {
   it("creates the default socket and connects with the stored token", () => {
     storageState.datalens_token = "token-123";
 
-    renderHook(() => useWebSocket());
+    renderHook(() => useWebSocket(undefined, "dataset-123"));
 
     expect(DataLensSocket).toHaveBeenCalledWith(DEFAULT_URL);
     expect(getItemMock).toHaveBeenCalledWith("datalens_token");
-    expect(getLatestSocket().connect).toHaveBeenCalledWith("token-123");
+    expect(getLatestSocket().connect).toHaveBeenCalledWith("token-123", "dataset-123");
   });
 
   it("uses a custom URL and connects without a token when none is stored", () => {
-    renderHook(() => useWebSocket("ws://example.test/socket"));
+    renderHook(() => useWebSocket("ws://example.test/socket", "dataset-xyz"));
 
     expect(DataLensSocket).toHaveBeenCalledWith("ws://example.test/socket");
-    expect(getLatestSocket().connect).toHaveBeenCalledWith(undefined);
+    expect(getLatestSocket().connect).toHaveBeenCalledWith(undefined, "dataset-xyz");
+  });
+
+  it("does not connect until a dataset id is available", () => {
+    renderHook(() => useWebSocket());
+
+    expect(getLatestSocket().connect).not.toHaveBeenCalled();
   });
 
   it("updates connection, message, and progress state from socket callbacks", () => {
-    const { result } = renderHook(() => useWebSocket());
+    const { result } = renderHook(() => useWebSocket(undefined, "dataset-1"));
     const socket = getLatestSocket();
     const message: SocketMessage = { type: "done", payload: { rows: 4 } };
     const progress: ProgressUpdate = {
@@ -142,7 +148,7 @@ describe("useWebSocket", () => {
   });
 
   it("delegates sendMessage to the active socket instance", () => {
-    const { result } = renderHook(() => useWebSocket());
+    const { result } = renderHook(() => useWebSocket(undefined, "dataset-1"));
     const payload = { event: "ping", attempt: 1 };
 
     act(() => {
@@ -154,9 +160,9 @@ describe("useWebSocket", () => {
 
   it("disconnects the previous socket and reconnects when the URL changes", () => {
     const { result, rerender } = renderHook(
-      ({ url }) => useWebSocket(url),
+      ({ url, datasetId }) => useWebSocket(url, datasetId),
       {
-        initialProps: { url: "ws://example.test/one" },
+        initialProps: { url: "ws://example.test/one", datasetId: "dataset-1" },
       },
     );
     const firstSocket = getLatestSocket();
@@ -166,7 +172,7 @@ describe("useWebSocket", () => {
       firstSocket.messageHandler?.({ type: "first" });
     });
 
-    rerender({ url: "ws://example.test/two" });
+    rerender({ url: "ws://example.test/two", datasetId: "dataset-1" });
 
     expect(firstSocket.disconnect).toHaveBeenCalledTimes(1);
     expect(DataLensSocket).toHaveBeenNthCalledWith(2, "ws://example.test/two");
@@ -175,7 +181,7 @@ describe("useWebSocket", () => {
   });
 
   it("disconnects the socket when the hook unmounts", () => {
-    const { unmount } = renderHook(() => useWebSocket());
+    const { unmount } = renderHook(() => useWebSocket(undefined, "dataset-1"));
     const socket = getLatestSocket();
 
     unmount();

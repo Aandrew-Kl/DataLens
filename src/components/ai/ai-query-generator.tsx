@@ -31,6 +31,7 @@ interface QueryHistoryItem {
 }
 
 const STORAGE_KEY = "datalens-ai-query-generator-history";
+const SAMPLE_ROW_LIMIT = 25;
 
 function isHistoryItem(value: unknown): value is QueryHistoryItem {
   return (
@@ -55,6 +56,25 @@ function readHistory() {
   } catch {
     return [];
   }
+}
+
+function buildSampleRows(columns: ColumnProfile[]): Record<string, unknown>[] {
+  const rowCount = Math.min(
+    SAMPLE_ROW_LIMIT,
+    columns.reduce(
+      (maxCount, column) => Math.max(maxCount, column.sampleValues.length),
+      0,
+    ),
+  );
+
+  return Array.from({ length: rowCount }, (_, rowIndex) => {
+    const entries = columns.flatMap((column) => {
+      const value = column.sampleValues[rowIndex];
+      return value === undefined ? [] : [[column.name, value] as const];
+    });
+
+    return entries.length > 0 ? [Object.fromEntries(entries)] : [];
+  }).flat();
 }
 
 export default function AIQueryGenerator({
@@ -97,13 +117,16 @@ export default function AIQueryGenerator({
     setStatus(null);
 
     try {
+      let fellBackToLocal = false;
+
       if (useBackend && !backendFailed) {
         try {
-          const result = await generateQuery(
+          const result = await generateQuery({
             question,
-            tableName,
-            columns.map((c) => ({ name: c.name, type: c.type })),
-          );
+            table_name: tableName,
+            schema: columns.map((column) => ({ name: column.name, type: column.type })),
+            data: buildSampleRows(columns),
+          });
           const nextItem: QueryHistoryItem = {
             id: generateId(),
             prompt: question,
@@ -116,7 +139,9 @@ export default function AIQueryGenerator({
           setHistory((current) => [nextItem, ...current].slice(0, 12));
           setStatus(result.explanation);
           return;
-        } catch {
+        } catch (error) {
+          console.warn("AI query backend unavailable; falling back to local generation.", error);
+          fellBackToLocal = true;
           startTransition(() => {
             setBackendFailed(true);
           });
@@ -134,7 +159,7 @@ export default function AIQueryGenerator({
 
       setGeneratedSql(sql);
       setHistory((current) => [nextItem, ...current].slice(0, 12));
-      setStatus("Generated SQL with Ollama.");
+      setStatus(fellBackToLocal ? "Backend unavailable; generated SQL locally." : "Generated SQL locally.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "SQL generation failed.");
     } finally {

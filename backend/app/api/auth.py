@@ -8,6 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.database import get_db
 from app.api.docs import build_error_responses
@@ -106,8 +107,19 @@ async def register_user(
 
     user = User(email=payload.email, hashed_password=hash_password(payload.password))
     db.add(user)
-    await db.commit()
-    await db.refresh(user)
+    try:
+        await db.commit()
+        await db.refresh(user)
+    except IntegrityError as exc:
+        await db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered") from exc
+    except SQLAlchemyError as exc:
+        await db.rollback()
+        _auth_logger.exception("register: db error")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Account creation failed. Try again.",
+        ) from exc
     access_token = _create_user_access_token(user)
     _auth_logger.info("new user registered email=%s user_id=%s", user.email, user.id)
     user_payload = UserResponse.model_validate(user)

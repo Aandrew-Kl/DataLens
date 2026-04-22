@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bookmark,
@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { downloadFile } from "@/lib/utils/export";
 import { generateId } from "@/lib/utils/formatters";
+import { bookmarksApi } from "@/lib/api/bookmarks";
+import { useAuthStore } from "@/stores/auth-store";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface DataBookmarksProps {
@@ -43,6 +45,7 @@ interface ViewBookmark {
   description: string;
   timestamp: number;
   state: ViewState;
+  synced?: boolean;
 }
 
 type Notice = string | null;
@@ -131,6 +134,68 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
   const [description, setDescription] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<Notice>(null);
+  const authToken = useAuthStore((state) => state.token);
+
+  useEffect(() => {
+    if (!authToken) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void bookmarksApi
+      .list()
+      .then((remoteBookmarks) => {
+        if (cancelled) {
+          return;
+        }
+
+        const mappedBookmarks = remoteBookmarks
+          .filter(
+            (bookmark): bookmark is typeof bookmark & {
+              tableName: string;
+              description: string | null;
+              viewState: ViewState;
+            } =>
+              bookmark.tableName === tableName &&
+              Boolean(bookmark.viewState) &&
+              typeof bookmark.viewState === "object",
+          )
+          .map((bookmark) => ({
+            id: bookmark.id,
+            name: bookmark.label,
+            description: bookmark.description ?? "",
+            timestamp: bookmark.updatedAt,
+            state: bookmark.viewState,
+            synced: true,
+          }));
+
+        const localBookmarks = readBookmarks(tableName);
+        const merged = new Map<string, ViewBookmark>();
+
+        for (const bookmark of mappedBookmarks) {
+          merged.set(bookmark.id, bookmark);
+        }
+
+        for (const bookmark of localBookmarks) {
+          const existingBookmark = merged.get(bookmark.id);
+          merged.set(bookmark.id, {
+            ...existingBookmark,
+            ...bookmark,
+            synced: bookmark.synced ?? existingBookmark?.synced ?? false,
+          });
+        }
+
+        writeBookmarks(tableName, Array.from(merged.values()));
+      })
+      .catch(() => {
+        // Preserve local-only behavior when remote persistence is unavailable.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authToken, tableName]);
 
   function updateView(nextState: ViewState) {
     writeViewState(tableName, nextState);
@@ -172,12 +237,16 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
       return;
     }
 
+    const existingBookmark = editingId
+      ? bookmarks.find((entry) => entry.id === editingId)
+      : undefined;
     const bookmark: ViewBookmark = {
       id: editingId ?? generateId(),
       name: trimmedName,
       description: description.trim(),
       timestamp: Date.now(),
       state: currentView,
+      synced: existingBookmark?.synced ?? false,
     };
 
     const nextBookmarks = editingId
@@ -185,6 +254,46 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
       : [bookmark, ...bookmarks];
 
     writeBookmarks(tableName, nextBookmarks);
+    if (authToken) {
+      const persistRequest = bookmark.synced
+        ? bookmarksApi.update(bookmark.id, {
+            tableName,
+            label: bookmark.name,
+            description: bookmark.description,
+            viewState: bookmark.state as unknown as Record<string, unknown>,
+          })
+        : bookmarksApi.create({
+            id: bookmark.id,
+            tableName,
+            label: bookmark.name,
+            description: bookmark.description,
+            viewState: bookmark.state as unknown as Record<string, unknown>,
+          });
+
+      void persistRequest
+        .then((remoteBookmark) => {
+          const syncedBookmark: ViewBookmark = {
+            id: remoteBookmark.id,
+            name: remoteBookmark.label,
+            description: remoteBookmark.description ?? "",
+            timestamp: remoteBookmark.updatedAt,
+            state:
+              remoteBookmark.viewState && typeof remoteBookmark.viewState === "object"
+                ? (remoteBookmark.viewState as unknown as ViewState)
+                : bookmark.state,
+            synced: true,
+          };
+          writeBookmarks(
+            tableName,
+            readBookmarks(tableName).map((entry) =>
+              entry.id === syncedBookmark.id ? syncedBookmark : entry,
+            ),
+          );
+        })
+        .catch(() => {
+          // Preserve local-only behavior when remote persistence is unavailable.
+        });
+    }
     setEditingId(null);
     setName("");
     setDescription("");
@@ -205,6 +314,11 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
 
   function deleteBookmark(bookmarkId: string) {
     writeBookmarks(tableName, bookmarks.filter((bookmark) => bookmark.id !== bookmarkId));
+    if (authToken) {
+      void bookmarksApi.delete(bookmarkId).catch(() => {
+        // Preserve the local removal if the backend is unavailable.
+      });
+    }
     if (editingId === bookmarkId) {
       setEditingId(null);
       setName("");
@@ -225,7 +339,51 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
       setNotice("Bookmark import must be a JSON array.");
       return;
     }
-    writeBookmarks(tableName, [...parsed, ...bookmarks]);
+    const nextBookmarks = [...parsed, ...bookmarks];
+    writeBookmarks(tableName, nextBookmarks);
+    if (authToken) {
+      void Promise.allSettled(
+        parsed.map(async (bookmark): Promise<ViewBookmark> => {
+          const remoteBookmark = await bookmarksApi.create({
+            id: bookmark.id,
+            tableName,
+            label: bookmark.name,
+            description: bookmark.description,
+            viewState: bookmark.state as unknown as Record<string, unknown>,
+          });
+
+          return {
+            id: remoteBookmark.id,
+            name: remoteBookmark.label,
+            description: remoteBookmark.description ?? "",
+            timestamp: remoteBookmark.updatedAt,
+            state:
+              remoteBookmark.viewState && typeof remoteBookmark.viewState === "object"
+                ? (remoteBookmark.viewState as unknown as ViewState)
+                : bookmark.state,
+            synced: true,
+          };
+        }),
+      ).then((results) => {
+        const syncedBookmarks = new Map(
+          results
+            .filter(
+              (result): result is PromiseFulfilledResult<ViewBookmark> =>
+                result.status === "fulfilled",
+            )
+            .map((result) => [result.value.id, result.value]),
+        );
+
+        if (syncedBookmarks.size === 0) {
+          return;
+        }
+
+        writeBookmarks(
+          tableName,
+          readBookmarks(tableName).map((bookmark) => syncedBookmarks.get(bookmark.id) ?? bookmark),
+        );
+      });
+    }
     setNotice(`Imported ${parsed.length} bookmark${parsed.length === 1 ? "" : "s"}.`);
     event.target.value = "";
   }

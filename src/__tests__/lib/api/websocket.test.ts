@@ -98,4 +98,14 @@ describe('DataLensSocket', () => {
 
     expect(socket.isConnected).toBe(false);
   });
+
+  it('appends both token and dataset_id to the handshake URL', () => {
+    const socket = new DataLensSocket('ws://localhost:8000/test');
+
+    socket.connect('token-123', 'dataset-456');
+
+    expect(createdSockets[0]?.url).toBe(
+      'ws://localhost:8000/test?token=token-123&dataset_id=dataset-456',
+    );
+  });
 });

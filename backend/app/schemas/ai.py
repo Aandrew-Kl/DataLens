@@ -45,9 +45,18 @@ class SummarizeResponse(BaseModel):
     top_terms: list[dict[str, Any]]
 
 
+class QuerySchemaColumn(BaseModel):
+    name: str = Field(max_length=255)
+    type: str = Field(default="unknown", max_length=64)
+
+
 class QueryGenerateRequest(BaseModel):
     question: str = Field(max_length=10000)
-    schema: dict[str, list[str]] = Field(default_factory=dict)
+    schema_columns: list[QuerySchemaColumn] = Field(
+        default_factory=list,
+        max_length=500,
+        alias="schema",
+    )
     table_name: str = Field(default="", max_length=255)
     data: list[dict[str, Any]] = Field(default_factory=list, max_length=50000)
     use_ollama: bool = False

@@ -44,7 +44,7 @@ Think Metabase or Tableau, but privacy-first and self-hosted by design.
 | Data stays on-device | No | No | **Yes** |
 | Works offline | No | No | **Yes** |
 | AI without OpenAI | No | No | **Yes** (local Ollama) |
-| Self-host in one command | Complex | No | **`docker-compose up`** |
+| Self-host in one command | Complex | No | **`docker compose up`** |
 | License | AGPL / Proprietary | Proprietary | **MIT** |
 
 ## Features
@@ -58,9 +58,15 @@ Think Metabase or Tableau, but privacy-first and self-hosted by design.
 - **Persistence** — bookmarks, pipelines, query history to Postgres with offline fallback
 - **Sample datasets built-in** — 4,600+ rows of realistic ecommerce, payments, and web analytics data
 - **Privacy defaults** — no telemetry, no tracking, PII-scrubbed optional Sentry
-- **One-command self-host** — `docker-compose up` and you're running
+- **One-command self-host** — `docker compose up` and you're running
 
 ## Quick start
+
+### Prerequisites
+
+- Python 3.12+ (3.11 may work but is unsupported for local dev)
+- Node.js 20+
+- Docker 24+ (for the one-command deploy)
 
 ### Option A — Docker (recommended)
 
@@ -71,7 +77,9 @@ cp .env.example .env   # required: sets browser-reachable API/WS URLs
 docker compose up
 ```
 
-Then visit http://localhost:3000. The app comes with 3 sample datasets pre-loaded — click one to start exploring.
+Then visit http://localhost:3000. The default `.env.example` works out of the box. Edit `.env` if you want a different `JWT_SECRET`, database URL, or public hostnames. If you change `NEXT_PUBLIC_*`, rebuild the frontend image with `docker compose up --build`.
+
+For a production reverse-proxy layout, see [docs/deploy.md](./docs/deploy.md).
 
 ### Option B — local dev
 
@@ -153,6 +161,17 @@ Make sure you've installed backend test deps (`pip install -r backend/requiremen
 ## Contributing
 
 PRs welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) and [docs-site/content/contributing.mdx](./docs-site/content/contributing.mdx). Good first issues tagged `good-first-issue`.
+
+## Required CI checks
+
+Maintainers should keep the `main` branch protection rule configured to require the `frontend`, `backend`, and `e2e` GitHub Actions checks before merging. The `e2e` job is the Playwright smoke gate and currently runs `smoke.spec.ts`, `auth.spec.ts`, `landing.spec.ts`, `navigation.spec.ts`, and `sql.spec.ts`.
+
+To enable the gate in GitHub:
+
+1. Open `Settings` for `Aandrew-Kl/DataLens`, then go to `Branches`.
+2. Edit the branch protection rule for `main`.
+3. Turn on `Require status checks to pass before merging`.
+4. Add `frontend`, `backend`, and `e2e` to the required checks list.
 
 ## License
 

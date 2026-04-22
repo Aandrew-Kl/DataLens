@@ -1,11 +1,15 @@
 "use client";
 
-import { Suspense, type ReactNode, useCallback } from "react";
+import { Suspense, type ReactNode, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { useUIStore } from "@/stores/ui-store";
 import { useDatasetStore } from "@/stores/dataset-store";
+import { useAuthStore } from "@/stores/auth-store";
+import { useBookmarkStore } from "@/stores/bookmark-store";
+import { usePipelineStore } from "@/stores/pipeline-store";
+import { useQueryStore } from "@/stores/query-store";
 import FileDropzone from "@/components/data/file-dropzone";
 import { getTableRowCount, loadCSVIntoDB } from "@/lib/duckdb/client";
 import { profileTable } from "@/lib/duckdb/profiler";
@@ -59,6 +63,7 @@ export default function WorkspaceLayout({
   children: ReactNode;
 }) {
   const pathname = usePathname();
+  const authToken = useAuthStore((state) => state.token);
   const { theme, toggleTheme, sidebarOpen, toggleSidebar } = useUIStore();
   const datasets = useDatasetStore((s) => s.datasets);
   const activeDatasetId = useDatasetStore((s) => s.activeDatasetId);
@@ -74,6 +79,14 @@ export default function WorkspaceLayout({
     setShowCommandPalette,
     isLoading,
   } = useWorkspaceStore();
+
+  useEffect(() => {
+    void Promise.all([
+      useBookmarkStore.getState().hydrate(),
+      usePipelineStore.getState().hydrate(),
+      useQueryStore.getState().hydrate(),
+    ]);
+  }, [authToken]);
 
   const handleCommandAction = useCallback(
     (actionId: string) => {

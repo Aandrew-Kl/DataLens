@@ -20,7 +20,7 @@ jest.mock("@/lib/api/websocket", () => {
 });
 
 interface MockSocket {
-  connect: jest.Mock<void, [token?: string]>;
+  connect: jest.Mock<void, [token?: string, datasetId?: string]>;
   disconnect: jest.Mock<void, []>;
   send: jest.Mock<void, [payload: unknown]>;
   onMessage: jest.Mock<void, [SocketMessageHandler]>;
@@ -80,11 +80,11 @@ describe("useStreamingQuery", () => {
     window.localStorage.setItem("datalens_token", "secret-token");
 
     const { result, unmount } = renderHook(() =>
-      useStreamingQuery("ws://example.test/stream"),
+      useStreamingQuery("ws://example.test/stream", "dataset-123"),
     );
 
     expect(DataLensSocket).toHaveBeenCalledWith("ws://example.test/stream");
-    expect(socket.connect).toHaveBeenCalledWith("secret-token");
+    expect(socket.connect).toHaveBeenCalledWith("secret-token", "dataset-123");
     expect(result.current.isConnected).toBe(false);
 
     unmount();
@@ -92,8 +92,14 @@ describe("useStreamingQuery", () => {
     expect(socket.disconnect).toHaveBeenCalledTimes(1);
   });
 
+  it("does not connect until a dataset id is available", () => {
+    renderHook(() => useStreamingQuery());
+
+    expect(socket.connect).not.toHaveBeenCalled();
+  });
+
   it("rejects empty queries without sending anything", () => {
-    const { result } = renderHook(() => useStreamingQuery());
+    const { result } = renderHook(() => useStreamingQuery(undefined, "dataset-1"));
 
     act(() => {
       result.current.execute("   ");
@@ -104,8 +110,19 @@ describe("useStreamingQuery", () => {
     expect(socket.send).not.toHaveBeenCalled();
   });
 
-  it("requires an active WebSocket connection before sending a query", () => {
+  it("requires a dataset before sending a query", () => {
     const { result } = renderHook(() => useStreamingQuery());
+
+    act(() => {
+      result.current.execute("SELECT 1");
+    });
+
+    expect(result.current.error).toBe("Select a dataset before starting a streamed query.");
+    expect(socket.send).not.toHaveBeenCalled();
+  });
+
+  it("requires an active WebSocket connection before sending a query", () => {
+    const { result } = renderHook(() => useStreamingQuery(undefined, "dataset-1"));
 
     act(() => {
       result.current.execute("SELECT 1");
@@ -117,7 +134,7 @@ describe("useStreamingQuery", () => {
   });
 
   it("sends trimmed queries and clears prior state before a new stream begins", () => {
-    const { result } = renderHook(() => useStreamingQuery());
+    const { result } = renderHook(() => useStreamingQuery(undefined, "dataset-1"));
 
     act(() => {
       socket.emitConnection(true);
@@ -150,7 +167,7 @@ describe("useStreamingQuery", () => {
   });
 
   it("streams rows and progress updates from multiple WebSocket message shapes", () => {
-    const { result } = renderHook(() => useStreamingQuery());
+    const { result } = renderHook(() => useStreamingQuery(undefined, "dataset-1"));
 
     act(() => {
       socket.emitConnection(true);
@@ -199,7 +216,7 @@ describe("useStreamingQuery", () => {
   });
 
   it("surfaces backend errors and ignores messages after the stream is no longer active", () => {
-    const { result } = renderHook(() => useStreamingQuery());
+    const { result } = renderHook(() => useStreamingQuery(undefined, "dataset-1"));
 
     act(() => {
       socket.emitMessage({ type: "row", row: { ignored: true } });

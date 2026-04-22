@@ -1,4 +1,5 @@
 import { useDatasetStore } from "@/stores/dataset-store";
+import { useAuthStore } from "@/stores/auth-store";
 import { useQueryStore } from "@/stores/query-store";
 import { useUIStore } from "@/stores/ui-store";
 import type { DatasetMeta } from "@/types/dataset";
@@ -6,6 +7,8 @@ import type { SavedQuery } from "@/types/query";
 
 // Reset stores before each test
 beforeEach(() => {
+  window.localStorage.clear();
+  useAuthStore.setState({ token: null, isAuthenticated: false });
   useDatasetStore.setState({ datasets: [], activeDatasetId: null });
   useQueryStore.setState({ history: [], lastResult: null, isQuerying: false });
   useUIStore.setState({ sidebarOpen: true, theme: "light" });

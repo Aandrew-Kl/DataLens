@@ -152,10 +152,14 @@ function aggregateUserFeatures(rows: Record<string, unknown>[]) {
     };
   });
 
+  // Derive a recency-based churn label so the GBM learns engagement/activity
+  // patterns that precede inactivity, instead of regressing recency on itself.
+  // 30 days of inactivity is the industry-standard engagement churn proxy.
+  const CHURN_INACTIVITY_DAYS = 30;
   const featureData = userRecords.map((record) => ({
-    recency_days: record.recency_days,
     avg_engagement: record.avg_engagement,
     activity_count: record.activity_count,
+    churned: record.recency_days > CHURN_INACTIVITY_DAYS ? "yes" : "no",
   }));
 
   return { userRecords, featureData };
@@ -173,10 +177,12 @@ async function computeChurnSnapshot(rows: Record<string, unknown>[]): Promise<Ch
     };
   }
 
-  const features = ["recency_days", "avg_engagement", "activity_count"];
+  const features = ["avg_engagement", "activity_count"];
 
-  // Call the Python backend for real ML-based churn prediction
-  const apiResult = await churnPredict(featureData, features, "recency_days");
+  // Call the Python backend for real ML-based churn prediction. Features
+  // exclude recency_days because the "churned" label is derived from it —
+  // keeping it as a feature would reintroduce the leakage this fix removed.
+  const apiResult = await churnPredict(featureData, features, "churned");
 
   const users = userRecords
     .map<ChurnUserRow>((record, index) => {

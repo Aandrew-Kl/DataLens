@@ -84,7 +84,7 @@ describe("AIQueryGenerator", () => {
       (await screen.findAllByText('SELECT "month", SUM("revenue") FROM "sales" GROUP BY 1;')).length,
     ).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: /Show monthly revenue/i })).toBeInTheDocument();
-    expect(screen.getByText("Generated SQL with Ollama.")).toBeInTheDocument();
+    expect(screen.getByText("Generated SQL locally.")).toBeInTheDocument();
   });
 
   it("copies and executes generated SQL", async () => {

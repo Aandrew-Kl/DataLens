@@ -8,7 +8,6 @@ from app.models.user import User
 from app.schemas.ai import (
     ExplainRequest,
     ExplainResponse,
-    NLQueryRequest,
     QueryGenerateRequest,
     QueryGenerateResponse,
     SentimentRequest,
@@ -90,9 +89,13 @@ async def generate_query(
     _current_user: User = Depends(get_current_user),
 ) -> dict:
     try:
-        frame = pd.DataFrame(payload.data) if payload.data else pd.DataFrame()
-        query_request = NLQueryRequest(question=payload.question, use_ollama=payload.use_ollama)
-        return await nlp_service.generate_query(query_request, frame, payload.table_name)
+        return await nlp_service.generate_sql_from_question(
+            payload.question,
+            schema=[column.model_dump() for column in payload.schema_columns],
+            data=payload.data,
+            table_name=payload.table_name,
+            use_ollama=payload.use_ollama,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 

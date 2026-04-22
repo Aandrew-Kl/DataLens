@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import pandas as pd
 import pytest
 
-from app.services.nlp_service import generate_query, sentiment, summarize
+from app.services.nlp_service import generate_query, generate_sql_from_question, sentiment, summarize
 
 
 def _sentiment_for_text(text: str) -> str:
@@ -65,3 +65,20 @@ async def test_generate_query_average() -> None:
     result = await generate_query(request, frame, table_name="payroll")
 
     assert "AVG(" in result["sql"].upper()
+
+
+@pytest.mark.asyncio
+async def test_generate_sql_from_question_uses_schema_without_rows() -> None:
+    result = await generate_sql_from_question(
+        "show revenue by region",
+        schema=[
+            {"name": "region", "type": "string"},
+            {"name": "revenue", "type": "number"},
+        ],
+        data=[],
+        table_name="sales",
+        use_ollama=False,
+    )
+
+    assert 'SUM("revenue")' in result["sql"]
+    assert '"region"' in result["sql"]

@@ -12,7 +12,7 @@ import sqlalchemy as sa
 ${imports}
 
 # revision identifiers, used by Alembic.
-revision: str = "${revision}"
+revision: str = "${up_revision}"
 down_revision: Union[str, None] = ${repr(down_revision)}
 branch_labels: Union[str, Sequence[str], None] = ${repr(branch_labels)}
 depends_on: Union[str, Sequence[str], None] = ${repr(depends_on)}
@@ -20,9 +20,9 @@ depends_on: Union[str, Sequence[str], None] = ${repr(depends_on)}
 
 def upgrade() -> None:
     """Upgrade schema."""
-    pass
+    ${upgrades if upgrades else "pass"}
 
 
 def downgrade() -> None:
     """Downgrade schema."""
-    pass
+    ${downgrades if downgrades else "pass"}

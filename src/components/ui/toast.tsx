@@ -98,6 +98,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 exit={{ opacity: 0, x: 80, scale: 0.95 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
+                role={t.type === "error" ? "alert" : "status"}
+                aria-live={t.type === "error" ? "assertive" : "polite"}
+                aria-atomic="true"
                 className={`
                   pointer-events-auto
                   flex items-start gap-3

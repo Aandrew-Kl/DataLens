@@ -69,7 +69,7 @@ interface ForecastResult {
   history: TimePoint[];
   fitted: Array<number | null>;
   forecast: ForecastPoint[];
-  method: ForecastMethod;
+  method: string;
   horizon: number;
   mae: number;
   rmse: number;
@@ -211,6 +211,23 @@ function buildForecast(points: TimePoint[], method: ForecastMethod, horizon: num
     rmse: metrics.rmse,
     confidenceWidth: metrics.confidenceWidth,
   };
+}
+
+function toBackendForecastMethod(method: ForecastMethod) {
+  return method === "moving_average" ? "arima" : "holt_winters";
+}
+
+function formatForecastMethodLabel(method: string) {
+  const localMethod = METHOD_OPTIONS.find((option) => option.value === method);
+  if (localMethod) {
+    return localMethod.label.toLowerCase();
+  }
+
+  if (method === "holt" || method === "holt_winters") {
+    return "holt-winters";
+  }
+
+  return method.replaceAll("_", " ").toLowerCase();
 }
 
 function formatMetric(value: number) {
@@ -506,26 +523,38 @@ function TimeSeriesForecast({
             [activeDateColumn]: d.isoDate,
             [activeValueColumn]: d.value,
           }));
-          const result = await forecast(recordData, activeDateColumn, activeValueColumn, forecastPeriods);
-          const backendForecast = result.predictions.map((p) => ({
-            isoDate: p.date,
-            forecast: p.value,
-            lower: p.value * 0.9,
-            upper: p.value * 1.1,
+          const result = await forecast(
+            recordData,
+            activeDateColumn,
+            activeValueColumn,
+            forecastPeriods,
+            toBackendForecastMethod(method),
+          );
+          const backendForecast = result.forecast_points.map((point) => ({
+            isoDate: toIsoDate(point.date) ?? point.date.slice(0, 10),
+            forecast: point.forecast,
+            lower: point.lower,
+            upper: point.upper,
           }));
+          const confidenceWidth =
+            backendForecast.length > 0
+              ? backendForecast.reduce((sum, point) => sum + (point.upper - point.lower), 0) /
+                backendForecast.length
+              : 0;
 
           setResult({
             history: timeSeriesData,
             fitted: new Array(timeSeriesData.length).fill(null) as null[],
             forecast: backendForecast,
-            method,
+            method: result.method,
             horizon: forecastPeriods,
-            mae: 0,
-            rmse: 0,
-            confidenceWidth: 0,
+            mae: result.metrics.mae,
+            rmse: result.metrics.rmse,
+            confidenceWidth,
           });
           return;
-        } catch {
+        } catch (error) {
+          console.warn("Forecast backend unavailable; falling back to local forecast.", error);
           startTransition(() => {
             setBackendFailed(true);
           });
@@ -712,7 +741,7 @@ function TimeSeriesForecast({
           </h3>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
             {result
-              ? `Projected ${result.forecast.length} future periods using ${METHOD_OPTIONS.find((option) => option.value === result.method)?.label.toLowerCase()}.`
+              ? `Projected ${result.forecast.length} future periods using ${formatForecastMethodLabel(result.method)}.`
               : "Run the forecast to inspect projected values and confidence bands."}
           </p>
           {result ? <div className="mt-4"><ForecastTable result={result} /></div> : null}

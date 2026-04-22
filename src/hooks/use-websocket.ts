@@ -17,7 +17,10 @@ export interface UseWebSocketResult {
   progress: ProgressUpdate | null;
 }
 
-export function useWebSocket(url = DEFAULT_WEBSOCKET_URL): UseWebSocketResult {
+export function useWebSocket(
+  url = DEFAULT_WEBSOCKET_URL,
+  datasetId?: string | null,
+): UseWebSocketResult {
   const socketRef = useRef<DataLensSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<SocketMessage | null>(null);
@@ -44,7 +47,9 @@ export function useWebSocket(url = DEFAULT_WEBSOCKET_URL): UseWebSocketResult {
         ? undefined
         : window.localStorage.getItem("datalens_token") ?? undefined;
 
-    socket.connect(token);
+    if (datasetId) {
+      socket.connect(token, datasetId);
+    }
 
     return () => {
       socket.disconnect();
@@ -54,7 +59,7 @@ export function useWebSocket(url = DEFAULT_WEBSOCKET_URL): UseWebSocketResult {
       setIsConnected(false);
       setLastMessage(null);
     };
-  }, [url]);
+  }, [datasetId, url]);
 
   const sendMessage = useCallback((data: unknown) => {
     socketRef.current?.send(data);

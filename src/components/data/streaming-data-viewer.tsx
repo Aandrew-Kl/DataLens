@@ -10,6 +10,7 @@ import { useStreamingQuery } from "@/hooks/use-streaming-query";
 
 export interface StreamingDataViewerProps {
   wsUrl?: string;
+  datasetId?: string | null;
   className?: string;
 }
 
@@ -49,10 +50,14 @@ function formatCellValue(value: unknown) {
 
 export default function StreamingDataViewer({
   wsUrl = DEFAULT_WS_URL,
+  datasetId,
   className,
 }: StreamingDataViewerProps) {
   const [query, setQuery] = useState("");
-  const { rows, isStreaming, progress, error, isConnected, execute } = useStreamingQuery(wsUrl);
+  const { rows, isStreaming, progress, error, isConnected, execute } = useStreamingQuery(
+    wsUrl,
+    datasetId,
+  );
 
   const columns = useMemo(() => {
     if (rows.length === 0) {
@@ -132,7 +137,7 @@ export default function StreamingDataViewer({
           />
           <button
             className="inline-flex min-h-12 items-center justify-center rounded-xl bg-slate-950 px-5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-cyan-500 dark:text-slate-950 dark:hover:bg-cyan-400"
-            disabled={isStreaming || query.trim().length === 0}
+            disabled={isStreaming || query.trim().length === 0 || !datasetId}
             type="submit"
           >
             {isStreaming ? "Streaming..." : "Stream"}
@@ -243,7 +248,11 @@ export default function StreamingDataViewer({
           >
             <div>
               <p className="font-medium text-slate-700 dark:text-slate-200">No results yet</p>
-              <p className="mt-1">Submit a SQL query to start streaming dataset rows.</p>
+              <p className="mt-1">
+                {datasetId
+                  ? "Submit a SQL query to start streaming dataset rows."
+                  : "Select an active dataset to start streaming dataset rows."}
+              </p>
             </div>
           </motion.div>
         ) : null}

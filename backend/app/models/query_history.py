@@ -17,7 +17,7 @@ class QueryHistory(Base):
 
     __tablename__ = "query_history"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="CASCADE"),
@@ -30,6 +30,7 @@ class QueryHistory(Base):
         index=True,
         nullable=False,
     )
+    question: Mapped[str | None] = mapped_column(Text, nullable=True)
     sql_text: Mapped[str] = mapped_column(Text, nullable=False)
     duration_ms: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(

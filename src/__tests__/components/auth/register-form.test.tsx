@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 
 import RegisterForm from "@/components/auth/register-form";
 import { register } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/types";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
@@ -134,6 +135,36 @@ describe("RegisterForm", () => {
       expect(mockRegister).toHaveBeenCalledWith("new-user@example.com", "ValidPass1");
       expect(screen.getByRole("alert")).toHaveTextContent("Email already exists");
     });
+  });
+
+  it("shows a password field error from FastAPI validation arrays with accessible wiring", async () => {
+    const user = userEvent.setup();
+    mockRegister.mockRejectedValue(
+      new ApiError(422, "Validation failed", {
+        detail: [
+          {
+            type: "value_error",
+            loc: ["body", "password"],
+            msg: "Password must contain at least one digit.",
+          },
+        ],
+      }),
+    );
+
+    render(<RegisterForm />);
+
+    await user.type(screen.getByLabelText(/email/i), "new-user@example.com");
+    await user.type(screen.getByLabelText(/^password$/i), "ValidPass1");
+    await user.type(screen.getByLabelText(/confirm password/i), "ValidPass1");
+    await user.click(screen.getByRole("button", { name: /create account/i }));
+
+    const passwordInput = screen.getByLabelText(/^password$/i);
+    const passwordError = await screen.findByText("Password must contain at least one digit.");
+
+    expect(mockRegister).toHaveBeenCalledWith("new-user@example.com", "ValidPass1");
+    expect(passwordInput).toHaveAttribute("aria-invalid", "true");
+    expect(passwordInput).toHaveAttribute("aria-describedby", passwordError.getAttribute("id"));
+    expect(passwordError).toHaveAttribute("role", "alert");
   });
 
   it("submits registration successfully, shows confirmation, and redirects", async () => {
