@@ -1,6 +1,6 @@
 {
   "name": "datalens",
-  "version": "0.1.0",
+  "version": "0.9.0-beta.0",
   "description": "DataLens is a free, open-source, AI-powered data explorer with local Ollama AI, browser-side DuckDB analytics, and zero API costs.",
   "private": true,
   "keywords": [

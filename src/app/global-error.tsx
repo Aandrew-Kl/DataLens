@@ -1,5 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
+import { reportError } from "@/lib/errors/report";
+
+// Last-resort boundary — wraps the <html>/<body> because the root layout is
+// considered broken by the time we land here. Keep styles inline to avoid
+// relying on CSS that may have failed to load. Sentry (if configured) receives
+// the error with PII scrubbing applied in the shared Sentry config.
 export default function GlobalError({
   error,
   reset,
@@ -7,7 +14,9 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  void error;
+  useEffect(() => {
+    reportError(error, { scope: "global-error-boundary", digest: error.digest });
+  }, [error]);
 
   return (
     <html lang="en">
