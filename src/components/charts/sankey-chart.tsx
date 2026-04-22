@@ -433,12 +433,16 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
                 </select>
               </label>
 
-              <label className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
-                <span className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <div className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
+                <label
+                  htmlFor="sankey-node-width"
+                  className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+                >
                   <span>Node width</span>
                   <span>{nodeWidth}px</span>
-                </span>
+                </label>
                 <input
+                  id="sankey-node-width"
                   type="range"
                   min={12}
                   max={42}
@@ -448,14 +452,18 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
                   }
                   className="mt-3 h-2 w-full accent-cyan-500"
                 />
-              </label>
+              </div>
 
-              <label className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
-                <span className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <div className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
+                <label
+                  htmlFor="sankey-node-gap"
+                  className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+                >
                   <span>Node gap</span>
                   <span>{nodeGap}px</span>
-                </span>
+                </label>
                 <input
+                  id="sankey-node-gap"
                   type="range"
                   min={6}
                   max={30}
@@ -465,7 +473,7 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
                   }
                   className="mt-3 h-2 w-full accent-cyan-500"
                 />
-              </label>
+              </div>
             </div>
           </div>
 

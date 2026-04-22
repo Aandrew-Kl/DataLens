@@ -85,10 +85,9 @@ jobs:
 
   security:
     runs-on: ubuntu-latest
-    # Non-blocking: requires "Code scanning" to be enabled in repo Settings >
-    # Code security. Until then the analyze step errors out. Do not gate
-    # merges on this job.
-    continue-on-error: true
+    # Blocking: CodeQL findings gate merges. If a particular rule produces
+    # known false positives, suppress it narrowly via a codeql-config file
+    # rather than reintroducing a global `continue-on-error` bypass.
     permissions:
       security-events: write
       actions: read
@@ -107,7 +106,6 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
-        continue-on-error: true
 
   e2e:
     needs: [frontend, backend]

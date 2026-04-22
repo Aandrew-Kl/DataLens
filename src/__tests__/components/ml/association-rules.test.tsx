@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AssociationRules from "@/components/ml/association-rules";
 import { runQuery } from "@/lib/duckdb/client";
@@ -81,11 +81,17 @@ describe("AssociationRules", () => {
     await renderAsync();
     await user.click(screen.getByRole("button", { name: "Mine rules" }));
 
+    // `setStatus("Mined ...")` lands synchronously but `setRules(...)` is
+    // scheduled inside `startTransition`, so the rules table commit lags
+    // behind the status line under React 19 StrictMode + heavy compiled
+    // surface on CI. Use `findByText`/`findAllByText` for every
+    // rules-dependent assertion so we wait on the transition commit
+    // instead of racing it with `getByText`.
     expect(
       await screen.findByText("Mined 6 directional rules from 4 transactions."),
     ).toBeInTheDocument();
-    expect(screen.getByText("Milk -> Bread")).toBeInTheDocument();
-    expect(screen.getAllByText("50.0%").length).toBeGreaterThan(0);
+    expect(await screen.findByText("Milk -> Bread")).toBeInTheDocument();
+    expect((await screen.findAllByText("50.0%")).length).toBeGreaterThan(0);
   });
 
   it("exports the filtered rules as CSV", async () => {
@@ -104,14 +110,21 @@ describe("AssociationRules", () => {
 
     await renderAsync();
     await user.click(screen.getByRole("button", { name: "Mine rules" }));
+    // `setStatus("Mined ...")` lands before `startTransition(setRules)`
+    // commits, so wait for BOTH the status line *and* an actual rule row
+    // before attempting to export — otherwise Export CSV runs against an
+    // empty `filteredRules` and `downloadFile` is never called.
     await screen.findByText("Mined 6 directional rules from 4 transactions.");
+    await screen.findByText("Milk -> Bread");
 
     await user.click(screen.getByRole("button", { name: "Export rules CSV" }));
 
-    expect(mockDownloadFile).toHaveBeenCalledWith(
-      expect.stringContaining("antecedent,consequent,support,confidence,lift,pair_count"),
-      "orders-association-rules.csv",
-      "text/csv;charset=utf-8;",
-    );
+    await waitFor(() => {
+      expect(mockDownloadFile).toHaveBeenCalledWith(
+        expect.stringContaining("antecedent,consequent,support,confidence,lift,pair_count"),
+        "orders-association-rules.csv",
+        "text/csv;charset=utf-8;",
+      );
+    });
   });
 });

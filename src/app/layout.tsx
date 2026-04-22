@@ -12,31 +12,67 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// TODO: update `metadataBase` once the deploy agent provisions the public URL.
 export const metadata: Metadata = {
   metadataBase: new URL("https://datalens.dev"),
-  title: "DataLens — AI-Powered Data Explorer",
+  title: {
+    default: "DataLens — Privacy-first AI data analytics",
+    template: "%s · DataLens",
+  },
   description:
-    "Drop a CSV, Excel, or JSON file and instantly explore your data with AI-powered profiling, auto-generated dashboards, and natural language queries. 100% local, open source, zero cost.",
+    "Drop a CSV, Excel, or JSON file and explore with AI-powered profiling, auto-generated dashboards, and natural-language queries. 100% local, open source, zero cost. Data never leaves your browser.",
+  applicationName: "DataLens",
+  authors: [{ name: "Andreas Klementidis", url: "https://github.com/Aandrew-Kl" }],
+  creator: "Andreas Klementidis",
+  publisher: "DataLens",
+  generator: "Next.js",
+  category: "technology",
   keywords: [
     "data explorer",
     "CSV viewer",
     "data profiling",
     "AI analytics",
     "DuckDB",
+    "DuckDB-WASM",
+    "Ollama",
+    "self-hosted BI",
+    "privacy-first analytics",
+    "local-first",
     "open source",
   ],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "DataLens — AI-Powered Data Explorer",
+    type: "website",
+    siteName: "DataLens",
+    title: "DataLens — Privacy-first AI data analytics",
     description:
       "Drop a file. Ask anything. See everything. Open source AI-powered data explorer that runs 100% locally.",
-    siteName: "DataLens",
-    type: "website",
+    url: "/",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "DataLens — AI-Powered Data Explorer",
+    title: "DataLens — Privacy-first AI data analytics",
     description:
-      "Drop a file. Ask anything. See everything. Open source AI-powered data explorer.",
+      "Drop a file. Ask anything. See everything. Open source AI-powered data explorer that runs 100% locally.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
   },
 };
 

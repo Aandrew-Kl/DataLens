@@ -299,10 +299,14 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 <SectionHeader icon={Bot} label="AI Settings" />
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                    <label
+                      htmlFor="settings-ollama-url"
+                      className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+                    >
                       Ollama URL
                     </label>
                     <input
+                      id="settings-ollama-url"
                       type="text"
                       value={settings.ollamaUrl}
                       onChange={(e) => updateSetting("ollamaUrl", e.target.value)}
@@ -320,10 +324,14 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                    <label
+                      htmlFor="settings-ollama-model"
+                      className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+                    >
                       Model Name
                     </label>
                     <input
+                      id="settings-ollama-model"
                       type="text"
                       value={settings.ollamaModel}
                       onChange={(e) => updateSetting("ollamaModel", e.target.value)}
@@ -374,10 +382,13 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 <SectionHeader icon={Palette} label="Appearance" />
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <div
+                      id="settings-theme-label"
+                      className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2"
+                    >
                       Theme
-                    </label>
-                    <div className="flex gap-2">
+                    </div>
+                    <div className="flex gap-2" role="group" aria-labelledby="settings-theme-label">
                       {(
                         [
                           { value: "light" as Theme, icon: Sun, label: "Light" },
@@ -417,10 +428,17 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 <SectionHeader icon={Database} label="Data Settings" />
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <div
+                      id="settings-page-size-label"
+                      className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2"
+                    >
                       Default Page Size
-                    </label>
-                    <div className="flex gap-2">
+                    </div>
+                    <div
+                      className="flex gap-2"
+                      role="group"
+                      aria-labelledby="settings-page-size-label"
+                    >
                       {PAGE_SIZES.map((size) => (
                         <button
                           key={size}
@@ -446,10 +464,17 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                     label="Auto-generate dashboard"
                   />
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    <div
+                      id="settings-max-chart-rows-label"
+                      className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2"
+                    >
                       Max Chart Rows
-                    </label>
-                    <div className="flex gap-2">
+                    </div>
+                    <div
+                      className="flex gap-2"
+                      role="group"
+                      aria-labelledby="settings-max-chart-rows-label"
+                    >
                       {MAX_CHART_ROWS_OPTIONS.map((count) => (
                         <button
                           key={count}
@@ -546,7 +571,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                     </p>
                     <div className="flex items-center gap-2 pt-1">
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
-                        v0.1.0
+                        v0.9.0-beta.0
                       </span>
                       <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400">
                         MIT License

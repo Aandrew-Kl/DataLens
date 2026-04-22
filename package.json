@@ -1,6 +1,6 @@
 {
   "name": "datalens",
-  "version": "0.1.0",
+  "version": "0.9.0-beta.0",
   "description": "DataLens is a free, open-source, AI-powered data explorer with local Ollama AI, browser-side DuckDB analytics, and zero API costs.",
   "private": true,
   "keywords": [
@@ -37,8 +37,8 @@
     "papaparse": "^5.5.3",
     "posthog-js": "1.261.8",
     "posthog-node": "5.8.4",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
     "zustand": "^5.0.12"
   },
   "devDependencies": {

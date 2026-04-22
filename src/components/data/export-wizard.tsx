@@ -281,14 +281,22 @@ export default function ExportWizard({ open, onClose, tableName, columns, rowCou
                   {step === 2 && (
                     <div className="space-y-5">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Row limit</label>
-                        <input type="number" min={0} placeholder={`All rows (${formatNumber(rowCount)})`} value={rowLimit} onChange={(e) => setRowLimit(e.target.value)} className="w-full px-3 py-2 rounded-lg text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-colors" />
+                        <label
+                          htmlFor="export-wizard-row-limit"
+                          className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                        >
+                          Row limit
+                        </label>
+                        <input id="export-wizard-row-limit" type="number" min={0} placeholder={`All rows (${formatNumber(rowCount)})`} value={rowLimit} onChange={(e) => setRowLimit(e.target.value)} className="w-full px-3 py-2 rounded-lg text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-colors" />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        <label
+                          htmlFor="export-wizard-where-clause"
+                          className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                        >
                           WHERE clause <span className="text-gray-400 dark:text-gray-500">(optional)</span>
                         </label>
-                        <input type="text" placeholder="e.g. age > 30 AND status = 'active'" value={whereClause} onChange={(e) => setWhereClause(e.target.value)} className="w-full px-3 py-2 rounded-lg text-sm font-mono bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-colors" />
+                        <input id="export-wizard-where-clause" type="text" placeholder="e.g. age > 30 AND status = 'active'" value={whereClause} onChange={(e) => setWhereClause(e.target.value)} className="w-full px-3 py-2 rounded-lg text-sm font-mono bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-colors" />
                         <p className="mt-1.5 text-[11px] text-gray-400 dark:text-gray-500">Standard SQL syntax. Column names with spaces need double quotes.</p>
                       </div>
                     </div>
