@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ShortcutSettings from "@/components/settings/shortcut-settings";
 import type { ColumnProfile } from "@/types/dataset";
@@ -40,18 +40,18 @@ describe("ShortcutSettings", () => {
     expect(screen.getByRole("button", { name: "Ctrl+S" })).toBeInTheDocument();
   });
 
-  // TODO(wave3): autoFocus → useEffect ref migration broke user.type timing
-  // in these two tests. Works in real browser. Re-enable after finding a
-  // reliable pattern for React 19 useEffect-focused inputs in RTL.
-  it.skip("edits a shortcut and persists to localStorage", async () => {
+  it("edits a shortcut and persists to localStorage", async () => {
     const user = userEvent.setup();
 
     await renderAsync();
     await user.click(screen.getByRole("button", { name: "Ctrl+Enter" }));
 
-    const input = screen.getByRole("textbox");
-    await user.clear(input);
-    await user.type(input, "Ctrl+Shift+Enter");
+    // NOTE: under React 19, the edit input is focused via useEffect (not
+    // autoFocus) which lands after the click. findByRole awaits the
+    // conditional render; fireEvent.change sidesteps user.type's focus
+    // requirement and the StrictMode double-mount re-focus race.
+    const input = await screen.findByRole("textbox");
+    fireEvent.change(input, { target: { value: "Ctrl+Shift+Enter" } });
     await user.click(screen.getByRole("button", { name: "Save" }));
 
     await waitFor(() => {
@@ -65,15 +65,14 @@ describe("ShortcutSettings", () => {
     });
   });
 
-  it.skip("detects conflicts when assigning a duplicate binding", async () => {
+  it("detects conflicts when assigning a duplicate binding", async () => {
     const user = userEvent.setup();
 
     await renderAsync();
     await user.click(screen.getByRole("button", { name: "Ctrl+Enter" }));
 
-    const input = screen.getByRole("textbox");
-    await user.clear(input);
-    await user.type(input, "Ctrl+S");
+    const input = await screen.findByRole("textbox");
+    fireEvent.change(input, { target: { value: "Ctrl+S" } });
     await user.click(screen.getByRole("button", { name: "Save" }));
 
     await waitFor(() => {
