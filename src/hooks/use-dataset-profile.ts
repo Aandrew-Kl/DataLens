@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { quoteIdentifier } from "@/lib/utils/sql";
-import { useDuckDBQuery } from "@/hooks/use-duckdb-query";
+import { useQuery } from "@/hooks/use-query";
 
 export interface DatasetProfileColumn {
   name: string;
@@ -52,8 +52,8 @@ export function useDatasetProfile(tableName: string | null): DatasetProfileResul
   const describeSql = safeTable ? `DESCRIBE ${safeTable}` : null;
   const rowCountSql = safeTable ? `SELECT COUNT(*) AS row_count FROM ${safeTable}` : null;
 
-  const describeQuery = useDuckDBQuery(describeSql);
-  const rowCountQuery = useDuckDBQuery(rowCountSql);
+  const describeQuery = useQuery(describeSql);
+  const rowCountQuery = useQuery(rowCountSql);
 
   const columns = useMemo<DatasetProfileColumn[]>(
     () =>
@@ -68,7 +68,7 @@ export function useDatasetProfile(tableName: string | null): DatasetProfileResul
     () => buildNullAnalysisSql(tableName, columns),
     [columns, tableName],
   );
-  const nullCountsQuery = useDuckDBQuery(nullAnalysisSql);
+  const nullCountsQuery = useQuery(nullAnalysisSql);
 
   return useMemo(() => {
     const rowCount = toNumber(rowCountQuery.data?.[0]?.row_count);

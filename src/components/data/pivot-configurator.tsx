@@ -1,6 +1,5 @@
 "use client";
 
-import { quoteIdentifier } from "@/lib/utils/sql";
 import { motion } from "framer-motion";
 import {
   Calculator,
@@ -26,7 +25,7 @@ import {
 import { runQuery } from "@/lib/duckdb/client";
 import { downloadFile } from "@/lib/utils/export";
 import { generateId } from "@/lib/utils/formatters";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression, quoteIdentifier } from "@/lib/utils/sql";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface PivotConfiguratorProps {
