@@ -487,9 +487,19 @@ describe("DataCleaner", () => {
     await waitFor(() => {
       expect(screen.getByText("Applied 2 critical fixes.")).toBeInTheDocument();
     });
-    expect(screen.getByText("history:2")).toBeInTheDocument();
-    expect(screen.getByText("Applied region (nulls:region)")).toBeInTheDocument();
-    expect(screen.getByText("Applied region (whitespace:region)")).toBeInTheDocument();
+    // `setStatus("Applied 2 critical fixes.")` lands before
+    // `startTransition(setHistory(...))` commits, so the `history:N`
+    // readout and per-entry labels (rendered by the mocked
+    // CleanerHistory) can still be draining when `waitFor` exits. Use
+    // `findByText` for every history-dependent assertion to wait on the
+    // transition flush instead of racing it with `getByText`.
+    expect(await screen.findByText("history:2")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Applied region (nulls:region)"),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText("Applied region (whitespace:region)"),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /reset all/i }));
 
@@ -498,7 +508,7 @@ describe("DataCleaner", () => {
     });
     // onCleanComplete fires once after bulk apply + once after reset.
     await waitFor(() => expect(onCleanComplete).toHaveBeenCalledTimes(2));
-    expect(screen.getByText("history:0")).toBeInTheDocument();
+    expect(await screen.findByText("history:0")).toBeInTheDocument();
   });
 
   it("surfaces bulk-apply failures", async () => {
