@@ -335,9 +335,20 @@ export default function ColumnGrouper({ tableName, columns }: ColumnGrouperProps
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {decoratedColumns.map(({ column, groups }) => (
-                  <label key={column.name} className="rounded-[1.25rem] border border-white/15 bg-white/35 p-3 dark:bg-slate-900/30">
+                  <label
+                    key={column.name}
+                    htmlFor={`column-grouper-select-${column.name}`}
+                    aria-label={`Select column ${column.name}`}
+                    className="rounded-[1.25rem] border border-white/15 bg-white/35 p-3 dark:bg-slate-900/30"
+                  >
                     <div className="flex items-start gap-3">
-                      <input type="checkbox" checked={selectedColumns.includes(column.name)} onChange={() => toggleColumn(column.name)} className="mt-1 h-4 w-4 rounded border-white/20 bg-transparent" />
+                      <input
+                        id={`column-grouper-select-${column.name}`}
+                        type="checkbox"
+                        checked={selectedColumns.includes(column.name)}
+                        onChange={() => toggleColumn(column.name)}
+                        className="mt-1 h-4 w-4 rounded border-white/20 bg-transparent"
+                      />
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="truncate font-medium text-slate-950 dark:text-slate-50">{column.name}</span>

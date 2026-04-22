@@ -437,10 +437,14 @@ export default function DataMaskingTool({
 
           <div className="space-y-4">
             <div className={`${GLASS_CARD_CLASS} p-5`}>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label
+                htmlFor="data-masking-output-table"
+                className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+              >
                 Output table
               </label>
               <input
+                id="data-masking-output-table"
                 value={outputTableName}
                 onChange={(event) => setOutputTableName(event.target.value)}
                 className={FIELD_CLASS}

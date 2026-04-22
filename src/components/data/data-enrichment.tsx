@@ -665,12 +665,16 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                       <option value="custom">Custom breakpoints</option>
                     </select>
                   </label>
-                  <label className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
-                    <span className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                  <div className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
+                    <label
+                      htmlFor="data-enrichment-bin-count"
+                      className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+                    >
                       <span>Bin count</span>
                       <span>{binCount}</span>
-                    </span>
+                    </label>
                     <input
+                      id="data-enrichment-bin-count"
                       type="range"
                       min={2}
                       max={12}
@@ -678,7 +682,7 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                       onChange={(event) => setBinCount(Number(event.target.value))}
                       className="mt-3 h-2 w-full accent-cyan-500"
                     />
-                  </label>
+                  </div>
                   {binningMode === "custom" ? (
                     <label className="block md:col-span-2 xl:col-span-1">
                       <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
@@ -770,12 +774,16 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                           <option value="lead">Next value</option>
                         </select>
                       </label>
-                      <label className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
-                        <span className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                      <div className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
+                        <label
+                          htmlFor="data-enrichment-lag-lead-offset"
+                          className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+                        >
                           <span>Offset</span>
                           <span>{offset}</span>
-                        </span>
+                        </label>
                         <input
+                          id="data-enrichment-lag-lead-offset"
                           type="range"
                           min={1}
                           max={5}
@@ -783,7 +791,7 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                           onChange={(event) => setOffset(Number(event.target.value))}
                           className="mt-3 h-2 w-full accent-cyan-500"
                         />
-                      </label>
+                      </div>
                     </>
                   ) : (
                     <label className="block">

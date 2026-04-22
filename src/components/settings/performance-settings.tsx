@@ -200,13 +200,17 @@ export default function PerformanceSettings() {
               />
             </label>
 
-            <label className="block">
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+            <div className="block">
+              <span
+                id="performance-settings-auto-profile-label"
+                className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+              >
                 Auto-profile on load
               </span>
               <button
                 type="button"
                 aria-pressed={settings.autoProfileOnLoad}
+                aria-labelledby="performance-settings-auto-profile-label"
                 onClick={() => updateSetting("autoProfileOnLoad", !settings.autoProfileOnLoad)}
                 className={`${BUTTON_CLASS} w-full justify-between`}
               >
@@ -215,7 +219,7 @@ export default function PerformanceSettings() {
                   {settings.autoProfileOnLoad ? "On" : "Off"}
                 </span>
               </button>
-            </label>
+            </div>
           </div>
 
           <div className="mt-5 flex flex-wrap gap-3">
