@@ -260,14 +260,14 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
             tableName,
             label: bookmark.name,
             description: bookmark.description,
-            viewState: bookmark.state,
+            viewState: bookmark.state as unknown as Record<string, unknown>,
           })
         : bookmarksApi.create({
             id: bookmark.id,
             tableName,
             label: bookmark.name,
             description: bookmark.description,
-            viewState: bookmark.state,
+            viewState: bookmark.state as unknown as Record<string, unknown>,
           });
 
       void persistRequest
@@ -279,7 +279,7 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
             timestamp: remoteBookmark.updatedAt,
             state:
               remoteBookmark.viewState && typeof remoteBookmark.viewState === "object"
-                ? (remoteBookmark.viewState as ViewState)
+                ? (remoteBookmark.viewState as unknown as ViewState)
                 : bookmark.state,
             synced: true,
           };
@@ -343,13 +343,13 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
     writeBookmarks(tableName, nextBookmarks);
     if (authToken) {
       void Promise.allSettled(
-        parsed.map(async (bookmark) => {
+        parsed.map(async (bookmark): Promise<ViewBookmark> => {
           const remoteBookmark = await bookmarksApi.create({
             id: bookmark.id,
             tableName,
             label: bookmark.name,
             description: bookmark.description,
-            viewState: bookmark.state,
+            viewState: bookmark.state as unknown as Record<string, unknown>,
           });
 
           return {
@@ -359,10 +359,10 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
             timestamp: remoteBookmark.updatedAt,
             state:
               remoteBookmark.viewState && typeof remoteBookmark.viewState === "object"
-                ? (remoteBookmark.viewState as ViewState)
+                ? (remoteBookmark.viewState as unknown as ViewState)
                 : bookmark.state,
             synced: true,
-          } satisfies ViewBookmark;
+          };
         }),
       ).then((results) => {
         const syncedBookmarks = new Map(

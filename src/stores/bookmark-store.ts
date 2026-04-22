@@ -85,22 +85,23 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     }
 
     try {
-      const remoteBookmarks = (await bookmarksApi.list())
-        .filter(
-          (bookmark): bookmark is Bookmark & { datasetId: string; tableName: string } =>
-            typeof bookmark.datasetId === "string" &&
-            typeof bookmark.tableName === "string",
-        )
-        .map((bookmark) => ({
-          id: bookmark.id,
-          datasetId: bookmark.datasetId,
-          tableName: bookmark.tableName,
-          columnName: bookmark.columnName ?? undefined,
-          sql: bookmark.sql ?? undefined,
-          label: bookmark.label,
-          createdAt: bookmark.createdAt,
+      const remoteRecords = await bookmarksApi.list();
+      const remoteBookmarks: Bookmark[] = [];
+      for (const record of remoteRecords) {
+        if (typeof record.datasetId !== "string" || typeof record.tableName !== "string") {
+          continue;
+        }
+        remoteBookmarks.push({
+          id: record.id,
+          datasetId: record.datasetId,
+          tableName: record.tableName,
+          columnName: record.columnName ?? undefined,
+          sql: record.sql ?? undefined,
+          label: record.label,
+          createdAt: record.createdAt,
           synced: true,
-        }));
+        });
+      }
 
       const next = sortBookmarks(remoteBookmarks);
       persistBookmarks(next);

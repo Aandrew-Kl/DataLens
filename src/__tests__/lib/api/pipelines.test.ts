@@ -1,5 +1,6 @@
 import { pipelinesApi } from "@/lib/api/pipelines";
 import { request } from "@/lib/api/client";
+import type { PipelineStep } from "@/lib/utils/pipeline-builder";
 
 jest.mock("@/lib/api/client", () => ({
   request: jest.fn(),
@@ -72,7 +73,7 @@ describe("pipelines API", () => {
 
     await pipelinesApi.update("pipeline-1", {
       name: "Regional filter v2",
-      steps: [{ id: "step-1", type: "sort", column: "sales" }],
+      steps: [{ id: "step-1", type: "sort", column: "sales" } as unknown as PipelineStep],
     });
 
     expect(mockedRequest).toHaveBeenCalledWith("PATCH", "/api/pipelines/pipeline-1", {
