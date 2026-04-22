@@ -481,10 +481,14 @@ function DateExplorerReady({ tableName, columns }: DateExplorerProps) {
 
         <div className="grid gap-3 xl:grid-cols-[1.2fr_1fr_1fr]">
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="date-explorer-date-column"
+              className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+            >
               Date column
             </label>
             <select
+              id="date-explorer-date-column"
               aria-label="Date column"
               value={safeColumn}
               onChange={(event) =>

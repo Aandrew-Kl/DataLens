@@ -125,13 +125,31 @@ describe("DashboardBuilder", () => {
     await waitFor(() => {
       expect(screen.getAllByText("Loaded from storage.").length).toBeGreaterThan(0);
     });
+    // Also wait for the post-load notice to land BEFORE firing the export
+    // click. `handleLoad` calls `setWidgets(...)` and `setNotice(...)`
+    // synchronously, but the preview-loader effect that fires afterwards
+    // (for non-text widgets) and the AnimatePresence key swap for the
+    // notice node both commit through the transition queue. Waiting on
+    // the Loaded notice guarantees the Export click sees a quiesced tree.
+    await waitFor(() => {
+      expect(screen.getByText(/Loaded 1 saved widgets\./i)).toBeInTheDocument();
+    });
 
     await user.click(screen.getByRole("button", { name: /export dashboard/i }));
 
+    // Under PR#25's larger compiled surface + StrictMode double-invoke,
+    // the 1000ms default `findByText` timeout is not enough for the
+    // notice key-swap (via AnimatePresence) to land. Bump to 5000ms so
+    // we don't race the render; also wrap `clickSpy` and subsequent
+    // assertions in `waitFor` for the same reason.
     expect(
-      await screen.findByText(/Exported the dashboard as standalone HTML\./i),
+      await screen.findByText(
+        /Exported the dashboard as standalone HTML\./i,
+        undefined,
+        { timeout: 5000 },
+      ),
     ).toBeInTheDocument();
-    expect(clickSpy).toHaveBeenCalled();
+    await waitFor(() => expect(clickSpy).toHaveBeenCalled());
 
     clickSpy.mockRestore();
   });

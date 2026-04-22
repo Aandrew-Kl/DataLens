@@ -598,12 +598,16 @@ function ForecastReady({ tableName, columns }: DataForecastProps) {
               </label>
             </div>
 
-            <label className="block rounded-2xl border border-white/15 bg-white/45 px-4 py-4 dark:bg-slate-950/35">
-              <span className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+            <div className="block rounded-2xl border border-white/15 bg-white/45 px-4 py-4 dark:bg-slate-950/35">
+              <label
+                htmlFor="data-forecast-horizon"
+                className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+              >
                 <span>Forecast horizon</span>
                 <span>{horizon} periods</span>
-              </span>
+              </label>
               <input
+                id="data-forecast-horizon"
                 type="range"
                 min={1}
                 max={30}
@@ -613,7 +617,7 @@ function ForecastReady({ tableName, columns }: DataForecastProps) {
                 }
                 className="mt-3 h-2 w-full accent-cyan-500"
               />
-            </label>
+            </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-2">

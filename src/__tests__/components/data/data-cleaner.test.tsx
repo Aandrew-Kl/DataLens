@@ -438,21 +438,34 @@ describe("DataCleaner", () => {
     );
   });
 
-  // TODO(wave3): flaky under React 19 strict double-mount — scanDataIssues mockResolvedValueOnce chain gets drained before render settles.
-  it.skip("bulk applies matching severities and reset all restores every recorded fix", async () => {
+  it("bulk applies matching severities and reset all restores every recorded fix", async () => {
     const user = userEvent.setup();
     const onCleanComplete = jest.fn();
 
-    mockScanDataIssues
-      .mockResolvedValueOnce({
+    // NOTE: React 19 StrictMode double-mounts components in dev/test, so
+    // scanDataIssues can be called up to 2x on mount and again after each
+    // apply/reset. Use a call-count-driven mock instead of mockResolvedValueOnce
+    // chains so extra/out-of-order reads still return consistent data.
+    let scanCount = 0;
+    mockScanDataIssues.mockImplementation(async () => {
+      scanCount += 1;
+      // First pass(es): surface 3 issues (2 critical, 1 warning).
+      // After the first bulk apply (>= 3rd call): only the warning remains.
+      // After reset (>= 5th call): all issues restored.
+      if (scanCount <= 2) {
+        return {
+          issues: [criticalIssue, secondCriticalIssue, warningIssue],
+          rowCount: 100,
+        };
+      }
+      if (scanCount <= 4) {
+        return { issues: [warningIssue], rowCount: 100 };
+      }
+      return {
         issues: [criticalIssue, secondCriticalIssue, warningIssue],
         rowCount: 100,
-      })
-      .mockResolvedValueOnce({ issues: [warningIssue], rowCount: 100 })
-      .mockResolvedValueOnce({
-        issues: [criticalIssue, secondCriticalIssue, warningIssue],
-        rowCount: 100,
-      });
+      };
+    });
     mockActionLabelForIssue.mockImplementation(
       (issue) => `Applied ${issue.columnName} (${issue.id})`,
     );
@@ -474,28 +487,40 @@ describe("DataCleaner", () => {
     await waitFor(() => {
       expect(screen.getByText("Applied 2 critical fixes.")).toBeInTheDocument();
     });
-    expect(screen.getByText("history:2")).toBeInTheDocument();
-    expect(screen.getByText("Applied region (nulls:region)")).toBeInTheDocument();
-    expect(screen.getByText("Applied region (whitespace:region)")).toBeInTheDocument();
+    // `setStatus("Applied 2 critical fixes.")` lands before
+    // `startTransition(setHistory(...))` commits, so the `history:N`
+    // readout and per-entry labels (rendered by the mocked
+    // CleanerHistory) can still be draining when `waitFor` exits. Use
+    // `findByText` for every history-dependent assertion to wait on the
+    // transition flush instead of racing it with `getByText`.
+    expect(await screen.findByText("history:2")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Applied region (nulls:region)"),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText("Applied region (whitespace:region)"),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /reset all/i }));
 
     await waitFor(() => {
       expect(screen.getByText("Reverted every applied cleaning step.")).toBeInTheDocument();
     });
+    // onCleanComplete fires once after bulk apply + once after reset.
     await waitFor(() => expect(onCleanComplete).toHaveBeenCalledTimes(2));
-    expect(screen.getByText("history:0")).toBeInTheDocument();
+    expect(await screen.findByText("history:0")).toBeInTheDocument();
   });
 
-  // TODO(wave3): flaky under React 19 strict double-mount — scanDataIssues mockResolvedValueOnce chain gets drained before render settles.
-  it.skip("surfaces bulk-apply failures", async () => {
+  it("surfaces bulk-apply failures", async () => {
     const user = userEvent.setup();
 
-    mockScanDataIssues.mockResolvedValueOnce({
+    // Use mockResolvedValue (not once) so StrictMode's duplicate call on
+    // mount still returns the expected dataset.
+    mockScanDataIssues.mockResolvedValue({
       issues: [criticalIssue],
       rowCount: 100,
     });
-    mockSelectSqlForIssue.mockImplementationOnce(() => {
+    mockSelectSqlForIssue.mockImplementation(() => {
       throw new Error("bulk failed");
     });
 
@@ -515,16 +540,22 @@ describe("DataCleaner", () => {
     });
   });
 
-  // TODO(wave3): flaky under React 19 strict double-mount — scanDataIssues mockResolvedValueOnce chain gets drained before render settles.
-  it.skip("surfaces reset failures after a bulk apply", async () => {
+  it("surfaces reset failures after a bulk apply", async () => {
     const user = userEvent.setup();
 
-    mockScanDataIssues
-      .mockResolvedValueOnce({
-        issues: [criticalIssue, secondCriticalIssue],
-        rowCount: 100,
-      })
-      .mockResolvedValueOnce({ issues: [], rowCount: 100 });
+    let scanCount = 0;
+    mockScanDataIssues.mockImplementation(async () => {
+      scanCount += 1;
+      // Under StrictMode the mount-effect fires twice; keep returning the
+      // initial 2 issues until after the apply-triggered refresh.
+      if (scanCount <= 2) {
+        return {
+          issues: [criticalIssue, secondCriticalIssue],
+          rowCount: 100,
+        };
+      }
+      return { issues: [], rowCount: 100 };
+    });
     mockActionLabelForIssue.mockImplementation(
       (issue) => `Applied ${issue.columnName} (${issue.id})`,
     );

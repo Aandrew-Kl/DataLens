@@ -740,10 +740,14 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
 
               {activeTab === "url" ? (
                 <div className="space-y-4">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">
+                  <label
+                    htmlFor="data-connector-remote-url"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-200"
+                  >
                     Remote CSV or JSON URL
                   </label>
                   <input
+                    id="data-connector-remote-url"
                     value={remoteUrl}
                     onChange={(event) => setRemoteUrl(event.target.value)}
                     placeholder="https://example.com/data.csv"

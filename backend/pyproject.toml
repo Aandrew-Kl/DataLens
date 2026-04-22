@@ -1,2 +1,25 @@
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+# Coverage gate: ratchet strategy identical to the frontend.
+# Audit baseline (2026-04-22): 90% lines, 159 passing backend tests.
+# Starting floor is 60% so a subsequent regression in non-tested modules
+# still fails CI well before the headline number drops below the floor.
+# Raise per wave as additional test areas stabilize.
+addopts = "--cov=app --cov-report=term-missing --cov-fail-under=60"
+
+[tool.coverage.run]
+branch = true
+source = ["app"]
+omit = [
+    "app/__init__.py",
+    "app/*/__init__.py",
+    "tests/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]

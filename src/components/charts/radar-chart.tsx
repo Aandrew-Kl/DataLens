@@ -413,10 +413,14 @@ function RadarChartReady({ tableName, columns }: RadarChartProps) {
 
             <div className="grid gap-3 md:grid-cols-2">
               <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <label
+                  htmlFor="radar-chart-group-overlay"
+                  className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+                >
                   Group overlay
                 </label>
                 <select
+                  id="radar-chart-group-overlay"
                   value={effectiveGroupBy}
                   onChange={(event) =>
                     startTransition(() => setGroupByColumn(event.target.value))

@@ -427,10 +427,16 @@ export default function TemplatePicker({
 
                 {/* Live SQL preview */}
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <p
+                    id="template-picker-sql-preview-label"
+                    className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
+                  >
                     SQL Preview
-                  </label>
-                  <pre className="overflow-x-auto rounded-xl border border-gray-200/60 bg-gray-950 px-4 py-3 font-mono text-xs leading-6 text-gray-100 dark:border-gray-700/60">
+                  </p>
+                  <pre
+                    aria-labelledby="template-picker-sql-preview-label"
+                    className="overflow-x-auto rounded-xl border border-gray-200/60 bg-gray-950 px-4 py-3 font-mono text-xs leading-6 text-gray-100 dark:border-gray-700/60"
+                  >
                     {previewSQL}
                   </pre>
                 </div>

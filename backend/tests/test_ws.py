@@ -272,12 +272,17 @@ def test_ws_handles_disconnect_during_stream(ws_client: TestClient, monkeypatch:
     assert logged_messages == []
 
 
-@pytest.mark.skip(reason="starlette send-after-close behavior varies across versions")
 def test_ws_returns_error_frame_for_invalid_query_expression(ws_client: TestClient) -> None:
     token, dataset = _register_login_user_with_dataset(ws_client)
     messages: list[dict[str, object]] = []
 
-    with pytest.raises(RuntimeError, match='Cannot call "send" once a close message has been sent.'):
+    # starlette closes the websocket after emitting the error frame via
+    # WS_1003_UNSUPPORTED_DATA. The recv loop in TestClient observes the
+    # close and raises WebSocketDisconnect. Earlier starlette versions
+    # leaked a "Cannot call 'send' once a close message has been sent."
+    # RuntimeError; starlette >= 0.40 raises WebSocketDisconnect cleanly.
+    # Accept either so the assertion is stable across the supported range.
+    try:
         with ws_client.websocket_connect(
             _websocket_url(
                 token=token,
@@ -286,9 +291,16 @@ def test_ws_returns_error_frame_for_invalid_query_expression(ws_client: TestClie
                 chunk_size=2,
             )
         ) as websocket:
-            messages = _receive_until_complete(websocket)
+            try:
+                messages = _receive_until_complete(websocket)
+            except WebSocketDisconnect as exc:
+                assert exc.code == 1003, f"expected WS_1003_UNSUPPORTED_DATA, got {exc.code}"
+    except RuntimeError as exc:
+        # Legacy starlette path: send-after-close surfaces as RuntimeError.
+        assert "close" in str(exc).lower()
 
-    assert messages == [
+    # The protocol contract is: profiling frame first, error frame second.
+    assert messages[:2] == [
         {
             "type": "profiling",
             "percent": 0,

@@ -38,26 +38,38 @@ describe("ShortcutOverlay", () => {
     expect(document.body.style.overflow).toBe("hidden");
   });
 
-  // TODO(wave3): useDeferredValue + React 19 + JSDOM interaction causes
-  // the filter update not to commit in test. Works in real browser.
-  // Re-enable once jest/React 19 testing shim supports deferred flush,
-  // or refactor ShortcutOverlay to expose a non-deferred path for tests.
-  it.skip("filters the shortcut list and shows the empty state for unmatched queries", async () => {
+  it("filters the shortcut list and shows the empty state for unmatched queries", async () => {
     const user = userEvent.setup();
 
     render(<ShortcutOverlay />);
     await user.keyboard("?");
 
-    const search = await screen.findByPlaceholderText("Filter shortcuts...");
-    await user.type(search, "export");
+    await screen.findByPlaceholderText("Filter shortcuts...");
 
-    expect(screen.getByText("Export the current data view")).toBeInTheDocument();
-    expect(screen.queryByText("Open the command palette")).not.toBeInTheDocument();
+    // NOTE: under React 19 + jsdom, useDeferredValue doesn't reliably commit
+    // on the same tick, and userEvent.type can coalesce keystrokes before
+    // the deferred render lands. We drive the controlled input with
+    // fireEvent.change and re-query the node between interactions so we're
+    // never holding a stale reference across a StrictMode double-render.
+    fireEvent.change(screen.getByPlaceholderText("Filter shortcuts..."), {
+      target: { value: "export" },
+    });
 
-    fireEvent.change(search, { target: { value: "" } });
-    await user.type(search, "zzzz");
+    await waitFor(() => {
+      expect(screen.getByText("Export the current data view")).toBeInTheDocument();
+      expect(screen.queryByText("Open the command palette")).not.toBeInTheDocument();
+    });
 
-    expect(await screen.findByText("No shortcuts matched")).toBeInTheDocument();
+    fireEvent.change(screen.getByPlaceholderText("Filter shortcuts..."), {
+      target: { value: "zzzz" },
+    });
+
+    await waitFor(
+      () => {
+        expect(screen.getByText("No shortcuts matched")).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
   });
 
   it("ignores the question-mark shortcut while typing inside an editable field", async () => {
