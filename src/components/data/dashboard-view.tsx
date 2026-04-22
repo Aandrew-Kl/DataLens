@@ -23,7 +23,7 @@ import ChartRenderer from "@/components/charts/chart-renderer";
 import Modal from "@/components/ui/modal";
 import { runQuery } from "@/lib/duckdb/client";
 import { sanitizeTableName, formatNumber } from "@/lib/utils/formatters";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression } from "@/lib/utils/sql";
 import type { DatasetMeta, ColumnProfile } from "@/types/dataset";
 import type {
   ChartConfig,

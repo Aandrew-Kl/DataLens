@@ -6,7 +6,7 @@ import DashboardBuilder from "@/components/charts/dashboard-builder";
 import RouteErrorBoundary from "@/components/workspace/route-error-boundary";
 import { runQuery } from "@/lib/duckdb/client";
 import { sanitizeTableName } from "@/lib/utils/formatters";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression } from "@/lib/utils/sql";
 import { useChartStore } from "@/stores/chart-store";
 import { useDatasetStore } from "@/stores/dataset-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";

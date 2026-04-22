@@ -97,6 +97,7 @@ export default function MissingDataMap({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // TODO(wave6): migrate to useQuery — single-SELECT + post-processing pattern.
   useEffect(() => {
     if (columns.length === 0) {
       setMetrics([]);
