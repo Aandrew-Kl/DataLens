@@ -1,7 +1,7 @@
 "use client";
 
 import { buildMetricExpression, quoteIdentifier } from "@/lib/utils/sql";
-import { useDuckDBQuery } from "@/hooks/use-duckdb-query";
+import { useQuery } from "@/hooks/use-query";
 
 export interface UseChartDataConfig {
   tableName: string | null;
@@ -193,7 +193,7 @@ export function useChartData(config: UseChartDataConfig): UseChartDataResult {
     configError = error instanceof Error ? error.message : "Unable to build chart query.";
   }
 
-  const query = useDuckDBQuery(sql);
+  const query = useQuery(sql);
   const chartData = transformChartRows(query.data ?? [], config);
 
   return {

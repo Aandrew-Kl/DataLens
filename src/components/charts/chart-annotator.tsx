@@ -13,7 +13,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { buildMetricExpression, quoteIdentifier } from "@/lib/utils/sql";
-import { useDuckDBQuery } from "@/hooks/use-duckdb-query";
+import { useQuery } from "@/hooks/use-query";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface ChartAnnotatorProps {
@@ -163,7 +163,7 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
     loading,
     error: queryError,
     refetch,
-  } = useDuckDBQuery(querySql);
+  } = useQuery(querySql);
   const rows = queryRows ?? EMPTY_ROWS;
   const notice =
     manualNotice
