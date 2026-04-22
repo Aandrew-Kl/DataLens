@@ -1,6 +1,5 @@
-import { quoteIdentifier } from "@/lib/utils/sql";
+import { buildMetricExpression, quoteIdentifier } from "@/lib/utils/sql";
 import type { ColumnProfile } from "@/types/dataset";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
 
 export type StepType =
   | "filter"

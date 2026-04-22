@@ -1,7 +1,6 @@
 "use client";
 
-import { quoteIdentifier } from "@/lib/utils/sql";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression, quoteIdentifier } from "@/lib/utils/sql";
 import { useDuckDBQuery } from "@/hooks/use-duckdb-query";
 
 export interface UseChartDataConfig {

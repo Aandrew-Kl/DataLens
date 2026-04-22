@@ -1,6 +1,5 @@
 "use client";
 
-import { quoteIdentifier } from "@/lib/utils/sql";
 import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { EChartsOption } from "echarts";
 import ReactECharts from "echarts-for-react";
@@ -13,7 +12,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression, quoteIdentifier } from "@/lib/utils/sql";
 import { useDuckDBQuery } from "@/hooks/use-duckdb-query";
 import type { ColumnProfile } from "@/types/dataset";
 

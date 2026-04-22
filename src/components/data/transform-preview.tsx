@@ -1,7 +1,6 @@
 "use client";
 
-import { quoteIdentifier } from "@/lib/utils/sql";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression, quoteIdentifier } from "@/lib/utils/sql";
 import { runQuery } from "@/lib/duckdb/client";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, Check, Eye, Play, RotateCcw } from "lucide-react";
