@@ -79,23 +79,43 @@ describe("FeatureEngineering", () => {
     await user.selectOptions(screen.getByRole("combobox", { name: "Secondary column" }), "cost");
     await user.click(screen.getByRole("button", { name: "Preview features" }));
 
-    expect(await screen.findByText("Previewed 2 rows for revenue_x_cost.")).toBeInTheDocument();
-    expect(screen.getByText("50.0000")).toBeInTheDocument();
-    expect(screen.getByText("18.0000")).toBeInTheDocument();
+    // Use findBy* everywhere after the state-triggering click so we wait on
+    // the React 19 transition flush instead of racing the render.
+    expect(
+      await screen.findByText("Previewed 2 rows for revenue_x_cost."),
+    ).toBeInTheDocument();
+    expect(await screen.findByText("50.0000")).toBeInTheDocument();
+    expect(await screen.findByText("18.0000")).toBeInTheDocument();
   });
 
   it("applies the selected feature and exports the preview CSV", async () => {
     const user = userEvent.setup();
 
-    mockRunQuery
-      .mockResolvedValueOnce([{ primary_value: 10, secondary_value: null }])
-      .mockResolvedValue([]);
+    // Use call-count driven mockImplementation rather than
+    // mockResolvedValueOnce -> mockResolvedValue chains. The chain can get
+    // drained before React 19's concurrent render settles (same failure
+    // mode fixed in Wave 4B for data-cleaner bulk tests). The first
+    // runQuery call is the preview (must return the preview row); every
+    // subsequent call (ALTER + UPDATE during apply) returns [].
+    let queryCallCount = 0;
+    mockRunQuery.mockImplementation(async () => {
+      queryCallCount += 1;
+      if (queryCallCount === 1) {
+        return [{ primary_value: 10, secondary_value: null }];
+      }
+      return [];
+    });
 
     await renderAsync();
-    await user.click(screen.getByRole("button", { name: "Preview features" }));
+    await user.click(
+      await screen.findByRole("button", { name: "Preview features" }),
+    );
+    // Wait for the preview status to commit before triggering apply.
     await screen.findByText("Previewed 1 rows for log_revenue.");
 
-    await user.click(screen.getByRole("button", { name: "Apply feature" }));
+    await user.click(
+      await screen.findByRole("button", { name: "Apply feature" }),
+    );
 
     await waitFor(() => {
       expect(mockRunQuery).toHaveBeenCalledWith(
@@ -106,12 +126,20 @@ describe("FeatureEngineering", () => {
       );
     });
 
-    await user.click(screen.getByRole("button", { name: "Export CSV" }));
-
-    expect(mockDownloadFile).toHaveBeenCalledWith(
-      expect.stringContaining("row_number,primary_value,secondary_value,log_revenue"),
-      "orders-log_revenue-preview.csv",
-      "text/csv;charset=utf-8;",
+    // Export CSV is gated by previewRows.length, which won't settle until
+    // the apply transition flushes. findByRole waits for the button to be
+    // in the DOM; since it's always present just in a disabled state here,
+    // this wait is inexpensive but guards against render ordering drift.
+    await user.click(
+      await screen.findByRole("button", { name: "Export CSV" }),
     );
+
+    await waitFor(() => {
+      expect(mockDownloadFile).toHaveBeenCalledWith(
+        expect.stringContaining("row_number,primary_value,secondary_value,log_revenue"),
+        "orders-log_revenue-preview.csv",
+        "text/csv;charset=utf-8;",
+      );
+    });
   });
 });
