@@ -198,6 +198,7 @@ export default function ColumnDetail({
     };
   }, [open, handleEscape]);
 
+  // TODO(wave6): migrate to useQuery — two sequential queries + per-type SQL branching.
   useEffect(() => {
     if (!open) return;
 

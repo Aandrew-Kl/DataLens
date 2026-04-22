@@ -126,13 +126,17 @@ describe("FeatureEngineering", () => {
       );
     });
 
-    // Export CSV is gated by previewRows.length, which won't settle until
-    // the apply transition flushes. findByRole waits for the button to be
-    // in the DOM; since it's always present just in a disabled state here,
-    // this wait is inexpensive but guards against render ordering drift.
-    await user.click(
-      await screen.findByRole("button", { name: "Export CSV" }),
-    );
+    // Export CSV is gated by `previewRows.length === 0` in the component.
+    // `previewRows` is committed via `startTransition` in `handlePreview`,
+    // and user-event v14 silently swallows clicks on disabled buttons, so
+    // racing a plain `findByRole` click will appear to succeed but produce
+    // zero downloadFile calls under CI scheduling. Wait for the button to
+    // actually be enabled before clicking.
+    const exportButton = await screen.findByRole("button", {
+      name: "Export CSV",
+    });
+    await waitFor(() => expect(exportButton).toBeEnabled());
+    await user.click(exportButton);
 
     await waitFor(() => {
       expect(mockDownloadFile).toHaveBeenCalledWith(

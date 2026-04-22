@@ -1,6 +1,10 @@
 /**
  * @jest-environment jsdom
  */
+jest.mock("@/lib/duckdb/client", () => ({
+  runQuery: jest.fn().mockResolvedValue([]),
+}));
+
 import * as exportUtils from "@/lib/utils/export";
 
 const { downloadFile, exportToCSV, exportToJSON, exportToClipboard } = exportUtils;

@@ -16,7 +16,7 @@ import type { ColumnProfile } from "@/types/dataset";
 import { runQuery } from "@/lib/duckdb/client";
 import { formatNumber } from "@/lib/utils/formatters";
 import { downloadFile } from "@/lib/utils/export";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression } from "@/lib/utils/sql";
 
 // ---------------------------------------------------------------------------
 // Types

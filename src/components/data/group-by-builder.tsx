@@ -14,7 +14,7 @@ import {
 } from "@/lib/utils/advanced-analytics";
 import { downloadFile } from "@/lib/utils/export";
 import { formatNumber } from "@/lib/utils/formatters";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression } from "@/lib/utils/sql";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface GroupByBuilderProps {
