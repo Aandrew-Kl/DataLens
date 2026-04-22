@@ -1,6 +1,5 @@
 "use client";
 
-import { quoteIdentifier } from "@/lib/utils/sql";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -14,7 +13,7 @@ import {
 import { runQuery } from "@/lib/duckdb/client";
 import { downloadFile } from "@/lib/utils/export";
 import { formatNumber, generateId } from "@/lib/utils/formatters";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression, quoteIdentifier } from "@/lib/utils/sql";
 import type { ColumnProfile } from "@/types/dataset";
 
 interface PivotTableAdvancedProps {

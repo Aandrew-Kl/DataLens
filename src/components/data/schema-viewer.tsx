@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Download, ChevronRight, Hash, Type, Calendar,
   ToggleLeft, HelpCircle, ArrowUpDown, Database, Layers,
 } from "lucide-react";
 import type { ColumnProfile, ColumnType } from "@/types/dataset";
-import { runQuery } from "@/lib/duckdb/client";
+import { useQuery } from "@/hooks/use-query";
 import { formatNumber } from "@/lib/utils/formatters";
 
 interface SchemaViewerProps {
@@ -118,19 +118,18 @@ function StatLine({ label, value }: { label: string; value: string | number }) {
 /*  Expanded detail row (fetches stddev via DuckDB)                    */
 /* ------------------------------------------------------------------ */
 function ExpandedDetail({ col, tableName, rowCount }: { col: ColumnProfile; tableName: string; rowCount: number }) {
-  const [stddev, setStddev] = useState<number | null>(null);
-  const [loading, setLoading] = useState(col.type === "number");
-
-  useEffect(() => {
-    if (col.type !== "number") return;
-    let cancelled = false;
-    const esc = col.name.replace(/"/g, '""');
-    runQuery(`SELECT STDDEV_SAMP("${esc}") AS sd FROM "${tableName}" WHERE "${esc}" IS NOT NULL`)
-      .then((r) => { if (!cancelled) setStddev(r[0]?.sd != null ? Number(Number(r[0].sd).toFixed(4)) : null); })
-      .catch(() => { if (!cancelled) setStddev(null); })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
-  }, [col.name, col.type, tableName]);
+  const isNumeric = col.type === "number";
+  const esc = col.name.replace(/"/g, '""');
+  const sql = isNumeric
+    ? `SELECT STDDEV_SAMP("${esc}") AS sd FROM "${tableName}" WHERE "${esc}" IS NOT NULL`
+    : null;
+  const { data, loading } = useQuery<{ sd: unknown }>(sql, { enabled: isNumeric });
+  const stddev = useMemo(() => {
+    const raw = data?.[0]?.sd;
+    if (raw == null) return null;
+    const numeric = Number(raw);
+    return Number.isFinite(numeric) ? Number(numeric.toFixed(4)) : null;
+  }, [data]);
 
   const np = getNullPct(col, rowCount);
   const card = getCardinality(col, rowCount);
