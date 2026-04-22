@@ -312,9 +312,15 @@ describe("DataCleaner", () => {
       expect(screen.getByText("Fill with the mode. Applied to sales.")).toBeInTheDocument();
     });
     await waitFor(() => expect(onCleanComplete).toHaveBeenCalledTimes(1));
-    expect(screen.getByText("Filled nulls in region")).toBeInTheDocument();
-    expect(screen.getByText("history:1")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /reset all/i })).toBeEnabled();
+    // History entry renders via `startTransition(setHistory(...))` inside
+    // `rewriteTable`, so the DOM commit can lag behind `onCleanComplete`
+    // under CI scheduling. Use `findByText` to wait for the transition to
+    // flush rather than racing it with `getByText`.
+    expect(await screen.findByText("Filled nulls in region")).toBeInTheDocument();
+    expect(await screen.findByText("history:1")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /reset all/i })).toBeEnabled(),
+    );
     expect(mockRunQuery).toHaveBeenCalledWith(
       expect.stringMatching(/^DROP TABLE IF EXISTS "sales__clean_/),
     );
@@ -385,7 +391,10 @@ describe("DataCleaner", () => {
       expect(screen.getByText("Reverted: Filled nulls in region.")).toBeInTheDocument();
     });
     await waitFor(() => expect(onCleanComplete).toHaveBeenCalledTimes(2));
-    expect(screen.getByText("history:0")).toBeInTheDocument();
+    // history state is updated via `startTransition` in `handleUndoLatest`,
+    // so the mocked CleanerHistory's `history:N` readout can lag behind
+    // `onCleanComplete`. Use findByText to wait for the transition commit.
+    expect(await screen.findByText("history:0")).toBeInTheDocument();
     expect(mockRunQuery).toHaveBeenCalledWith(
       expect.stringMatching(/^ALTER TABLE "sales" RENAME TO "sales__restore_/),
     );
