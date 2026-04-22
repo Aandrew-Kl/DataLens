@@ -633,10 +633,14 @@ export default function DataJoinWizard({
           {step === 5 ? (
             <div className="space-y-4">
               <div className="rounded-[1rem] border border-white/15 bg-white/55 p-4 dark:bg-slate-950/25">
-                <label className="block text-sm font-semibold text-slate-900 dark:text-slate-50">
+                <label
+                  htmlFor="data-join-wizard-result-name"
+                  className="block text-sm font-semibold text-slate-900 dark:text-slate-50"
+                >
                   Result table name
                 </label>
                 <input
+                  id="data-join-wizard-result-name"
                   value={resultTableName}
                   onChange={(event) => setResultTableName(event.target.value)}
                   className="mt-3 w-full rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"

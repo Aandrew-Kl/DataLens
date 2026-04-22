@@ -300,10 +300,14 @@ export default function ColumnSplitter({
 
         <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
           <div className={`${GLASS_CARD_CLASS} p-5`}>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="column-splitter-source-column"
+              className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+            >
               Source column
             </label>
             <select
+              id="column-splitter-source-column"
               aria-label="Source column"
               value={activeColumn}
               onChange={(event) => setSelectedColumn(event.target.value)}

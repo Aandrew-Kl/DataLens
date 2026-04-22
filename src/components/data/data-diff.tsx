@@ -696,15 +696,19 @@ function DataDiffReady({ tableName }: DataDiffProps) {
             </div>
 
             {versionOptions.length > 1 ? (
-              <label className="block rounded-2xl border border-white/15 bg-white/45 px-4 py-4 dark:bg-slate-950/35">
-                <span className="mb-3 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <div className="block rounded-2xl border border-white/15 bg-white/45 px-4 py-4 dark:bg-slate-950/35">
+                <label
+                  htmlFor="data-diff-version-timeline"
+                  className="mb-3 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+                >
                   <span className="flex items-center gap-2">
                     <Clock3 className="h-3.5 w-3.5" />
                     Version timeline
                   </span>
                   <span>{versionOptions[timelineIndex]?.label ?? "Snapshot"}</span>
-                </span>
+                </label>
                 <input
+                  id="data-diff-version-timeline"
                   type="range"
                   min={0}
                   max={Math.max(versionOptions.length - 1, 0)}
@@ -722,7 +726,7 @@ function DataDiffReady({ tableName }: DataDiffProps) {
                   <span>{versionOptions[0]?.label ?? "Earliest"}</span>
                   <span>{versionOptions[versionOptions.length - 1]?.label ?? "Latest"}</span>
                 </div>
-              </label>
+              </div>
             ) : null}
 
             <div className="flex flex-wrap gap-2">

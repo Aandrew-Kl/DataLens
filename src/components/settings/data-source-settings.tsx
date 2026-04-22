@@ -237,13 +237,17 @@ export default function DataSourceSettings() {
               </select>
             </label>
 
-            <label className="block">
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+            <div className="block">
+              <span
+                id="data-source-settings-header-row-label"
+                className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+              >
                 Header row
               </span>
               <button
                 type="button"
                 aria-pressed={settings.hasHeaderRow}
+                aria-labelledby="data-source-settings-header-row-label"
                 onClick={() => patchSettings({ hasHeaderRow: !settings.hasHeaderRow })}
                 className={`${BUTTON_CLASS} w-full justify-between`}
               >
@@ -252,7 +256,7 @@ export default function DataSourceSettings() {
                   {settings.hasHeaderRow ? "On" : "Off"}
                 </span>
               </button>
-            </label>
+            </div>
           </div>
 
           <div className="mt-5">

@@ -270,12 +270,16 @@ export default function ReportExportPanel({ tableName, columns }: ReportExportPa
             <div className="mt-4 space-y-3">
               {sections.map((section) => {
                 const active = includedSectionIds.includes(section.id);
+                const inputId = `report-export-section-${section.id}`;
                 return (
                   <label
                     key={section.id}
+                    htmlFor={inputId}
+                    aria-label={section.title}
                     className="flex cursor-pointer items-start gap-3 rounded-3xl border border-white/15 bg-white/60 px-4 py-3 dark:bg-slate-950/25"
                   >
                     <input
+                      id={inputId}
                       type="checkbox"
                       checked={active}
                       onChange={() => toggleSection(section.id)}

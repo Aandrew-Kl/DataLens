@@ -335,10 +335,14 @@ export default function EncodingDetector({
 
         <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
           <div className={`${GLASS_CARD_CLASS} p-5`}>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="encoding-detector-text-column"
+              className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+            >
               Text column
             </label>
             <select
+              id="encoding-detector-text-column"
               aria-label="Encoding column"
               value={activeColumn}
               onChange={(event) => setSelectedColumn(event.target.value)}
