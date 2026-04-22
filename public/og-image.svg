@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="DataLens — Privacy-first AI data analytics">
+  <title>DataLens — Privacy-first AI data analytics</title>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="55%" stop-color="#0891b2"/>
+      <stop offset="100%" stop-color="#0e7490"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="85%" cy="15%" r="55%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.22)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="10%" cy="95%" r="55%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow1)"/>
+  <rect width="1200" height="630" fill="url(#glow2)"/>
+
+  <!-- Monogram tile -->
+  <rect x="84" y="120" width="112" height="112" rx="24" fill="rgba(255,255,255,0.14)" stroke="rgba(255,255,255,0.28)" stroke-width="2"/>
+  <text x="140" y="212" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-weight="800" font-size="80" text-anchor="middle" fill="#ffffff">D</text>
+
+  <!-- Wordmark -->
+  <text x="84" y="360" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-weight="800" font-size="104" fill="#ffffff" letter-spacing="-4">DataLens</text>
+
+  <!-- Tagline -->
+  <text x="84" y="430" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-weight="500" font-size="42" fill="rgba(255,255,255,0.96)">Privacy-first AI data analytics</text>
+
+  <!-- Subline -->
+  <text x="84" y="488" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-weight="400" font-size="28" fill="rgba(255,255,255,0.86)">DuckDB-WASM in-browser · Local Ollama AI · MIT · self-hosted</text>
+
+  <!-- Version chip -->
+  <rect x="84" y="528" width="208" height="48" rx="24" fill="rgba(15,23,42,0.32)" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>
+  <text x="188" y="559" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="600" font-size="20" text-anchor="middle" fill="#ffffff">v0.9.0-beta</text>
+</svg>

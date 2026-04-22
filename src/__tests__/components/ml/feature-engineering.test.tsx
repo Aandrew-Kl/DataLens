@@ -117,13 +117,25 @@ describe("FeatureEngineering", () => {
       await screen.findByRole("button", { name: "Apply feature" }),
     );
 
-    await waitFor(() => {
-      expect(mockRunQuery).toHaveBeenCalledWith(
-        expect.stringContaining('ALTER TABLE "orders" ADD COLUMN IF NOT EXISTS "log_revenue" DOUBLE'),
-      );
-      expect(mockRunQuery).toHaveBeenCalledWith(
-        expect.stringContaining('UPDATE "orders" SET "log_revenue" = CASE WHEN TRY_CAST("revenue" AS DOUBLE) > -1'),
-      );
+    await waitFor(
+      () => {
+        expect(mockRunQuery).toHaveBeenCalledWith(
+          expect.stringContaining('ALTER TABLE "orders" ADD COLUMN IF NOT EXISTS "log_revenue" DOUBLE'),
+        );
+        expect(mockRunQuery).toHaveBeenCalledWith(
+          expect.stringContaining('UPDATE "orders" SET "log_revenue" = CASE WHEN TRY_CAST("revenue" AS DOUBLE) > -1'),
+        );
+      },
+      { timeout: 3000 },
+    );
+    // Also wait for the Apply-triggered status to commit. The apply
+    // handler wraps `setAppliedFeatures + setStatus` in a single
+    // `startTransition`, so the commit can lag behind the awaited
+    // `runQuery` calls. Waiting here ensures we aren't clicking Export
+    // while React is still draining the apply transition queue under
+    // heavy compiled surface (PR#25).
+    await screen.findByText(/Applied log_revenue to orders\./i, undefined, {
+      timeout: 3000,
     });
 
     // Export CSV is gated by `previewRows.length === 0` in the component.
@@ -135,15 +147,20 @@ describe("FeatureEngineering", () => {
     const exportButton = await screen.findByRole("button", {
       name: "Export CSV",
     });
-    await waitFor(() => expect(exportButton).toBeEnabled());
+    await waitFor(() => expect(exportButton).toBeEnabled(), {
+      timeout: 3000,
+    });
     await user.click(exportButton);
 
-    await waitFor(() => {
-      expect(mockDownloadFile).toHaveBeenCalledWith(
-        expect.stringContaining("row_number,primary_value,secondary_value,log_revenue"),
-        "orders-log_revenue-preview.csv",
-        "text/csv;charset=utf-8;",
-      );
-    });
+    await waitFor(
+      () => {
+        expect(mockDownloadFile).toHaveBeenCalledWith(
+          expect.stringContaining("row_number,primary_value,secondary_value,log_revenue"),
+          "orders-log_revenue-preview.csv",
+          "text/csv;charset=utf-8;",
+        );
+      },
+      { timeout: 3000 },
+    );
   });
 });

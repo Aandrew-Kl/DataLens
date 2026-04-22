@@ -73,7 +73,9 @@ describe("DataEnrichTool", () => {
     });
 
     expect(await screen.findByText("26")).toBeInTheDocument();
-    expect(screen.getByText("Previewed 1 enriched rows for ordered_at.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Previewed 1 enriched rows for ordered_at."),
+    ).toBeInTheDocument();
   });
 
   it("switches to email domain enrichment and refreshes the preview", async () => {
@@ -92,7 +94,9 @@ describe("DataEnrichTool", () => {
     });
 
     expect(await screen.findByText("example.com")).toBeInTheDocument();
-    expect(screen.getByText("Previewed 1 enriched rows for email.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Previewed 1 enriched rows for email."),
+    ).toBeInTheDocument();
   });
 
   it("applies the enrichment back into DuckDB", async () => {

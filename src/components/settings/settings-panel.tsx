@@ -571,7 +571,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                     </p>
                     <div className="flex items-center gap-2 pt-1">
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
-                        v0.1.0
+                        v0.9.0-beta.0
                       </span>
                       <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400">
                         MIT License

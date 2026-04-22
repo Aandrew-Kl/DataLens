@@ -92,7 +92,9 @@ describe("DataSummarizer", () => {
     expect(clipboard.writeText).toHaveBeenCalledWith(
       expect.stringContaining("Executive Summary: orders"),
     );
-    expect(screen.getByText("Summary copied to clipboard.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Summary copied to clipboard."),
+    ).toBeInTheDocument();
   });
 
   it("exports the executive summary as Markdown", async () => {
@@ -107,7 +109,9 @@ describe("DataSummarizer", () => {
       "orders-executive-summary.md",
       "text/markdown;charset=utf-8",
     );
-    expect(screen.getByText("Exported executive summary as MD.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Exported executive summary as MD."),
+    ).toBeInTheDocument();
   });
 
   it("exports the executive summary as plain text", async () => {
@@ -122,7 +126,9 @@ describe("DataSummarizer", () => {
       "orders-executive-summary.txt",
       "text/plain;charset=utf-8",
     );
-    expect(screen.getByText("Exported executive summary as TXT.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Exported executive summary as TXT."),
+    ).toBeInTheDocument();
   });
 
   it("opens the column snapshot section on demand", async () => {

@@ -25,7 +25,7 @@ export default function Footer() {
               </p>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
                 <span>MIT License</span>
-                <span>Version 0.1.0</span>
+                <span>Version 0.9.0-beta.0</span>
                 <a
                   href="https://github.com/Aandrew-Kl/DataLens"
                   target="_blank"
