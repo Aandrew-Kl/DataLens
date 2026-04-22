@@ -1,20 +1,31 @@
 from datetime import datetime, timedelta, timezone
 
+import bcrypt
 from jose import jwt
-from passlib.context import CryptContext
 
 from app.config import settings
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# bcrypt has a 72-byte input limit; truncate transparently as passlib did.
+# Using bcrypt directly avoids the passlib dependency (unmaintained since 2020
+# and incompatible with bcrypt>=5 which removed passlib's __about__ probe).
+_BCRYPT_ROUNDS = 12
+
+
+def _truncate(password: str) -> bytes:
+    return password.encode("utf-8")[:72]
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password[:72])
+    return bcrypt.hashpw(_truncate(password), bcrypt.gensalt(rounds=_BCRYPT_ROUNDS)).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain[:72], hashed)
+    try:
+        return bcrypt.checkpw(_truncate(plain), hashed.encode("utf-8"))
+    except ValueError:
+        # Malformed hash — treat as verification failure rather than raising.
+        return False
 
 
 def create_access_token(data: dict) -> str:
