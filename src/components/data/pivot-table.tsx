@@ -16,7 +16,7 @@ import type { ColumnProfile } from "@/types/dataset";
 import { runQuery } from "@/lib/duckdb/client";
 import { formatNumber } from "@/lib/utils/formatters";
 import { downloadFile } from "@/lib/utils/export";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression } from "@/lib/utils/sql";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -321,17 +321,20 @@ export default function PivotTable({ tableName, columns }: PivotTableProps) {
 
   // Dropdown helper
   const Select = ({
+    id,
     value,
     onChange,
     options,
     placeholder,
   }: {
+    id?: string;
     value: string;
     onChange: (v: string) => void;
     options: { value: string; label: string }[];
     placeholder?: string;
   }) => (
     <select
+      id={id}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2.5 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-400/50 dark:focus:ring-indigo-500/50 transition-shadow"
@@ -412,20 +415,28 @@ export default function PivotTable({ tableName, columns }: PivotTableProps) {
       {/* Configuration bar */}
       <div className="mx-6 mb-4 grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-xl border border-gray-200/60 dark:border-gray-700/60 bg-gray-50/60 dark:bg-gray-800/40 p-3">
         <div className="space-y-1">
-          <label className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+          <label
+            htmlFor="pivot-table-rows"
+            className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"
+          >
             <GripVertical className="w-3 h-3" /> Rows
           </label>
           <Select
+            id="pivot-table-rows"
             value={config.rowDim}
             onChange={(v) => setConfig((c) => ({ ...c, rowDim: v }))}
             options={stringCols.map((c) => ({ value: c.name, label: c.name }))}
           />
         </div>
         <div className="space-y-1">
-          <label className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+          <label
+            htmlFor="pivot-table-columns"
+            className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"
+          >
             <GripVertical className="w-3 h-3" /> Columns
           </label>
           <Select
+            id="pivot-table-columns"
             value={config.colDim}
             onChange={(v) => setConfig((c) => ({ ...c, colDim: v }))}
             options={stringOnlyCols.map((c) => ({ value: c.name, label: c.name }))}
@@ -433,20 +444,28 @@ export default function PivotTable({ tableName, columns }: PivotTableProps) {
           />
         </div>
         <div className="space-y-1">
-          <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+          <label
+            htmlFor="pivot-table-value"
+            className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"
+          >
             Value
           </label>
           <Select
+            id="pivot-table-value"
             value={config.valueField}
             onChange={(v) => setConfig((c) => ({ ...c, valueField: v }))}
             options={numericCols.map((c) => ({ value: c.name, label: c.name }))}
           />
         </div>
         <div className="space-y-1">
-          <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+          <label
+            htmlFor="pivot-table-aggregation"
+            className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"
+          >
             Aggregation
           </label>
           <Select
+            id="pivot-table-aggregation"
             value={config.aggFn}
             onChange={(v) => setConfig((c) => ({ ...c, aggFn: v as AggFn }))}
             options={AGG_OPTIONS}

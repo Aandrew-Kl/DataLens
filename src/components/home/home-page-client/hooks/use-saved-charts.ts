@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
 
 import {
   CHART_SAVED_EVENT,
@@ -7,32 +7,105 @@ import {
 } from "@/components/charts/chart-builder";
 import type { DatasetMeta } from "@/types/dataset";
 
-import { readSavedChartsFromStorage } from "../constants";
 import type { AddNotificationFn } from "./use-notifications-adapter";
+
+// Internal event dispatched when this tab mutates localStorage's saved-charts
+// entry. The browser's native "storage" event only fires in *other* tabs, so
+// we dispatch this manually to keep the current tab's useSyncExternalStore in
+// sync.
+const SAVED_CHARTS_LOCAL_MUTATION_EVENT = "datalens:saved-charts-mutated";
+
+// useSyncExternalStore helpers for saved charts backed by localStorage.
+// getSnapshot returns the raw string (stable reference when unchanged) to
+// keep re-render churn low; the component parses+filters inside a useMemo.
+function getSavedChartsSnapshot(): string {
+  if (typeof window === "undefined") {
+    return "";
+  }
+  try {
+    return window.localStorage.getItem(SAVED_CHARTS_STORAGE_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function getSavedChartsServerSnapshot(): string {
+  return "";
+}
+
+function subscribeToSavedCharts(onStoreChange: () => void): () => void {
+  if (typeof window === "undefined") {
+    return () => undefined;
+  }
+  const chartHandler = () => onStoreChange();
+  const storageHandler = (event: StorageEvent) => {
+    if (event.key === null || event.key === SAVED_CHARTS_STORAGE_KEY) {
+      onStoreChange();
+    }
+  };
+  const mutationHandler = () => onStoreChange();
+  window.addEventListener(CHART_SAVED_EVENT, chartHandler as EventListener);
+  window.addEventListener("storage", storageHandler);
+  window.addEventListener(
+    SAVED_CHARTS_LOCAL_MUTATION_EVENT,
+    mutationHandler as EventListener,
+  );
+  return () => {
+    window.removeEventListener(
+      CHART_SAVED_EVENT,
+      chartHandler as EventListener,
+    );
+    window.removeEventListener("storage", storageHandler);
+    window.removeEventListener(
+      SAVED_CHARTS_LOCAL_MUTATION_EVENT,
+      mutationHandler as EventListener,
+    );
+  };
+}
+
+function parseSavedCharts(raw: string): SavedChartSnapshot[] {
+  if (!raw) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed) ? (parsed as SavedChartSnapshot[]) : [];
+  } catch {
+    return [];
+  }
+}
 
 export function useSavedCharts(
   activeDataset: DatasetMeta | undefined,
   tableName: string,
   addNotification: AddNotificationFn,
 ) {
-  const [savedCharts, setSavedCharts] = useState<SavedChartSnapshot[]>([]);
+  // Subscribe to saved-charts in localStorage via useSyncExternalStore,
+  // then derive the filtered list per-tableName during render. This avoids
+  // the old useEffect -> setSavedCharts pattern that tripped
+  // react-you-might-not-need-an-effect/no-chained-state.
+  const savedChartsSnapshot = useSyncExternalStore(
+    subscribeToSavedCharts,
+    getSavedChartsSnapshot,
+    getSavedChartsServerSnapshot,
+  );
+  const savedCharts = useMemo<SavedChartSnapshot[]>(() => {
+    if (!activeDataset) {
+      return [];
+    }
+    return parseSavedCharts(savedChartsSnapshot).filter(
+      (chart) => chart.tableName === tableName,
+    );
+  }, [activeDataset, savedChartsSnapshot, tableName]);
 
+  // Separately: fire the "Chart saved" toast when the CHART_SAVED_EVENT
+  // custom event targets the current table. Pure side-effect (no state).
   useEffect(() => {
     if (!activeDataset) {
-      setSavedCharts([]);
       return;
     }
 
-    const syncSavedCharts = () => {
-      setSavedCharts(
-        readSavedChartsFromStorage().filter(
-          (chart) => chart.tableName === tableName,
-        ),
-      );
-    };
-
     const handleChartSaved = (event: Event) => {
-      syncSavedCharts();
       const detail = (event as CustomEvent<SavedChartSnapshot>).detail;
       if (detail?.tableName === tableName) {
         addNotification({
@@ -44,29 +117,18 @@ export function useSavedCharts(
         });
       }
     };
-
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key === null || event.key === SAVED_CHARTS_STORAGE_KEY) {
-        syncSavedCharts();
-      }
-    };
-
-    syncSavedCharts();
     window.addEventListener(CHART_SAVED_EVENT, handleChartSaved as EventListener);
-    window.addEventListener("storage", handleStorage);
-
     return () => {
       window.removeEventListener(
         CHART_SAVED_EVENT,
         handleChartSaved as EventListener,
       );
-      window.removeEventListener("storage", handleStorage);
     };
   }, [activeDataset, addNotification, tableName]);
 
   const handleSavedChartRemove = useCallback(
     (chartId: string) => {
-      const nextCharts = readSavedChartsFromStorage().filter(
+      const nextCharts = parseSavedCharts(getSavedChartsSnapshot()).filter(
         (entry) => entry.config.id !== chartId,
       );
 
@@ -75,18 +137,20 @@ export function useSavedCharts(
           SAVED_CHARTS_STORAGE_KEY,
           JSON.stringify(nextCharts),
         );
+        // Notify the useSyncExternalStore subscriber in the same tab
+        // (native "storage" events don't fire for the writing tab).
+        window.dispatchEvent(new Event(SAVED_CHARTS_LOCAL_MUTATION_EVENT));
       } catch {
         // localStorage failures are non-critical
       }
 
-      setSavedCharts(nextCharts.filter((entry) => entry.tableName === tableName));
       addNotification({
         type: "info",
         title: "Chart removed",
         message: "The saved chart was removed from the gallery.",
       });
     },
-    [addNotification, tableName],
+    [addNotification],
   );
 
   const handleSavedChartEdit = useCallback(

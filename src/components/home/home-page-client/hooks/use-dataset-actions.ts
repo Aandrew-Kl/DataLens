@@ -17,7 +17,6 @@ interface DatasetActionsInput {
   addNotification: AddNotificationFn;
   activeDataset: DatasetMeta | undefined;
   tableName: string;
-  setProfileData: (columns: ColumnProfile[]) => void;
   setActiveTab: (tab: AppTab) => void;
   setIsLoading: (loading: boolean) => void;
   setLoadError: (error: string | null) => void;
@@ -28,7 +27,6 @@ export function useDatasetActions({
   addNotification,
   activeDataset,
   tableName,
-  setProfileData,
   setActiveTab,
   setIsLoading,
   setLoadError,
@@ -62,7 +60,6 @@ export function useDatasetActions({
         };
 
         addDataset(meta);
-        setProfileData(columns);
         setActiveTab("profile");
         addNotification({
           type: "success",
@@ -116,7 +113,6 @@ export function useDatasetActions({
       setActiveTab,
       setIsLoading,
       setLoadError,
-      setProfileData,
       setShowUploader,
     ],
   );
@@ -133,8 +129,6 @@ export function useDatasetActions({
           profileTable(tableName),
           getTableRowCount(tableName),
         ]);
-
-        setProfileData(columns);
 
         useDatasetStore.setState((state) => ({
           datasets: state.datasets.map((dataset) =>
@@ -169,7 +163,7 @@ export function useDatasetActions({
         });
       }
     },
-    [activeDataset, addNotification, setProfileData, tableName],
+    [activeDataset, addNotification, tableName],
   );
 
   const registerDerivedDataset = useCallback(
@@ -221,7 +215,6 @@ export function useDatasetActions({
           addDataset(nextMeta);
         }
 
-        setProfileData(resolvedColumns);
         setActiveTab(nextTab);
         addNotification({
           type: "success",
@@ -243,7 +236,7 @@ export function useDatasetActions({
         });
       }
     },
-    [addDataset, addNotification, datasets, setActiveTab, setProfileData],
+    [addDataset, addNotification, datasets, setActiveTab],
   );
 
   const handleFormulaSave = useCallback(

@@ -1,6 +1,5 @@
 "use client";
 
-import { quoteIdentifier } from "@/lib/utils/sql";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -19,7 +18,7 @@ import {
 
 import { runQuery } from "@/lib/duckdb/client";
 import { generateReportHTML } from "@/lib/utils/report-export";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression, quoteIdentifier } from "@/lib/utils/sql";
 import type { ChartConfig } from "@/types/chart";
 import type { DatasetMeta, ColumnProfile } from "@/types/dataset";
 import type { ReportConfig, ReportWidget } from "@/types/report";

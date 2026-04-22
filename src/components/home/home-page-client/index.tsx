@@ -57,7 +57,6 @@ export default function HomePageClient() {
     useNotifications();
 
   const [activeTab, setActiveTab] = useState<AppTab>("profile");
-  const [profileData, setProfileData] = useState<ColumnProfile[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -67,6 +66,18 @@ export default function HomePageClient() {
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
   const [showExportWizard, setShowExportWizard] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
+
+  // Derive profileData directly from activeDataset.columns during render
+  // (was previously synced via useEffect -> setProfileData, which triggers
+  // react-you-might-not-need-an-effect/no-chained-state). Refresh flows
+  // update the dataset in the store, which flows into activeDataset.columns
+  // automatically — so no separate profileData state is needed. Memoised to
+  // give a stable reference for downstream hook dependencies when the
+  // columns value hasn't changed.
+  const profileData = useMemo<ColumnProfile[]>(
+    () => activeDataset?.columns ?? [],
+    [activeDataset?.columns],
+  );
 
   useThemeBootstrap(theme);
 
@@ -79,7 +90,6 @@ export default function HomePageClient() {
     addNotification,
     activeDataset,
     tableName,
-    setProfileData,
     setActiveTab,
     setIsLoading,
     setLoadError,
@@ -99,12 +109,6 @@ export default function HomePageClient() {
     },
     [handleFileLoaded],
   );
-
-  useEffect(() => {
-    if (activeDataset) {
-      setProfileData(activeDataset.columns);
-    }
-  }, [activeDataset]);
 
   useEffect(() => {
     if (!activeDataset) {
@@ -175,7 +179,7 @@ export default function HomePageClient() {
       setShowUploader(true);
     } else {
       setActiveDataset(null);
-      setProfileData([]);
+      // profileData derives from activeDataset.columns; no separate reset needed
       setActiveTab("profile");
       setLoadError(null);
     }

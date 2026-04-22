@@ -362,10 +362,14 @@ function ParallelCoordinatesReady({ tableName, columns }: ParallelCoordinatesPro
 
           <div className="space-y-4">
             <div>
-              <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <label
+                htmlFor="parallel-coordinates-color-by"
+                className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
+              >
                 Color by
               </label>
               <select
+                id="parallel-coordinates-color-by"
                 value={effectiveCategory}
                 onChange={(event) => startTransition(() => setCategoryColumn(event.target.value))}
                 className={`${FIELD_CLASS} w-full`}

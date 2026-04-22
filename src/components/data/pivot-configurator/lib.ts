@@ -1,6 +1,5 @@
-import { quoteIdentifier } from "@/lib/utils/sql";
 import { generateId } from "@/lib/utils/formatters";
-import { buildMetricExpression } from "@/lib/utils/sql-safe";
+import { buildMetricExpression, quoteIdentifier } from "@/lib/utils/sql";
 
 import {
   AGG_SQL,
