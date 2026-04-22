@@ -275,6 +275,56 @@ async def request_logging_middleware(request: Request, call_next):
         )
 
 
+# Swagger UI and ReDoc serve HTML pages that load inline bootstrap scripts and
+# styles. Those routes need a relaxed CSP so the docs stay functional, while
+# the default CSP for API responses can stay strict. We key off URL paths
+# rather than content-type so /api/openapi.json (fetched by the doc pages) is
+# covered too.
+_DOC_PATHS: frozenset[str] = frozenset({"/api/docs", "/api/redoc", "/api/openapi.json"})
+
+
+def _is_docs_path(path: str) -> bool:
+    return path in _DOC_PATHS or path.startswith("/api/docs/") or path.startswith("/api/redoc/")
+
+
+def build_csp_header(path: str, environment: str) -> str:
+    """Return the CSP string for a given request path.
+
+    API/JSON responses get the strict policy (no 'unsafe-inline', no
+    'unsafe-eval'). Swagger UI / ReDoc routes get a narrowly scoped relaxed
+    policy that permits the inline scripts/styles FastAPI's bundled docs need.
+    'unsafe-eval' is only allowed in development (e.g. for tooling) and never
+    in production.
+    """
+    is_dev = environment.strip().lower() == "development"
+    if _is_docs_path(path):
+        script_src = "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net"
+        if is_dev:
+            script_src += " 'unsafe-eval'"
+        return (
+            "default-src 'self'; "
+            f"{script_src}; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "img-src 'self' data: blob: https://fastapi.tiangolo.com; "
+            "font-src 'self' data:; "
+            "connect-src 'self'; "
+            "frame-ancestors 'none'"
+        )
+
+    # Strict default for API responses — JSON can't execute scripts, so there
+    # is no legitimate reason to relax script-src on these paths in any
+    # environment (including development).
+    return (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self'; "
+        "img-src 'self' data: blob:; "
+        "font-src 'self' data:; "
+        "connect-src 'self' ws: wss:; "
+        "frame-ancestors 'none'"
+    )
+
+
 @app.middleware("http")
 async def security_headers_middleware(request: Request, call_next):
     response = await call_next(request)
@@ -283,14 +333,8 @@ async def security_headers_middleware(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
-    response.headers["Content-Security-Policy"] = (
-        "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
-        "style-src 'self' 'unsafe-inline'; "
-        "img-src 'self' data: blob:; "
-        "font-src 'self' data:; "
-        "connect-src 'self' ws: wss:; "
-        "frame-ancestors 'none'"
+    response.headers["Content-Security-Policy"] = build_csp_header(
+        request.url.path, settings.ENVIRONMENT
     )
     if should_set_hsts(request):
         response.headers["Strict-Transport-Security"] = HSTS_HEADER_VALUE

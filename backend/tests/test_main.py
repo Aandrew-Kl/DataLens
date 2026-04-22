@@ -5,7 +5,7 @@ import pytest
 from httpx import AsyncClient
 
 from app.config import settings
-from app.main import HSTS_HEADER_VALUE, app
+from app.main import HSTS_HEADER_VALUE, app, build_csp_header
 
 
 @pytest.mark.asyncio
@@ -97,16 +97,53 @@ async def test_security_headers_are_applied(client: AsyncClient) -> None:
     assert response.headers["x-xss-protection"] == "1; mode=block"
     assert response.headers["referrer-policy"] == "strict-origin-when-cross-origin"
     assert response.headers["permissions-policy"] == "camera=(), microphone=(), geolocation=()"
-    assert response.headers["content-security-policy"] == (
-        "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
-        "style-src 'self' 'unsafe-inline'; "
-        "img-src 'self' data: blob:; "
-        "font-src 'self' data:; "
-        "connect-src 'self' ws: wss:; "
-        "frame-ancestors 'none'"
-    )
+    csp = response.headers["content-security-policy"]
+    # API/JSON responses must use the strict CSP: no 'unsafe-inline' and no
+    # 'unsafe-eval' on script-src, which is what shuts down reflected-XSS on
+    # any path that accidentally returns HTML.
+    assert "'unsafe-inline'" not in csp
+    assert "'unsafe-eval'" not in csp
+    assert "script-src 'self'" in csp
+    assert "frame-ancestors 'none'" in csp
     assert "strict-transport-security" not in response.headers
+
+
+def test_build_csp_header_api_response_is_strict() -> None:
+    csp = build_csp_header("/v1/health", environment="production")
+
+    assert "'unsafe-inline'" not in csp
+    assert "'unsafe-eval'" not in csp
+    assert "script-src 'self';" in csp
+    assert "frame-ancestors 'none'" in csp
+
+
+def test_build_csp_header_dev_api_is_still_strict() -> None:
+    # Even in development, API responses must stay strict. There's no valid
+    # reason for JSON endpoints to ever need 'unsafe-inline' or 'unsafe-eval'.
+    csp = build_csp_header("/v1/health", environment="development")
+
+    assert "'unsafe-eval'" not in csp
+    assert "'unsafe-inline'" not in csp
+    assert "script-src 'self';" in csp
+
+
+def test_build_csp_header_docs_path_allows_inline_scripts() -> None:
+    # Swagger UI ships inline bootstrap scripts and styles; API-strict CSP
+    # would blank-page the interactive docs. Scope the relaxation to doc
+    # routes only.
+    csp = build_csp_header("/api/docs", environment="production")
+
+    assert "'unsafe-inline'" in csp
+    # Even on docs, production must not enable 'unsafe-eval'.
+    assert "'unsafe-eval'" not in csp
+    assert "cdn.jsdelivr.net" in csp
+
+
+def test_build_csp_header_docs_dev_adds_unsafe_eval() -> None:
+    csp = build_csp_header("/api/docs", environment="development")
+
+    assert "'unsafe-inline'" in csp
+    assert "'unsafe-eval'" in csp
 
 
 @pytest.mark.asyncio
