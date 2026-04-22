@@ -1,0 +1,61 @@
+1:"$Sreact.fragment"
+2:I[55169,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"TOCProvider"]
+3:I[769,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"Sidebar"]
+4:I[47486,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"ClientWrapper"]
+6:I[63894,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"HeadingAnchor"]
+c:I[83987,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"ToggleWordWrapButton"]
+d:I[97367,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"OutletBoundary"]
+e:"$Sreact.suspense"
+5:T500,---
+title: Charts
+description: Build visualizations, tune axes and colors, and export chart output from DataLens.
+---
+
+# Charts
+
+## 40+ Chart Types
+
+DataLens ships with more than forty chart implementations, including:
+
+- bar, stacked bar, line, stepped line, area, combo, and donut charts
+- bubble, box plot, violin, dot plot, lollipop, and scatter variants
+- treemap, sunburst, funnel, sankey, heatmap, and network views
+- radar, polar, gauge, candlestick, histogram, and 3D scatter charts
+
+## Chart Builder UI
+
+The chart builder lets you:
+
+- pick a chart family
+- map fields to axes and dimensions
+- choose aggregation rules
+- preview the generated result against the active DuckDB query
+
+## Axes, Colors, and Aggregations
+
+Typical configuration points include:
+
+- X and Y axis field mapping
+- grouping or series breakdowns
+- aggregate functions such as `COUNT`, `SUM`, `AVG`, `MIN`, and `MAX`
+- palette and style choices tuned for dark and light themes
+
+## Export
+
+Depending on the chart type, you can export:
+
+- `PNG`
+- `SVG`
+- `CSV`
+
+Some export surfaces also generate share URLs or watermark-ready image output.
+
+## Embed in Dashboards
+
+Once the chart is stable, add it to a dashboard so it can sit beside KPI cards, narrative text, or additional visuals in a saved layout.0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"Why This Design","id":"why-this-design","depth":2},{"value":"High-Level Flow","id":"high-level-flow","depth":2},{"value":"Practical Result","id":"practical-result","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"Architecture Overview","description":"Understand the hybrid DuckDB, Next.js, FastAPI, and PostgreSQL design behind DataLens.","filePath":"content/architecture/overview.mdx","timestamp":1776877494000},"sourceCode":"$5","children":[["$","div",null,{"id":"nextra-skip-nav"}],["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["Architecture Overview","$undefined"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"DataLens uses a hybrid architecture:"}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"DuckDB-WASM in the browser for local query execution and profiling"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Next.js for the interactive frontend shell"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"FastAPI for auth, persistence, analytics, and AI endpoints"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"PostgreSQL for durable backend state"}],"\n"]}],"\n",["$","h2",null,{"id":"why-this-design","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Why This Design",["$","$L6",null,{"id":"why-this-design"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"This split gives DataLens its two main properties:"}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"Fast:"}]," exploratory queries, previews, and many chart workflows happen locally in the browser without a round trip for every SQL statement."]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":[["$","strong",null,{"children":"Private:"}]," the core analytics loop can stay on the user’s machine, while backend services are used only when you need persistence, auth, collaboration-adjacent workflows, or server-side ML and analytics endpoints."]}],"\n"]}],"\n","$L7","\n","$L8","\n","$L9","\n","$La"]}]]}]]}]}],null,"$Lb"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"d5voidjT3pMIfs3hOF7tU"}
+7:["$","h2",null,{"id":"high-level-flow","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["High-Level Flow",["$","$L6",null,{"id":"high-level-flow"}]]}]
+8:["$","div",null,{"data-pagefind-ignore":"all","className":"nextra-code x:relative x:not-first:mt-[1.25em]","children":["$undefined",["$","pre",null,{"className":"x:group x:focus-visible:nextra-focus x:overflow-x-auto x:subpixel-antialiased x:text-[.9em] x:bg-white x:dark:bg-black x:py-4 x:ring-1 x:ring-inset x:ring-gray-300 x:dark:ring-neutral-700 x:contrast-more:ring-gray-900 x:contrast-more:dark:ring-gray-50 x:contrast-more:contrast-150 x:rounded-md not-prose","tabIndex":"0","children":[["$","div",null,{"className":"x:group-hover:opacity-100 x:group-focus:opacity-100 x:opacity-0 x:transition x:focus-within:opacity-100 x:flex x:gap-1 x:absolute x:right-4 x:top-2","children":[["$","$Lc",null,{"children":["$","svg",null,{"viewBox":"0 0 24 24","fill":"currentColor","height":"1em","children":["$","path",null,{"d":"M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3l3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"}]}]}],false]}],["$","code",null,{"className":"nextra-code","dir":"ltr","children":[["$","span",null,{"children":["$","span",null,{"children":"CSV / JSON / Excel"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"        |"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"        v"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"Browser parsers -> DuckDB-WASM -> query results -> charts / dashboards / reports"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"        |                                 |"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"        |                                 v"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"        +------> Next.js frontend <-------+"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"                     |"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"                     v"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"             FastAPI application"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"             |       |        |"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"             |       |        +--> Ollama (optional local AI)"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"             |       |"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"             |       +--> ML / analytics endpoints"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"             |"}]}],"\n",["$","span",null,{"children":["$","span",null,{"children":"             +--> PostgreSQL for users, datasets, history, and metadata"}]}]]}]]}]]}]
+9:["$","h2",null,{"id":"practical-result","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Practical Result",["$","$L6",null,{"id":"practical-result"}]]}]
+a:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"The frontend stays responsive for exploratory work, while the backend remains focused on the jobs that benefit from a durable service boundary."}]
+b:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
+f:null

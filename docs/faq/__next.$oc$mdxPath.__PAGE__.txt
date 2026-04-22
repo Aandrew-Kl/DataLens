@@ -1,0 +1,62 @@
+1:"$Sreact.fragment"
+2:I[55169,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"TOCProvider"]
+3:I[769,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"Sidebar"]
+4:I[47486,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"ClientWrapper"]
+6:I[63894,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"HeadingAnchor"]
+e:I[97367,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"OutletBoundary"]
+f:"$Sreact.suspense"
+5:T500,---
+title: Charts
+description: Build visualizations, tune axes and colors, and export chart output from DataLens.
+---
+
+# Charts
+
+## 40+ Chart Types
+
+DataLens ships with more than forty chart implementations, including:
+
+- bar, stacked bar, line, stepped line, area, combo, and donut charts
+- bubble, box plot, violin, dot plot, lollipop, and scatter variants
+- treemap, sunburst, funnel, sankey, heatmap, and network views
+- radar, polar, gauge, candlestick, histogram, and 3D scatter charts
+
+## Chart Builder UI
+
+The chart builder lets you:
+
+- pick a chart family
+- map fields to axes and dimensions
+- choose aggregation rules
+- preview the generated result against the active DuckDB query
+
+## Axes, Colors, and Aggregations
+
+Typical configuration points include:
+
+- X and Y axis field mapping
+- grouping or series breakdowns
+- aggregate functions such as `COUNT`, `SUM`, `AVG`, `MIN`, and `MAX`
+- palette and style choices tuned for dark and light themes
+
+## Export
+
+Depending on the chart type, you can export:
+
+- `PNG`
+- `SVG`
+- `CSV`
+
+Some export surfaces also generate share URLs or watermark-ready image output.
+
+## Embed in Dashboards
+
+Once the chart is stable, add it to a dashboard so it can sit beside KPI cards, narrative text, or additional visuals in a saved layout.0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"Is my data sent to the cloud?","id":"is-my-data-sent-to-the-cloud","depth":2},{"value":"Do I need OpenAI?","id":"do-i-need-openai","depth":2},{"value":"What file sizes are supported?","id":"what-file-sizes-are-supported","depth":2},{"value":"Which file formats can I upload?","id":"which-file-formats-can-i-upload","depth":2},{"value":"Can I self-host?","id":"can-i-self-host","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"FAQ","description":"Common questions about privacy, AI providers, upload limits, and self-hosting.","filePath":"content/faq.mdx","timestamp":1776877494000},"sourceCode":"$5","children":[["$","div",null,{"id":"nextra-skip-nav"}],["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["FAQ","$undefined"]}],"\n",["$","h2",null,{"id":"is-my-data-sent-to-the-cloud","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Is my data sent to the cloud?",["$","$L6",null,{"id":"is-my-data-sent-to-the-cloud"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"No, not by default. The core analytics loop runs locally with DuckDB-WASM in the browser. If you enable AI features, the intended default is local Ollama rather than a hosted provider."}],"\n",["$","h2",null,{"id":"do-i-need-openai","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Do I need OpenAI?",["$","$L6",null,{"id":"do-i-need-openai"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"No. OpenAI is optional. DataLens is designed to work without a hosted LLM and can use Ollama locally for natural-language workflows."}],"\n",["$","h2",null,{"id":"what-file-sizes-are-supported","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["What file sizes are supported?","$L7"]}],"\n","$L8","\n","$L9","\n","$La","\n","$Lb","\n","$Lc"]}]]}]]}]}],null,"$Ld"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"d5voidjT3pMIfs3hOF7tU"}
+7:["$","$L6",null,{"id":"what-file-sizes-are-supported"}]
+8:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["The backend defaults to ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"50 MiB"}],", which is about ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"52 MB"}]," in decimal terms. You can change the limit with ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"MAX_UPLOAD_SIZE"}]," if your deployment needs larger uploads."]}]
+9:["$","h2",null,{"id":"which-file-formats-can-i-upload","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Which file formats can I upload?",["$","$L6",null,{"id":"which-file-formats-can-i-upload"}]]}]
+a:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"The frontend workspace is built around CSV, JSON, and Excel ingestion for local analysis."}]
+b:["$","h2",null,{"id":"can-i-self-host","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Can I self-host?",["$","$L6",null,{"id":"can-i-self-host"}]]}]
+c:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Yes. The repository includes Docker assets and a compose-based local stack for the frontend, backend, and PostgreSQL."}]
+d:["$","$Le",null,{"children":["$","$f",null,{"name":"Next.MetadataOutlet","children":"$@10"}]}]
+10:null

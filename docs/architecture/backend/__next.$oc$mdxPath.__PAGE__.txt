@@ -1,0 +1,67 @@
+1:"$Sreact.fragment"
+2:I[55169,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"TOCProvider"]
+3:I[769,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"Sidebar"]
+4:I[47486,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"ClientWrapper"]
+6:I[63894,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"HeadingAnchor"]
+13:I[97367,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"OutletBoundary"]
+14:"$Sreact.suspense"
+5:T500,---
+title: Charts
+description: Build visualizations, tune axes and colors, and export chart output from DataLens.
+---
+
+# Charts
+
+## 40+ Chart Types
+
+DataLens ships with more than forty chart implementations, including:
+
+- bar, stacked bar, line, stepped line, area, combo, and donut charts
+- bubble, box plot, violin, dot plot, lollipop, and scatter variants
+- treemap, sunburst, funnel, sankey, heatmap, and network views
+- radar, polar, gauge, candlestick, histogram, and 3D scatter charts
+
+## Chart Builder UI
+
+The chart builder lets you:
+
+- pick a chart family
+- map fields to axes and dimensions
+- choose aggregation rules
+- preview the generated result against the active DuckDB query
+
+## Axes, Colors, and Aggregations
+
+Typical configuration points include:
+
+- X and Y axis field mapping
+- grouping or series breakdowns
+- aggregate functions such as `COUNT`, `SUM`, `AVG`, `MIN`, and `MAX`
+- palette and style choices tuned for dark and light themes
+
+## Export
+
+Depending on the chart type, you can export:
+
+- `PNG`
+- `SVG`
+- `CSV`
+
+Some export surfaces also generate share URLs or watermark-ready image output.
+
+## Embed in Dashboards
+
+Once the chart is stable, add it to a dashboard so it can sit beside KPI cards, narrative text, or additional visuals in a saved layout.0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"Core Responsibilities","id":"core-responsibilities","depth":2},{"value":"Key Route Groups","id":"key-route-groups","depth":2},{"value":"Persistence and Runtime","id":"persistence-and-runtime","depth":2},{"value":"Rate limits","id":"rate-limits","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"Backend","description":"Review the FastAPI service, persistence layer, and server-side analytics responsibilities.","filePath":"content/architecture/backend.mdx","timestamp":1776877494000},"sourceCode":"$5","children":[["$","div",null,{"id":"nextra-skip-nav"}],["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["Backend","$undefined"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"The backend is a FastAPI application backed by PostgreSQL and Alembic migrations."}],"\n",["$","h2",null,{"id":"core-responsibilities","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Core Responsibilities",["$","$L6",null,{"id":"core-responsibilities"}]]}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"user registration, login, and bearer-token validation"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"dataset metadata persistence"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"machine learning and analytics endpoints"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"AI endpoints that broker local Ollama access"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"operational middleware for security headers, rate limiting, request IDs, and metrics"}],"\n"]}],"\n",["$","h2",null,{"id":"key-route-groups","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Key Route Groups",["$","$L6",null,{"id":"key-route-groups"}]]}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n","$L7","\n","$L8","\n","$L9","\n","$La","\n","$Lb","\n"]}],"\n","$Lc","\n","$Ld","\n","$Le","\n","$Lf","\n","$L10"]}]]}]]}]}],null,"$L11"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"d5voidjT3pMIfs3hOF7tU"}
+7:["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"/auth"}]}]
+8:["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"/datasets"}]}]
+9:["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"/ai"}]}]
+a:["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"/ml"}]}]
+b:["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"/analytics"}]}]
+c:["$","h2",null,{"id":"persistence-and-runtime","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Persistence and Runtime",["$","$L6",null,{"id":"persistence-and-runtime"}]]}]
+d:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"PostgreSQL stores users, datasets, and other durable backend records."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"SQLAlchemy manages async database access."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Alembic applies schema migrations."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"FastAPI auto-generates OpenAPI docs for the service."}],"\n"]}]
+e:["$","h2",null,{"id":"rate-limits","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Rate limits",["$","$L6",null,{"id":"rate-limits"}]]}]
+f:["$","table",null,{"className":"x:block x:overflow-x-auto nextra-scrollbar x:not-first:mt-[1.25em] x:p-0","children":[["$","thead",null,{"children":["$","tr",null,{"children":[["$","th",null,{"children":"Endpoint","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:font-semibold x:dark:border-gray-600"}],["$","th",null,{"children":"Limit","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:font-semibold x:dark:border-gray-600"}],["$","th",null,{"children":"Key","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:font-semibold x:dark:border-gray-600"}]],"className":"x:m-0 x:border-t x:border-gray-300 x:p-0 x:dark:border-gray-600 x:even:bg-gray-100 x:even:dark:bg-gray-600/20"}]}],["$","tbody",null,{"children":[["$","tr",null,{"children":[["$","td",null,{"children":"POST /auth/login","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"5/min","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"IP","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}]],"className":"x:m-0 x:border-t x:border-gray-300 x:p-0 x:dark:border-gray-600 x:even:bg-gray-100 x:even:dark:bg-gray-600/20"}],["$","tr",null,{"children":[["$","td",null,{"children":"POST /auth/register","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"3/min","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"IP","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}]],"className":"x:m-0 x:border-t x:border-gray-300 x:p-0 x:dark:border-gray-600 x:even:bg-gray-100 x:even:dark:bg-gray-600/20"}],["$","tr",null,{"children":[["$","td",null,{"children":"POST /ai/*","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"20/min","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"User","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}]],"className":"x:m-0 x:border-t x:border-gray-300 x:p-0 x:dark:border-gray-600 x:even:bg-gray-100 x:even:dark:bg-gray-600/20"}],["$","tr",null,{"children":[["$","td",null,{"children":"POST /ml/train","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"5/min","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"User","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}]],"className":"x:m-0 x:border-t x:border-gray-300 x:p-0 x:dark:border-gray-600 x:even:bg-gray-100 x:even:dark:bg-gray-600/20"}],["$","tr",null,{"children":[["$","td",null,{"children":"POST /ml/*","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"10/min","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"User","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}]],"className":"x:m-0 x:border-t x:border-gray-300 x:p-0 x:dark:border-gray-600 x:even:bg-gray-100 x:even:dark:bg-gray-600/20"}],["$","tr",null,{"children":[["$","td",null,{"children":"GET /*","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"60/min","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"User or IP","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}]],"className":"x:m-0 x:border-t x:border-gray-300 x:p-0 x:dark:border-gray-600 x:even:bg-gray-100 x:even:dark:bg-gray-600/20"}],"$L12"]}]]}]
+10:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":["When the API returns ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"429 Too Many Requests"}],", clients should back off and honor the ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"Retry-After"}]," response header before retrying."]}]
+11:["$","$L13",null,{"children":["$","$14",null,{"name":"Next.MetadataOutlet","children":"$@15"}]}]
+12:["$","tr",null,{"children":[["$","td",null,{"children":"/health, /metrics","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"—","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}],["$","td",null,{"children":"exempt","className":"x:m-0 x:border x:border-gray-300 x:px-4 x:py-2 x:dark:border-gray-600"}]],"className":"x:m-0 x:border-t x:border-gray-300 x:p-0 x:dark:border-gray-600 x:even:bg-gray-100 x:even:dark:bg-gray-600/20"}]
+15:null

@@ -1,0 +1,69 @@
+1:"$Sreact.fragment"
+2:I[55169,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"TOCProvider"]
+3:I[769,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"Sidebar"]
+4:I[47486,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"ClientWrapper"]
+6:I[63894,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"HeadingAnchor"]
+15:I[97367,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"OutletBoundary"]
+16:"$Sreact.suspense"
+5:T500,---
+title: Charts
+description: Build visualizations, tune axes and colors, and export chart output from DataLens.
+---
+
+# Charts
+
+## 40+ Chart Types
+
+DataLens ships with more than forty chart implementations, including:
+
+- bar, stacked bar, line, stepped line, area, combo, and donut charts
+- bubble, box plot, violin, dot plot, lollipop, and scatter variants
+- treemap, sunburst, funnel, sankey, heatmap, and network views
+- radar, polar, gauge, candlestick, histogram, and 3D scatter charts
+
+## Chart Builder UI
+
+The chart builder lets you:
+
+- pick a chart family
+- map fields to axes and dimensions
+- choose aggregation rules
+- preview the generated result against the active DuckDB query
+
+## Axes, Colors, and Aggregations
+
+Typical configuration points include:
+
+- X and Y axis field mapping
+- grouping or series breakdowns
+- aggregate functions such as `COUNT`, `SUM`, `AVG`, `MIN`, and `MAX`
+- palette and style choices tuned for dark and light themes
+
+## Export
+
+Depending on the chart type, you can export:
+
+- `PNG`
+- `SVG`
+- `CSV`
+
+Some export surfaces also generate share URLs or watermark-ready image output.
+
+## Embed in Dashboards
+
+Once the chart is stable, add it to a dashboard so it can sit beside KPI cards, narrative text, or additional visuals in a saved layout.0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"40+ Chart Types","id":"40-chart-types","depth":2},{"value":"Chart Builder UI","id":"chart-builder-ui","depth":2},{"value":"Axes, Colors, and Aggregations","id":"axes-colors-and-aggregations","depth":2},{"value":"Export","id":"export","depth":2},{"value":"Embed in Dashboards","id":"embed-in-dashboards","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"Charts","description":"Build visualizations, tune axes and colors, and export chart output from DataLens.","filePath":"content/guides/charts.mdx","timestamp":1776877494000},"sourceCode":"$5","children":[["$","div",null,{"id":"nextra-skip-nav"}],["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["Charts","$undefined"]}],"\n",["$","h2",null,{"id":"40-chart-types","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["40+ Chart Types",["$","$L6",null,{"id":"40-chart-types"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"DataLens ships with more than forty chart implementations, including:"}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"bar, stacked bar, line, stepped line, area, combo, and donut charts"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"bubble, box plot, violin, dot plot, lollipop, and scatter variants"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"treemap, sunburst, funnel, sankey, heatmap, and network views"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"radar, polar, gauge, candlestick, histogram, and 3D scatter charts"}],"\n"]}],"\n",["$","h2",null,{"id":"chart-builder-ui","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Chart Builder UI",["$","$L6",null,{"id":"chart-builder-ui"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"The chart builder lets you:"}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n","$L7","\n","$L8","\n","$L9","\n","$La","\n"]}],"\n","$Lb","\n","$Lc","\n","$Ld","\n","$Le","\n","$Lf","\n","$L10","\n","$L11","\n","$L12","\n","$L13"]}]]}]]}]}],null,"$L14"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"d5voidjT3pMIfs3hOF7tU"}
+7:["$","li",null,{"className":"x:my-[.5em]","children":"pick a chart family"}]
+8:["$","li",null,{"className":"x:my-[.5em]","children":"map fields to axes and dimensions"}]
+9:["$","li",null,{"className":"x:my-[.5em]","children":"choose aggregation rules"}]
+a:["$","li",null,{"className":"x:my-[.5em]","children":"preview the generated result against the active DuckDB query"}]
+b:["$","h2",null,{"id":"axes-colors-and-aggregations","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Axes, Colors, and Aggregations",["$","$L6",null,{"id":"axes-colors-and-aggregations"}]]}]
+c:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Typical configuration points include:"}]
+d:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"X and Y axis field mapping"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"grouping or series breakdowns"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["aggregate functions such as ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"COUNT"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"SUM"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"AVG"}],", ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"MIN"}],", and ",["$","code",null,{"className":"nextra-code","dir":"ltr","children":"MAX"}]]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"palette and style choices tuned for dark and light themes"}],"\n"]}]
+e:["$","h2",null,{"id":"export","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Export",["$","$L6",null,{"id":"export"}]]}]
+f:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Depending on the chart type, you can export:"}]
+10:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"PNG"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"SVG"}]}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":["$","code",null,{"className":"nextra-code","dir":"ltr","children":"CSV"}]}],"\n"]}]
+11:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Some export surfaces also generate share URLs or watermark-ready image output."}]
+12:["$","h2",null,{"id":"embed-in-dashboards","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Embed in Dashboards",["$","$L6",null,{"id":"embed-in-dashboards"}]]}]
+13:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Once the chart is stable, add it to a dashboard so it can sit beside KPI cards, narrative text, or additional visuals in a saved layout."}]
+14:["$","$L15",null,{"children":["$","$16",null,{"name":"Next.MetadataOutlet","children":"$@17"}]}]
+17:null

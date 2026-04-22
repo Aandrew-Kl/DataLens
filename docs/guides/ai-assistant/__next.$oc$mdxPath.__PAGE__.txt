@@ -1,0 +1,61 @@
+1:"$Sreact.fragment"
+2:I[55169,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"TOCProvider"]
+3:I[769,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"Sidebar"]
+4:I[47486,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"ClientWrapper"]
+6:I[63894,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"HeadingAnchor"]
+d:I[97367,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"OutletBoundary"]
+e:"$Sreact.suspense"
+5:T500,---
+title: Charts
+description: Build visualizations, tune axes and colors, and export chart output from DataLens.
+---
+
+# Charts
+
+## 40+ Chart Types
+
+DataLens ships with more than forty chart implementations, including:
+
+- bar, stacked bar, line, stepped line, area, combo, and donut charts
+- bubble, box plot, violin, dot plot, lollipop, and scatter variants
+- treemap, sunburst, funnel, sankey, heatmap, and network views
+- radar, polar, gauge, candlestick, histogram, and 3D scatter charts
+
+## Chart Builder UI
+
+The chart builder lets you:
+
+- pick a chart family
+- map fields to axes and dimensions
+- choose aggregation rules
+- preview the generated result against the active DuckDB query
+
+## Axes, Colors, and Aggregations
+
+Typical configuration points include:
+
+- X and Y axis field mapping
+- grouping or series breakdowns
+- aggregate functions such as `COUNT`, `SUM`, `AVG`, `MIN`, and `MAX`
+- palette and style choices tuned for dark and light themes
+
+## Export
+
+Depending on the chart type, you can export:
+
+- `PNG`
+- `SVG`
+- `CSV`
+
+Some export surfaces also generate share URLs or watermark-ready image output.
+
+## Embed in Dashboards
+
+Once the chart is stable, add it to a dashboard so it can sit beside KPI cards, narrative text, or additional visuals in a saved layout.0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"Natural-Language Queries","id":"natural-language-queries","depth":2},{"value":"Suggested Questions","id":"suggested-questions","depth":2},{"value":"SQL Explanation","id":"sql-explanation","depth":2},{"value":"Auto-Dashboard Generation","id":"auto-dashboard-generation","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"AI Assistant","description":"Use natural-language prompts, SQL explanation, and dashboard suggestions inside DataLens.","filePath":"content/guides/ai-assistant.mdx","timestamp":1776877494000},"sourceCode":"$5","children":[["$","div",null,{"id":"nextra-skip-nav"}],["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["AI Assistant","$undefined"]}],"\n",["$","h2",null,{"id":"natural-language-queries","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Natural-Language Queries",["$","$L6",null,{"id":"natural-language-queries"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Ask questions in plain English such as:"}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"“Show revenue by region”"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"“Which customers have the highest churn risk?”"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"“Summarize sentiment by support channel”"}],"\n"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"DataLens sends the prompt plus schema context to its AI routes and returns generated SQL with an explanation."}],"\n",["$","h2",null,{"id":"suggested-questions","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Suggested Questions",["$","$L6",null,{"id":"suggested-questions"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"The assistant can surface question suggestions based on the current dataset so new users have a fast starting point instead of writing prompts from scratch."}],"\n","$L7","\n","$L8","\n","$L9","\n","$La","\n","$Lb"]}]]}]]}]}],null,"$Lc"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"d5voidjT3pMIfs3hOF7tU"}
+7:["$","h2",null,{"id":"sql-explanation","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["SQL Explanation",["$","$L6",null,{"id":"sql-explanation"}]]}]
+8:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"When a query already exists, the explain flow breaks it into:"}]
+9:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"what the query is doing"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"which tables and columns matter"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"how filters, joins, or aggregates shape the result"}],"\n"]}]
+a:["$","h2",null,{"id":"auto-dashboard-generation","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Auto-Dashboard Generation",["$","$L6",null,{"id":"auto-dashboard-generation"}]]}]
+b:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"The AI suggestion routes can generate dashboard-style recommendations from schema shape, row counts, and query intent. When Ollama is not available, DataLens falls back to deterministic dashboard suggestions where possible."}]
+c:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
+f:null

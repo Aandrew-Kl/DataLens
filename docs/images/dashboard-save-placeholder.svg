@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" fill="none">
+  <rect width="1280" height="720" rx="32" fill="#020617"/>
+  <rect x="48" y="48" width="1184" height="624" rx="28" fill="#0F172A" stroke="#334155" stroke-width="2"/>
+  <rect x="88" y="112" width="1104" height="88" rx="18" fill="#111827"/>
+  <text x="128" y="166" fill="#E2E8F0" font-family="Arial, sans-serif" font-size="32" font-weight="700">Executive revenue dashboard</text>
+  <rect x="1028" y="128" width="124" height="52" rx="14" fill="#10B981"/>
+  <text x="1090" y="162" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="24" font-weight="700" text-anchor="middle">Save</text>
+  <rect x="88" y="232" width="332" height="172" rx="22" fill="#111827"/>
+  <rect x="448" y="232" width="332" height="172" rx="22" fill="#111827"/>
+  <rect x="808" y="232" width="384" height="392" rx="22" fill="#111827"/>
+  <rect x="88" y="432" width="692" height="192" rx="22" fill="#111827"/>
+  <text x="136" y="292" fill="#94A3B8" font-family="Arial, sans-serif" font-size="22">KPI card</text>
+  <text x="496" y="292" fill="#94A3B8" font-family="Arial, sans-serif" font-size="22">Trend chart</text>
+  <text x="856" y="292" fill="#94A3B8" font-family="Arial, sans-serif" font-size="22">Breakdown panel</text>
+  <text x="136" y="492" fill="#94A3B8" font-family="Arial, sans-serif" font-size="22">Supporting table or detail view</text>
+  <text x="640" y="652" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">Saved dashboard placeholder screenshot</text>
+</svg>
