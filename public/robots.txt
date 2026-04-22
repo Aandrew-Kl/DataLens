@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /login
-Disallow: /register
-Sitemap: https://datalens.dev/sitemap.xml
