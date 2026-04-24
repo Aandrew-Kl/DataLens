@@ -32,7 +32,7 @@
     "exceljs": "^4.4.0",
     "framer-motion": "^12.38.0",
     "jose": "^6.2.2",
-    "lucide-react": "^1.7.0",
+    "lucide-react": "^1.9.0",
     "next": "16.2.3",
     "papaparse": "^5.5.3",
     "posthog-js": "1.261.8",
