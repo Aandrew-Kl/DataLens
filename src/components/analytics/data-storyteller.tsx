@@ -732,7 +732,7 @@ function DataStorytellerReady({
 
                     {isOpen ? (
                       <div className="grid gap-4 border-t border-white/10 px-5 py-5 xl:grid-cols-[1.4fr_0.8fr]">
-                        <div className="rounded-2xl border border-white/10 bg-white/45 p-4 dark:bg-slate-950/30">
+                        <div className="rounded-2xl border border-white/10 bg-white p-4 dark:bg-slate-950/30">
                           <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                             <Sparkles className="h-4 w-4" />
                             Markdown finding
@@ -741,7 +741,7 @@ function DataStorytellerReady({
                             {finding.markdown}
                           </pre>
                         </div>
-                        <div className="rounded-2xl border border-white/10 bg-white/45 p-4 dark:bg-slate-950/30">
+                        <div className="rounded-2xl border border-white/10 bg-white p-4 dark:bg-slate-950/30">
                           <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                             <TrendingUp className="h-4 w-4" />
                             Mini chart

@@ -354,7 +354,7 @@ export default function PivotTable({ tableName, columns }: PivotTableProps) {
       <motion.section
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-gray-200/50 dark:border-gray-700/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl p-6 shadow-xl shadow-slate-900/5"
+        className="rounded-2xl border border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-900 p-6 shadow-xl shadow-slate-900/5"
       >
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
@@ -378,7 +378,7 @@ export default function PivotTable({ tableName, columns }: PivotTableProps) {
     <motion.section
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-gray-200/50 dark:border-gray-700/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-xl shadow-slate-900/5"
+      className="rounded-2xl border border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-900 shadow-xl shadow-slate-900/5"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-6 pt-5 pb-3">
@@ -413,7 +413,7 @@ export default function PivotTable({ tableName, columns }: PivotTableProps) {
       </div>
 
       {/* Configuration bar */}
-      <div className="mx-6 mb-4 grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-xl border border-gray-200/60 dark:border-gray-700/60 bg-gray-50/60 dark:bg-gray-800/40 p-3">
+      <div className="mx-6 mb-4 grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-xl border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 p-3">
         <div className="space-y-1">
           <label
             htmlFor="pivot-table-rows"
@@ -474,7 +474,7 @@ export default function PivotTable({ tableName, columns }: PivotTableProps) {
       </div>
 
       {/* Content area */}
-      <div className="mx-6 mb-6 overflow-hidden rounded-xl border border-gray-200/60 dark:border-gray-700/60 bg-white/55 dark:bg-gray-950/35">
+      <div className="mx-6 mb-6 overflow-hidden rounded-xl border border-gray-200/60 dark:border-gray-700/60 bg-white dark:bg-gray-950/35">
         {loading ? (
           <div className="grid min-h-[240px] place-items-center">
             <motion.div
@@ -496,10 +496,10 @@ export default function PivotTable({ tableName, columns }: PivotTableProps) {
           <div className="overflow-auto max-h-[520px]">
             <table className="w-full border-collapse text-xs">
               <thead className="sticky top-0 z-10">
-                <tr className="bg-gray-50/95 dark:bg-gray-800/95 backdrop-blur-sm">
+                <tr className="bg-gray-50 dark:bg-gray-800 ">
                   {/* Row dimension header */}
                   <th
-                    className="group/th cursor-pointer select-none border-b border-r border-gray-200/60 dark:border-gray-700/60 px-3 py-2.5 text-left text-[11px] font-semibold text-gray-600 dark:text-gray-300 sticky left-0 bg-gray-50/95 dark:bg-gray-800/95 backdrop-blur-sm z-20"
+                    className="group/th cursor-pointer select-none border-b border-r border-gray-200/60 dark:border-gray-700/60 px-3 py-2.5 text-left text-[11px] font-semibold text-gray-600 dark:text-gray-300 sticky left-0 bg-gray-50 dark:bg-gray-800 z-20"
                     onClick={() => handleSort("__row_label__")}
                   >
                     <div className="flex items-center gap-1">
@@ -553,7 +553,7 @@ export default function PivotTable({ tableName, columns }: PivotTableProps) {
                       className={`
                         border-b border-gray-100 dark:border-gray-800/50 transition-colors
                         hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10
-                        ${idx % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50/40 dark:bg-gray-800/20"}
+                        ${idx % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-800/20"}
                       `}
                     >
                       {/* Row label */}
@@ -594,8 +594,8 @@ export default function PivotTable({ tableName, columns }: PivotTableProps) {
 
               {/* Totals row */}
               <tfoot className="sticky bottom-0 z-10">
-                <tr className="bg-gray-50/95 dark:bg-gray-800/95 backdrop-blur-sm border-t-2 border-gray-300/60 dark:border-gray-600/60">
-                  <td className="border-r border-gray-200/60 dark:border-gray-700/60 px-3 py-2.5 font-bold text-[11px] uppercase tracking-wider text-gray-600 dark:text-gray-300 sticky left-0 bg-gray-50/95 dark:bg-gray-800/95 backdrop-blur-sm z-20">
+                <tr className="bg-gray-50 dark:bg-gray-800 border-t-2 border-gray-300/60 dark:border-gray-600/60">
+                  <td className="border-r border-gray-200/60 dark:border-gray-700/60 px-3 py-2.5 font-bold text-[11px] uppercase tracking-wider text-gray-600 dark:text-gray-300 sticky left-0 bg-gray-50 dark:bg-gray-800 z-20">
                     Total
                   </td>
                   {displayColKeys.map((ck) => (
@@ -627,7 +627,7 @@ export default function PivotTable({ tableName, columns }: PivotTableProps) {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex items-center justify-between mx-6 mb-5 px-4 py-2.5 rounded-xl border border-gray-200/60 dark:border-gray-700/60 bg-gray-50/60 dark:bg-gray-800/40 text-[11px] text-gray-500 dark:text-gray-400"
+          className="flex items-center justify-between mx-6 mb-5 px-4 py-2.5 rounded-xl border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 text-[11px] text-gray-500 dark:text-gray-400"
         >
           <span>
             {result.rowKeys.length} rows

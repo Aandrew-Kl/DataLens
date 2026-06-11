@@ -334,7 +334,7 @@ export default function DataStandardizer({
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/40 dark:text-slate-300">
+      <div className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
         {status}
       </div>
 
@@ -355,7 +355,7 @@ export default function DataStandardizer({
                     className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm transition ${
                       active
                         ? "border-cyan-400 bg-cyan-500/15 text-cyan-700 dark:text-cyan-300"
-                        : "border-white/20 bg-white/70 text-slate-700 dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-200"
+                        : "border-white/20 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200"
                     }`}
                   >
                     {active ? <Check className="h-4 w-4" /> : null}
@@ -451,7 +451,7 @@ export default function DataStandardizer({
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
-                  <thead className="bg-white/50 dark:bg-slate-950/20">
+                  <thead className="bg-white dark:bg-slate-950/20">
                     <tr className="text-slate-500 dark:text-slate-400">
                       <th className="px-5 py-3 font-medium">Column</th>
                       <th className="px-5 py-3 font-medium">Original</th>

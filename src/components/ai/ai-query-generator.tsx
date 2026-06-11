@@ -311,7 +311,7 @@ export default function AIQueryGenerator({
                     setGeneratedSql(item.sql);
                     setStatus("Loaded a query from history.");
                   }}
-                  className="block w-full rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-left transition hover:border-cyan-400/30 hover:bg-white dark:bg-slate-950/55 dark:hover:bg-slate-900/80"
+                  className="block w-full rounded-2xl border border-white/20 bg-white px-4 py-3 text-left transition hover:border-cyan-400/30 hover:bg-white dark:bg-slate-950 dark:hover:bg-slate-900"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -332,7 +332,7 @@ export default function AIQueryGenerator({
                 </button>
               ))
             ) : (
-              <p className="rounded-2xl border border-white/20 bg-white/70 px-4 py-4 text-sm text-slate-600 dark:bg-slate-950/55 dark:text-slate-300">
+              <p className="rounded-2xl border border-white/20 bg-white px-4 py-4 text-sm text-slate-600 dark:bg-slate-950 dark:text-slate-300">
                 No generated queries yet.
               </p>
             )}

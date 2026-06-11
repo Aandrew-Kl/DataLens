@@ -52,7 +52,7 @@ interface ResizeState {
 }
 
 const GLASS_PANEL =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-slate-950 border border-white/20";
 const DEFAULT_HEIGHT = 460;
 const DEFAULT_ROW_HEIGHT = 44;
 const DEFAULT_OVERSCAN = 8;
@@ -356,7 +356,7 @@ export default function DataGrid({
     .join(" ");
 
   return (
-    <section className={`overflow-hidden rounded-[2rem] ${GLASS_PANEL}`}>
+    <section className={`overflow-hidden rounded-lg ${GLASS_PANEL}`}>
       <div className="border-b border-white/15 px-5 py-4">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -368,7 +368,7 @@ export default function DataGrid({
               selection.
             </p>
           </div>
-          <div className="rounded-full bg-white/70 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-900/60 dark:text-slate-300">
+          <div className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-900 dark:text-slate-300">
             {sortedRows.length.toLocaleString()} rows
           </div>
         </div>
@@ -385,7 +385,7 @@ export default function DataGrid({
         onKeyDown={handleGridKeyDown}
       >
         <div
-          className="sticky top-0 z-10 border-b border-white/15 bg-white/90 backdrop-blur-2xl dark:bg-slate-950/85"
+          className="sticky top-0 z-10 border-b border-white/15 bg-white dark:bg-slate-950"
           style={{ minWidth: gridTemplateColumns }}
         >
           <div
@@ -440,7 +440,7 @@ export default function DataGrid({
                   onChange={(event) => updateFilter(column.key, event.target.value)}
                   placeholder="Filter…"
                   aria-label={`Filter ${column.label}`}
-                  className="w-full rounded-xl border border-white/15 bg-white/70 px-3 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-sky-400 dark:bg-slate-900/60 dark:text-slate-50"
+                  className="w-full rounded-xl border border-white/15 bg-white px-3 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-sky-400 dark:bg-slate-900 dark:text-slate-50"
                 />
               </label>
             ))}

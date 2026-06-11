@@ -33,7 +33,7 @@ export default function NotFoundPage() {
       <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.14),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.1),transparent_28%)] dark:bg-[radial-gradient(circle_at_top,rgba(129,140,248,0.18),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.12),transparent_30%)]" />
 
       <div className="absolute left-4 top-4 sm:left-6 sm:top-6">
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/75 px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm shadow-slate-200/40 backdrop-blur-sm dark:border-slate-800/80 dark:bg-slate-950/70 dark:text-slate-300 dark:shadow-black/10">
+        <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm shadow-slate-200/40 dark:border-slate-800/80 dark:bg-slate-950 dark:text-slate-300 dark:shadow-black/10">
           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-500">
             <Database className="h-3.5 w-3.5 text-white" />
           </div>
@@ -44,7 +44,7 @@ export default function NotFoundPage() {
       <div className="w-full max-w-5xl">
         <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="order-2 text-center lg:order-1 lg:text-left">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-slate-500 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-400">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
               <span>404</span>
               <span className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-600" />
               <span>Route Missing</span>
@@ -92,7 +92,7 @@ export default function NotFoundPage() {
               />
 
               <motion.div
-                className="absolute inset-6 rounded-[2rem] border border-slate-200/80 bg-white/70 p-6 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.55)] backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/75"
+                className="absolute inset-6 rounded-lg border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-950"
                 animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
                 transition={
                   reduceMotion
@@ -100,11 +100,11 @@ export default function NotFoundPage() {
                     : { duration: 5.5, repeat: Infinity, ease: "easeInOut" }
                 }
               >
-                <div className="absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.14),transparent_55%)] dark:bg-[radial-gradient(circle_at_top,rgba(129,140,248,0.18),transparent_55%)]" />
+                <div className="absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.14),transparent_55%)] dark:bg-[radial-gradient(circle_at_top,rgba(129,140,248,0.18),transparent_55%)]" />
 
                 <div className="relative flex h-full flex-col items-center justify-center">
                   <motion.div
-                    className="mb-5 flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-500 shadow-lg shadow-indigo-500/25"
+                    className="mb-5 flex h-20 w-20 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-500 shadow-lg shadow-indigo-500/25"
                     animate={reduceMotion ? undefined : { rotate: [0, -6, 6, 0] }}
                     transition={
                       reduceMotion
@@ -122,7 +122,7 @@ export default function NotFoundPage() {
                   <div className="w-full max-w-[12rem] space-y-2">
                     <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-700" />
                     <div className="h-2 w-4/5 rounded-full bg-slate-200 dark:bg-slate-700" />
-                    <div className="h-2 w-3/5 rounded-full bg-slate-200/80 dark:bg-slate-700/80" />
+                    <div className="h-2 w-3/5 rounded-full bg-slate-200 dark:bg-slate-700/80" />
                   </div>
 
                   <p className="mt-5 text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -137,7 +137,7 @@ export default function NotFoundPage() {
                 return (
                   <motion.div
                     key={item.className}
-                    className={`absolute flex h-14 w-14 items-center justify-center rounded-2xl border shadow-sm backdrop-blur-sm ${item.className}`}
+                    className={`absolute flex h-14 w-14 items-center justify-center rounded-2xl border shadow-sm ${item.className}`}
                     animate={
                       reduceMotion
                         ? undefined

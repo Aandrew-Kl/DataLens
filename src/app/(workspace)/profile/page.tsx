@@ -38,7 +38,7 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-white/30 bg-white/60 p-6 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60">
+      <section className="rounded-2xl border border-white/30 bg-white p-6 dark:border-white/10 dark:bg-slate-900">
         <h1 className="text-lg font-semibold text-slate-900 dark:text-white">Data Profile</h1>
         <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
           {activeDataset
@@ -47,7 +47,7 @@ export default function ProfilePage() {
         </p>
       </section>
 
-      <section className="rounded-2xl border border-white/30 bg-white/60 p-4 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60">
+      <section className="rounded-2xl border border-white/30 bg-white p-4 dark:border-white/10 dark:bg-slate-900">
         <DataProfiler
           columns={profileData}
           rowCount={rowCount}
@@ -56,7 +56,7 @@ export default function ProfilePage() {
       </section>
 
       {selectedColumn && activeDataset ? (
-        <section className="rounded-2xl border border-white/30 bg-white/60 p-4 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60">
+        <section className="rounded-2xl border border-white/30 bg-white p-4 dark:border-white/10 dark:bg-slate-900">
           <ColumnStats
             tableName={tableName}
             column={selectedColumn}
@@ -66,7 +66,7 @@ export default function ProfilePage() {
       ) : null}
 
       {activeDataset && hasNumericColumns ? (
-        <section className="rounded-2xl border border-white/30 bg-white/60 p-4 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60">
+        <section className="rounded-2xl border border-white/30 bg-white p-4 dark:border-white/10 dark:bg-slate-900">
           <CorrelationMatrix tableName={tableName} columns={profileData} />
         </section>
       ) : null}

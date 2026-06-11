@@ -129,7 +129,7 @@ async function runKnnModel(
           (columnName) =>
             `TRY_CAST(${quoteIdentifier(columnName)} AS DOUBLE) AS ${quoteIdentifier(columnName)}`,
         )
-        .join(",\n      ")}
+        .join(",\n ")}
     FROM ${quoteIdentifier(tableName)}
     WHERE ${quoteIdentifier(targetColumn)} IS NOT NULL
       ${featureColumns
@@ -137,7 +137,7 @@ async function runKnnModel(
           (columnName) =>
             `AND TRY_CAST(${quoteIdentifier(columnName)} AS DOUBLE) IS NOT NULL`,
         )
-        .join("\n      ")}
+        .join("\n ")}
     LIMIT ${SAMPLE_LIMIT}
   `);
 
@@ -338,7 +338,7 @@ export default function KnnView({ tableName, columns }: KnnViewProps) {
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/40 dark:text-slate-300">
+      <div className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
         {status}
       </div>
 
@@ -358,7 +358,7 @@ export default function KnnView({ tableName, columns }: KnnViewProps) {
                   </option>
                 ))}
               </select>
-              <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 dark:border-white/10 dark:bg-slate-950/55 dark:text-slate-100">
+              <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100">
                 <span>K</span>
                 <input
                   aria-label="K value"
@@ -392,7 +392,7 @@ export default function KnnView({ tableName, columns }: KnnViewProps) {
                     className={`rounded-full border px-3 py-2 text-sm transition ${
                       active
                         ? "border-fuchsia-400 bg-fuchsia-500/15 text-fuchsia-700 dark:text-fuchsia-300"
-                        : "border-white/20 bg-white/70 text-slate-700 dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-200"
+                        : "border-white/20 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200"
                     }`}
                   >
                     {column.name}
@@ -421,7 +421,7 @@ export default function KnnView({ tableName, columns }: KnnViewProps) {
             </div>
             {result ? (
               <table className="min-w-full text-left text-sm">
-                <thead className="bg-white/50 dark:bg-slate-950/20">
+                <thead className="bg-white dark:bg-slate-950/20">
                   <tr className="text-slate-500 dark:text-slate-400">
                     <th className="px-5 py-3 font-medium">Actual</th>
                     <th className="px-5 py-3 font-medium">Predicted</th>
@@ -451,7 +451,7 @@ export default function KnnView({ tableName, columns }: KnnViewProps) {
             </div>
             {result ? (
               <table className="min-w-full text-left text-sm">
-                <thead className="bg-white/50 dark:bg-slate-950/20">
+                <thead className="bg-white dark:bg-slate-950/20">
                   <tr className="text-slate-500 dark:text-slate-400">
                     <th className="px-5 py-3 font-medium">Actual \ Predicted</th>
                     {result.labels.map((label) => (

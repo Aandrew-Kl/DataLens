@@ -152,7 +152,7 @@ export default function NaturalLanguageBar({
   return (
     <div
       ref={containerRef}
-      className="relative overflow-visible rounded-3xl border border-gray-200/70 bg-white/80 p-4 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.55)] backdrop-blur-xl dark:border-gray-700/60 dark:bg-gray-950/75"
+      className="relative overflow-visible rounded-3xl border border-gray-200/70 bg-white p-4 shadow-sm dark:border-gray-700/60 dark:bg-gray-950"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200/70 pb-3 dark:border-gray-800/80">
         <div className="min-w-0">
@@ -168,7 +168,7 @@ export default function NaturalLanguageBar({
         <button
           type="button"
           onClick={() => setIsRecentOpen((open) => !open)}
-          className="inline-flex items-center gap-2 rounded-full border border-gray-200/80 bg-white/75 px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:border-sky-300 hover:text-sky-600 dark:border-gray-700/70 dark:bg-gray-900/70 dark:text-gray-300 dark:hover:border-sky-600 dark:hover:text-sky-300"
+          className="inline-flex items-center gap-2 rounded-full border border-gray-200/80 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:border-sky-300 hover:text-sky-600 dark:border-gray-700/70 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-sky-600 dark:hover:text-sky-300"
         >
           <Clock className="h-3.5 w-3.5" />
           <span>Recent</span>
@@ -185,7 +185,7 @@ export default function NaturalLanguageBar({
             onChange={(event) => setValue(event.target.value)}
             onFocus={() => hasRecentQueries && setIsRecentOpen(true)}
             placeholder={`Ask about trends, averages, or segments in ${tableName}...`}
-            className="w-full rounded-2xl border border-gray-200/80 bg-gray-50/80 py-3.5 pl-11 pr-28 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-sky-300 focus:ring-4 focus:ring-sky-500/10 dark:border-gray-700/70 dark:bg-gray-900/80 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-sky-500"
+            className="w-full rounded-2xl border border-gray-200/80 bg-gray-50 py-3.5 pl-11 pr-28 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-sky-300 focus:ring-4 focus:ring-sky-500/10 dark:border-gray-700/70 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-sky-500"
           />
           <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-2">
             <kbd className="hidden rounded-lg border border-gray-200 bg-white px-2 py-1 text-[10px] font-medium text-gray-400 shadow-sm sm:inline-flex dark:border-gray-700 dark:bg-gray-900 dark:text-gray-500">
@@ -208,7 +208,7 @@ export default function NaturalLanguageBar({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.98 }}
               transition={{ duration: 0.18 }}
-              className="absolute inset-x-0 top-full z-20 mt-3 rounded-2xl border border-gray-200/80 bg-white/95 p-3 shadow-2xl backdrop-blur-xl dark:border-gray-700/70 dark:bg-gray-900/95"
+              className="absolute inset-x-0 top-full z-20 mt-3 rounded-2xl border border-gray-200/80 bg-white p-3 shadow-2xl dark:border-gray-700/70 dark:bg-gray-900"
             >
               <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
                 <Clock className="h-3.5 w-3.5" />
@@ -245,7 +245,7 @@ export default function NaturalLanguageBar({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, delay: index * 0.04 }}
               onClick={() => submitQuestion(suggestion)}
-              className="rounded-full border border-gray-200/80 bg-gray-50/80 px-3 py-2 text-sm text-gray-700 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700 dark:border-gray-700/70 dark:bg-gray-900/70 dark:text-gray-300 dark:hover:border-sky-600 dark:hover:bg-sky-500/10 dark:hover:text-sky-300"
+              className="rounded-full border border-gray-200/80 bg-gray-50 px-3 py-2 text-sm text-gray-700 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700 dark:border-gray-700/70 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-sky-600 dark:hover:bg-sky-500/10 dark:hover:text-sky-300"
             >
               {suggestion}
             </motion.button>

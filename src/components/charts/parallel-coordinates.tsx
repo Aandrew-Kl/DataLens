@@ -34,9 +34,9 @@ interface ParallelQueryResult {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.8rem] border border-white/15 bg-white/60 shadow-[0_24px_90px_-46px_rgba(15,23,42,0.76)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/15 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/15 bg-white/75 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-100";
+  "rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100";
 const COLOR_PALETTE = ["#38bdf8", "#34d399", "#f59e0b", "#a78bfa", "#fb7185", "#2dd4bf", "#f97316"] as const;
 const SAMPLE_ROWS = 720;
 const MAX_GROUPS = 7;
@@ -244,7 +244,7 @@ function AxisToggle({
       className={`rounded-2xl border px-3 py-2 text-left text-sm transition ${
         active
           ? "border-cyan-400/45 bg-cyan-500/12 text-cyan-700 dark:text-cyan-200"
-          : "border-white/15 bg-white/45 text-slate-600 hover:border-cyan-300/30 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-300"
+          : "border-white/15 bg-white text-slate-600 hover:border-cyan-300/30 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-300"
       }`}
     >
       {label}
@@ -407,7 +407,7 @@ function ParallelCoordinatesReady({ tableName, columns }: ParallelCoordinatesPro
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-              <div className="rounded-2xl border border-white/15 bg-white/45 p-4 dark:border-white/10 dark:bg-slate-950/35">
+              <div className="rounded-2xl border border-white/15 bg-white p-4 dark:border-white/10 dark:bg-slate-950/35">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Active axes
                 </div>
@@ -415,7 +415,7 @@ function ParallelCoordinatesReady({ tableName, columns }: ParallelCoordinatesPro
                   {effectiveAxes.length}
                 </div>
               </div>
-              <div className="rounded-2xl border border-white/15 bg-white/45 p-4 dark:border-white/10 dark:bg-slate-950/35">
+              <div className="rounded-2xl border border-white/15 bg-white p-4 dark:border-white/10 dark:bg-slate-950/35">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Groups
                 </div>
@@ -423,7 +423,7 @@ function ParallelCoordinatesReady({ tableName, columns }: ParallelCoordinatesPro
                   {result.groups.length}
                 </div>
               </div>
-              <div className="rounded-2xl border border-white/15 bg-white/45 p-4 dark:border-white/10 dark:bg-slate-950/35">
+              <div className="rounded-2xl border border-white/15 bg-white p-4 dark:border-white/10 dark:bg-slate-950/35">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Sample rows
                 </div>
@@ -477,9 +477,9 @@ function ParallelCoordinatesLoading() {
   return (
     <section className={`${PANEL_CLASS} p-6`}>
       <div className="animate-pulse space-y-4">
-        <div className="h-6 w-44 rounded-full bg-white/50 dark:bg-slate-800/70" />
-        <div className="h-4 w-80 rounded-full bg-white/40 dark:bg-slate-800/60" />
-        <div className="h-[30rem] rounded-[1.5rem] bg-white/40 dark:bg-slate-900/45" />
+        <div className="h-6 w-44 rounded-full bg-white dark:bg-slate-800" />
+        <div className="h-4 w-80 rounded-full bg-white dark:bg-slate-800" />
+        <div className="h-[30rem] rounded-lg bg-white dark:bg-slate-900" />
       </div>
     </section>
   );

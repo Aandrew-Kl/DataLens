@@ -16,7 +16,7 @@ interface ValidationWarning { id: string; columnName: string; message: string; }
 interface ValidationResult extends ValidationTask { violationCount: number; sampleRows: Record<string, unknown>[]; }
 
 const fieldClass = "w-full rounded-xl border border-slate-300/80 bg-white px-3 py-2 text-sm text-slate-950 outline-none transition focus:border-cyan-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50";
-const panelClass = "rounded-2xl border border-slate-200/70 bg-white/80 shadow-sm backdrop-blur dark:border-slate-800/80 dark:bg-slate-950/60";
+const panelClass = "rounded-2xl border border-slate-200/70 bg-white shadow-sm dark:border-slate-800/80 dark:bg-slate-950";
 const RULE_OPTIONS: Array<{ value: RuleType; label: string }> = [
   { value: "not_null", label: "Not null" },
   { value: "unique", label: "Unique" },
@@ -120,7 +120,7 @@ function RuleEditor({ column, rules, onAdd, onChange, onRemove }: {
         ) : (
           <div className="space-y-3">
             {rules.map((rule) => (
-              <motion.div key={rule.id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-slate-800 dark:bg-slate-900/80">
+              <motion.div key={rule.id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="rounded-xl border border-slate-200/80 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900">
                 <div className="flex items-start gap-3">
                   <select value={rule.type} onChange={(event) => onChange(rule.id, { type: event.target.value as RuleType })} className={`min-w-0 flex-1 ${fieldClass}`}>
                     {RULE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
@@ -161,7 +161,7 @@ function ResultCard({ result }: { result: ValidationResult }) {
   const headers = Object.keys(result.sampleRows[0] ?? {});
   const badgeClass = passed ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-200" : "border-rose-500/20 bg-rose-500/10 text-rose-200";
   return (
-    <motion.div layout initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-slate-800 bg-slate-950/85 p-4">
+    <motion.div layout initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${badgeClass}`}>
@@ -171,7 +171,7 @@ function ResultCard({ result }: { result: ValidationResult }) {
           <p className="mt-3 text-base font-semibold text-slate-100">{result.columnName} · {result.label}</p>
           <p className="mt-1 text-sm text-slate-400">{result.detail}</p>
         </div>
-        <div className="rounded-xl border border-slate-800 bg-slate-900/80 px-3 py-2 text-right">
+        <div className="rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-right">
           <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Violations</p>
           <p className="mt-1 text-xl font-semibold text-slate-100">{formatNumber(result.violationCount)}</p>
         </div>
@@ -183,8 +183,8 @@ function ResultCard({ result }: { result: ValidationResult }) {
           <div className="overflow-hidden rounded-xl border border-slate-800">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-slate-800 text-sm">
-                <thead className="bg-slate-900/90"><tr>{headers.map((header) => <th key={header} className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{header}</th>)}</tr></thead>
-                <tbody className="divide-y divide-slate-800 bg-slate-950/70">{result.sampleRows.map((row, index) => <tr key={`${result.id}-${index}`}>{headers.map((header) => <td key={header} className="px-3 py-2 text-slate-300">{renderValue(row[header])}</td>)}</tr>)}</tbody>
+                <thead className="bg-slate-900"><tr>{headers.map((header) => <th key={header} className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{header}</th>)}</tr></thead>
+                <tbody className="divide-y divide-slate-800 bg-slate-950">{result.sampleRows.map((row, index) => <tr key={`${result.id}-${index}`}>{headers.map((header) => <td key={header} className="px-3 py-2 text-slate-300">{renderValue(row[header])}</td>)}</tr>)}</tbody>
               </table>
             </div>
           </div>
@@ -271,7 +271,7 @@ export default function DataValidator({ tableName, columns }: DataValidatorProps
       <div className="grid gap-4 xl:grid-cols-2">
         {columns.map((column) => <RuleEditor key={column.name} column={column} rules={rulesByColumn[column.name] ?? []} onAdd={() => updateColumnRules(column.name, (rules) => [...rules, createRule()])} onChange={(ruleId, patch) => updateColumnRules(column.name, (rules) => rules.map((rule) => (rule.id === ruleId ? { ...rule, ...patch } : rule)))} onRemove={(ruleId) => updateColumnRules(column.name, (rules) => rules.filter((rule) => rule.id !== ruleId))} />)}
       </div>
-      <div className="rounded-3xl border border-slate-800 bg-slate-950/95 p-5">
+      <div className="rounded-3xl border border-slate-800 bg-slate-950 p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Results</p>

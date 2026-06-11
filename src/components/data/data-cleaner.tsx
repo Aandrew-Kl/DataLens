@@ -208,7 +208,7 @@ export default function DataCleaner({ tableName, columns, onCleanComplete }: Dat
   }
 
   return (
-    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: EASE }} className="overflow-hidden rounded-3xl border border-white/15 bg-white/10 shadow-2xl shadow-slate-950/15 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45">
+    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: EASE }} className="overflow-hidden rounded-3xl border border-white/15 bg-white/10 shadow-2xl shadow-slate-950/15 dark:border-white/10 dark:bg-slate-950">
       <div className="border-b border-white/10 px-6 py-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
@@ -250,7 +250,7 @@ export default function DataCleaner({ tableName, columns, onCleanComplete }: Dat
             <span>{taskProgress ? taskProgress.label : "Cleaning progress"}</span>
             <span>{formatPercent(progressPercent, 0)}</span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-slate-200/60 dark:bg-slate-800/80">
+          <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
             <motion.div animate={{ width: `${progressPercent}%` }} transition={{ duration: 0.24, ease: EASE }} className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-sky-500 to-emerald-400" />
           </div>
         </div>

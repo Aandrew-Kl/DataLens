@@ -328,7 +328,7 @@ function PivotConfiguratorInner({ tableName, columns }: PivotConfiguratorProps) 
             <button
               type="button"
               onClick={exportPivotCsv}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/55 px-4 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
             >
               <Download className="h-4 w-4" />
               Export CSV
@@ -402,7 +402,7 @@ function PivotConfiguratorInner({ tableName, columns }: PivotConfiguratorProps) 
           </div>
 
           <div className="space-y-5">
-            <div className="rounded-[1.6rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-950/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/30">
               <PivotTable
                 result={result}
                 rowFields={rowFields}

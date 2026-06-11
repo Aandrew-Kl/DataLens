@@ -325,7 +325,7 @@ export default function ColumnDetail({
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 "
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -337,8 +337,8 @@ export default function ColumnDetail({
             ref={panelRef}
             className="
               relative w-full max-w-[400px] h-full
-              bg-white/95 dark:bg-gray-900/95
-              backdrop-blur-xl
+              bg-white dark:bg-gray-900
+              
               border-l border-gray-200/50 dark:border-gray-700/50
               shadow-2xl
               flex flex-col
@@ -392,7 +392,7 @@ export default function ColumnDetail({
                 <div className="space-y-2">
                   <NullRateIndicator rate={nullRate} />
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60">
+                    <div className="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800">
                       <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wide">
                         Completeness
                       </p>
@@ -400,7 +400,7 @@ export default function ColumnDetail({
                         {completeness.toFixed(1)}%
                       </p>
                     </div>
-                    <div className="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60">
+                    <div className="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800">
                       <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wide">
                         Uniqueness
                       </p>
@@ -417,7 +417,7 @@ export default function ColumnDetail({
                 <h3 className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-semibold mb-2">
                   Statistics
                 </h3>
-                <div className="rounded-lg border border-gray-200/60 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/30 px-3 py-1 divide-y divide-gray-100 dark:divide-gray-800">
+                <div className="rounded-lg border border-gray-200/60 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-800/30 px-3 py-1 divide-y divide-gray-100 dark:divide-gray-800">
                   <StatRow label="Unique Values" value={column.uniqueCount} />
                   <StatRow label="Null Count" value={column.nullCount} />
                   <StatRow label="Null %" value={`${nullRate.toFixed(1)}%`} />

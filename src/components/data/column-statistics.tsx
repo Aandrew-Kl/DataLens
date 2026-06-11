@@ -378,12 +378,12 @@ function StatisticsFallback() {
   return (
     <div className="grid gap-4 lg:grid-cols-[0.9fr,1.1fr]">
       <div className={`${GLASS_CARD_CLASS} animate-pulse p-5`}>
-        <div className="h-4 w-28 rounded-full bg-slate-200/80 dark:bg-slate-800/80" />
-        <div className="mt-4 h-40 rounded-3xl bg-slate-200/70 dark:bg-slate-800/70" />
+        <div className="h-4 w-28 rounded-full bg-slate-200 dark:bg-slate-800" />
+        <div className="mt-4 h-40 rounded-3xl bg-slate-200 dark:bg-slate-800" />
       </div>
       <div className={`${GLASS_CARD_CLASS} animate-pulse p-5`}>
-        <div className="h-4 w-28 rounded-full bg-slate-200/80 dark:bg-slate-800/80" />
-        <div className="mt-4 h-40 rounded-3xl bg-slate-200/70 dark:bg-slate-800/70" />
+        <div className="h-4 w-28 rounded-full bg-slate-200 dark:bg-slate-800" />
+        <div className="mt-4 h-40 rounded-3xl bg-slate-200 dark:bg-slate-800" />
       </div>
     </div>
   );
@@ -473,7 +473,7 @@ function ColumnStatisticsBody({
               ].map(([label, value]) => (
                 <div
                   key={label}
-                  className="rounded-3xl border border-white/20 bg-white/60 p-4 dark:bg-slate-950/30"
+                  className="rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/30"
                 >
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     {label}
@@ -489,7 +489,7 @@ function ColumnStatisticsBody({
               {detail.topValues.map((value) => (
                 <div
                   key={value.label}
-                  className="rounded-3xl border border-white/20 bg-white/60 p-4 dark:bg-slate-950/30"
+                  className="rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/30"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <p className="font-medium text-slate-950 dark:text-white">

@@ -51,7 +51,7 @@ interface AnovaSummary {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const CARD_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 
 function subscribeDarkMode(listener: () => void) {
   if (typeof document === "undefined") return () => undefined;
@@ -204,7 +204,7 @@ function buildResidualOption(
 function AnovaTable({ summary }: { summary: AnovaSummary | null }) {
   if (!summary) {
     return (
-      <div className="rounded-[1rem] border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+      <div className="rounded-lg border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
         Run a regression model to inspect the ANOVA breakdown.
       </div>
     );
@@ -222,7 +222,7 @@ function AnovaTable({ summary }: { summary: AnovaSummary | null }) {
   ] as const;
 
   return (
-    <div className="overflow-hidden rounded-[1rem] border border-white/15 bg-white/55 dark:bg-slate-950/25">
+    <div className="overflow-hidden rounded-lg border border-white/15 bg-white dark:bg-slate-950/25">
       <table className="min-w-full text-left text-sm">
         <tbody>
           {rows.map((row) => (
@@ -296,8 +296,8 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
     const aggregateSql = `
       SELECT
         COUNT(*) AS row_count,
-        ${powerTerms.map((power) => `SUM(POWER(CAST(${quoteIdentifier(xColumn)} AS DOUBLE), ${power})) AS sx${power}`).join(",\n        ")},
-        ${Array.from({ length: degree + 1 }, (_, index) => `SUM(POWER(CAST(${quoteIdentifier(xColumn)} AS DOUBLE), ${index}) * CAST(${quoteIdentifier(yColumn)} AS DOUBLE)) AS sxy${index}`).join(",\n        ")}
+        ${powerTerms.map((power) => `SUM(POWER(CAST(${quoteIdentifier(xColumn)} AS DOUBLE), ${power})) AS sx${power}`).join(",\n ")},
+        ${Array.from({ length: degree + 1 }, (_, index) => `SUM(POWER(CAST(${quoteIdentifier(xColumn)} AS DOUBLE), ${index}) * CAST(${quoteIdentifier(yColumn)} AS DOUBLE)) AS sxy${index}`).join(",\n ")}
       FROM ${quoteIdentifier(tableName)}
       WHERE ${quoteIdentifier(xColumn)} IS NOT NULL AND ${quoteIdentifier(yColumn)} IS NOT NULL
     `;
@@ -474,7 +474,7 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
     <section className={`${CARD_CLASS} overflow-hidden p-5`}>
       <div className="flex flex-col gap-5 border-b border-white/15 pb-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
             <LineChartIcon className="h-5 w-5" />
           </div>
           <div>
@@ -488,7 +488,7 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <label className="flex cursor-pointer items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
+          <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
             <input
               type="checkbox"
               checked={useBackend}
@@ -516,12 +516,12 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
         </div>
       </div>
 
-      <div className="rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 mt-4 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
+      <div className="rounded-lg border border-white/15 bg-white px-4 py-3 mt-4 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
         {status}
       </div>
 
       {error ? (
-        <div className="mt-4 rounded-[1.2rem] border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
+        <div className="mt-4 rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
           {error}
         </div>
       ) : null}
@@ -532,13 +532,13 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.28, ease: EASE }}
-            className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30"
+            className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30"
           >
             <div className="grid gap-3 md:grid-cols-2">
               <select
                 value={xColumn}
                 onChange={(event) => setXColumn(event.target.value)}
-                className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               >
                 {numericColumns.map((column) => (
                   <option key={column.name} value={column.name}>
@@ -549,7 +549,7 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
               <select
                 value={yColumn}
                 onChange={(event) => setYColumn(event.target.value)}
-                className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               >
                 {numericColumns.map((column) => (
                   <option key={column.name} value={column.name}>
@@ -562,7 +562,7 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
                 onChange={(event) =>
                   setRegressionType(event.target.value as "linear" | "poly2" | "poly3" | "poly4" | "poly5")
                 }
-                className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               >
                 <option value="linear">Linear</option>
                 <option value="poly2">Polynomial degree 2</option>
@@ -574,7 +574,7 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
                 value={predictionInput}
                 onChange={(event) => setPredictionInput(event.target.value)}
                 placeholder="X value for prediction"
-                className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               />
             </div>
 
@@ -582,7 +582,7 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
               <button
                 type="button"
                 onClick={() => void runRegression()}
-                className="inline-flex items-center gap-2 rounded-[1rem] bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
+                className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                 Fit model
@@ -590,7 +590,7 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
               <button
                 type="button"
                 onClick={exportCoefficients}
-                className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/70 dark:bg-slate-950/35 dark:text-slate-200"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-950/35 dark:text-slate-200"
               >
                 <Download className="h-4 w-4" />
                 Export coefficients
@@ -599,7 +599,7 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
           </motion.div>
 
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-[1.25rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
               <div className="flex items-center gap-2">
                 <Sigma className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
                 <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">R²</p>
@@ -608,14 +608,14 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
                 {formatNumber(rSquared)}
               </p>
             </div>
-            <div className="rounded-[1.25rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
               <div className="flex items-center gap-2">
                 <FunctionSquare className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
                 <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">Model order</p>
               </div>
               <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-50">{degree}</p>
             </div>
-            <div className="rounded-[1.25rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
               <div className="flex items-center gap-2">
                 <Calculator className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
                 <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">Prediction</p>
@@ -626,7 +626,7 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
             </div>
           </div>
 
-          <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">Model coefficients</p>
             <div className="mt-4 space-y-2">
               {coefficients.length === 0 ? (
@@ -637,7 +637,7 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
                 coefficients.map((coefficient, index) => (
                   <div
                     key={`coef-${index}`}
-                    className="flex items-center justify-between rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/25"
+                    className="flex items-center justify-between rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/25"
                   >
                     <span className="text-sm text-slate-700 dark:text-slate-200">
                       {index === 0 ? "Intercept" : `x^${index}`}
@@ -655,16 +655,16 @@ function RegressionView({ tableName, columns }: RegressionViewProps) {
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">Observed points and fitted curve</p>
-            <div className="mt-4 overflow-hidden rounded-[1.2rem] border border-white/15 bg-white/55 dark:bg-slate-950/25">
+            <div className="mt-4 overflow-hidden rounded-lg border border-white/15 bg-white dark:bg-slate-950/25">
               <ReactEChartsCore echarts={echarts} option={regressionOption} notMerge lazyUpdate style={{ height: 360 }} />
             </div>
           </div>
 
-          <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">Residuals plot</p>
-            <div className="mt-4 overflow-hidden rounded-[1.2rem] border border-white/15 bg-white/55 dark:bg-slate-950/25">
+            <div className="mt-4 overflow-hidden rounded-lg border border-white/15 bg-white dark:bg-slate-950/25">
               <ReactEChartsCore echarts={echarts} option={residualOption} notMerge lazyUpdate style={{ height: 280 }} />
             </div>
           </div>

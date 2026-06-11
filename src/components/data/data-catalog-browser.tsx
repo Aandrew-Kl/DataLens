@@ -33,9 +33,9 @@ type SortMode = "name" | "size" | "date";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "border border-white/20 bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 rounded-[1.75rem] shadow-xl shadow-slate-950/10";
+  "border border-white/20 bg-white dark:bg-slate-950 rounded-lg shadow-xl shadow-slate-950/10";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950/50 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950 dark:text-slate-100";
 function quoteLiteral(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;
 }
@@ -242,7 +242,7 @@ export default function DataCatalogBrowser({
           Showing <strong>{visibleCatalog.length}</strong> of{" "}
           <strong>{catalog.length}</strong> tables
         </span>
-        <span className="rounded-full border border-white/20 bg-white/60 px-3 py-1 dark:bg-slate-900/50">
+        <span className="rounded-full border border-white/20 bg-white px-3 py-1 dark:bg-slate-900">
           {status}
         </span>
       </div>
@@ -292,7 +292,7 @@ export default function DataCatalogBrowser({
                 </div>
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-2xl bg-white/70 p-3 dark:bg-slate-900/50">
+                  <div className="rounded-2xl bg-white p-3 dark:bg-slate-900">
                     <p className="text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                       Rows
                     </p>
@@ -300,7 +300,7 @@ export default function DataCatalogBrowser({
                       {formatNumber(entry.rowCount)}
                     </p>
                   </div>
-                  <div className="rounded-2xl bg-white/70 p-3 dark:bg-slate-900/50">
+                  <div className="rounded-2xl bg-white p-3 dark:bg-slate-900">
                     <p className="text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                       Columns
                     </p>
@@ -308,7 +308,7 @@ export default function DataCatalogBrowser({
                       {formatNumber(entry.columnCount)}
                     </p>
                   </div>
-                  <div className="rounded-2xl bg-white/70 p-3 dark:bg-slate-900/50">
+                  <div className="rounded-2xl bg-white p-3 dark:bg-slate-900">
                     <p className="text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                       Size
                     </p>
@@ -322,7 +322,7 @@ export default function DataCatalogBrowser({
                   {entry.columnNames.slice(0, 6).map((columnName) => (
                     <span
                       key={`${entry.name}-${columnName}`}
-                      className="rounded-full border border-white/20 bg-white/60 px-3 py-1 text-xs text-slate-600 dark:bg-slate-900/40 dark:text-slate-300"
+                      className="rounded-full border border-white/20 bg-white px-3 py-1 text-xs text-slate-600 dark:bg-slate-900 dark:text-slate-300"
                     >
                       {columnName}
                     </span>
@@ -336,7 +336,7 @@ export default function DataCatalogBrowser({
         <div className={`${PANEL_CLASS} p-5`}>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-900/50 dark:text-slate-300">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-900 dark:text-slate-300">
                 <Table2 className="h-3.5 w-3.5" />
                 Selected table
               </div>
@@ -349,7 +349,7 @@ export default function DataCatalogBrowser({
           {selectedEntry ? (
             <div className="mt-5 space-y-4">
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/50">
+                <div className="rounded-2xl bg-white p-4 dark:bg-slate-900">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Table profile
                   </p>
@@ -362,7 +362,7 @@ export default function DataCatalogBrowser({
                   </p>
                 </div>
 
-                <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/50">
+                <div className="rounded-2xl bg-white p-4 dark:bg-slate-900">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Sort focus
                   </p>

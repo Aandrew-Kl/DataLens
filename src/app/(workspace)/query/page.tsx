@@ -83,7 +83,7 @@ export default function QueryPage() {
               />
             </div>
           ) : (
-            <div className="mt-4 rounded-2xl border border-white/25 bg-white/35 px-4 py-3 text-sm text-slate-500 dark:border-white/10 dark:bg-slate-950/40">
+            <div className="mt-4 rounded-2xl border border-white/25 bg-white/35 px-4 py-3 text-sm text-slate-500 dark:border-white/10 dark:bg-slate-950">
               No active dataset. Open a CSV from the workspace sidebar to run
               AI-powered queries.
             </div>
@@ -111,11 +111,11 @@ export default function QueryPage() {
 
               {lastResult ? (
                 <div className="mt-4 space-y-4">
-                  <div className="rounded-2xl border border-slate-200/70 bg-white/60 p-3 text-sm text-slate-700 dark:border-slate-700/60 dark:bg-slate-900/45 dark:text-slate-200">
+                  <div className="rounded-2xl border border-slate-200/70 bg-white p-3 text-sm text-slate-700 dark:border-slate-700/60 dark:bg-slate-900 dark:text-slate-200">
                     <p className="mb-2 font-medium text-slate-900 dark:text-white">
                       Generated SQL
                     </p>
-                    <pre className="overflow-x-auto rounded-xl border border-slate-200/70 bg-slate-950/80 p-3 text-xs font-mono text-slate-100">
+                    <pre className="overflow-x-auto rounded-xl border border-slate-200/70 bg-slate-950 p-3 text-xs font-mono text-slate-100">
                       {lastResult.sql}
                     </pre>
                     <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">

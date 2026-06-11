@@ -39,7 +39,7 @@ export function SummaryPanel({
   return (
     <motion.div
       variants={itemVariants}
-      className="relative overflow-hidden rounded-[30px] border border-white/30 bg-white/68 p-6 shadow-[0_26px_90px_-44px_rgba(15,23,42,0.58)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/48"
+      className="relative overflow-hidden rounded-lg border border-white/30 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-950"
     >
       <div className="absolute inset-y-0 left-0 w-40 bg-linear-to-br from-cyan-500/16 via-cyan-400/6 to-transparent" />
       <div className="relative flex h-full flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -57,7 +57,7 @@ export function SummaryPanel({
 
         <div className="max-w-xl space-y-5">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/65 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 shadow-sm dark:border-white/10 dark:bg-slate-950/55 dark:text-slate-300">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 shadow-sm dark:border-white/10 dark:bg-slate-950 dark:text-slate-300">
               <Sparkles className="h-3.5 w-3.5" />
               {getQualityLabel(metrics.overallScore)}
             </div>
@@ -72,7 +72,7 @@ export function SummaryPanel({
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/35 bg-white/60 px-4 py-3 dark:border-white/10 dark:bg-slate-950/50">
+            <div className="rounded-2xl border border-white/35 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-950">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 Rows checked
               </p>
@@ -80,7 +80,7 @@ export function SummaryPanel({
                 {formatNumber(metrics.rowCount)}
               </p>
             </div>
-            <div className="rounded-2xl border border-white/35 bg-white/60 px-4 py-3 dark:border-white/10 dark:bg-slate-950/50">
+            <div className="rounded-2xl border border-white/35 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-950">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 Weakest column
               </p>
@@ -88,7 +88,7 @@ export function SummaryPanel({
                 {weakestColumn?.name ?? "—"}
               </p>
             </div>
-            <div className="rounded-2xl border border-white/35 bg-white/60 px-4 py-3 dark:border-white/10 dark:bg-slate-950/50">
+            <div className="rounded-2xl border border-white/35 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-950">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 Evaluated
               </p>
@@ -96,7 +96,7 @@ export function SummaryPanel({
                 {formatDateTime(new Date(metrics.evaluatedAt).toISOString())}
               </p>
             </div>
-            <div className="rounded-2xl border border-white/35 bg-white/60 px-4 py-3 dark:border-white/10 dark:bg-slate-950/50">
+            <div className="rounded-2xl border border-white/35 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-950">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 Quality tier
               </p>
@@ -106,13 +106,13 @@ export function SummaryPanel({
             </div>
           </div>
 
-          <div className="space-y-3 rounded-[24px] border border-white/35 bg-white/60 p-4 dark:border-white/10 dark:bg-slate-950/50">
+          <div className="space-y-3 rounded-lg border border-white/35 bg-white p-4 dark:border-white/10 dark:bg-slate-950">
             {dimensionList.map((summary) => (
               <div key={summary.key} className="flex items-center gap-4">
                 <div className="w-28 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   {summary.label}
                 </div>
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-200/80 dark:bg-slate-800/85">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                   <div
                     className="h-full rounded-full"
                     style={{

@@ -405,7 +405,7 @@ function DiffList({
           {items.map((item) => (
             <span
               key={item}
-              className="rounded-full border border-white/20 bg-white/70 px-3 py-1 text-xs font-medium text-slate-700 dark:bg-slate-950/45 dark:text-slate-200"
+              className="rounded-full border border-white/20 bg-white px-3 py-1 text-xs font-medium text-slate-700 dark:bg-slate-950 dark:text-slate-200"
             >
               {item}
             </span>

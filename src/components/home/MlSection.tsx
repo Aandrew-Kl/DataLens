@@ -127,7 +127,7 @@ export default function MlSection({
         <button
           type="button"
           onClick={() => setShowAdvancedMl((current) => !current)}
-          className="flex w-full items-center justify-between gap-2 bg-slate-50/80 px-4 py-3 text-left transition-colors hover:bg-slate-100 dark:bg-slate-900/60 dark:hover:bg-slate-800/60"
+          className="flex w-full items-center justify-between gap-2 bg-slate-50 px-4 py-3 text-left transition-colors hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800"
         >
           <div>
             <h3 className="text-base font-semibold text-slate-900 dark:text-white">

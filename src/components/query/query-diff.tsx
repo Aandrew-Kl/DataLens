@@ -202,7 +202,7 @@ export default function QueryDiff({ tableName }: QueryDiffProps) {
             aria-label="Left query"
             value={leftQuery}
             onChange={(event) => setLeftQuery(event.target.value)}
-            className="min-h-[200px] w-full rounded-3xl border border-white/20 bg-white/75 px-4 py-4 font-mono text-sm text-slate-900 outline-none backdrop-blur-2xl dark:bg-slate-950/45 dark:text-slate-100"
+            className="min-h-[200px] w-full rounded-3xl border border-white/20 bg-white px-4 py-4 font-mono text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-100"
           />
         </label>
         <label className={`${GLASS_CARD_CLASS} p-4 text-sm text-slate-600 dark:text-slate-300`}>
@@ -213,7 +213,7 @@ export default function QueryDiff({ tableName }: QueryDiffProps) {
             aria-label="Right query"
             value={rightQuery}
             onChange={(event) => setRightQuery(event.target.value)}
-            className="min-h-[200px] w-full rounded-3xl border border-white/20 bg-white/75 px-4 py-4 font-mono text-sm text-slate-900 outline-none backdrop-blur-2xl dark:bg-slate-950/45 dark:text-slate-100"
+            className="min-h-[200px] w-full rounded-3xl border border-white/20 bg-white px-4 py-4 font-mono text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-100"
           />
         </label>
       </div>

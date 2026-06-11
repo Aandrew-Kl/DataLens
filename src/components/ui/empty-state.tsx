@@ -35,7 +35,7 @@ export default function EmptyState({
         className="
           w-16 h-16 rounded-2xl mb-5
           flex items-center justify-center
-          bg-gray-100 dark:bg-gray-800/80
+          bg-gray-100 dark:bg-gray-800
           border border-gray-200/50 dark:border-gray-700/50
         "
       >

@@ -23,7 +23,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
     <nav aria-label="Breadcrumb" className="w-full overflow-hidden">
       <motion.ol
         layout
-        className="flex min-w-0 items-center gap-1 rounded-2xl border border-gray-200/70 bg-white/70 px-2.5 py-2 text-sm shadow-sm backdrop-blur-xl dark:border-gray-700/70 dark:bg-gray-900/60 md:px-3"
+        className="flex min-w-0 items-center gap-1 rounded-2xl border border-gray-200/70 bg-white px-2.5 py-2 text-sm shadow-sm dark:border-gray-700/70 dark:bg-gray-900 md:px-3"
         transition={{ type: "spring", stiffness: 420, damping: 34 }}
       >
         <AnimatePresence initial={false} mode="popLayout">

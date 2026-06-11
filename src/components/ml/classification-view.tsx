@@ -213,7 +213,7 @@ async function loadClassificationResult(
           (feature) =>
             `TRY_CAST(${quoteIdentifier(feature)} AS DOUBLE) AS ${quoteIdentifier(feature)}`,
         )
-        .join(",\n      ")}
+        .join(",\n ")}
     FROM ${quoteIdentifier(tableName)}
     WHERE ${quoteIdentifier(targetColumn)} IS NOT NULL
       ${featureColumns
@@ -221,7 +221,7 @@ async function loadClassificationResult(
           (feature) =>
             `AND TRY_CAST(${quoteIdentifier(feature)} AS DOUBLE) IS NOT NULL`,
         )
-        .join("\n      ")}
+        .join("\n ")}
     LIMIT ${SAMPLE_LIMIT}
   `;
 
@@ -382,7 +382,7 @@ export default function ClassificationView({
             (feature) =>
               `TRY_CAST(${quoteIdentifier(feature)} AS DOUBLE) AS ${quoteIdentifier(feature)}`,
           )
-          .join(",\n        ")}
+          .join(",\n ")}
       FROM ${quoteIdentifier(tableName)}
       WHERE ${quoteIdentifier(activeTargetColumn)} IS NOT NULL
         ${activeFeatures
@@ -390,7 +390,7 @@ export default function ClassificationView({
             (feature) =>
               `AND TRY_CAST(${quoteIdentifier(feature)} AS DOUBLE) IS NOT NULL`,
           )
-          .join("\n        ")}
+          .join("\n ")}
       LIMIT ${SAMPLE_LIMIT}
     `;
     const rows = await runQuery(query);
@@ -510,7 +510,7 @@ export default function ClassificationView({
 
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
-            <label className="flex cursor-pointer items-center gap-2 rounded-2xl border border-white/20 bg-white/80 px-4 py-2.5 text-sm text-slate-600 dark:border-white/10 dark:bg-slate-950/55 dark:text-slate-300">
+            <label className="flex cursor-pointer items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-2.5 text-sm text-slate-600 dark:border-white/10 dark:bg-slate-950 dark:text-slate-300">
               <input
                 type="checkbox"
                 checked={useBackend}
@@ -620,7 +620,7 @@ export default function ClassificationView({
                     className={`rounded-2xl border px-3 py-2 text-left text-sm transition ${
                       active
                         ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300"
-                        : "border-white/20 bg-white/60 text-slate-700 dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-200"
+                        : "border-white/20 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200"
                     }`}
                   >
                     {column.name}

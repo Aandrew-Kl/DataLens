@@ -426,13 +426,13 @@ function PivotAnalysisPanel({
           <table className="min-w-full border-separate border-spacing-0 text-sm">
             <thead>
               <tr>
-                <th className="sticky left-0 z-10 rounded-l-2xl bg-white/90 px-4 py-3 text-left font-semibold text-slate-700 backdrop-blur dark:bg-slate-950/85 dark:text-slate-200">
+                <th className="sticky left-0 z-10 rounded-l-2xl bg-white px-4 py-3 text-left font-semibold text-slate-700 dark:bg-slate-950 dark:text-slate-200">
                   {rowField}
                 </th>
                 {result.columnKeys.map((columnKey) => (
                   <th
                     key={columnKey}
-                    className="bg-white/60 px-4 py-3 text-right font-semibold text-slate-700 dark:bg-slate-950/45 dark:text-slate-200"
+                    className="bg-white px-4 py-3 text-right font-semibold text-slate-700 dark:bg-slate-950 dark:text-slate-200"
                   >
                     {columnKey}
                   </th>
@@ -445,7 +445,7 @@ function PivotAnalysisPanel({
             <tbody>
               {result.rowKeys.map((rowKey) => (
                 <tr key={rowKey}>
-                  <th className="sticky left-0 z-10 border-t border-white/15 bg-white/90 px-4 py-3 text-left font-medium text-slate-800 backdrop-blur dark:bg-slate-950/85 dark:text-slate-100">
+                  <th className="sticky left-0 z-10 border-t border-white/15 bg-white px-4 py-3 text-left font-medium text-slate-800 dark:bg-slate-950 dark:text-slate-100">
                     {rowKey}
                   </th>
                   {result.columnKeys.map((columnKey) => {
@@ -471,7 +471,7 @@ function PivotAnalysisPanel({
             </tbody>
             <tfoot>
               <tr>
-                <th className="sticky left-0 z-10 rounded-bl-2xl border-t border-white/20 bg-white/90 px-4 py-3 text-left font-semibold text-slate-900 backdrop-blur dark:bg-slate-950/85 dark:text-white">
+                <th className="sticky left-0 z-10 rounded-bl-2xl border-t border-white/20 bg-white px-4 py-3 text-left font-semibold text-slate-900 dark:bg-slate-950 dark:text-white">
                   Column total
                 </th>
                 {result.columnKeys.map((columnKey) => (

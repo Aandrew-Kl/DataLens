@@ -239,14 +239,14 @@ function buildJoinSelectSQL(
       (condition) =>
         `l.${quoteIdentifier(condition.leftColumn)} = r.${quoteIdentifier(condition.rightColumn)}`,
     )
-    .join("\n  AND ");
+    .join("\n AND ");
 
   return [
     "SELECT",
-    projectedColumns.map((column) => `  ${column.expression}`).join(",\n"),
+    projectedColumns.map((column) => ` ${column.expression}`).join(",\n"),
     `FROM ${quoteIdentifier(leftDataset.name)} l`,
     `${joinType} JOIN ${quoteIdentifier(rightDataset.name)} r`,
-    `  ON ${onClause}`,
+    ` ON ${onClause}`,
   ].join("\n");
 }
 
@@ -268,7 +268,7 @@ function DatasetCard({
       className={`w-full rounded-xl border p-4 text-left transition-all ${
         selected
           ? "border-sky-400 bg-sky-500/10 shadow-lg shadow-sky-500/10"
-          : "border-gray-200/70 bg-white/70 hover:border-gray-300 hover:bg-white dark:border-gray-700/70 dark:bg-gray-950/30 dark:hover:border-gray-600 dark:hover:bg-gray-950/40"
+          : "border-gray-200/70 bg-white hover:border-gray-300 hover:bg-white dark:border-gray-700/70 dark:bg-gray-950/30 dark:hover:border-gray-600 dark:hover:bg-gray-950"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -289,19 +289,19 @@ function DatasetCard({
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-        <div className="rounded-lg bg-gray-100/80 px-2 py-2 text-gray-600 dark:bg-gray-800/80 dark:text-gray-300">
+        <div className="rounded-lg bg-gray-100 px-2 py-2 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
           <p className="text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500">
             Rows
           </p>
           <p className="mt-1 font-medium">{formatNumber(dataset.rowCount)}</p>
         </div>
-        <div className="rounded-lg bg-gray-100/80 px-2 py-2 text-gray-600 dark:bg-gray-800/80 dark:text-gray-300">
+        <div className="rounded-lg bg-gray-100 px-2 py-2 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
           <p className="text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500">
             Columns
           </p>
           <p className="mt-1 font-medium">{formatNumber(dataset.columnCount)}</p>
         </div>
-        <div className="rounded-lg bg-gray-100/80 px-2 py-2 text-gray-600 dark:bg-gray-800/80 dark:text-gray-300">
+        <div className="rounded-lg bg-gray-100 px-2 py-2 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
           <p className="text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500">
             Uploaded
           </p>
@@ -333,7 +333,7 @@ function PreviewTable({
     <div className="overflow-hidden rounded-xl border border-gray-200/70 dark:border-gray-700/70">
       <div className="max-h-[360px] overflow-auto">
         <table className="min-w-full divide-y divide-gray-200/70 text-left text-sm dark:divide-gray-700/70">
-          <thead className="sticky top-0 bg-gray-50/95 backdrop-blur-sm dark:bg-gray-950/95">
+          <thead className="sticky top-0 bg-gray-50 dark:bg-gray-950">
             <tr>
               {columns.map((column) => (
                 <th
@@ -345,7 +345,7 @@ function PreviewTable({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200/60 bg-white/80 dark:divide-gray-800/70 dark:bg-gray-900/40">
+          <tbody className="divide-y divide-gray-200/60 bg-white dark:divide-gray-800/70 dark:bg-gray-900">
             {rows.length === 0 ? (
               <tr>
                 <td
@@ -357,7 +357,7 @@ function PreviewTable({
               </tr>
             ) : (
               rows.map((row, index) => (
-                <tr key={index} className="hover:bg-gray-50/80 dark:hover:bg-gray-800/40">
+                <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                   {columns.map((column) => (
                     <td
                       key={`${index}:${column}`}
@@ -664,7 +664,7 @@ export default function JoinBuilder({
   };
 
   return (
-    <section className="overflow-hidden rounded-xl border border-gray-200/70 bg-white/80 backdrop-blur-sm dark:border-gray-700/70 dark:bg-gray-900/60">
+    <section className="overflow-hidden rounded-xl border border-gray-200/70 bg-white dark:border-gray-700/70 dark:bg-gray-900">
       <div className="border-b border-gray-200/70 px-6 py-5 dark:border-gray-700/70">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -683,25 +683,25 @@ export default function JoinBuilder({
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
-            <div className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-3 py-2 dark:border-gray-700/70 dark:bg-gray-950/30">
+            <div className="rounded-xl border border-gray-200/70 bg-gray-50 px-3 py-2 dark:border-gray-700/70 dark:bg-gray-950/30">
               <p className="text-gray-500 dark:text-gray-400">Datasets</p>
               <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
                 {datasets.length}
               </p>
             </div>
-            <div className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-3 py-2 dark:border-gray-700/70 dark:bg-gray-950/30">
+            <div className="rounded-xl border border-gray-200/70 bg-gray-50 px-3 py-2 dark:border-gray-700/70 dark:bg-gray-950/30">
               <p className="text-gray-500 dark:text-gray-400">Join Type</p>
               <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
                 {joinType}
               </p>
             </div>
-            <div className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-3 py-2 dark:border-gray-700/70 dark:bg-gray-950/30">
+            <div className="rounded-xl border border-gray-200/70 bg-gray-50 px-3 py-2 dark:border-gray-700/70 dark:bg-gray-950/30">
               <p className="text-gray-500 dark:text-gray-400">Keys</p>
               <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
                 {validConditions.length}
               </p>
             </div>
-            <div className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-3 py-2 dark:border-gray-700/70 dark:bg-gray-950/30">
+            <div className="rounded-xl border border-gray-200/70 bg-gray-50 px-3 py-2 dark:border-gray-700/70 dark:bg-gray-950/30">
               <p className="text-gray-500 dark:text-gray-400">Preview Fields</p>
               <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
                 {projectedColumns.length}
@@ -724,10 +724,10 @@ export default function JoinBuilder({
                     ? "border-sky-400 bg-sky-500/10 text-sky-800 dark:border-sky-600 dark:text-sky-200"
                     : isComplete
                       ? "border-emerald-300 bg-emerald-500/10 text-emerald-700 dark:border-emerald-700 dark:text-emerald-300"
-                      : "border-gray-200/70 bg-gray-50/70 text-gray-500 dark:border-gray-700/70 dark:bg-gray-950/30 dark:text-gray-400"
+                      : "border-gray-200/70 bg-gray-50 text-gray-500 dark:border-gray-700/70 dark:bg-gray-950/30 dark:text-gray-400"
                 }`}
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full border border-current/20 bg-white/70 dark:bg-gray-950/40">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full border border-current/20 bg-white dark:bg-gray-950">
                   {isComplete ? (
                     <CheckCircle2 className="h-4 w-4" />
                   ) : (
@@ -816,7 +816,7 @@ export default function JoinBuilder({
                         className={`rounded-xl border p-5 text-left transition-all ${
                           joinType === option.value
                             ? "border-sky-400 bg-sky-500/10 shadow-lg shadow-sky-500/10"
-                            : "border-gray-200/70 bg-white/70 hover:border-gray-300 dark:border-gray-700/70 dark:bg-gray-950/30 dark:hover:border-gray-600"
+                            : "border-gray-200/70 bg-white hover:border-gray-300 dark:border-gray-700/70 dark:bg-gray-950/30 dark:hover:border-gray-600"
                         }`}
                       >
                         <div className="flex items-center justify-between gap-3">
@@ -841,7 +841,7 @@ export default function JoinBuilder({
 
                 {currentStep === 2 && leftDataset && rightDataset && (
                   <div className="space-y-6">
-                    <div className="rounded-xl border border-gray-200/70 bg-gray-50/80 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
+                    <div className="rounded-xl border border-gray-200/70 bg-gray-50 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
                           <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
@@ -889,7 +889,7 @@ export default function JoinBuilder({
                       {conditions.map((condition, index) => (
                         <div
                           key={condition.id}
-                          className="grid gap-3 rounded-xl border border-gray-200/70 bg-white/70 p-4 dark:border-gray-700/70 dark:bg-gray-950/30 lg:grid-cols-[1fr_auto_1fr_auto]"
+                          className="grid gap-3 rounded-xl border border-gray-200/70 bg-white p-4 dark:border-gray-700/70 dark:bg-gray-950/30 lg:grid-cols-[1fr_auto_1fr_auto]"
                         >
                           <label className="space-y-2">
                             <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
@@ -971,7 +971,7 @@ export default function JoinBuilder({
 
                 {currentStep === 3 && (
                   <div className="space-y-6">
-                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-200/70 bg-gray-50/80 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-200/70 bg-gray-50 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
                       <div>
                         <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                           Preview join SQL and sample rows
@@ -1067,7 +1067,7 @@ export default function JoinBuilder({
                       )}
                     </div>
 
-                    <div className="space-y-4 rounded-xl border border-gray-200/70 bg-gray-50/80 p-5 dark:border-gray-700/70 dark:bg-gray-950/30">
+                    <div className="space-y-4 rounded-xl border border-gray-200/70 bg-gray-50 p-5 dark:border-gray-700/70 dark:bg-gray-950/30">
                       <div>
                         <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                           Save settings
@@ -1092,7 +1092,7 @@ export default function JoinBuilder({
                         />
                       </label>
 
-                      <div className="rounded-xl border border-gray-200/70 bg-white/80 p-4 text-sm dark:border-gray-700/70 dark:bg-gray-900/70">
+                      <div className="rounded-xl border border-gray-200/70 bg-white p-4 text-sm dark:border-gray-700/70 dark:bg-gray-900">
                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
                           Summary
                         </p>

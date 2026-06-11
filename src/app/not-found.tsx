@@ -4,7 +4,7 @@ import { MapPin } from "lucide-react";
 export default function NotFound() {
   return (
     <main className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4 md:p-8">
-      <section className="w-full max-w-xl rounded-[1.75rem] border border-white/15 bg-white/50 p-6 text-center shadow-[0_20px_60px_-35px_rgba(15,23,42,0.55)] backdrop-blur-2xl dark:bg-slate-900/35 md:p-8">
+      <section className="w-full max-w-xl rounded-lg border border-white/15 bg-white p-6 text-center shadow-sm dark:bg-slate-900/35 md:p-8">
         <p className="text-6xl font-semibold tracking-[-0.04em] text-slate-900 dark:text-white">
           404
         </p>
@@ -32,7 +32,7 @@ export default function NotFound() {
           <Link
             href="/"
             aria-label="Back to home"
-            className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/70 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-white/90 dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-200 dark:hover:bg-slate-900/80"
+            className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
           >
             Home
           </Link>

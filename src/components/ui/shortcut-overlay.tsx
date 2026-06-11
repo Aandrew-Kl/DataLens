@@ -195,7 +195,7 @@ function KeyCombo({
           {index > 0 ? (
             <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">+</span>
           ) : null}
-          <kbd className="min-w-9 rounded-lg border border-white/60 bg-white/70 px-2.5 py-1.5 text-center text-xs font-semibold text-slate-700 shadow-sm backdrop-blur dark:border-slate-700/70 dark:bg-slate-950/70 dark:text-slate-200">
+          <kbd className="min-w-9 rounded-lg border border-white/60 bg-white px-2.5 py-1.5 text-center text-xs font-semibold text-slate-700 shadow-sm dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-200">
             {getKeyLabel(key, isMac)}
           </kbd>
         </div>
@@ -294,7 +294,7 @@ export default function ShortcutOverlay() {
           <motion.button
             type="button"
             aria-label="Close shortcut overlay"
-            className="absolute inset-0 bg-slate-950/65 backdrop-blur-md"
+            className="absolute inset-0 bg-slate-950/60 "
             onClick={closeOverlay}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -305,7 +305,7 @@ export default function ShortcutOverlay() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="shortcut-overlay-title"
-            className="relative w-full max-w-6xl overflow-hidden rounded-[30px] border border-white/20 bg-slate-950/72 shadow-[0_40px_140px_-56px_rgba(15,23,42,0.95)] backdrop-blur-3xl"
+            className="relative w-full max-w-6xl overflow-hidden rounded-lg border border-white/20 bg-slate-950 shadow-sm "
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.96 }}
@@ -374,7 +374,7 @@ export default function ShortcutOverlay() {
 
             <div className="relative max-h-[70vh] overflow-y-auto px-6 py-6 sm:px-8">
               {groupedShortcuts.length === 0 ? (
-                <div className="flex min-h-52 flex-col items-center justify-center gap-3 rounded-[26px] border border-dashed border-white/10 bg-white/5 text-center text-slate-300">
+                <div className="flex min-h-52 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-white/10 bg-white/5 text-center text-slate-300">
                   <Search className="h-6 w-6 text-slate-500" />
                   <div className="space-y-1">
                     <p className="text-base font-semibold text-white">No shortcuts matched</p>
@@ -390,7 +390,7 @@ export default function ShortcutOverlay() {
                     return (
                       <motion.section
                         key={section.title}
-                        className="rounded-[26px] border border-white/10 bg-white/6 p-5 shadow-[0_18px_50px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl"
+                        className="rounded-lg border border-white/10 bg-white/6 p-5 shadow-sm "
                         initial={{ opacity: 0, y: 18 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.24, delay: index * 0.05, ease: EASE }}

@@ -362,7 +362,7 @@ function DataTypeOverviewBody({
                 sampleValues.map((sample) => (
                   <span
                     key={`${selectedColumn?.name ?? "sample"}-${sample}`}
-                    className="rounded-full border border-white/15 bg-white/55 px-3 py-1.5 text-sm text-slate-700 dark:bg-slate-950/25 dark:text-slate-200"
+                    className="rounded-full border border-white/15 bg-white px-3 py-1.5 text-sm text-slate-700 dark:bg-slate-950/25 dark:text-slate-200"
                   >
                     {sample}
                   </span>

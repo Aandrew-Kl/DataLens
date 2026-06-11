@@ -93,7 +93,7 @@ const CATEGORY_COLORS: Record<TemplateCategory, string> = {
   Date: "bg-amber-50 text-amber-600 border-amber-200/60 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800/40",
   Text: "bg-rose-50 text-rose-600 border-rose-200/60 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800/40",
   Advanced:
-    "bg-gray-50 text-gray-600 border-gray-200/60 dark:bg-gray-800/40 dark:text-gray-400 dark:border-gray-700/40",
+    "bg-gray-50 text-gray-600 border-gray-200/60 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700/40",
 };
 
 // ---------------------------------------------------------------------------
@@ -208,7 +208,7 @@ export default function TemplatePicker({
 
   return (
     <>
-      <section className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-white/70 backdrop-blur-xl dark:border-gray-700/50 dark:bg-gray-900/70">
+      <section className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-white dark:border-gray-700/50 dark:bg-gray-900">
         {/* Header */}
         <div className="border-b border-gray-200/60 px-4 py-4 dark:border-gray-700/50">
           <div className="flex items-center gap-3">
@@ -234,7 +234,7 @@ export default function TemplatePicker({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search templates..."
-              className="w-full rounded-xl border border-gray-200/80 bg-white/90 py-2.5 pl-10 pr-10 text-sm text-gray-700 outline-none transition focus:border-indigo-300 focus:ring-2 focus:ring-indigo-400/20 dark:border-gray-700/70 dark:bg-gray-800/90 dark:text-gray-200 dark:focus:border-indigo-500"
+              className="w-full rounded-xl border border-gray-200/80 bg-white py-2.5 pl-10 pr-10 text-sm text-gray-700 outline-none transition focus:border-indigo-300 focus:ring-2 focus:ring-indigo-400/20 dark:border-gray-700/70 dark:bg-gray-800 dark:text-gray-200 dark:focus:border-indigo-500"
             />
             {search && (
               <button
@@ -274,7 +274,7 @@ export default function TemplatePicker({
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200/80 bg-gray-50/70 px-6 text-center dark:border-gray-700/60 dark:bg-gray-800/30"
+              className="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200/80 bg-gray-50 px-6 text-center dark:border-gray-700/60 dark:bg-gray-800/30"
             >
               <Search className="h-10 w-10 text-gray-300 dark:text-gray-600" />
               <h3 className="mt-4 text-sm font-semibold text-gray-700 dark:text-gray-200">
@@ -302,7 +302,7 @@ export default function TemplatePicker({
                       exit={{ opacity: 0, scale: 0.96 }}
                       transition={{ duration: 0.2, delay: idx * 0.03 }}
                       onClick={() => openTemplate(tpl)}
-                      className="group flex flex-col items-start gap-2 rounded-2xl border border-gray-200/70 bg-white/85 p-4 text-left transition-all hover:border-indigo-300 hover:shadow-md dark:border-gray-700/60 dark:bg-gray-800/70 dark:hover:border-indigo-600"
+                      className="group flex flex-col items-start gap-2 rounded-2xl border border-gray-200/70 bg-white p-4 text-left transition-all hover:border-indigo-300 hover:shadow-md dark:border-gray-700/60 dark:bg-gray-800 dark:hover:border-indigo-600"
                     >
                       <div className="flex w-full items-center justify-between gap-2">
                         <div
@@ -333,7 +333,7 @@ export default function TemplatePicker({
       </section>
 
       {/* ------------------------------------------------------------------ */}
-      {/* Configuration modal                                                  */}
+      {/* Configuration modal */}
       {/* ------------------------------------------------------------------ */}
 
       <AnimatePresence>
@@ -342,7 +342,7 @@ export default function TemplatePicker({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/55 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/60 p-4 "
             onClick={closeTemplate}
           >
             <motion.div
@@ -401,7 +401,7 @@ export default function TemplatePicker({
                           onChange={(e) =>
                             updateParam(param.key, e.target.value)
                           }
-                          className="w-full rounded-xl border border-gray-200/80 bg-white/90 px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-indigo-300 focus:ring-2 focus:ring-indigo-400/20 dark:border-gray-700/70 dark:bg-gray-800/90 dark:text-gray-200 dark:focus:border-indigo-500"
+                          className="w-full rounded-xl border border-gray-200/80 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-indigo-300 focus:ring-2 focus:ring-indigo-400/20 dark:border-gray-700/70 dark:bg-gray-800 dark:text-gray-200 dark:focus:border-indigo-500"
                         >
                           <option value="">Select a column...</option>
                           {available.map((col) => (
@@ -418,7 +418,7 @@ export default function TemplatePicker({
                             updateParam(param.key, e.target.value)
                           }
                           placeholder={param.placeholder}
-                          className="w-full rounded-xl border border-gray-200/80 bg-white/90 px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-indigo-300 focus:ring-2 focus:ring-indigo-400/20 dark:border-gray-700/70 dark:bg-gray-800/90 dark:text-gray-200 dark:focus:border-indigo-500"
+                          className="w-full rounded-xl border border-gray-200/80 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-indigo-300 focus:ring-2 focus:ring-indigo-400/20 dark:border-gray-700/70 dark:bg-gray-800 dark:text-gray-200 dark:focus:border-indigo-500"
                         />
                       )}
                     </div>

@@ -132,8 +132,8 @@ function buildPreview(settings: ExportSettingsState) {
   if (settings.format === "html") {
     return [
       "<table>",
-      "  <thead><tr><th>id</th><th>created_at</th><th>revenue</th></tr></thead>",
-      `  <tbody><tr><td>101</td><td>${dateValue}</td><td>1450.75</td></tr></tbody>`,
+      " <thead><tr><th>id</th><th>created_at</th><th>revenue</th></tr></thead>",
+      ` <tbody><tr><td>101</td><td>${dateValue}</td><td>1450.75</td></tr></tbody>`,
       "</table>",
     ].join("\n");
   }
@@ -338,7 +338,7 @@ export default function ExportSettings() {
             Preview
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-3xl border border-white/20 bg-white/60 p-4 dark:bg-slate-950/30">
+            <div className="rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/30">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <TextCursorInput className="h-4 w-4" />
                 Headers
@@ -347,7 +347,7 @@ export default function ExportSettings() {
                 {settings.includeHeaders ? "Included" : "Removed"}
               </p>
             </div>
-            <div className="rounded-3xl border border-white/20 bg-white/60 p-4 dark:bg-slate-950/30">
+            <div className="rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/30">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <SeparatorHorizontal className="h-4 w-4" />
                 Delimiter

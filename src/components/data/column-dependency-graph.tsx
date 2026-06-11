@@ -125,7 +125,7 @@ function buildNumericSampleQuery(tableName: string, numericColumns: string[]): s
           (column) =>
             `TRY_CAST(${quoteIdentifier(column)} AS DOUBLE) AS ${quoteIdentifier(column)}`,
         )
-        .join(",\n      ")}
+        .join(",\n ")}
     FROM ${quoteIdentifier(tableName)}
     LIMIT ${CORRELATION_SAMPLE_LIMIT}
   `;
@@ -779,7 +779,7 @@ export default function ColumnDependencyGraph({
                   className={`rounded-full border px-3 py-1.5 text-sm transition ${
                     resolvedSelectedNode?.id === node.id
                       ? "border-cyan-400 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300"
-                      : "border-white/20 bg-white/70 text-slate-700 dark:border-white/10 dark:bg-slate-900/45 dark:text-slate-200"
+                      : "border-white/20 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-900 dark:text-slate-200"
                   }`}
                 >
                   {node.id}
@@ -807,7 +807,7 @@ export default function ColumnDependencyGraph({
                     <p className="mt-1">Type: {resolvedSelectedNode.type}</p>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-white/20 bg-white/60 p-3 dark:border-white/10 dark:bg-slate-900/45">
+                    <div className="rounded-2xl border border-white/20 bg-white p-3 dark:border-white/10 dark:bg-slate-900">
                       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                         Uniqueness
                       </p>
@@ -815,7 +815,7 @@ export default function ColumnDependencyGraph({
                         {formatPercent(resolvedSelectedNode.uniquenessRatio * 100, 0)}
                       </p>
                     </div>
-                    <div className="rounded-2xl border border-white/20 bg-white/60 p-3 dark:border-white/10 dark:bg-slate-900/45">
+                    <div className="rounded-2xl border border-white/20 bg-white p-3 dark:border-white/10 dark:bg-slate-900">
                       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                         Null count
                       </p>
@@ -832,7 +832,7 @@ export default function ColumnDependencyGraph({
                       {resolvedSelectedNode.sampleValues.map((value) => (
                         <span
                           key={`${resolvedSelectedNode.id}-${value}`}
-                          className="rounded-full border border-white/20 bg-white/70 px-3 py-1 text-xs dark:border-white/10 dark:bg-slate-900/45"
+                          className="rounded-full border border-white/20 bg-white px-3 py-1 text-xs dark:border-white/10 dark:bg-slate-900"
                         >
                           {value}
                         </span>
@@ -865,7 +865,7 @@ export default function ColumnDependencyGraph({
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
-                  <thead className="bg-white/55 dark:bg-slate-900/55">
+                  <thead className="bg-white dark:bg-slate-900">
                     <tr>
                       <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">
                         Edge

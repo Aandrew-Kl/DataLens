@@ -286,11 +286,11 @@ export default function FileDropzone({
         aria-describedby={helpTextId}
         className={`
           relative overflow-hidden rounded-2xl transition-all duration-300 cursor-pointer
-          backdrop-blur-xl bg-white/60 dark:bg-gray-900/60
+           bg-white dark:bg-gray-900
           border-2 border-dashed
           ${
             status === "dragging"
-              ? "border-indigo-400 dark:border-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.25)] scale-[1.01]"
+              ? "border-indigo-400 dark:border-indigo-500 shadow-sm scale-[1.01]"
               : status === "error"
               ? "border-red-300 dark:border-red-500/50"
               : status === "success"

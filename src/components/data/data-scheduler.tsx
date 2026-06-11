@@ -57,7 +57,7 @@ interface ScheduledTask {
 const STORAGE_KEY_PREFIX = "datalens:scheduler:";
 const EASE = [0.22, 1, 0.36, 1] as const;
 const CARD_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const TASK_LABELS: Record<TaskType, string> = {
   refresh_data: "Refresh data",
   run_pipeline: "Run pipeline",
@@ -170,7 +170,7 @@ function TaskCard({
   const latestHistory = task.history[0] ?? null;
 
   return (
-    <div className="rounded-[1.3rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+    <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
           <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{task.name}</p>
@@ -183,7 +183,7 @@ function TaskCard({
           <button
             type="button"
             onClick={() => onRun(task.id)}
-            className="inline-flex items-center gap-2 rounded-[0.95rem] border border-white/15 bg-white/55 px-3 py-2 text-sm text-slate-700 transition hover:bg-white/70 dark:bg-slate-950/35 dark:text-slate-200"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-3 py-2 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-950/35 dark:text-slate-200"
           >
             {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
             {running ? "Running" : "Run now"}
@@ -191,10 +191,10 @@ function TaskCard({
           <button
             type="button"
             onClick={() => onToggle(task.id)}
-            className={`inline-flex items-center gap-2 rounded-[0.95rem] px-3 py-2 text-sm font-medium transition ${
+            className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ${
               task.enabled
                 ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                : "bg-slate-200/70 text-slate-700 dark:bg-slate-800/70 dark:text-slate-300"
+                : "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
             }`}
           >
             <CheckCircle2 className="h-4 w-4" />
@@ -204,7 +204,7 @@ function TaskCard({
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-3">
-        <div className="rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/25">
+        <div className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/25">
           <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
             Next run
           </p>
@@ -212,7 +212,7 @@ function TaskCard({
             {formatDateTime(task.nextRunAt)}
           </p>
         </div>
-        <div className="rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/25">
+        <div className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/25">
           <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
             Notifications
           </p>
@@ -220,7 +220,7 @@ function TaskCard({
             {task.notifications ? "Browser enabled" : "Off"}
           </p>
         </div>
-        <div className="rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/25">
+        <div className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/25">
           <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
             Last run
           </p>
@@ -432,7 +432,7 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
     <section className={`${CARD_CLASS} overflow-hidden p-5`}>
       <div className="flex flex-col gap-5 border-b border-white/15 pb-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
             <CalendarClock className="h-5 w-5" />
           </div>
           <div>
@@ -448,7 +448,7 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
         <button
           type="button"
           onClick={() => void requestNotificationPermission()}
-          className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/60 dark:bg-slate-900/30 dark:text-slate-200"
+          className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-900/30 dark:text-slate-200"
         >
           <Bell className="h-4 w-4" />
           {notifications ? "Notifications enabled" : "Enable notifications"}
@@ -461,7 +461,7 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.28, ease: EASE }}
-            className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30"
+            className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30"
           >
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
               Create a scheduled task
@@ -471,12 +471,12 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
                 value={taskName}
                 onChange={(event) => setTaskName(event.target.value)}
                 placeholder="Task name"
-                className="rounded-[1rem] border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               />
               <select
                 value={taskType}
                 onChange={(event) => setTaskType(event.target.value as TaskType)}
-                className="rounded-[1rem] border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               >
                 {(Object.keys(TASK_LABELS) as TaskType[]).map((type) => (
                   <option key={type} value={type}>
@@ -487,7 +487,7 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
               <select
                 value={mode}
                 onChange={(event) => setMode(event.target.value as ScheduleMode)}
-                className="rounded-[1rem] border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               >
                 <option value="minutes">Every N minutes</option>
                 <option value="hours">Every N hours</option>
@@ -499,18 +499,18 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
                 min={1}
                 value={every}
                 onChange={(event) => setEvery(Math.max(Number(event.target.value), 1))}
-                className="rounded-[1rem] border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               />
               <input
                 type="time"
                 value={time}
                 onChange={(event) => setTime(event.target.value)}
-                className="rounded-[1rem] border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               />
               <select
                 value={weekday}
                 onChange={(event) => setWeekday(Number(event.target.value))}
-                className="rounded-[1rem] border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               >
                 {WEEKDAY_LABELS.map((label, index) => (
                   <option key={label} value={index}>
@@ -523,7 +523,7 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
             <button
               type="button"
               onClick={addTask}
-              className="mt-4 inline-flex items-center gap-2 rounded-[1rem] bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
+              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
             >
               <Timer className="h-4 w-4" />
               Create task
@@ -532,7 +532,7 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
 
           <div className="space-y-3">
             {tasks.length === 0 ? (
-              <div className="rounded-[1.3rem] border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+              <div className="rounded-lg border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
                 No scheduled tasks yet. Configure one above to start periodic runs.
               </div>
             ) : (
@@ -550,7 +550,7 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <div className="flex items-center gap-3">
               <Clock3 className="h-4 w-4 text-slate-500 dark:text-slate-400" />
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -566,7 +566,7 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
                 timelineEntries.map((task) => (
                   <div
                     key={task.id}
-                    className="rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/25"
+                    className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/25"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -585,7 +585,7 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
             </div>
           </div>
 
-          <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <div className="flex items-center gap-3">
               <RefreshCw className="h-4 w-4 text-slate-500 dark:text-slate-400" />
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -601,7 +601,7 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
                 taskHistory.map((entry) => (
                   <div
                     key={entry.id}
-                    className="rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/25"
+                    className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/25"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -639,7 +639,7 @@ export default function DataScheduler({ tableName, columns }: DataSchedulerProps
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.24, ease: EASE }}
-                className="rounded-[1.2rem] border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-800 dark:text-cyan-300"
+                className="rounded-lg border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-800 dark:text-cyan-300"
               >
                 <div className="flex items-center gap-2">
                   <ShieldAlert className="h-4 w-4" />

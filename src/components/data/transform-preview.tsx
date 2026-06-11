@@ -126,7 +126,7 @@ function buildGroupStatement(sourceName: string, columns: ColumnProfile[], draft
   const groupColumns = draft.groupBy.filter((name) => columns.some((column) => column.name === name));
   if (draft.aggregates.length === 0) return { label: "Group & aggregate", statement: "", error: "Add at least one aggregation." };
   const seenNames = new Set(groupColumns.map((name) => name.toLowerCase()));
-  const selectLines = groupColumns.map((name) => `  ${quoteIdentifier(name)}`);
+  const selectLines = groupColumns.map((name) => ` ${quoteIdentifier(name)}`);
   for (const aggregate of draft.aggregates) {
     const alias = aggregate.alias.trim() || defaultAggregateAlias(aggregate);
     const aliasKey = alias.toLowerCase();
@@ -134,12 +134,12 @@ function buildGroupStatement(sourceName: string, columns: ColumnProfile[], draft
     seenNames.add(aliasKey);
     if (aggregate.functionName === "COUNT") {
       const target = aggregate.column ? quoteIdentifier(aggregate.column) : "*";
-      selectLines.push(`  COUNT(${target}) AS ${quoteIdentifier(alias)}`);
+      selectLines.push(` COUNT(${target}) AS ${quoteIdentifier(alias)}`);
       continue;
     }
     const column = columns.find((item) => item.name === aggregate.column);
     if (!column) return { label: "Group & aggregate", statement: "", error: `Choose a source column for ${aggregate.functionName}.` };
-    selectLines.push(`  ${buildMetricExpression(aggregate.functionName, column.name, quoteIdentifier, { cast: false })} AS ${quoteIdentifier(alias)}`);
+    selectLines.push(` ${buildMetricExpression(aggregate.functionName, column.name, quoteIdentifier, { cast: false })} AS ${quoteIdentifier(alias)}`);
   }
   const lines = ["SELECT", selectLines.join(",\n"), `FROM ${quoteIdentifier(sourceName)}`];
   if (groupColumns.length > 0) {
@@ -156,7 +156,7 @@ function buildComputedStatement(sourceName: string, columns: ColumnProfile[], dr
   if (columns.some((column) => column.name.toLowerCase() === trimmedName.toLowerCase())) {
     return { label: `Add computed column ${trimmedName}`, statement: "", error: `A column named "${trimmedName}" already exists in this relation.` };
   }
-  return { label: `Add computed column ${trimmedName}`, statement: `SELECT *,\n  ${trimmedExpression} AS ${quoteIdentifier(trimmedName)}\nFROM ${quoteIdentifier(sourceName)}` };
+  return { label: `Add computed column ${trimmedName}`, statement: `SELECT *,\n ${trimmedExpression} AS ${quoteIdentifier(trimmedName)}\nFROM ${quoteIdentifier(sourceName)}` };
 }
 
 function buildRenameStatement(sourceName: string, columns: ColumnProfile[], draft: RenameDraft): BuildResult {
@@ -168,7 +168,7 @@ function buildRenameStatement(sourceName: string, columns: ColumnProfile[], draf
   if (columns.some((column) => column.name !== existingColumn.name && column.name.toLowerCase() === trimmedNewName.toLowerCase())) {
     return { label: `Rename ${existingColumn.name}`, statement: "", error: `A column named "${trimmedNewName}" already exists.` };
   }
-  const projection = columns.map((column) => column.name === existingColumn.name ? `  ${quoteIdentifier(column.name)} AS ${quoteIdentifier(trimmedNewName)}` : `  ${quoteIdentifier(column.name)}`).join(",\n");
+  const projection = columns.map((column) => column.name === existingColumn.name ? ` ${quoteIdentifier(column.name)} AS ${quoteIdentifier(trimmedNewName)}` : ` ${quoteIdentifier(column.name)}`).join(",\n");
   return { label: `Rename ${existingColumn.name} to ${trimmedNewName}`, statement: `SELECT\n${projection}\nFROM ${quoteIdentifier(sourceName)}` };
 }
 
@@ -177,7 +177,7 @@ function buildDropStatement(sourceName: string, columns: ColumnProfile[], draft:
   if (!existingColumn) return { label: "Drop column", statement: "", error: "Choose a valid column to drop." };
   const remainingColumns = columns.filter((column) => column.name !== existingColumn.name);
   if (remainingColumns.length === 0) return { label: `Drop ${existingColumn.name}`, statement: "", error: "At least one column must remain in the result." };
-  const projection = remainingColumns.map((column) => `  ${quoteIdentifier(column.name)}`).join(",\n");
+  const projection = remainingColumns.map((column) => ` ${quoteIdentifier(column.name)}`).join(",\n");
   return { label: `Drop ${existingColumn.name}`, statement: `SELECT\n${projection}\nFROM ${quoteIdentifier(sourceName)}` };
 }
 
@@ -225,7 +225,7 @@ export function buildTransformPreview(tableName: string, activeTab: TransformKin
 
 function SqlPreview({ preview }: { preview: PreviewResult }) {
   return (
-    <div className="rounded-2xl border border-gray-200/60 bg-white/45 p-4 dark:border-gray-700/60 dark:bg-gray-950/35">
+    <div className="rounded-2xl border border-gray-200/60 bg-white p-4 dark:border-gray-700/60 dark:bg-gray-950/35">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">SQL preview</p>
@@ -236,7 +236,7 @@ function SqlPreview({ preview }: { preview: PreviewResult }) {
           {preview.viewName}
         </span>
       </div>
-      <pre className="overflow-x-auto rounded-xl bg-slate-950/95 px-4 py-3 text-xs leading-6 text-slate-200">{preview.createViewSql}</pre>
+      <pre className="overflow-x-auto rounded-xl bg-slate-950 px-4 py-3 text-xs leading-6 text-slate-200">{preview.createViewSql}</pre>
     </div>
   );
 }
@@ -281,7 +281,7 @@ export function TransformPreview({
           <Play className="h-4 w-4" />
           {busyAction === "execute" ? "Creating view..." : "Create view"}
         </button>
-        <button type="button" onClick={onUndo} disabled={historyLength === 0 || busyAction !== null} className="inline-flex items-center gap-2 rounded-xl border border-gray-200/70 bg-white/70 px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-blue-400/50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700/70 dark:bg-gray-950/40 dark:text-gray-200 dark:hover:text-blue-300">
+        <button type="button" onClick={onUndo} disabled={historyLength === 0 || busyAction !== null} className="inline-flex items-center gap-2 rounded-xl border border-gray-200/70 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-blue-400/50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-200 dark:hover:text-blue-300">
           <RotateCcw className="h-4 w-4" />
           Undo last transform
         </button>

@@ -30,10 +30,10 @@ export function DraggableColumn({ column }: { column: ColumnProfile }) {
       type="button"
       draggable
       onDragStart={handleDragStart}
-      className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/45 px-3 py-2 text-left text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
+      className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white px-3 py-2 text-left text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
     >
       <span className="truncate">{column.name}</span>
-      <span className="shrink-0 rounded-full bg-white/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:bg-slate-900/70 dark:text-slate-300">
+      <span className="shrink-0 rounded-full bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:bg-slate-900 dark:text-slate-300">
         {column.type}
       </span>
     </button>
@@ -65,7 +65,7 @@ export function DropZone({
     <div
       onDragOver={(event) => event.preventDefault()}
       onDrop={handleDrop}
-      className="rounded-[1.4rem] border border-dashed border-white/20 bg-white/35 p-4 dark:bg-slate-950/30"
+      className="rounded-lg border border-dashed border-white/20 bg-white/35 p-4 dark:bg-slate-950/30"
     >
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
         <GripVertical className="h-3.5 w-3.5" />
@@ -85,7 +85,7 @@ export function ZonePill({
   onRemove: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/55 px-3 py-2 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
+    <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white px-3 py-2 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
       <span className="truncate">{label}</span>
       <button
         type="button"

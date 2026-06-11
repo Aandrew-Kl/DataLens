@@ -24,7 +24,7 @@ interface AnalysisResult {
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const FREQUENCY_LABELS: Record<Frequency, string> = { daily: "Daily cadence", weekly: "Weekly cadence", monthly: "Monthly cadence" };
-const selectClass = "w-full rounded-2xl border border-gray-200/80 bg-white/70 px-4 py-3 text-sm text-gray-900 shadow-sm outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-500/10 dark:border-gray-800/80 dark:bg-gray-900/70 dark:text-gray-100";
+const selectClass = "w-full rounded-2xl border border-gray-200/80 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-500/10 dark:border-gray-800/80 dark:bg-gray-900 dark:text-gray-100";
 
 const quote = (value: string) => `"${value.replace(/"/g, '""')}"`;
 const toNumber = (value: unknown) => {
@@ -196,7 +196,7 @@ function buildSeasonalityOption(points: SeasonalityPoint[], dark: boolean): ECha
 
 function Panel({ title, icon: Icon, children }: { title: string; icon: ElementType; children: ReactNode }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.24, ease: "easeOut" }} className="rounded-2xl border border-gray-200/70 bg-white/80 p-5 shadow-sm dark:border-gray-700/70 dark:bg-gray-900/60">
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.24, ease: "easeOut" }} className="rounded-2xl border border-gray-200/70 bg-white p-5 shadow-sm dark:border-gray-700/70 dark:bg-gray-900">
       <div className="mb-4 flex items-center gap-3">
         <div className="rounded-xl bg-sky-500/10 p-2 text-sky-600 dark:text-sky-400"><Icon className="h-4 w-4" /></div>
         <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
@@ -207,7 +207,7 @@ function Panel({ title, icon: Icon, children }: { title: string; icon: ElementTy
 }
 function StatTile({ label, value, icon: Icon }: { label: string; value: string; icon: ElementType }) {
   return (
-    <div className="rounded-2xl border border-gray-200/70 bg-gray-50/80 p-4 dark:border-gray-800/70 dark:bg-gray-950/35">
+    <div className="rounded-2xl border border-gray-200/70 bg-gray-50 p-4 dark:border-gray-800/70 dark:bg-gray-950/35">
       <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400"><Icon className="h-3.5 w-3.5" />{label}</div>
       <p className="mt-3 text-xl font-semibold text-gray-900 dark:text-gray-100">{value}</p>
     </div>
@@ -282,7 +282,7 @@ export default function TimeSeriesAnalyzer({ tableName, columns }: TimeSeriesAna
 
   if (dateColumns.length === 0 || numericColumns.length === 0) {
     return (
-      <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-gray-200/50 bg-white/60 p-6 shadow-xl shadow-slate-900/5 backdrop-blur-xl dark:border-gray-700/50 dark:bg-gray-900/60">
+      <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-gray-200/50 bg-white p-6 shadow-xl shadow-slate-900/5 dark:border-gray-700/50 dark:bg-gray-900">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">Time Series Analysis</p>
         <h3 className="mt-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Insufficient columns</h3>
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">This tool needs at least one date column and one numeric column.</p>
@@ -291,7 +291,7 @@ export default function TimeSeriesAnalyzer({ tableName, columns }: TimeSeriesAna
   }
 
   return (
-    <section className="rounded-2xl border border-gray-200/50 bg-white/60 p-6 shadow-xl shadow-slate-900/5 backdrop-blur-xl dark:border-gray-700/50 dark:bg-gray-900/60">
+    <section className="rounded-2xl border border-gray-200/50 bg-white p-6 shadow-xl shadow-slate-900/5 dark:border-gray-700/50 dark:bg-gray-900">
       <div className="flex flex-col gap-5 border-b border-gray-200/70 pb-5 dark:border-gray-700/70 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-600 dark:text-sky-400">Time Series Analysis</p>
@@ -309,7 +309,7 @@ export default function TimeSeriesAnalyzer({ tableName, columns }: TimeSeriesAna
           </label>
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Moving average</span>
-            <div className="rounded-2xl border border-gray-200/80 bg-white/70 px-4 py-3 shadow-sm dark:border-gray-800/80 dark:bg-gray-900/70">
+            <div className="rounded-2xl border border-gray-200/80 bg-white px-4 py-3 shadow-sm dark:border-gray-800/80 dark:bg-gray-900">
               <input type="range" min={2} max={maxWindow} value={windowSize} disabled={rows.length < 2} onChange={(event) => setMovingAverageWindow(Number(event.target.value))} className="w-full accent-sky-500 disabled:cursor-not-allowed disabled:opacity-50" />
               <div className="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400"><span>2</span><span>{windowSize} periods</span><span>{maxWindow}</span></div>
             </div>
@@ -325,7 +325,7 @@ export default function TimeSeriesAnalyzer({ tableName, columns }: TimeSeriesAna
       ) : error ? (
         <div className="mt-6 rounded-2xl border border-red-300/50 bg-red-500/10 p-5 text-sm text-red-700 dark:border-red-500/30 dark:text-red-300">{error}</div>
       ) : !analysis || analysis.points.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-gray-200/70 bg-gray-50/80 p-5 text-sm text-gray-600 dark:border-gray-800/70 dark:bg-gray-950/35 dark:text-gray-400">No valid time-series rows were found for the selected columns.</div>
+        <div className="mt-6 rounded-2xl border border-gray-200/70 bg-gray-50 p-5 text-sm text-gray-600 dark:border-gray-800/70 dark:bg-gray-950/35 dark:text-gray-400">No valid time-series rows were found for the selected columns.</div>
       ) : (
         <div className="mt-6 grid gap-6 xl:grid-cols-[1.45fr_0.95fr]">
           <div className="space-y-6">
@@ -342,19 +342,19 @@ export default function TimeSeriesAnalyzer({ tableName, columns }: TimeSeriesAna
           <div className="space-y-6">
             <Panel title="Seasonality" icon={Calendar}>
               <ReactECharts option={buildSeasonalityOption(analysis.seasonality, dark)} style={{ height: 280, width: "100%" }} opts={{ renderer: "svg" }} notMerge lazyUpdate />
-              <div className="mt-4 rounded-2xl border border-gray-200/70 bg-gray-50/80 p-4 text-sm leading-6 text-gray-700 dark:border-gray-800/70 dark:bg-gray-950/35 dark:text-gray-300">
+              <div className="mt-4 rounded-2xl border border-gray-200/70 bg-gray-50 p-4 text-sm leading-6 text-gray-700 dark:border-gray-800/70 dark:bg-gray-950/35 dark:text-gray-300">
                 <p><span className="font-semibold text-gray-900 dark:text-gray-100">{analysis.seasonalLabel}:</span> strongest lift appears in <span className="font-semibold text-emerald-600 dark:text-emerald-400">{analysis.peakSeason ?? "—"}</span>.</p>
                 <p className="mt-2">Seasonal swing: <span className="font-semibold text-gray-900 dark:text-gray-100">{analysis.seasonalLift == null ? "—" : formatPercent(analysis.seasonalLift, 1)}</span> between the highest and lowest recurring bucket.</p>
               </div>
             </Panel>
             <Panel title="Series Summary" icon={Sigma}>
               <div className="space-y-4 text-sm text-gray-700 dark:text-gray-300">
-                <div className="rounded-2xl border border-gray-200/70 bg-gray-50/80 p-4 dark:border-gray-800/70 dark:bg-gray-950/35">
+                <div className="rounded-2xl border border-gray-200/70 bg-gray-50 p-4 dark:border-gray-800/70 dark:bg-gray-950/35">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">Coverage</p>
                   <p className="mt-2 text-base font-semibold text-gray-900 dark:text-gray-100">{analysis.startLabel} to {analysis.endLabel}</p>
                   <p className="mt-1 text-gray-600 dark:text-gray-400">{formatNumber(analysis.points.length)} buckets from {formatNumber(analysis.totalRows)} non-null rows.</p>
                 </div>
-                <div className="rounded-2xl border border-gray-200/70 bg-gray-50/80 p-4 dark:border-gray-800/70 dark:bg-gray-950/35">
+                <div className="rounded-2xl border border-gray-200/70 bg-gray-50 p-4 dark:border-gray-800/70 dark:bg-gray-950/35">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">Interpretation</p>
                   <p className="mt-2">The chart overlays the raw series with a <span className="font-semibold text-gray-900 dark:text-gray-100">{windowSize}-period moving average</span> and a fitted trend line to separate noise from direction.</p>
                   <p className="mt-2">Cadence is inferred from the median spacing between dates so sparse weekly and monthly datasets are labeled correctly.</p>

@@ -387,7 +387,7 @@ export default function EncodingDetector({
               </label>
             </div>
 
-            <div className="mt-4 rounded-2xl border border-white/20 bg-white/55 p-4 dark:bg-slate-950/35">
+            <div className="mt-4 rounded-2xl border border-white/20 bg-white p-4 dark:bg-slate-950/35">
               <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 Summary
               </div>
@@ -418,7 +418,7 @@ export default function EncodingDetector({
                 previewRows.map((row) => (
                   <div
                     key={row.key}
-                    className="rounded-2xl border border-white/20 bg-white/55 p-4 dark:bg-slate-950/35"
+                    className="rounded-2xl border border-white/20 bg-white p-4 dark:bg-slate-950/35"
                   >
                     <div className="grid gap-3 md:grid-cols-2">
                       <div>

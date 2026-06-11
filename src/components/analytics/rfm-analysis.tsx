@@ -611,7 +611,7 @@ export default function RfmAnalysis({ tableName, columns }: RfmAnalysisProps) {
               style={{ height: 360 }}
             />
           ) : (
-            <div className="flex min-h-[18rem] items-center justify-center rounded-[1.5rem] border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex min-h-[18rem] items-center justify-center rounded-lg border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
               Choose a date, user, and amount column to score customers.
             </div>
           )}
@@ -631,7 +631,7 @@ export default function RfmAnalysis({ tableName, columns }: RfmAnalysisProps) {
               style={{ height: 360 }}
             />
           ) : (
-            <div className="flex min-h-[18rem] items-center justify-center rounded-[1.5rem] border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex min-h-[18rem] items-center justify-center rounded-lg border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
               Score customers to compare recency, frequency, and monetary distributions.
             </div>
           )}
@@ -646,7 +646,7 @@ export default function RfmAnalysis({ tableName, columns }: RfmAnalysisProps) {
         {result ? (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
-              <thead className="bg-white/60 dark:bg-slate-900/60">
+              <thead className="bg-white dark:bg-slate-900">
                 <tr>
                   <th className="px-5 py-3 font-semibold text-slate-700 dark:text-slate-200">Segment</th>
                   <th className="px-5 py-3 font-semibold text-slate-700 dark:text-slate-200">Customers</th>

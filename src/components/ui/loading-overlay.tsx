@@ -46,7 +46,7 @@ export default function LoadingOverlay({
           role="status"
         >
           <motion.div
-            className="absolute inset-0 bg-slate-950/25 backdrop-blur-md dark:bg-slate-950/50"
+            className="absolute inset-0 bg-slate-950/25 dark:bg-slate-950/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -54,9 +54,9 @@ export default function LoadingOverlay({
 
           <motion.div
             className={mergeClasses(
-              "relative w-full max-w-sm overflow-hidden rounded-[28px] border px-8 py-7 text-center",
-              "border-white/40 bg-white/78 shadow-[0_30px_120px_-48px_rgba(15,23,42,0.75)] backdrop-blur-2xl",
-              "dark:border-slate-700/70 dark:bg-slate-950/82",
+              "relative w-full max-w-sm overflow-hidden rounded-lg border px-8 py-7 text-center",
+              "border-white/40 bg-white shadow-sm ",
+              "dark:border-slate-700/70 dark:bg-slate-950",
             )}
             initial={{ opacity: 0, y: 16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -77,7 +77,7 @@ export default function LoadingOverlay({
                   <span>Progress</span>
                   <span>{safeProgress}%</span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-slate-200/80 dark:bg-slate-800/80">
+                <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                   <motion.div
                     className="h-full rounded-full bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400"
                     initial={{ width: 0 }}

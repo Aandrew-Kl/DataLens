@@ -333,7 +333,7 @@ function OutlierDetector({
         animate={{ opacity: 1, y: 0 }}
         className="
           rounded-2xl border border-gray-200/50 dark:border-gray-700/50
-          bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl
+          bg-white dark:bg-gray-900 
           p-6 shadow-xl shadow-slate-900/5
         "
       >
@@ -356,7 +356,7 @@ function OutlierDetector({
       animate={{ opacity: 1, y: 0 }}
       className="
         rounded-2xl border border-gray-200/50 dark:border-gray-700/50
-        bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl
+        bg-white dark:bg-gray-900 
         p-6 shadow-xl shadow-slate-900/5
       "
     >
@@ -375,7 +375,7 @@ function OutlierDetector({
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2">
-          <div className="rounded-2xl border border-gray-200/60 bg-white/70 px-4 py-3 dark:border-gray-700/70 dark:bg-gray-950/35">
+          <div className="rounded-2xl border border-gray-200/60 bg-white px-4 py-3 dark:border-gray-700/70 dark:bg-gray-950/35">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
               Columns With Outliers
             </p>
@@ -383,7 +383,7 @@ function OutlierDetector({
               {columnsWithOutliers}
             </p>
           </div>
-          <div className="rounded-2xl border border-gray-200/60 bg-white/70 px-4 py-3 dark:border-gray-700/70 dark:bg-gray-950/35">
+          <div className="rounded-2xl border border-gray-200/60 bg-white px-4 py-3 dark:border-gray-700/70 dark:bg-gray-950/35">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
               Total Outlier Cells
             </p>
@@ -396,7 +396,7 @@ function OutlierDetector({
 
       <div className="mt-5 space-y-4">
         {loading ? (
-          <div className="grid min-h-[220px] place-items-center rounded-2xl border border-gray-200/60 bg-white/55 dark:border-gray-800/70 dark:bg-gray-950/35">
+          <div className="grid min-h-[220px] place-items-center rounded-2xl border border-gray-200/60 bg-white dark:border-gray-800/70 dark:bg-gray-950/35">
             <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
           </div>
         ) : error ? (
@@ -421,7 +421,7 @@ function OutlierDetector({
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.03, duration: 0.24 }}
-                className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white/70 dark:border-gray-700/70 dark:bg-gray-950/35"
+                className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white dark:border-gray-700/70 dark:bg-gray-950/35"
               >
                 <div className="p-5">
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -439,7 +439,7 @@ function OutlierDetector({
                       </div>
 
                       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                        <div className="rounded-xl border border-gray-200/60 bg-white/70 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
+                        <div className="rounded-xl border border-gray-200/60 bg-white px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
                           <p className="text-[11px] uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
                             Outliers
                           </p>
@@ -451,7 +451,7 @@ function OutlierDetector({
                           </p>
                         </div>
 
-                        <div className="rounded-xl border border-gray-200/60 bg-white/70 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
+                        <div className="rounded-xl border border-gray-200/60 bg-white px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
                           <p className="text-[11px] uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
                             IQR
                           </p>
@@ -464,7 +464,7 @@ function OutlierDetector({
                           </p>
                         </div>
 
-                        <div className="rounded-xl border border-gray-200/60 bg-white/70 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
+                        <div className="rounded-xl border border-gray-200/60 bg-white px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
                           <p className="text-[11px] uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
                             Lower Fence
                           </p>
@@ -473,7 +473,7 @@ function OutlierDetector({
                           </p>
                         </div>
 
-                        <div className="rounded-xl border border-gray-200/60 bg-white/70 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
+                        <div className="rounded-xl border border-gray-200/60 bg-white px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
                           <p className="text-[11px] uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
                             Upper Fence
                           </p>
@@ -489,9 +489,9 @@ function OutlierDetector({
                       onClick={() => void handleToggleRows(summary)}
                       className="
                         inline-flex items-center justify-center gap-2 rounded-full
-                        border border-gray-200/70 bg-white/80 px-4 py-2 text-sm font-medium
+                        border border-gray-200/70 bg-white px-4 py-2 text-sm font-medium
                         text-gray-700 transition-colors hover:bg-gray-100
-                        dark:border-gray-700/70 dark:bg-gray-950/40 dark:text-gray-200 dark:hover:bg-gray-900
+                        dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900
                       "
                     >
                       {expandedColumn === summary.columnName ? (
@@ -538,7 +538,7 @@ function OutlierDetector({
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="border-t border-gray-200/60 bg-white/55 p-5 dark:border-gray-800/70 dark:bg-gray-950/25"
+                      className="border-t border-gray-200/60 bg-white p-5 dark:border-gray-800/70 dark:bg-gray-950/25"
                     >
                       {rowLoadingColumn === summary.columnName ? (
                         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -556,7 +556,7 @@ function OutlierDetector({
                       ) : (
                         <div className="overflow-auto rounded-xl border border-gray-200/60 dark:border-gray-800/70">
                           <table className="min-w-full divide-y divide-gray-200/60 text-left text-xs dark:divide-gray-800/70">
-                            <thead className="bg-gray-50/80 dark:bg-gray-900/70">
+                            <thead className="bg-gray-50 dark:bg-gray-900">
                               <tr>
                                 <th className="px-3 py-2 font-semibold uppercase tracking-[0.15em] text-gray-500 dark:text-gray-400">
                                   Row
@@ -571,7 +571,7 @@ function OutlierDetector({
                                 ))}
                               </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-200/60 bg-white/80 dark:divide-gray-800/70 dark:bg-gray-950/25">
+                            <tbody className="divide-y divide-gray-200/60 bg-white dark:divide-gray-800/70 dark:bg-gray-950/25">
                               {rows.map((row, rowIndex) => (
                                 <tr key={`${summary.columnName}-row-${rowIndex}`}>
                                   <td className="whitespace-nowrap px-3 py-2 font-mono text-gray-500 dark:text-gray-400">

@@ -22,7 +22,7 @@ interface SnapshotRecord {
 type StatusState = { type: "success" | "error"; message: string } | null;
 
 const STORAGE_KEY = "datalens:snapshot-metadata";
-const container = "rounded-2xl border border-slate-200/70 bg-white/80 shadow-sm dark:border-slate-800/80 dark:bg-slate-950/55";
+const container = "rounded-2xl border border-slate-200/70 bg-white shadow-sm dark:border-slate-800/80 dark:bg-slate-950";
 function sanitizeSnapshotName(value: string) {
   return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40) || "snapshot";
 }
@@ -48,7 +48,7 @@ function describeColumns(columns: SnapshotRecord["columns"]) {
 
 function SnapshotMetric({ icon: Icon, label, value }: { icon: typeof Database; label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-3 shadow-sm dark:border-slate-800/80 dark:bg-slate-950/50">
+    <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3 shadow-sm dark:border-slate-800/80 dark:bg-slate-950">
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
         <Icon className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
         {label}
@@ -239,7 +239,7 @@ export default function SnapshotManager({ tableName, columns, rowCount }: Snapsh
             event.preventDefault();
             void handleCreateSnapshot();
           }}
-          className={`${container} border-slate-200/70 bg-white/70 p-4 dark:bg-slate-950/55`}
+          className={`${container} border-slate-200/70 bg-white p-4 dark:bg-slate-950`}
         >
           <div className="flex flex-col gap-3 lg:flex-row">
             <label className="flex-1">
@@ -310,7 +310,7 @@ export default function SnapshotManager({ tableName, columns, rowCount }: Snapsh
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -12 }}
-                className="rounded-2xl border border-dashed border-slate-300/80 bg-white/50 px-5 py-8 text-center dark:border-slate-700/80 dark:bg-slate-950/35"
+                className="rounded-2xl border border-dashed border-slate-300/80 bg-white px-5 py-8 text-center dark:border-slate-700/80 dark:bg-slate-950/35"
               >
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 dark:bg-slate-900 dark:text-slate-400">
                   <AlertCircle className="h-5 w-5" />

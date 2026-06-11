@@ -181,7 +181,7 @@ export default function ChartBuilderSection({
         </ToolSection>
       </div>
 
-      <details className="group mt-6 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+      <details className="group mt-6 rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900">
         <summary className="cursor-pointer list-none">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -238,7 +238,7 @@ export default function ChartBuilderSection({
                 }
               />
             ) : (
-              <div className="rounded-xl border border-dashed border-slate-200 bg-white/70 px-4 py-5 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-400">
+              <div className="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-5 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
                 Save a chart from the builder to preview it in the standalone
                 renderer.
               </div>

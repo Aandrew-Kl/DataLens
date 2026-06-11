@@ -67,7 +67,7 @@ function SqlBlock({ sql }: { sql: string }) {
           {copied ? "Copied!" : "Copy"}
         </button>
       </div>
-      <pre className="px-3 py-2.5 text-xs leading-relaxed overflow-x-auto bg-gray-50 dark:bg-gray-900/80 text-gray-700 dark:text-gray-300 font-mono">
+      <pre className="px-3 py-2.5 text-xs leading-relaxed overflow-x-auto bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 font-mono">
         {sql}
       </pre>
     </div>
@@ -273,7 +273,7 @@ export default function ChatInterface({
   );
 
   return (
-    <div className="flex flex-col h-full min-h-[500px] max-h-[800px] rounded-2xl overflow-hidden border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-xl bg-white/60 dark:bg-gray-900/60">
+    <div className="flex flex-col h-full min-h-[500px] max-h-[800px] rounded-2xl overflow-hidden border border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-900">
       {/* Suggestions */}
       {suggestions.length > 0 && messages.length === 0 && (
         <div className="px-4 pt-4 pb-2">
@@ -357,7 +357,7 @@ export default function ChatInterface({
                         )}
 
                         {msg.chart && msg.data && msg.data.length > 0 && (
-                          <div className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 overflow-hidden bg-white dark:bg-gray-900/80 p-2">
+                          <div className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 overflow-hidden bg-white dark:bg-gray-900 p-2">
                             <ChartRenderer config={msg.chart} data={msg.data} />
                           </div>
                         )}
@@ -408,7 +408,7 @@ export default function ChatInterface({
       </div>
 
       {/* Input area */}
-      <div className="border-t border-gray-200/60 dark:border-gray-700/50 px-4 py-3 bg-white/40 dark:bg-gray-900/40">
+      <div className="border-t border-gray-200/60 dark:border-gray-700/50 px-4 py-3 bg-white dark:bg-gray-900">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -428,7 +428,7 @@ export default function ChatInterface({
               className="
                 w-full pl-10 pr-4 py-2.5 text-sm
                 rounded-xl border border-gray-200/60 dark:border-gray-700/50
-                bg-white/80 dark:bg-gray-800/80
+                bg-white dark:bg-gray-800
                 text-gray-700 dark:text-gray-200
                 placeholder-gray-400 dark:placeholder-gray-500
                 focus:outline-none focus:ring-2 focus:ring-purple-400/40 dark:focus:ring-purple-500/30

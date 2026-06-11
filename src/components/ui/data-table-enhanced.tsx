@@ -22,7 +22,7 @@ import {
 import { clamp } from "@/lib/utils/formatters";
 
 const GLASS_PANEL_CLASS =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-slate-950 border border-white/20";
 
 type SortDirection = "asc" | "desc" | null;
 
@@ -134,7 +134,7 @@ function IndeterminateCheckbox({
       checked={checked}
       aria-label={label}
       onChange={onChange}
-      className="h-4 w-4 rounded border-white/20 bg-white/70 text-cyan-600 focus:ring-cyan-400 dark:bg-slate-900/60"
+      className="h-4 w-4 rounded border-white/20 bg-white text-cyan-600 focus:ring-cyan-400 dark:bg-slate-900"
     />
   );
 }
@@ -184,7 +184,7 @@ function BulkToolbar<T>({
             className={`rounded-2xl px-3 py-2 text-sm font-semibold transition-colors ${
               action.tone === "danger"
                 ? "bg-rose-500 text-white hover:bg-rose-400"
-                : "border border-white/20 bg-white/60 text-slate-700 hover:bg-white dark:bg-slate-900/55 dark:text-slate-100 dark:hover:bg-slate-900"
+                : "border border-white/20 bg-white text-slate-700 hover:bg-white dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-900"
             }`}
           >
             {action.label}
@@ -193,7 +193,7 @@ function BulkToolbar<T>({
         <button
           type="button"
           onClick={onClear}
-          className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/60 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-white dark:bg-slate-900/55 dark:text-slate-100 dark:hover:bg-slate-900"
+          className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-white dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-900"
         >
           <Trash2 className="h-4 w-4" />
           Clear selection
@@ -422,7 +422,7 @@ export default function DataTableEnhanced<T>({
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <label className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/60 px-3 py-2 text-sm text-slate-600 dark:bg-slate-900/55 dark:text-slate-300">
+          <label className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
             <Search className="h-4 w-4 text-slate-400" />
             <input
               value={filterText}
@@ -445,7 +445,7 @@ export default function DataTableEnhanced<T>({
                 setPage(1);
               }}
               aria-label="Rows per page"
-              className="rounded-2xl border border-white/20 bg-white/60 px-3 py-2 text-sm text-slate-900 outline-none dark:bg-slate-900/55 dark:text-slate-100"
+              className="rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-900 outline-none dark:bg-slate-900 dark:text-slate-100"
             >
               {pageSizeOptions.map((option) => (
                 <option key={option} value={option}>
@@ -469,7 +469,7 @@ export default function DataTableEnhanced<T>({
       <div className="overflow-hidden rounded-3xl border border-white/20">
         <div className="max-h-[28rem] overflow-auto">
           <table className="w-full table-fixed border-separate border-spacing-0">
-            <thead className="sticky top-0 z-10 bg-white/90 backdrop-blur-2xl dark:bg-slate-950/80">
+            <thead className="sticky top-0 z-10 bg-white dark:bg-slate-950">
               <tr>
                 <th className="w-14 border-b border-white/20 px-4 py-3 text-left">
                   <IndeterminateCheckbox
@@ -568,7 +568,7 @@ export default function DataTableEnhanced<T>({
             type="button"
             onClick={() => setPage(1)}
             disabled={currentPage === 1}
-            className="rounded-2xl border border-white/20 bg-white/60 px-3 py-2 font-medium transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900/55 dark:hover:bg-slate-900"
+            className="rounded-2xl border border-white/20 bg-white px-3 py-2 font-medium transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900 dark:hover:bg-slate-900"
           >
             First page
           </button>
@@ -576,7 +576,7 @@ export default function DataTableEnhanced<T>({
             type="button"
             onClick={() => setPage((currentValue) => Math.max(1, currentValue - 1))}
             disabled={currentPage === 1}
-            className="rounded-2xl border border-white/20 bg-white/60 px-3 py-2 font-medium transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900/55 dark:hover:bg-slate-900"
+            className="rounded-2xl border border-white/20 bg-white px-3 py-2 font-medium transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900 dark:hover:bg-slate-900"
           >
             Previous page
           </button>
@@ -584,7 +584,7 @@ export default function DataTableEnhanced<T>({
             type="button"
             onClick={() => setPage((currentValue) => Math.min(totalPages, currentValue + 1))}
             disabled={currentPage === totalPages}
-            className="rounded-2xl border border-white/20 bg-white/60 px-3 py-2 font-medium transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900/55 dark:hover:bg-slate-900"
+            className="rounded-2xl border border-white/20 bg-white px-3 py-2 font-medium transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900 dark:hover:bg-slate-900"
           >
             Next page
           </button>

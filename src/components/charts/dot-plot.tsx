@@ -47,9 +47,9 @@ interface DotPlotResult {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "border border-white/20 bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 rounded-[1.75rem] shadow-xl shadow-slate-950/10";
+  "border border-white/20 bg-white dark:bg-slate-950 rounded-lg shadow-xl shadow-slate-950/10";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950/50 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950 dark:text-slate-100";
 const PALETTE = ["#0ea5e9", "#8b5cf6", "#10b981", "#f97316", "#ef4444"] as const;
 function toNumber(value: unknown): number | null {
   const numeric = Number(value);
@@ -353,7 +353,7 @@ export default function DotPlot({ tableName, columns }: DotPlotProps) {
           Build dot plot
         </button>
 
-        <label className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-3 py-2 text-sm text-slate-700 dark:bg-slate-900/50 dark:text-slate-200">
+        <label className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white px-3 py-2 text-sm text-slate-700 dark:bg-slate-900 dark:text-slate-200">
           <input
             type="checkbox"
             checked={jitter}
@@ -366,7 +366,7 @@ export default function DotPlot({ tableName, columns }: DotPlotProps) {
           type="button"
           onClick={handleExportPng}
           disabled={!result}
-          className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900/50 dark:text-slate-200"
+          className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900 dark:text-slate-200"
         >
           <Download className="h-4 w-4" />
           Export PNG
@@ -375,14 +375,14 @@ export default function DotPlot({ tableName, columns }: DotPlotProps) {
           type="button"
           onClick={handleExportCsv}
           disabled={!result}
-          className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900/50 dark:text-slate-200"
+          className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900 dark:text-slate-200"
         >
           <Download className="h-4 w-4" />
           Export CSV
         </button>
       </div>
 
-      <div className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/40 dark:text-slate-300">
+      <div className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
         {numericColumns.length === 0 ? "Add a numeric value column to render the plot." : status}
       </div>
 
@@ -393,7 +393,7 @@ export default function DotPlot({ tableName, columns }: DotPlotProps) {
               Plot summary
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/50">
+              <div className="rounded-2xl bg-white p-4 dark:bg-slate-900">
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Observations
                 </p>
@@ -401,7 +401,7 @@ export default function DotPlot({ tableName, columns }: DotPlotProps) {
                   {formatNumber(result.points.length)}
                 </p>
               </div>
-              <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/50">
+              <div className="rounded-2xl bg-white p-4 dark:bg-slate-900">
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Categories
                 </p>

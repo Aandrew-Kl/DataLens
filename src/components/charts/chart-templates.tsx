@@ -754,7 +754,7 @@ export default function ChartTemplates({ tableName, columns }: ChartTemplatesPro
   }
 
   return (
-    <section className="overflow-hidden rounded-[30px] border border-white/15 bg-[radial-gradient(circle_at_top_right,rgba(34,197,94,0.15),transparent_24%),linear-gradient(135deg,rgba(248,250,252,0.92),rgba(226,232,240,0.78))] shadow-[0_30px_120px_-50px_rgba(15,23,42,0.9)] dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_right,rgba(34,197,94,0.16),transparent_24%),linear-gradient(135deg,rgba(2,6,23,0.95),rgba(15,23,42,0.88))]">
+    <section className="overflow-hidden rounded-lg border border-white/15 bg-[radial-gradient(circle_at_top_right,rgba(34,197,94,0.15),transparent_24%),linear-gradient(135deg,rgba(248,250,252,0.92),rgba(226,232,240,0.78))] shadow-sm dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_right,rgba(34,197,94,0.16),transparent_24%),linear-gradient(135deg,rgba(2,6,23,0.95),rgba(15,23,42,0.88))]">
       <div className="border-b border-white/10 px-6 py-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
@@ -770,7 +770,7 @@ export default function ChartTemplates({ tableName, columns }: ChartTemplatesPro
             </p>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-xl dark:bg-slate-950/45">
+          <div className="rounded-3xl border border-white/10 bg-white/10 px-4 py-3 dark:bg-slate-950">
             <div className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Saved templates</div>
             <div className="mt-2 text-xl font-semibold text-slate-950 dark:text-slate-50">{savedTemplates.length}</div>
           </div>
@@ -900,7 +900,7 @@ export default function ChartTemplates({ tableName, columns }: ChartTemplatesPro
                   <input
                     value={activeDraft.title}
                     onChange={(event) => setActiveDraft((current) => (current ? { ...current, title: event.target.value } : current))}
-                    className="w-full rounded-2xl border border-white/10 bg-white/50 px-3 py-2.5 outline-none dark:bg-slate-950/45"
+                    className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2.5 outline-none dark:bg-slate-950"
                   />
                 </label>
                 <label className="block text-sm text-slate-600 dark:text-slate-300">
@@ -908,7 +908,7 @@ export default function ChartTemplates({ tableName, columns }: ChartTemplatesPro
                   <select
                     value={activeDraft.xAxis}
                     onChange={(event) => setActiveDraft((current) => (current ? { ...current, xAxis: event.target.value } : current))}
-                    className="w-full rounded-2xl border border-white/10 bg-white/50 px-3 py-2.5 outline-none dark:bg-slate-950/45"
+                    className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2.5 outline-none dark:bg-slate-950"
                   >
                     <option value="">No field</option>
                     {columns.map((column) => (
@@ -923,7 +923,7 @@ export default function ChartTemplates({ tableName, columns }: ChartTemplatesPro
                   <select
                     value={activeDraft.yAxis}
                     onChange={(event) => setActiveDraft((current) => (current ? { ...current, yAxis: event.target.value } : current))}
-                    className="w-full rounded-2xl border border-white/10 bg-white/50 px-3 py-2.5 outline-none dark:bg-slate-950/45"
+                    className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2.5 outline-none dark:bg-slate-950"
                   >
                     <option value="">No field</option>
                     {columns.map((column) => (
@@ -938,7 +938,7 @@ export default function ChartTemplates({ tableName, columns }: ChartTemplatesPro
                   <select
                     value={activeDraft.groupBy}
                     onChange={(event) => setActiveDraft((current) => (current ? { ...current, groupBy: event.target.value } : current))}
-                    className="w-full rounded-2xl border border-white/10 bg-white/50 px-3 py-2.5 outline-none dark:bg-slate-950/45"
+                    className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2.5 outline-none dark:bg-slate-950"
                   >
                     <option value="">No field</option>
                     {columns.map((column) => (
@@ -953,7 +953,7 @@ export default function ChartTemplates({ tableName, columns }: ChartTemplatesPro
                   <select
                     value={activeDraft.sizeAxis}
                     onChange={(event) => setActiveDraft((current) => (current ? { ...current, sizeAxis: event.target.value } : current))}
-                    className="w-full rounded-2xl border border-white/10 bg-white/50 px-3 py-2.5 outline-none dark:bg-slate-950/45"
+                    className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2.5 outline-none dark:bg-slate-950"
                   >
                     <option value="">No field</option>
                     {columns.map((column) => (
@@ -968,7 +968,7 @@ export default function ChartTemplates({ tableName, columns }: ChartTemplatesPro
                   <select
                     value={activeDraft.geoField}
                     onChange={(event) => setActiveDraft((current) => (current ? { ...current, geoField: event.target.value } : current))}
-                    className="w-full rounded-2xl border border-white/10 bg-white/50 px-3 py-2.5 outline-none dark:bg-slate-950/45"
+                    className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2.5 outline-none dark:bg-slate-950"
                   >
                     <option value="">No field</option>
                     {columns.map((column) => (
@@ -1047,7 +1047,7 @@ export default function ChartTemplates({ tableName, columns }: ChartTemplatesPro
               <BarChart3 className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
               Template SQL
             </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/85 p-4 text-xs leading-6 text-cyan-200">
+            <div className="rounded-2xl border border-white/10 bg-slate-950 p-4 text-xs leading-6 text-cyan-200">
               {previewState.sql ?? "-- This template uses a placeholder or still needs valid field assignments."}
             </div>
           </div>

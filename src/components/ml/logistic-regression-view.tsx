@@ -461,7 +461,7 @@ export default function LogisticRegressionView({ tableName, columns }: LogisticR
               (feature) =>
                 `TRY_CAST(${quoteIdentifier(feature)} AS DOUBLE) AS ${quoteIdentifier(feature)}`,
             )
-            .join(",\n          ")}
+            .join(",\n ")}
         FROM ${quoteIdentifier(tableName)}
         WHERE ${quoteIdentifier(targetColumn)} IS NOT NULL
           ${selectedFeatures
@@ -469,7 +469,7 @@ export default function LogisticRegressionView({ tableName, columns }: LogisticR
               (feature) =>
                 `AND TRY_CAST(${quoteIdentifier(feature)} AS DOUBLE) IS NOT NULL`,
             )
-            .join("\n          ")}
+            .join("\n ")}
       `);
 
       const nextResult = buildResult(rows, selectedFeatures);

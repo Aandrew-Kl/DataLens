@@ -61,7 +61,7 @@ interface VersionState {
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const STORAGE_KEY = "datalens:data-versioning";
-const PANEL = "rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45";
+const PANEL = "rounded-3xl border border-white/15 bg-white/10 dark:border-white/10 dark:bg-slate-950";
 
 function quoteId(value: string): string {
   return `"${value.replaceAll('"', '""')}"`;
@@ -246,7 +246,7 @@ export default function DataVersioning({ tableName, columns, rowCount }: DataVer
   }
 
   return (
-    <section className="overflow-hidden rounded-[30px] border border-white/15 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.16),transparent_24%),linear-gradient(135deg,rgba(248,250,252,0.92),rgba(226,232,240,0.75))] shadow-[0_30px_120px_-50px_rgba(15,23,42,0.9)] dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.12),transparent_24%),linear-gradient(135deg,rgba(2,6,23,0.95),rgba(15,23,42,0.88))]">
+    <section className="overflow-hidden rounded-lg border border-white/15 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.16),transparent_24%),linear-gradient(135deg,rgba(248,250,252,0.92),rgba(226,232,240,0.75))] shadow-sm dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.12),transparent_24%),linear-gradient(135deg,rgba(2,6,23,0.95),rgba(15,23,42,0.88))]">
       <div className="border-b border-white/10 px-6 py-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
@@ -269,8 +269,8 @@ export default function DataVersioning({ tableName, columns, rowCount }: DataVer
         <div className="space-y-5">
           <div className={`${PANEL} p-5`}>
             <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100"><Save className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />Create named snapshot</div>
-            <input value={name} onChange={(event) => setName(event.target.value)} placeholder="pre-cleaning baseline" className="w-full rounded-2xl border border-white/15 bg-white/40 px-4 py-3 dark:bg-slate-950/40" />
-            <textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={3} placeholder="What changed or why this snapshot matters" className="mt-3 w-full rounded-2xl border border-white/15 bg-white/40 px-4 py-3 dark:bg-slate-950/40" />
+            <input value={name} onChange={(event) => setName(event.target.value)} placeholder="pre-cleaning baseline" className="w-full rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950" />
+            <textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={3} placeholder="What changed or why this snapshot matters" className="mt-3 w-full rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950" />
             <div className="mt-4 flex items-center gap-3">
               <button type="button" onClick={() => void handleSnapshot()} disabled={busy !== null} className="inline-flex items-center gap-2 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm font-medium text-cyan-800 disabled:opacity-60 dark:text-cyan-200">
                 {busy === "snapshot" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}Create snapshot
@@ -281,11 +281,11 @@ export default function DataVersioning({ tableName, columns, rowCount }: DataVer
 
           <div className={`${PANEL} p-5`}>
             <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100"><GitBranch className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />Create branch from version</div>
-            <select value={branchVersionId} onChange={(event) => setBranchVersionId(event.target.value)} className="w-full rounded-2xl border border-white/15 bg-white/40 px-4 py-3 dark:bg-slate-950/40">
+            <select value={branchVersionId} onChange={(event) => setBranchVersionId(event.target.value)} className="w-full rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950">
               <option value="">Select source version</option>
               {versions.map((version) => <option key={version.id} value={version.id}>{version.branch} / {version.name}</option>)}
             </select>
-            <input value={branchName} onChange={(event) => setBranchName(event.target.value)} placeholder="experiment_branch" className="mt-3 w-full rounded-2xl border border-white/15 bg-white/40 px-4 py-3 dark:bg-slate-950/40" />
+            <input value={branchName} onChange={(event) => setBranchName(event.target.value)} placeholder="experiment_branch" className="mt-3 w-full rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950" />
             <div className="mt-4 flex flex-wrap gap-3">
               <button type="button" onClick={() => void handleBranchCreate()} className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-slate-700 dark:text-slate-200"><GitBranch className="h-4 w-4" />Save branch</button>
               {branches.map((branch) => (
@@ -297,11 +297,11 @@ export default function DataVersioning({ tableName, columns, rowCount }: DataVer
           <div className={`${PANEL} p-5`}>
             <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100"><RefreshCw className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />Compare two versions</div>
             <div className="grid gap-3 md:grid-cols-2">
-              <select value={compareLeft} onChange={(event) => setCompareLeft(event.target.value)} className="rounded-2xl border border-white/15 bg-white/40 px-4 py-3 dark:bg-slate-950/40">
+              <select value={compareLeft} onChange={(event) => setCompareLeft(event.target.value)} className="rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950">
                 <option value="">Base version</option>
                 {versions.map((version) => <option key={version.id} value={version.id}>{version.name}</option>)}
               </select>
-              <select value={compareRight} onChange={(event) => setCompareRight(event.target.value)} className="rounded-2xl border border-white/15 bg-white/40 px-4 py-3 dark:bg-slate-950/40">
+              <select value={compareRight} onChange={(event) => setCompareRight(event.target.value)} className="rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950">
                 <option value="">Target version</option>
                 {versions.map((version) => <option key={version.id} value={version.id}>{version.name}</option>)}
               </select>

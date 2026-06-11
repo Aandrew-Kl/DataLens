@@ -59,7 +59,7 @@ export interface PreviewRequest extends BuiltOperation {
 }
 
 const FIELD_CLASS =
-  "w-full rounded-2xl border border-white/15 bg-white/75 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-100";
+  "w-full rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100";
 
 export function getTextColumns(columns: ColumnProfile[]) {
   return columns.filter((column) => column.type === "string" || column.type === "unknown");
@@ -247,7 +247,7 @@ export function WranglerFilters(props: WranglerFiltersProps) {
   };
 
   return (
-    <div className="rounded-[1.35rem] border border-white/12 bg-white/45 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/35">
+    <div className="rounded-lg border border-white/12 bg-white p-5 dark:border-white/10 dark:bg-slate-950/35">
       <div className="mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
         <Sparkles className="h-3.5 w-3.5" />
         Operation builder
@@ -379,7 +379,7 @@ export function WranglerFilters(props: WranglerFiltersProps) {
       ) : null}
 
       <div className="mt-6 flex flex-wrap gap-3">
-        <button type="button" onClick={onPreview} className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/30 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100">
+        <button type="button" onClick={onPreview} className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/30 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100">
           <ScissorsLineDashed className="h-4 w-4" />
           Preview
         </button>

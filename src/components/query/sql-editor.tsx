@@ -306,7 +306,7 @@ export default function SQLEditor({
         const end = target.selectionEnd;
         const value = target.value;
 
-        const newValue = value.substring(0, start) + "  " + value.substring(end);
+        const newValue = value.substring(0, start) + " " + value.substring(end);
         setSQL(newValue);
 
         // Restore cursor position after React re-render
@@ -360,9 +360,9 @@ export default function SQLEditor({
   const modKey = isMac() ? "\u2318" : "Ctrl";
 
   return (
-    <div className="rounded-xl border border-gray-200/50 dark:border-gray-700/40 backdrop-blur-xl bg-white/60 dark:bg-gray-900/60 overflow-hidden shadow-sm">
+    <div className="rounded-xl border border-gray-200/50 dark:border-gray-700/40 bg-white dark:bg-gray-900 overflow-hidden shadow-sm">
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-gray-200/40 dark:border-gray-700/30 bg-gray-50/40 dark:bg-gray-800/40">
+      <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-gray-200/40 dark:border-gray-700/30 bg-gray-50 dark:bg-gray-800">
         <div className="flex items-center gap-1">
           {/* Execute */}
           <button
@@ -446,7 +446,7 @@ export default function SQLEditor({
                     <button
                       key={idx}
                       onClick={() => handleHistorySelect(entry)}
-                      className="w-full text-left px-3 py-2.5 border-b border-gray-100 dark:border-gray-800 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
+                      className="w-full text-left px-3 py-2.5 border-b border-gray-100 dark:border-gray-800 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >
                       <p className="text-xs font-mono text-gray-700 dark:text-gray-300 truncate">
                         {entry.sql}
@@ -533,7 +533,7 @@ export default function SQLEditor({
               animate={{ width: 220, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="overflow-hidden border-l border-gray-200/40 dark:border-gray-700/30 bg-gray-50/40 dark:bg-gray-800/30"
+              className="overflow-hidden border-l border-gray-200/40 dark:border-gray-700/30 bg-gray-50 dark:bg-gray-800/30"
             >
               <div className="w-[220px] p-3">
                 <div className="flex items-center gap-1.5 mb-2">
@@ -581,7 +581,7 @@ export default function SQLEditor({
       </div>
 
       {/* Status bar */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-t border-gray-200/40 dark:border-gray-700/30 bg-gray-50/40 dark:bg-gray-800/40 text-[10px] text-gray-400 dark:text-gray-500">
+      <div className="flex items-center justify-between px-3 py-1.5 border-t border-gray-200/40 dark:border-gray-700/30 bg-gray-50 dark:bg-gray-800 text-[10px] text-gray-400 dark:text-gray-500">
         <div className="flex items-center gap-3">
           {isExecuting && (
             <span className="inline-flex items-center gap-1 text-amber-500 dark:text-amber-400">

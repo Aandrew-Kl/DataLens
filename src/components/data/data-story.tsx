@@ -281,7 +281,7 @@ export default function DataStory({ tableName, columns, rowCount }: DataStoryPro
   };
 
   return (
-    <motion.section variants={containerVariants} initial="hidden" animate="visible" className="glass relative overflow-hidden rounded-[28px] border border-white/15 bg-white/55 shadow-[0_28px_90px_rgba(15,23,42,0.18)] dark:border-white/10 dark:bg-slate-950/45">
+    <motion.section variants={containerVariants} initial="hidden" animate="visible" className="glass relative overflow-hidden rounded-lg border border-white/15 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.16),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(168,85,247,0.12),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(34,197,94,0.12),transparent_26%)]" />
 
       <div className="relative border-b border-white/15 px-6 py-6 dark:border-white/10">
@@ -297,7 +297,7 @@ export default function DataStory({ tableName, columns, rowCount }: DataStoryPro
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <button type="button" onClick={handleCopy} disabled={!analysis || loading} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/70 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-cyan-400/40 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900/60 dark:text-slate-200">
+            <button type="button" onClick={handleCopy} disabled={!analysis || loading} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-cyan-400/40 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900 dark:text-slate-200">
               <Copy className="h-4 w-4" />
               {copied ? "Copied" : "Copy Story"}
             </button>
@@ -313,16 +313,16 @@ export default function DataStory({ tableName, columns, rowCount }: DataStoryPro
         {loading ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 6 }, (_, index) => (
-              <div key={index} className="animate-shimmer rounded-[24px] border border-white/15 bg-white/45 p-5 dark:bg-slate-900/35">
-                <div className="h-4 w-28 rounded-full bg-white/60 dark:bg-white/10" />
-                <div className="mt-4 h-3 w-full rounded-full bg-white/55 dark:bg-white/8" />
-                <div className="mt-2 h-3 w-[92%] rounded-full bg-white/45 dark:bg-white/8" />
+              <div key={index} className="animate-shimmer rounded-lg border border-white/15 bg-white p-5 dark:bg-slate-900/35">
+                <div className="h-4 w-28 rounded-full bg-white dark:bg-white/10" />
+                <div className="mt-4 h-3 w-full rounded-full bg-white dark:bg-white/8" />
+                <div className="mt-2 h-3 w-[92%] rounded-full bg-white dark:bg-white/8" />
                 <div className="mt-2 h-3 w-[84%] rounded-full bg-white/35 dark:bg-white/8" />
               </div>
             ))}
           </div>
         ) : error ? (
-          <div className="rounded-[24px] border border-rose-400/20 bg-rose-500/10 p-6 text-sm text-rose-700 dark:text-rose-300">
+          <div className="rounded-lg border border-rose-400/20 bg-rose-500/10 p-6 text-sm text-rose-700 dark:text-rose-300">
             <div className="flex items-start gap-3">
               <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
               <div>
@@ -340,7 +340,7 @@ export default function DataStory({ tableName, columns, rowCount }: DataStoryPro
                 { label: "Quality Score", value: `${analysis.qualityScore}/100` },
                 { label: "Completeness", value: formatPercent(analysis.completeness) },
               ].map((metric) => (
-                <div key={metric.label} className="rounded-[22px] border border-white/15 bg-white/60 p-4 backdrop-blur-xl dark:bg-slate-900/40">
+                <div key={metric.label} className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">{metric.label}</p>
                   <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">{metric.value}</p>
                 </div>
@@ -351,9 +351,9 @@ export default function DataStory({ tableName, columns, rowCount }: DataStoryPro
               {analysis.sections.map((section) => {
                 const Icon = section.icon;
                 return (
-                  <motion.article key={section.id} variants={cardVariants} className="group rounded-[24px] border border-white/15 bg-white/60 p-5 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-white/25 dark:bg-slate-900/42">
+                  <motion.article key={section.id} variants={cardVariants} className="group rounded-lg border border-white/15 bg-white p-5 transition hover:-translate-y-0.5 hover:border-white/25 dark:bg-slate-900">
                     <div className={`inline-flex rounded-2xl bg-gradient-to-br p-[1px] ${section.accent}`}>
-                      <div className="rounded-[15px] bg-white/85 p-2.5 dark:bg-slate-950/75">
+                      <div className="rounded-lg bg-white p-2.5 dark:bg-slate-950">
                         <Icon className="h-4 w-4 text-slate-700 dark:text-slate-200" />
                       </div>
                     </div>

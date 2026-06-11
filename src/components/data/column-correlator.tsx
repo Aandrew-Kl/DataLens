@@ -70,9 +70,9 @@ type StatusState = { kind: "error"; message: string } | null;
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const panelClass =
-  "overflow-hidden rounded-[28px] border border-white/20 bg-white/70 shadow-[0_24px_90px_-48px_rgba(15,23,42,0.7)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "overflow-hidden rounded-lg border border-white/20 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 const fieldClass =
-  "w-full rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950/60 dark:text-slate-100";
+  "w-full rounded-2xl border border-slate-200/70 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-100";
 
 function subscribeDarkMode(callback: () => void) {
   if (typeof document === "undefined") return () => undefined;
@@ -490,7 +490,7 @@ async function analyzeDateTrend(tableName: string, dateColumn: string, numericCo
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200/70 bg-white/65 p-4 shadow-sm backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-950/35">
+    <div className="rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-950/35">
       <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{label}</p>
       <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">{value}</p>
     </div>
@@ -616,7 +616,7 @@ export default function ColumnCorrelator({ tableName, columns, rowCount }: Colum
             </select>
           </label>
 
-          <div className="rounded-2xl border border-white/25 bg-white/55 p-5 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-slate-950/30">
+          <div className="rounded-2xl border border-white/25 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950/30">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
               <GitCompareArrows className="h-4 w-4 text-cyan-500" />
               Expected analysis
@@ -661,7 +661,7 @@ export default function ColumnCorrelator({ tableName, columns, rowCount }: Colum
 
         <div className="space-y-5">
           {!result ? (
-            <div className="rounded-[26px] border border-white/25 bg-white/55 px-6 py-10 text-center shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-slate-950/30">
+            <div className="rounded-lg border border-white/25 bg-white px-6 py-10 text-center shadow-sm dark:border-white/10 dark:bg-slate-950/30">
               <BarChart3 className="mx-auto h-10 w-10 text-slate-300 dark:text-slate-600" />
               <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
                 No correlation run yet
@@ -672,7 +672,7 @@ export default function ColumnCorrelator({ tableName, columns, rowCount }: Colum
             </div>
           ) : (
             <>
-              <div className="rounded-[26px] border border-white/25 bg-white/55 p-5 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-slate-950/30">
+              <div className="rounded-lg border border-white/25 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950/30">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
@@ -699,7 +699,7 @@ export default function ColumnCorrelator({ tableName, columns, rowCount }: Colum
                 </p>
               </div>
 
-              <div className="rounded-[26px] border border-white/25 bg-white/55 p-4 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-slate-950/30">
+              <div className="rounded-lg border border-white/25 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-slate-950/30">
                 <ReactECharts
                   option={result.chartOption}
                   style={{ height: 420, width: "100%" }}

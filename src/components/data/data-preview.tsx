@@ -64,7 +64,7 @@ interface ContextMenuState {
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100] as const;
 const PANEL_CLASS =
-  "rounded-[1.8rem] border border-white/15 bg-white/60 shadow-[0_24px_90px_-46px_rgba(15,23,42,0.76)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/15 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 
 const TYPE_META: Record<
   ColumnType,
@@ -229,7 +229,7 @@ function ColumnStatsPopover({
   const stats = useColumnStats(tableName, column.name);
 
   return (
-    <div className="absolute left-0 top-full z-30 mt-2 w-72 rounded-[1.1rem] border border-white/15 bg-white/88 p-4 text-left shadow-[0_18px_54px_-34px_rgba(15,23,42,0.8)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/92">
+    <div className="absolute left-0 top-full z-30 mt-2 w-72 rounded-lg border border-white/15 bg-white p-4 text-left shadow-sm dark:border-white/10 dark:bg-slate-950">
       <div className="text-sm font-semibold text-slate-950 dark:text-white">{column.name}</div>
       <div className="mt-3 grid gap-2 text-xs text-slate-600 dark:text-slate-300">
         <div className="flex items-center justify-between">
@@ -383,7 +383,7 @@ function DataPreviewReady({
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="rounded-2xl border border-white/15 bg-white/50 px-4 py-3 dark:border-white/10 dark:bg-slate-950/35">
+          <div className="rounded-2xl border border-white/15 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-950/35">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Filtered rows
             </div>
@@ -391,7 +391,7 @@ function DataPreviewReady({
               {formatNumber(result.totalRows)}
             </div>
           </div>
-          <label className="rounded-2xl border border-white/15 bg-white/50 px-4 py-3 text-sm dark:border-white/10 dark:bg-slate-950/35">
+          <label className="rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-slate-950/35">
             <span className="mr-3 text-slate-500 dark:text-slate-400">Page size</span>
             <select
               value={pageSize}
@@ -413,9 +413,9 @@ function DataPreviewReady({
         </div>
       </div>
 
-      <div className="mt-5 overflow-x-auto rounded-[1.3rem] border border-white/10">
+      <div className="mt-5 overflow-x-auto rounded-lg border border-white/10">
         <table className="min-w-full border-separate border-spacing-0">
-          <thead className="sticky top-0 z-10 bg-white/85 backdrop-blur-xl dark:bg-slate-950/85">
+          <thead className="sticky top-0 z-10 bg-white dark:bg-slate-950">
             <tr>
               {columns.map((column) => {
                 const typeMeta = TYPE_META[column.type];
@@ -450,7 +450,7 @@ function DataPreviewReady({
                         <SortIcon active={sort.column === column.name} direction={sort.direction} />
                       </button>
 
-                      <div className="mt-3 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/45 px-3 py-2 dark:bg-slate-950/35">
+                      <div className="mt-3 flex items-center gap-2 rounded-2xl border border-white/10 bg-white px-3 py-2 dark:bg-slate-950/35">
                         <Filter className="h-3.5 w-3.5 text-slate-400" />
                         <input
                           value={filters[column.name] ?? ""}
@@ -551,7 +551,7 @@ function DataPreviewReady({
             type="button"
             onClick={() => startTransition(() => setPage((current) => Math.max(1, current - 1)))}
             disabled={page <= 1}
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/30 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100"
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/30 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100"
           >
             <ChevronLeft className="h-4 w-4" />
             Previous
@@ -560,7 +560,7 @@ function DataPreviewReady({
             type="button"
             onClick={() => startTransition(() => setPage((current) => Math.min(totalPages, current + 1)))}
             disabled={page >= totalPages}
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/30 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100"
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/30 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100"
           >
             Next
             <ChevronRight className="h-4 w-4" />
@@ -573,7 +573,7 @@ function DataPreviewReady({
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.28, ease: EASE }}
-          className="mt-5 rounded-[1.3rem] border border-white/10 bg-white/45 p-5 backdrop-blur-xl dark:bg-slate-950/35"
+          className="mt-5 rounded-lg border border-white/10 bg-white p-5 dark:bg-slate-950/35"
         >
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -587,14 +587,14 @@ function DataPreviewReady({
             <button
               type="button"
               onClick={() => void copyRowAsJson(selectedRow)}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/30 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/30 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100"
             >
               <Copy className="h-4 w-4" />
               Copy row as JSON
             </button>
           </div>
 
-          <pre className="mt-4 overflow-x-auto rounded-[1.1rem] border border-white/10 bg-slate-950/90 p-4 text-xs leading-6 text-slate-200">
+          <pre className="mt-4 overflow-x-auto rounded-lg border border-white/10 bg-slate-950 p-4 text-xs leading-6 text-slate-200">
             {JSON.stringify(selectedRow, null, 2)}
           </pre>
         </motion.aside>
@@ -607,7 +607,7 @@ function DataPreviewReady({
           onMouseDown={closeContextMenu}
         >
           <div
-            className="absolute rounded-2xl border border-white/15 bg-white/88 p-2 shadow-[0_18px_54px_-34px_rgba(15,23,42,0.8)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/94"
+            className="absolute rounded-2xl border border-white/15 bg-white p-2 shadow-sm dark:border-white/10 dark:bg-slate-950"
             role="menu"
             tabIndex={-1}
             style={{ left: contextMenu.x, top: contextMenu.y }}
@@ -635,14 +635,14 @@ function DataPreviewFallback({
   return (
     <section className={`${PANEL_CLASS} p-5`}>
       <div className="animate-pulse space-y-4">
-        <div className="h-6 w-40 rounded-full bg-white/45 dark:bg-slate-800/70" />
-        <div className="overflow-hidden rounded-[1.3rem] border border-white/10">
+        <div className="h-6 w-40 rounded-full bg-white dark:bg-slate-800" />
+        <div className="overflow-hidden rounded-lg border border-white/10">
           <table className="min-w-full">
             <thead>
               <tr>
                 {columns.map((column) => (
                   <th key={column.name} className="px-4 py-3 text-left">
-                    <div className="h-4 w-24 rounded-full bg-white/35 dark:bg-slate-800/60" />
+                    <div className="h-4 w-24 rounded-full bg-white/35 dark:bg-slate-800" />
                   </th>
                 ))}
               </tr>
@@ -652,7 +652,7 @@ function DataPreviewFallback({
                 <tr key={rowKey(row, rowIndex)}>
                   {columns.map((column) => (
                     <td key={`${rowIndex}:${column.name}`} className="px-4 py-3">
-                      <div className="h-3.5 w-32 rounded-full bg-white/30 dark:bg-slate-800/55" />
+                      <div className="h-3.5 w-32 rounded-full bg-white/30 dark:bg-slate-800" />
                     </td>
                   ))}
                 </tr>

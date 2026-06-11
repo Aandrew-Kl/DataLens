@@ -103,7 +103,7 @@ interface TourStep {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "overflow-hidden rounded-[1.9rem] border border-white/20 bg-white/75 shadow-[0_24px_90px_-48px_rgba(15,23,42,0.75)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "overflow-hidden rounded-lg border border-white/20 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 function toNumber(value: unknown) {
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric : null;
@@ -475,7 +475,7 @@ function TypeMixVisual({
             <span>{item.label}</span>
             <span className="font-semibold text-slate-950 dark:text-white">{item.value}</span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-white/70 dark:bg-slate-900/70">
+          <div className="h-2 overflow-hidden rounded-full bg-white dark:bg-slate-900">
             <div
               className="h-full rounded-full"
               style={{
@@ -513,7 +513,7 @@ function MissingVisual({
               {formatPercent(item.rate, 1)}
             </span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-white/70 dark:bg-slate-900/70">
+          <div className="h-2 overflow-hidden rounded-full bg-white dark:bg-slate-900">
             <div
               className="h-full rounded-full bg-amber-500"
               style={{ width: `${Math.min(item.rate, 100)}%` }}
@@ -542,11 +542,11 @@ function CorrelationVisual({
   const fill = `${Math.max(0, Math.min(Math.abs(correlation), 1)) * 100}%`;
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-white/15 bg-white/55 p-4 dark:bg-slate-950/35">
+      <div className="rounded-2xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
         <div className="text-sm font-semibold text-slate-950 dark:text-white">
           {left} ↔ {right}
         </div>
-        <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/70 dark:bg-slate-900/70">
+        <div className="mt-3 h-3 overflow-hidden rounded-full bg-white dark:bg-slate-900">
           <div
             className={`h-full rounded-full ${correlation >= 0 ? "bg-cyan-500" : "bg-rose-500"}`}
             style={{ width: fill }}
@@ -586,7 +586,7 @@ function DistributionVisual({
               {formatNumber(item.value)}
             </span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-white/70 dark:bg-slate-900/70">
+          <div className="h-2 overflow-hidden rounded-full bg-white dark:bg-slate-900">
             <div
               className="h-full rounded-full bg-fuchsia-500"
               style={{ width: `${(item.value / maxValue) * 100}%` }}
@@ -604,7 +604,7 @@ function IdentifierVisual({ samples }: { samples: string[] }) {
       {samples.map((sample) => (
         <span
           key={sample}
-          className="rounded-full border border-white/15 bg-white/55 px-3 py-2 text-xs font-medium text-slate-600 dark:bg-slate-950/35 dark:text-slate-300"
+          className="rounded-full border border-white/15 bg-white px-3 py-2 text-xs font-medium text-slate-600 dark:bg-slate-950/35 dark:text-slate-300"
         >
           {sample}
         </span>
@@ -615,12 +615,12 @@ function IdentifierVisual({ samples }: { samples: string[] }) {
 
 function TimelineVisual({ start, end }: { start: string; end: string }) {
   return (
-    <div className="rounded-2xl border border-white/15 bg-white/55 p-4 dark:bg-slate-950/35">
+    <div className="rounded-2xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
       <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-300">
         <span>{start}</span>
         <span>{end}</span>
       </div>
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/70 dark:bg-slate-900/70">
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-white dark:bg-slate-900">
         <div className="h-full w-full rounded-full bg-gradient-to-r from-cyan-500 via-emerald-500 to-fuchsia-500" />
       </div>
     </div>
@@ -633,7 +633,7 @@ function ActionsVisual({ items }: { items: string[] }) {
       {items.map((item) => (
         <div
           key={item}
-          className="flex items-start gap-3 rounded-2xl border border-white/15 bg-white/55 px-4 py-3 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300"
+          className="flex items-start gap-3 rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300"
         >
           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-cyan-500" />
           <span>{item}</span>
@@ -725,7 +725,7 @@ function DataTourReady({ tableName, columns }: DataTourProps) {
           <button
             type="button"
             onClick={() => setDismissed(false)}
-            className="rounded-2xl border border-white/20 bg-white/55 px-4 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
+            className="rounded-2xl border border-white/20 bg-white px-4 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
           >
             Reopen
           </button>
@@ -759,7 +759,7 @@ function DataTourReady({ tableName, columns }: DataTourProps) {
                 {safeIndex + 1} / {steps.length}
               </span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-white/70 dark:bg-slate-900/70">
+            <div className="h-2 overflow-hidden rounded-full bg-white dark:bg-slate-900">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-emerald-500 to-fuchsia-500"
                 style={{ width: `${progress}%` }}
@@ -778,10 +778,10 @@ function DataTourReady({ tableName, columns }: DataTourProps) {
                 key={step.id}
                 type="button"
                 onClick={() => startTransition(() => setActiveIndex(index))}
-                className={`w-full rounded-[1.35rem] border px-4 py-4 text-left transition ${
+                className={`w-full rounded-lg border px-4 py-4 text-left transition ${
                   active
                     ? "border-cyan-400/40 bg-cyan-500/12 text-cyan-800 dark:text-cyan-200"
-                    : "border-white/15 bg-white/45 text-slate-600 hover:border-cyan-300/30 dark:bg-slate-950/30 dark:text-slate-300"
+                    : "border-white/15 bg-white text-slate-600 hover:border-cyan-300/30 dark:bg-slate-950/30 dark:text-slate-300"
                 }`}
               >
                 <div className="flex items-center justify-between gap-3">
@@ -798,7 +798,7 @@ function DataTourReady({ tableName, columns }: DataTourProps) {
           })}
         </div>
 
-        <div className="rounded-[1.6rem] border border-white/15 bg-white/45 p-5 dark:bg-slate-950/30">
+        <div className="rounded-lg border border-white/15 bg-white p-5 dark:bg-slate-950/30">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeStep.id}
@@ -820,7 +820,7 @@ function DataTourReady({ tableName, columns }: DataTourProps) {
                   <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
                     {activeStep.description}
                   </p>
-                  <div className="mt-4 rounded-2xl border border-white/15 bg-white/55 px-4 py-4 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
+                  <div className="mt-4 rounded-2xl border border-white/15 bg-white px-4 py-4 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
                     <div className="flex items-center gap-2 font-semibold text-slate-950 dark:text-white">
                       <Binary className="h-4 w-4 text-cyan-500" />
                       Did you know?
@@ -829,7 +829,7 @@ function DataTourReady({ tableName, columns }: DataTourProps) {
                   </div>
                 </div>
 
-                <div className="rounded-[1.35rem] border border-white/15 bg-white/55 p-4 dark:bg-slate-950/35">
+                <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
                   <MiniVisualization visual={activeStep.visual} />
                 </div>
               </div>
@@ -842,7 +842,7 @@ function DataTourReady({ tableName, columns }: DataTourProps) {
               onClick={() =>
                 startTransition(() => setDismissed(true))
               }
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/55 px-4 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
             >
               <SkipForward className="h-4 w-4" />
               Skip tour
@@ -857,7 +857,7 @@ function DataTourReady({ tableName, columns }: DataTourProps) {
                     setActiveIndex((current) => Math.max(current - 1, 0)),
                   )
                 }
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/55 px-4 py-2 text-sm text-slate-700 transition disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950/35 dark:text-slate-200"
+                className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-2 text-sm text-slate-700 transition disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950/35 dark:text-slate-200"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back

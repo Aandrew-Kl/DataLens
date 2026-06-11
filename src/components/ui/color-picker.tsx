@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } f
 import { Pipette } from "lucide-react";
 
 const GLASS_PANEL_CLASS =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-slate-950 border border-white/20";
 const DEFAULT_COLORS = [
   "#0F172A",
   "#0EA5E9",
@@ -149,7 +149,7 @@ export default function ColorPicker({
 
             <label className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
               <span className="font-medium">Hex color</span>
-              <div className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/60 px-3 py-2 dark:bg-slate-900/55">
+              <div className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-3 py-2 dark:bg-slate-900">
                 <Pipette className="h-4 w-4 text-slate-400" />
                 <input
                   value={draftValue}
@@ -177,7 +177,7 @@ export default function ColorPicker({
                         applyColor(color);
                         setOpen(false);
                       }}
-                      className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/60 px-3 py-2 text-sm font-medium text-slate-700 dark:bg-slate-900/55 dark:text-slate-100"
+                      className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm font-medium text-slate-700 dark:bg-slate-900 dark:text-slate-100"
                     >
                       <span className="h-4 w-4 rounded-full border border-white/30" style={{ backgroundColor: color }} />
                       {color}

@@ -78,7 +78,7 @@ function ToggleRow({
     <button
       type="button"
       onClick={onToggle}
-      className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-left backdrop-blur-xl transition hover:border-cyan-400/25 hover:bg-white/15 dark:bg-slate-950/40"
+      className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-left transition hover:border-cyan-400/25 hover:bg-white/15 dark:bg-slate-950"
     >
       <div>
         <p className="text-sm font-semibold text-slate-950 dark:text-slate-50">{label}</p>
@@ -232,7 +232,7 @@ export default function AccessibilityPanel() {
           aria-label="Open accessibility settings"
           aria-expanded={open}
           onClick={() => setOpen((current) => !current)}
-          className="glass inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/80 text-slate-900 shadow-[0_24px_60px_-30px_rgba(15,23,42,0.9)] backdrop-blur-2xl transition hover:-translate-y-0.5 hover:bg-white dark:bg-slate-950/70 dark:text-slate-50"
+          className="glass inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-white dark:bg-slate-950 dark:text-slate-50"
         >
           <Accessibility className="h-6 w-6" />
         </button>
@@ -245,7 +245,7 @@ export default function AccessibilityPanel() {
             animate={{ opacity: 1, x: 0, y: 0 }}
             exit={{ opacity: 0, x: -18, y: 12 }}
             transition={{ duration: 0.28, ease: EASE }}
-            className="fixed bottom-24 left-5 z-50 w-[min(92vw,24rem)] overflow-hidden rounded-[28px] border border-white/15 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.18),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.9),rgba(226,232,240,0.8))] shadow-[0_30px_90px_-42px_rgba(15,23,42,0.95)] backdrop-blur-2xl dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.18),transparent_24%),linear-gradient(135deg,rgba(2,6,23,0.94),rgba(15,23,42,0.9))]"
+            className="fixed bottom-24 left-5 z-50 w-[min(92vw,24rem)] overflow-hidden rounded-lg border border-white/15 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.18),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.9),rgba(226,232,240,0.8))] shadow-sm dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.18),transparent_24%),linear-gradient(135deg,rgba(2,6,23,0.94),rgba(15,23,42,0.9))]"
           >
             <div className="border-b border-white/10 px-5 py-4">
               <div className="flex items-start justify-between gap-3">
@@ -262,7 +262,7 @@ export default function AccessibilityPanel() {
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded-2xl border border-white/10 bg-white/10 p-2 text-slate-500 transition hover:text-slate-900 dark:bg-slate-950/40 dark:text-slate-400 dark:hover:text-white"
+                  className="rounded-2xl border border-white/10 bg-white/10 p-2 text-slate-500 transition hover:text-slate-900 dark:bg-slate-950 dark:text-slate-400 dark:hover:text-white"
                   aria-label="Close accessibility settings"
                 >
                   <X className="h-4 w-4" />
@@ -428,7 +428,7 @@ export default function AccessibilityPanel() {
               <button
                 type="button"
                 onClick={() => setShowKeyboardHelp(true)}
-                className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-left text-slate-700 backdrop-blur-xl transition hover:border-cyan-400/25 hover:bg-white/15 dark:bg-slate-950/40 dark:text-slate-200"
+                className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-left text-slate-700 transition hover:border-cyan-400/25 hover:bg-white/15 dark:bg-slate-950 dark:text-slate-200"
               >
                 <span>
                   <span className="flex items-center gap-2 text-sm font-semibold">
@@ -454,14 +454,14 @@ export default function AccessibilityPanel() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-md"
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/60 p-4 "
           >
             <motion.div
               initial={{ opacity: 0, y: 18, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 18, scale: 0.98 }}
               transition={{ duration: 0.28, ease: EASE }}
-              className="w-full max-w-lg overflow-hidden rounded-[30px] border border-white/15 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.16),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.9),rgba(226,232,240,0.82))] shadow-[0_30px_90px_-42px_rgba(15,23,42,0.95)] dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.18),transparent_28%),linear-gradient(135deg,rgba(2,6,23,0.94),rgba(15,23,42,0.9))]"
+              className="w-full max-w-lg overflow-hidden rounded-lg border border-white/15 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.16),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.9),rgba(226,232,240,0.82))] shadow-sm dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.18),transparent_28%),linear-gradient(135deg,rgba(2,6,23,0.94),rgba(15,23,42,0.9))]"
               role="dialog"
               aria-modal="true"
               aria-label="Keyboard navigation help"
@@ -476,7 +476,7 @@ export default function AccessibilityPanel() {
                 <button
                   type="button"
                   onClick={() => setShowKeyboardHelp(false)}
-                  className="rounded-2xl border border-white/10 bg-white/10 p-2 text-slate-500 transition hover:text-slate-900 dark:bg-slate-950/40 dark:text-slate-400 dark:hover:text-white"
+                  className="rounded-2xl border border-white/10 bg-white/10 p-2 text-slate-500 transition hover:text-slate-900 dark:bg-slate-950 dark:text-slate-400 dark:hover:text-white"
                   aria-label="Close keyboard help"
                 >
                   <X className="h-4 w-4" />

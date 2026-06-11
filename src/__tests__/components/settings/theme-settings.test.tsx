@@ -60,7 +60,7 @@ describe("ThemeSettings", () => {
     expect(window.localStorage.getItem("datalens:theme-settings")).toContain(
       '"fontSize":19',
     );
-    expect(screen.getByText("system · amber · 19px")).toBeInTheDocument();
+    expect(screen.getByText("light · amber · 19px")).toBeInTheDocument();
   });
 
   it("toggles compact mode and updates the preview copy", async () => {

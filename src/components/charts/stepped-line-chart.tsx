@@ -224,7 +224,7 @@ export default function SteppedLineChart({
               (columnName) =>
                 `TRY_CAST(${quoteIdentifier(columnName)} AS DOUBLE) AS ${quoteIdentifier(columnName)}`,
             )
-            .join(",\n          ")}
+            .join(",\n ")}
         FROM ${quoteIdentifier(tableName)}
         WHERE ${quoteIdentifier(xColumn)} IS NOT NULL
         ORDER BY 1
@@ -353,7 +353,7 @@ export default function SteppedLineChart({
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/40 dark:text-slate-300">
+      <div className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
         {status}
       </div>
 
@@ -374,7 +374,7 @@ export default function SteppedLineChart({
                     className={`rounded-full border px-3 py-2 text-sm transition ${
                       active
                         ? "border-cyan-400 bg-cyan-500/15 text-cyan-700 dark:text-cyan-300"
-                        : "border-white/20 bg-white/70 text-slate-700 dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-200"
+                        : "border-white/20 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200"
                     }`}
                   >
                     {column.name}

@@ -136,7 +136,7 @@ export default function DataSummary({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.32, ease: "easeOut" }}
-      className="overflow-hidden rounded-xl border border-gray-200/70 bg-white/80 backdrop-blur-sm dark:border-gray-700/70 dark:bg-gray-900/60"
+      className="overflow-hidden rounded-xl border border-gray-200/70 bg-white dark:border-gray-700/70 dark:bg-gray-900"
     >
       <div className="border-b border-gray-200/70 px-6 py-5 dark:border-gray-700/70">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -153,7 +153,7 @@ export default function DataSummary({
             </p>
           </div>
 
-          <div className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-4 py-3 text-sm dark:border-gray-700/70 dark:bg-gray-950/30">
+          <div className="rounded-xl border border-gray-200/70 bg-gray-50 px-4 py-3 text-sm dark:border-gray-700/70 dark:bg-gray-950/30">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
               Completeness
             </p>
@@ -177,7 +177,7 @@ export default function DataSummary({
       </div>
 
       <div className="grid gap-4 px-6 py-6 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl border border-gray-200/70 bg-gray-50/80 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
+        <div className="rounded-xl border border-gray-200/70 bg-gray-50 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
             <Table2 className="h-4 w-4 text-sky-500" />
             Shape
@@ -194,13 +194,13 @@ export default function DataSummary({
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200/70 bg-gray-50/80 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
+        <div className="rounded-xl border border-gray-200/70 bg-gray-50 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
             <Sigma className="h-4 w-4 text-violet-500" />
             Column Mix
           </div>
           <div className="mt-3 grid grid-cols-2 gap-3 text-sm text-gray-700 dark:text-gray-200">
-            <p className="rounded-lg bg-white/80 px-3 py-2 dark:bg-gray-900/70">
+            <p className="rounded-lg bg-white px-3 py-2 dark:bg-gray-900">
               <span className="block text-xs text-gray-500 dark:text-gray-400">
                 Numeric
               </span>
@@ -208,7 +208,7 @@ export default function DataSummary({
                 {stats.numericColumns.length}
               </span>
             </p>
-            <p className="rounded-lg bg-white/80 px-3 py-2 dark:bg-gray-900/70">
+            <p className="rounded-lg bg-white px-3 py-2 dark:bg-gray-900">
               <span className="block text-xs text-gray-500 dark:text-gray-400">
                 Text
               </span>
@@ -216,7 +216,7 @@ export default function DataSummary({
                 {stats.textColumns.length}
               </span>
             </p>
-            <p className="rounded-lg bg-white/80 px-3 py-2 dark:bg-gray-900/70">
+            <p className="rounded-lg bg-white px-3 py-2 dark:bg-gray-900">
               <span className="block text-xs text-gray-500 dark:text-gray-400">
                 Date
               </span>
@@ -224,7 +224,7 @@ export default function DataSummary({
                 {stats.dateColumns.length}
               </span>
             </p>
-            <p className="rounded-lg bg-white/80 px-3 py-2 dark:bg-gray-900/70">
+            <p className="rounded-lg bg-white px-3 py-2 dark:bg-gray-900">
               <span className="block text-xs text-gray-500 dark:text-gray-400">
                 Other
               </span>
@@ -235,7 +235,7 @@ export default function DataSummary({
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200/70 bg-gray-50/80 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
+        <div className="rounded-xl border border-gray-200/70 bg-gray-50 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
             <BarChart3 className="h-4 w-4 text-amber-500" />
             Sparsest Column
@@ -263,7 +263,7 @@ export default function DataSummary({
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200/70 bg-gray-50/80 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
+        <div className="rounded-xl border border-gray-200/70 bg-gray-50 p-4 dark:border-gray-700/70 dark:bg-gray-950/30">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
             <Database className="h-4 w-4 text-emerald-500" />
             Schema Notes

@@ -252,7 +252,7 @@ export default function ReportExportPanel({ tableName, columns }: ReportExportPa
                     className={`rounded-3xl border px-4 py-4 text-left transition ${
                       active
                         ? "border-cyan-400/40 bg-cyan-500/10 text-cyan-700 dark:text-cyan-200"
-                        : "border-white/20 bg-white/60 text-slate-700 dark:border-white/10 dark:bg-slate-950/30 dark:text-slate-200"
+                        : "border-white/20 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-950/30 dark:text-slate-200"
                     }`}
                   >
                     <Icon className="h-5 w-5" />
@@ -276,7 +276,7 @@ export default function ReportExportPanel({ tableName, columns }: ReportExportPa
                     key={section.id}
                     htmlFor={inputId}
                     aria-label={section.title}
-                    className="flex cursor-pointer items-start gap-3 rounded-3xl border border-white/15 bg-white/60 px-4 py-3 dark:bg-slate-950/25"
+                    className="flex cursor-pointer items-start gap-3 rounded-3xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/25"
                   >
                     <input
                       id={inputId}

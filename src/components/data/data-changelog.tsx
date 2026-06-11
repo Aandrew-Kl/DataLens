@@ -180,10 +180,10 @@ function DeltaBar({ before, after }: { before: number; after: number }) {
         <span>{deltaLabel}</span>
       </div>
       <div className="space-y-2">
-        <div className="overflow-hidden rounded-full bg-white/60 dark:bg-slate-900/80">
+        <div className="overflow-hidden rounded-full bg-white dark:bg-slate-900">
           <div className="h-2 rounded-full bg-slate-300 dark:bg-slate-700" style={{ width: beforeWidth }} />
         </div>
-        <div className="overflow-hidden rounded-full bg-white/60 dark:bg-slate-900/80">
+        <div className="overflow-hidden rounded-full bg-white dark:bg-slate-900">
           <div className="h-2 rounded-full bg-cyan-500/80" style={{ width: afterWidth }} />
         </div>
       </div>
@@ -312,7 +312,7 @@ export default function DataChangelog({ tableName }: DataChangelogProps) {
   }
 
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-white/20 bg-white/60 shadow-2xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45">
+    <section className="overflow-hidden rounded-lg border border-white/20 bg-white shadow-2xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950">
       <div className="border-b border-white/15 bg-gradient-to-br from-white/35 to-slate-200/10 px-5 py-5 dark:from-white/10 dark:to-slate-900/10">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -331,15 +331,15 @@ export default function DataChangelog({ tableName }: DataChangelogProps) {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/20 bg-white/45 px-4 py-3 dark:bg-slate-900/55">
+            <div className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-900">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Entries</p>
               <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-50">{summary.total}</p>
             </div>
-            <div className="rounded-2xl border border-white/20 bg-white/45 px-4 py-3 dark:bg-slate-900/55">
+            <div className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-900">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Rows Affected</p>
               <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-50">{formatNumber(summary.affected)}</p>
             </div>
-            <div className="rounded-2xl border border-white/20 bg-white/45 px-4 py-3 dark:bg-slate-900/55">
+            <div className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-900">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Undone</p>
               <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-50">{summary.undone}</p>
             </div>
@@ -350,21 +350,21 @@ export default function DataChangelog({ tableName }: DataChangelogProps) {
       <div className="space-y-5 px-5 py-5">
         <NoticeBanner notice={notice} />
 
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE }} className="grid gap-4 rounded-[1.75rem] border border-white/15 bg-white/50 p-4 dark:bg-slate-900/40 lg:grid-cols-[1.4fr_0.9fr]">
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE }} className="grid gap-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900 lg:grid-cols-[1.4fr_0.9fr]">
           <div className="space-y-3">
             <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Record transformation</h3>
-            <input value={form.description} onChange={(event) => updateForm("description", event.target.value)} placeholder="Removed test rows older than 2022" className="w-full rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 dark:bg-slate-950/60 dark:text-slate-50" />
+            <input value={form.description} onChange={(event) => updateForm("description", event.target.value)} placeholder="Removed test rows older than 2022" className="w-full rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 dark:bg-slate-950 dark:text-slate-50" />
             <div className="grid gap-3 sm:grid-cols-3">
-              <select value={form.operation} onChange={(event) => updateForm("operation", event.target.value as OperationType)} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+              <select value={form.operation} onChange={(event) => updateForm("operation", event.target.value as OperationType)} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                 {Object.entries(operationMeta).map(([value, meta]) => <option key={value} value={value}>{meta.label}</option>)}
               </select>
-              <input value={form.rowsBefore} onChange={(event) => updateForm("rowsBefore", event.target.value)} placeholder="Rows before" className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
-              <input value={form.rowsAfter} onChange={(event) => updateForm("rowsAfter", event.target.value)} placeholder="Rows after" className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
+              <input value={form.rowsBefore} onChange={(event) => updateForm("rowsBefore", event.target.value)} placeholder="Rows before" className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
+              <input value={form.rowsAfter} onChange={(event) => updateForm("rowsAfter", event.target.value)} placeholder="Rows after" className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
             </div>
-            <textarea value={form.undoSql} onChange={(event) => updateForm("undoSql", event.target.value)} rows={3} placeholder='Optional undo SQL, e.g. CREATE OR REPLACE TABLE "sales" AS SELECT * FROM "__snapshot_before_clean"' className="w-full rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 dark:bg-slate-950/60 dark:text-slate-50" />
+            <textarea value={form.undoSql} onChange={(event) => updateForm("undoSql", event.target.value)} rows={3} placeholder='Optional undo SQL, e.g. CREATE OR REPLACE TABLE "sales" AS SELECT * FROM "__snapshot_before_clean"' className="w-full rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 dark:bg-slate-950 dark:text-slate-50" />
           </div>
 
-          <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-white/15 bg-slate-950/5 p-4 dark:bg-white/5">
+          <div className="flex flex-col justify-between gap-4 rounded-lg border border-white/15 bg-slate-950/5 p-4 dark:bg-white/5">
             <div className="space-y-3">
               <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Export & reset</h3>
               <div className="grid gap-2">
@@ -372,11 +372,11 @@ export default function DataChangelog({ tableName }: DataChangelogProps) {
                   <GitCompareArrows className="h-4 w-4" />
                   Save entry
                 </button>
-                <button type="button" onClick={() => handleExport("text")} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+                <button type="button" onClick={() => handleExport("text")} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white dark:text-slate-200">
                   <Download className="h-4 w-4" />
                   Export text
                 </button>
-                <button type="button" onClick={() => handleExport("json")} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+                <button type="button" onClick={() => handleExport("json")} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white dark:text-slate-200">
                   <Download className="h-4 w-4" />
                   Export JSON
                 </button>
@@ -400,7 +400,7 @@ export default function DataChangelog({ tableName }: DataChangelogProps) {
 
           <AnimatePresence initial={false}>
             {entries.length === 0 ? (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-[1.75rem] border border-dashed border-white/20 bg-white/35 px-6 py-10 text-center text-sm text-slate-500 dark:bg-slate-900/30 dark:text-slate-400">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-lg border border-dashed border-white/20 bg-white/35 px-6 py-10 text-center text-sm text-slate-500 dark:bg-slate-900/30 dark:text-slate-400">
                 Record the first transformation to start building a timeline for <span className="font-mono">{tableName}</span>.
               </motion.div>
             ) : (
@@ -408,7 +408,7 @@ export default function DataChangelog({ tableName }: DataChangelogProps) {
                 const meta = operationMeta[entry.operation];
                 const Icon = meta.icon;
                 return (
-                  <motion.article key={entry.id} layout initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.28, delay: index * 0.03, ease: EASE }} className="overflow-hidden rounded-[1.75rem] border border-white/15 bg-gradient-to-br px-5 py-5 shadow-lg shadow-slate-950/5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/35">
+                  <motion.article key={entry.id} layout initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.28, delay: index * 0.03, ease: EASE }} className="overflow-hidden rounded-lg border border-white/15 bg-gradient-to-br px-5 py-5 shadow-lg shadow-slate-950/5 dark:border-white/10 dark:bg-slate-950/35">
                     <div className={`absolute inset-0 -z-10 bg-gradient-to-br ${meta.accent}`} />
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                       <div className="space-y-3">
@@ -418,17 +418,17 @@ export default function DataChangelog({ tableName }: DataChangelogProps) {
                             {formatTimestamp(entry.timestamp)}
                           </span>
                           <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${meta.chip}`}>{meta.label}</span>
-                          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${entry.status === "failed" ? "bg-rose-500/10 text-rose-700 dark:text-rose-300" : entry.status === "undone" ? "bg-slate-500/10 text-slate-700 dark:text-slate-300" : "bg-white/50 text-slate-600 dark:bg-white/5 dark:text-slate-300"}`}>{entry.status}</span>
+                          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${entry.status === "failed" ? "bg-rose-500/10 text-rose-700 dark:text-rose-300" : entry.status === "undone" ? "bg-slate-500/10 text-slate-700 dark:text-slate-300" : "bg-white text-slate-600 dark:bg-white/5 dark:text-slate-300"}`}>{entry.status}</span>
                         </div>
                         <h4 className="text-lg font-semibold text-slate-950 dark:text-slate-50">{entry.description}</h4>
                         <div className="flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">
-                          <span className="rounded-full bg-white/50 px-2.5 py-1 dark:bg-slate-900/60">{formatNumber(entry.rowsBefore)} before</span>
-                          <span className="rounded-full bg-white/50 px-2.5 py-1 dark:bg-slate-900/60">{formatNumber(entry.rowsAfter)} after</span>
-                          <span className="rounded-full bg-white/50 px-2.5 py-1 dark:bg-slate-900/60">{formatNumber(entry.rowsAffected)} affected</span>
+                          <span className="rounded-full bg-white px-2.5 py-1 dark:bg-slate-900">{formatNumber(entry.rowsBefore)} before</span>
+                          <span className="rounded-full bg-white px-2.5 py-1 dark:bg-slate-900">{formatNumber(entry.rowsAfter)} after</span>
+                          <span className="rounded-full bg-white px-2.5 py-1 dark:bg-slate-900">{formatNumber(entry.rowsAffected)} affected</span>
                         </div>
                       </div>
 
-                      <button type="button" onClick={() => void handleUndo(entry)} disabled={busyId === entry.id || entry.status === "undone"} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white/40 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-200">
+                      <button type="button" onClick={() => void handleUndo(entry)} disabled={busyId === entry.id || entry.status === "undone"} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-200">
                         <RotateCcw className={`h-4 w-4 ${busyId === entry.id ? "animate-spin" : ""}`} />
                         Undo
                       </button>
@@ -436,7 +436,7 @@ export default function DataChangelog({ tableName }: DataChangelogProps) {
 
                     <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_0.8fr]">
                       <DeltaBar before={entry.rowsBefore} after={entry.rowsAfter} />
-                      <div className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/55 dark:text-slate-300">
+                      <div className="rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Undo strategy</p>
                         <p className="mt-2 break-all font-mono text-xs leading-5">{entry.undoSql ?? "No undo SQL captured for this entry."}</p>
                       </div>

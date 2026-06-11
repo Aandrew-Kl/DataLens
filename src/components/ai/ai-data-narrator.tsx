@@ -325,14 +325,14 @@ function NarratorFallback() {
   return (
     <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
       <div className={`${GLASS_CARD_CLASS} animate-pulse p-5`}>
-        <div className="h-4 w-28 rounded-full bg-slate-200/80 dark:bg-slate-800/80" />
-        <div className="mt-4 h-28 rounded-3xl bg-slate-200/70 dark:bg-slate-800/70" />
+        <div className="h-4 w-28 rounded-full bg-slate-200 dark:bg-slate-800" />
+        <div className="mt-4 h-28 rounded-3xl bg-slate-200 dark:bg-slate-800" />
       </div>
       <div className={`${GLASS_CARD_CLASS} animate-pulse p-5`}>
         <div className="grid gap-3">
-          <div className="h-20 rounded-3xl bg-slate-200/70 dark:bg-slate-800/70" />
-          <div className="h-20 rounded-3xl bg-slate-200/70 dark:bg-slate-800/70" />
-          <div className="h-20 rounded-3xl bg-slate-200/70 dark:bg-slate-800/70" />
+          <div className="h-20 rounded-3xl bg-slate-200 dark:bg-slate-800" />
+          <div className="h-20 rounded-3xl bg-slate-200 dark:bg-slate-800" />
+          <div className="h-20 rounded-3xl bg-slate-200 dark:bg-slate-800" />
         </div>
       </div>
     </div>
@@ -437,7 +437,7 @@ function NarratorBody({
               {copied ? "Copied" : "Copy"}
             </button>
           </div>
-          <div className="mt-4 whitespace-pre-wrap rounded-3xl border border-white/20 bg-white/60 p-4 text-sm leading-7 text-slate-700 dark:bg-slate-950/30 dark:text-slate-200">
+          <div className="mt-4 whitespace-pre-wrap rounded-3xl border border-white/20 bg-white p-4 text-sm leading-7 text-slate-700 dark:bg-slate-950/30 dark:text-slate-200">
             {report.narrative}
           </div>
           {report.warning ? (
@@ -462,7 +462,7 @@ function NarratorBody({
                 report.snapshot.topNullColumns.map((column) => (
                   <div
                     key={column.name}
-                    className="rounded-3xl border border-white/20 bg-white/60 p-4 dark:bg-slate-950/30"
+                    className="rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/30"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <p className="font-medium text-slate-950 dark:text-white">
@@ -495,7 +495,7 @@ function NarratorBody({
                 report.snapshot.topCorrelations.map((pair) => (
                   <div
                     key={`${pair.left}:${pair.right}`}
-                    className="rounded-3xl border border-white/20 bg-white/60 p-4 dark:bg-slate-950/30"
+                    className="rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/30"
                   >
                     <p className="font-medium text-slate-950 dark:text-white">
                       {pair.left} × {pair.right}

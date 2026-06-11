@@ -41,7 +41,7 @@ export default function DataQualityDashboard({
     : 0;
 
   return (
-    <section className="overflow-hidden rounded-[32px] border border-slate-200/70 bg-linear-to-br from-slate-50/95 via-white/85 to-slate-100/80 shadow-[0_28px_100px_-46px_rgba(15,23,42,0.52)] backdrop-blur-2xl dark:border-slate-800/80 dark:from-slate-950 dark:via-slate-950/95 dark:to-slate-900/92">
+    <section className="overflow-hidden rounded-lg border border-slate-200/70 bg-linear-to-br from-slate-50/95 via-white/85 to-slate-100/80 shadow-sm dark:border-slate-800/80 dark:from-slate-950 dark:via-slate-950/95 dark:to-slate-900/92">
       <DashboardHeader tableName={tableName} columnCount={columns.length} />
 
       <AnimatePresence mode="wait">

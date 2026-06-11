@@ -412,7 +412,7 @@ function InfoCard({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/20 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-slate-900/45">
+    <div className="rounded-2xl border border-white/20 bg-slate-50 p-4 dark:border-white/10 dark:bg-slate-900">
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
         <Icon className="h-4 w-4" />
         {label}
@@ -529,7 +529,7 @@ export default function RelationshipExplorer({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: EASE }}
-      className="rounded-[2rem] border border-white/20 bg-white/70 p-6 shadow-xl shadow-slate-950/5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45"
+      className="rounded-lg border border-white/20 bg-white p-6 shadow-xl shadow-slate-950/5 dark:border-white/10 dark:bg-slate-950"
     >
       <div className="flex flex-col gap-4 border-b border-slate-200/70 pb-5 dark:border-slate-800/70 lg:flex-row lg:items-end lg:justify-between">
         <div>
@@ -551,16 +551,16 @@ export default function RelationshipExplorer({
 
       {loading ? (
         <div className="mt-6 grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
-          <div className="h-[520px] animate-pulse rounded-[1.75rem] border border-white/20 bg-slate-200/60 dark:border-white/10 dark:bg-slate-800/40" />
-          <div className="h-[520px] animate-pulse rounded-[1.75rem] border border-white/20 bg-slate-200/60 dark:border-white/10 dark:bg-slate-800/40" />
+          <div className="h-[520px] animate-pulse rounded-lg border border-white/20 bg-slate-200 dark:border-white/10 dark:bg-slate-800" />
+          <div className="h-[520px] animate-pulse rounded-lg border border-white/20 bg-slate-200 dark:border-white/10 dark:bg-slate-800" />
         </div>
       ) : loadState.error ? (
-        <div className="mt-6 rounded-[1.75rem] border border-rose-300/30 bg-rose-500/10 p-5 dark:border-rose-500/20 dark:bg-rose-500/10">
+        <div className="mt-6 rounded-lg border border-rose-300/30 bg-rose-500/10 p-5 dark:border-rose-500/20 dark:bg-rose-500/10">
           <p className="text-sm text-rose-700 dark:text-rose-300">{loadState.error}</p>
         </div>
       ) : (
         <div className="mt-6 grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
-          <div className="rounded-[1.75rem] border border-white/20 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-slate-900/45">
+          <div className="rounded-lg border border-white/20 bg-slate-50 p-4 dark:border-white/10 dark:bg-slate-900">
             {edges.length > 0 ? (
               <ReactECharts
                 option={buildGraphOption(nodes, edges, dark, activeNodeId, activeEdgeId)}
@@ -586,7 +586,7 @@ export default function RelationshipExplorer({
             </div>
 
             {selectedNode ? (
-              <div className="rounded-[1.75rem] border border-white/20 bg-slate-50/80 p-5 dark:border-white/10 dark:bg-slate-900/45">
+              <div className="rounded-lg border border-white/20 bg-slate-50 p-5 dark:border-white/10 dark:bg-slate-900">
                 <div className="flex items-center gap-3">
                   <div className="rounded-2xl bg-cyan-500/15 p-3 text-cyan-700 dark:text-cyan-300">
                     <Network className="h-5 w-5" />
@@ -613,7 +613,7 @@ export default function RelationshipExplorer({
                         setActiveEdgeId(edge.id);
                         setActiveNodeId(null);
                       }}
-                      className="w-full rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-left transition hover:border-cyan-300 dark:border-white/10 dark:bg-slate-950/50 dark:hover:border-cyan-500/40"
+                      className="w-full rounded-2xl border border-white/20 bg-white px-4 py-3 text-left transition hover:border-cyan-300 dark:border-white/10 dark:bg-slate-950 dark:hover:border-cyan-500/40"
                     >
                       <p className="font-medium text-slate-950 dark:text-white">
                         {edge.source} ↔ {edge.target}
@@ -630,7 +630,7 @@ export default function RelationshipExplorer({
                 </div>
               </div>
             ) : selectedEdge ? (
-              <div className="rounded-[1.75rem] border border-white/20 bg-slate-50/80 p-5 dark:border-white/10 dark:bg-slate-900/45">
+              <div className="rounded-lg border border-white/20 bg-slate-50 p-5 dark:border-white/10 dark:bg-slate-900">
                 <div className="flex items-center gap-3">
                   <div className="rounded-2xl bg-cyan-500/15 p-3 text-cyan-700 dark:text-cyan-300">
                     <Link2 className="h-5 w-5" />
@@ -657,7 +657,7 @@ export default function RelationshipExplorer({
                 </div>
 
                 <div className="mt-4 space-y-3">
-                  <div className="rounded-2xl border border-white/20 bg-white/70 p-4 dark:border-white/10 dark:bg-slate-950/50">
+                  <div className="rounded-2xl border border-white/20 bg-white p-4 dark:border-white/10 dark:bg-slate-950">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                       Why this edge exists
                     </p>
@@ -673,14 +673,14 @@ export default function RelationshipExplorer({
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-white/20 bg-white/70 p-4 dark:border-white/10 dark:bg-slate-950/50">
+                  <div className="rounded-2xl border border-white/20 bg-white p-4 dark:border-white/10 dark:bg-slate-950">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                       Functional dependencies
                     </p>
                     <div className="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300">
                       {selectedEdge.dependencies.length > 0 ? (
                         selectedEdge.dependencies.map((dependency) => (
-                          <div key={dependency} className="rounded-xl bg-slate-50 px-3 py-2 dark:bg-slate-900/60">
+                          <div key={dependency} className="rounded-xl bg-slate-50 px-3 py-2 dark:bg-slate-900">
                             {dependency}
                           </div>
                         ))

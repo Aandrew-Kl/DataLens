@@ -67,7 +67,7 @@ export default function Modal({
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 "
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -80,8 +80,8 @@ export default function Modal({
             className={`
               relative w-full ${sizeClasses[size]}
               rounded-2xl p-6
-              bg-white/90 dark:bg-gray-900/90
-              backdrop-blur-xl
+              bg-white dark:bg-gray-900
+              
               border border-gray-200/50 dark:border-gray-700/50
               shadow-xl
             `}

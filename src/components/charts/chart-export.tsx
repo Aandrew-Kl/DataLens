@@ -42,7 +42,7 @@ type BackgroundChoice = "transparent" | "white" | "dark";
 const STORAGE_KEY = "datalens:chart-export-history";
 const EASE = [0.22, 1, 0.36, 1] as const;
 const CARD_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 
 function readHistory(): DownloadHistoryEntry[] {
   if (typeof window === "undefined") return [];
@@ -404,7 +404,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
     <section className={`${CARD_CLASS} overflow-hidden p-5`}>
       <div className="flex flex-col gap-5 border-b border-white/15 pb-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
             <FileImage className="h-5 w-5" />
           </div>
           <div>
@@ -421,7 +421,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
           <button
             type="button"
             onClick={() => void refreshPreview()}
-            className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/60 dark:bg-slate-900/30 dark:text-slate-200"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-900/30 dark:text-slate-200"
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             Refresh preview
@@ -429,7 +429,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
           <button
             type="button"
             onClick={() => void batchExport()}
-            className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/60 dark:bg-slate-900/30 dark:text-slate-200"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-900/30 dark:text-slate-200"
           >
             <Download className="h-4 w-4" />
             Batch export
@@ -440,7 +440,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
       <div className="mt-5 grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-[1.3rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
               <label className="block text-sm font-semibold text-slate-900 dark:text-slate-50">
                 <span>
                 Pixel ratio
@@ -448,7 +448,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
               <select
                 value={pixelRatio}
                 onChange={(event) => setPixelRatio(Number(event.target.value))}
-                className="mt-3 w-full rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="mt-3 w-full rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               >
                 <option value={2}>PNG 2x</option>
                 <option value={4}>PNG 4x</option>
@@ -456,7 +456,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
               </label>
             </div>
 
-            <div className="rounded-[1.3rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
               <label className="block text-sm font-semibold text-slate-900 dark:text-slate-50">
                 <span>
                 Background
@@ -464,7 +464,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
               <select
                 value={background}
                 onChange={(event) => setBackground(event.target.value as BackgroundChoice)}
-                className="mt-3 w-full rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="mt-3 w-full rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               >
                 <option value="transparent">Transparent</option>
                 <option value="white">White</option>
@@ -473,7 +473,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
               </label>
             </div>
 
-            <div className="rounded-[1.3rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
               <label className="block text-sm font-semibold text-slate-900 dark:text-slate-50">
                 <span>
                 Width
@@ -483,12 +483,12 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
                 min={320}
                 value={width}
                 onChange={(event) => setWidth(Math.max(Number(event.target.value), 320))}
-                className="mt-3 w-full rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="mt-3 w-full rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               />
               </label>
             </div>
 
-            <div className="rounded-[1.3rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
               <label className="block text-sm font-semibold text-slate-900 dark:text-slate-50">
                 <span>
                 Height
@@ -498,13 +498,13 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
                 min={240}
                 value={height}
                 onChange={(event) => setHeight(Math.max(Number(event.target.value), 240))}
-                className="mt-3 w-full rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="mt-3 w-full rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               />
               </label>
             </div>
           </div>
 
-          <div className="rounded-[1.3rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -534,7 +534,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
             <button
               type="button"
               onClick={() => void exportChart("png")}
-              className="inline-flex items-center gap-2 rounded-[1rem] bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
+              className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
             >
               <Download className="h-4 w-4" />
               Export PNG
@@ -542,7 +542,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
             <button
               type="button"
               onClick={() => void exportChart("svg")}
-              className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/60 dark:bg-slate-900/30 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-900/30 dark:text-slate-200"
             >
               <ExternalLink className="h-4 w-4" />
               Export SVG
@@ -550,7 +550,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
             <button
               type="button"
               onClick={() => void exportChart("pdf")}
-              className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/60 dark:bg-slate-900/30 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-900/30 dark:text-slate-200"
             >
               <Printer className="h-4 w-4" />
               Export PDF
@@ -558,7 +558,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
             <button
               type="button"
               onClick={() => void copyToClipboard()}
-              className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/60 dark:bg-slate-900/30 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-900/30 dark:text-slate-200"
             >
               <Copy className="h-4 w-4" />
               Copy image
@@ -566,7 +566,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
             <button
               type="button"
               onClick={generateShareUrl}
-              className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/60 dark:bg-slate-900/30 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-900/30 dark:text-slate-200"
             >
               <Link2 className="h-4 w-4" />
               Generate share URL
@@ -574,7 +574,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
           </div>
 
           {shareUrl ? (
-            <div className="rounded-[1.2rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                 Share URL
               </p>
@@ -584,9 +584,9 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-[1.3rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">Preview</p>
-            <div className="mt-4 overflow-hidden rounded-[1.1rem] border border-white/15 bg-slate-100/70 p-3 dark:bg-slate-950/35">
+            <div className="mt-4 overflow-hidden rounded-lg border border-white/15 bg-slate-100 p-3 dark:bg-slate-950/35">
               {previewUrl ? (
                 <NextImage
                   src={previewUrl}
@@ -594,7 +594,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
                   width={width}
                   height={height}
                   unoptimized
-                  className="w-full rounded-[0.8rem]"
+                  className="w-full rounded-lg"
                 />
               ) : (
                 <div className="flex min-h-64 items-center justify-center text-sm text-slate-500 dark:text-slate-400">
@@ -604,7 +604,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
             </div>
           </div>
 
-          <div className="rounded-[1.3rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <div className="flex items-center gap-2">
               <History className="h-4 w-4 text-slate-500 dark:text-slate-400" />
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">Download history</p>
@@ -618,7 +618,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
                 history.map((entry) => (
                   <div
                     key={entry.id}
-                    className="rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/25"
+                    className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/25"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -645,7 +645,7 @@ export default function ChartExport({ chartRef, chartTitle }: ChartExportProps) 
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.24, ease: EASE }}
-                className="rounded-[1.2rem] border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-800 dark:text-cyan-300"
+                className="rounded-lg border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-800 dark:text-cyan-300"
               >
                 {notice}
               </motion.div>

@@ -122,7 +122,7 @@ export default function MissingDataMap({
         const sql = `
           SELECT
             COUNT(*) AS row_count,
-            ${selectClauses.join(",\n            ")}
+            ${selectClauses.join(",\n ")}
           FROM ${safeTable}
         `;
 
@@ -198,7 +198,7 @@ export default function MissingDataMap({
         animate={{ opacity: 1, y: 0 }}
         className="
           rounded-2xl border border-gray-200/50 dark:border-gray-700/50
-          bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl
+          bg-white dark:bg-gray-900 
           p-6 shadow-xl shadow-slate-900/5
         "
       >
@@ -221,7 +221,7 @@ export default function MissingDataMap({
       animate={{ opacity: 1, y: 0 }}
       className="
         rounded-2xl border border-gray-200/50 dark:border-gray-700/50
-        bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl
+        bg-white dark:bg-gray-900 
         p-6 shadow-xl shadow-slate-900/5
       "
     >
@@ -239,7 +239,7 @@ export default function MissingDataMap({
           </p>
         </div>
 
-        <div className="min-w-[260px] rounded-2xl border border-gray-200/60 bg-white/70 p-4 dark:border-gray-700/70 dark:bg-gray-950/35">
+        <div className="min-w-[260px] rounded-2xl border border-gray-200/60 bg-white p-4 dark:border-gray-700/70 dark:bg-gray-950/35">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
             Overall Completeness
           </p>
@@ -251,7 +251,7 @@ export default function MissingDataMap({
               across {formatNumber(rowCount)} rows
             </span>
           </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-200/80 dark:bg-gray-800/80">
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-200/80 dark:bg-gray-800">
             <motion.div
               className={getCompletenessColor(completenessScore)}
               initial={{ width: 0 }}
@@ -278,7 +278,7 @@ export default function MissingDataMap({
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.75fr)]">
-        <div className="rounded-2xl border border-gray-200/60 bg-white/55 p-4 dark:border-gray-800/70 dark:bg-gray-950/35">
+        <div className="rounded-2xl border border-gray-200/60 bg-white p-4 dark:border-gray-800/70 dark:bg-gray-950/35">
           {loading ? (
             <div className="grid min-h-[260px] place-items-center">
               <motion.div
@@ -299,7 +299,7 @@ export default function MissingDataMap({
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.03, duration: 0.24 }}
-                  className="rounded-2xl border border-gray-200/60 bg-white/80 p-4 dark:border-gray-800/70 dark:bg-gray-950/30"
+                  className="rounded-2xl border border-gray-200/60 bg-white p-4 dark:border-gray-800/70 dark:bg-gray-950/30"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
@@ -320,7 +320,7 @@ export default function MissingDataMap({
                     </div>
                   </div>
 
-                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-200/80 dark:bg-gray-800/70">
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-200/80 dark:bg-gray-800">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${metric.nullPercentage}%` }}
@@ -335,7 +335,7 @@ export default function MissingDataMap({
           )}
         </div>
 
-        <div className="rounded-2xl border border-gray-200/60 bg-white/55 p-4 dark:border-gray-800/70 dark:bg-gray-950/35">
+        <div className="rounded-2xl border border-gray-200/60 bg-white p-4 dark:border-gray-800/70 dark:bg-gray-950/35">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
             Suggested Actions
           </p>
@@ -346,7 +346,7 @@ export default function MissingDataMap({
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05, duration: 0.24 }}
-                className="rounded-2xl border border-gray-200/60 bg-white/80 px-4 py-3 text-sm text-gray-700 dark:border-gray-800/70 dark:bg-gray-950/30 dark:text-gray-300"
+                className="rounded-2xl border border-gray-200/60 bg-white px-4 py-3 text-sm text-gray-700 dark:border-gray-800/70 dark:bg-gray-950/30 dark:text-gray-300"
               >
                 {suggestion}
               </motion.div>

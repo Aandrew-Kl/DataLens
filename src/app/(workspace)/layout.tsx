@@ -39,18 +39,18 @@ const TABS = [
 function WorkspaceContentFallback() {
   return (
     <div className="flex min-h-[24rem] items-center justify-center">
-      <div className="w-full max-w-3xl animate-pulse rounded-2xl bg-white/60 p-6 backdrop-blur-xl dark:bg-slate-900/60">
+      <div className="w-full max-w-3xl animate-pulse rounded-2xl bg-white p-6 dark:bg-slate-900">
         <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
           Loading workspace...
         </p>
         <div className="mt-4 space-y-3">
-          <div className="h-10 rounded-xl bg-white/70 dark:bg-slate-800/70" />
+          <div className="h-10 rounded-xl bg-white dark:bg-slate-800" />
           <div className="grid gap-3 md:grid-cols-3">
-            <div className="h-24 rounded-xl bg-white/70 dark:bg-slate-800/70" />
-            <div className="h-24 rounded-xl bg-white/70 dark:bg-slate-800/70" />
-            <div className="h-24 rounded-xl bg-white/70 dark:bg-slate-800/70" />
+            <div className="h-24 rounded-xl bg-white dark:bg-slate-800" />
+            <div className="h-24 rounded-xl bg-white dark:bg-slate-800" />
+            <div className="h-24 rounded-xl bg-white dark:bg-slate-800" />
           </div>
-          <div className="h-48 rounded-xl bg-white/70 dark:bg-slate-800/70" />
+          <div className="h-48 rounded-xl bg-white dark:bg-slate-800" />
         </div>
       </div>
     </div>
@@ -110,12 +110,12 @@ export default function WorkspaceLayout({
   );
 
   return (
-    <div className="flex min-h-screen overflow-hidden bg-white/50 dark:bg-slate-950/90 text-slate-900 dark:text-slate-100 backdrop-blur-sm">
+    <div className="flex min-h-screen overflow-hidden bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 ">
       <div
         className={`
           ${
             sidebarOpen ? "w-64" : "w-0"
-          } flex-shrink-0 border-r border-white/30 dark:border-white/10 bg-white/55 dark:bg-slate-900/60 backdrop-blur-xl transition-all duration-200 overflow-hidden flex flex-col
+          } flex-shrink-0 border-r border-white/30 dark:border-white/10 bg-white dark:bg-slate-900 transition-all duration-200 overflow-hidden flex flex-col
         `}
       >
         <div className="h-full flex flex-col rounded-r-2xl">
@@ -139,7 +139,7 @@ export default function WorkspaceLayout({
                 className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                   dataset.id === activeDataset?.id
                     ? "bg-purple-100/90 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-medium"
-                    : "text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800/70"
+                    : "text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800"
                 }`}
               >
                 <span className="truncate block text-left">{dataset.fileName}</span>
@@ -153,7 +153,7 @@ export default function WorkspaceLayout({
           <div className="p-2 border-t border-white/20 dark:border-white/10">
             <button
               onClick={() => setShowUploader(true)}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-colors"
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
             >
               <Upload className="w-4 h-4" />
               New Dataset
@@ -163,11 +163,11 @@ export default function WorkspaceLayout({
       </div>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-14 flex items-center justify-between px-4 border-b border-white/25 dark:border-white/10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl flex-shrink-0 rounded-b-xl">
+        <header className="h-14 flex items-center justify-between px-4 border-b border-white/25 dark:border-white/10 bg-white dark:bg-slate-900 flex-shrink-0 rounded-b-xl">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={toggleSidebar}
-              className="p-1.5 rounded-lg hover:bg-white/70 dark:hover:bg-slate-800/70 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"
               aria-label="Toggle sidebar"
             >
               <Menu className="w-4 h-4" />
@@ -183,28 +183,28 @@ export default function WorkspaceLayout({
           <div className="flex items-center gap-1">
             <button
               onClick={() => setShowCommandPalette(true)}
-              className="p-1.5 rounded-lg hover:bg-white/70 dark:hover:bg-slate-800/70 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"
               title="Command Palette (⌘K)"
             >
               <Search className="w-4 h-4" />
             </button>
             <button
               onClick={() => setShowSettings(true)}
-              className="p-1.5 rounded-lg hover:bg-white/70 dark:hover:bg-slate-800/70 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"
               title="Settings"
             >
               <Settings className="w-4 h-4" />
             </button>
             <button
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg hover:bg-white/70 dark:hover:bg-slate-800/70 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"
               title="Toggle Theme"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             <button
               onClick={() => setShowUploader(true)}
-              className="p-1.5 rounded-lg hover:bg-white/70 dark:hover:bg-slate-800/70 transition-colors lg:hidden"
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors lg:hidden"
               title="Upload dataset"
             >
               <Upload className="w-4 h-4" />
@@ -212,7 +212,7 @@ export default function WorkspaceLayout({
           </div>
         </header>
 
-        <nav className="flex items-center gap-1 px-4 py-1.5 border-b border-white/20 dark:border-white/10 bg-white/50 dark:bg-slate-900/40 backdrop-blur-md flex-shrink-0 overflow-x-auto scrollbar-hide">
+        <nav className="flex items-center gap-1 px-4 py-1.5 border-b border-white/20 dark:border-white/10 bg-white dark:bg-slate-900 flex-shrink-0 overflow-x-auto scrollbar-hide">
           {TABS.map((tab) => {
             const isActive = pathname === tab.href || pathname?.startsWith(`${tab.href}/`);
 
@@ -224,7 +224,7 @@ export default function WorkspaceLayout({
                 className={`px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap transition-colors ${
                   isActive
                     ? "bg-purple-100/80 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300"
-                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/70 dark:hover:bg-slate-800/70"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-800"
                 }`}
               >
                 {tab.label}
@@ -258,17 +258,17 @@ export default function WorkspaceLayout({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <button
             type="button"
-            className="absolute inset-0 bg-black/25 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/25 "
             aria-label="Close uploader"
             onClick={() => setShowUploader(false)}
           />
-          <div className="relative w-full max-w-lg rounded-2xl border border-white/30 bg-white/80 p-4 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/90">
+          <div className="relative w-full max-w-lg rounded-2xl border border-white/30 bg-white p-4 shadow-xl dark:border-white/10 dark:bg-slate-900">
             <div className="mb-4 flex items-center justify-between gap-3">
               <h3 className="text-sm font-semibold">Upload Dataset</h3>
               <button
                 type="button"
                 onClick={() => setShowUploader(false)}
-                className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-white/70 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-slate-200"
+                className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-white hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                 aria-label="Close uploader"
               >
                 <X className="h-4 w-4" />

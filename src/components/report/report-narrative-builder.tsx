@@ -181,7 +181,7 @@ function buildPreviewQuery(tableName: string, columns: ColumnProfile[]) {
           (column) =>
             `CAST(${quoteIdentifier(column.name)} AS VARCHAR) AS ${quoteIdentifier(column.name)}`,
         )
-        .join(",\n      ")}
+        .join(",\n ")}
     FROM ${quoteIdentifier(tableName)}
     LIMIT 1
   `;

@@ -100,7 +100,7 @@ function projectionSql(columns: ColumnProfile[], overrides: Record<string, strin
   return columns.map((column) => {
     const field = quoteId(column.name);
     return overrides[column.name] ? `${overrides[column.name]} AS ${field}` : field;
-  }).join(",\n      ");
+  }).join(",\n ");
 }
 
 function inferTypeCandidate(column: ColumnProfile, row: Record<string, unknown>): TypeCandidate | null {

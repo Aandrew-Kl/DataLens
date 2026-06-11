@@ -69,8 +69,8 @@ function buildSql(
 ) {
   return [
     "SELECT",
-    "  *,",
-    `  ${buildWindowExpression(fn, targetColumn, partitionColumn, orderColumn, offset)}`,
+    " *,",
+    ` ${buildWindowExpression(fn, targetColumn, partitionColumn, orderColumn, offset)}`,
     `FROM ${quoteIdentifier(tableName)}`,
     `ORDER BY ${quoteIdentifier(orderColumn)}`,
     "LIMIT 50",

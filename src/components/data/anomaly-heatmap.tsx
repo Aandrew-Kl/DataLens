@@ -130,7 +130,7 @@ function buildHeatmapOption(cells: HeatCell[], rowLabels: string[], columnLabels
 }
 function StatCard({ label, value, tone }: { label: string; value: string; tone: string }) {
   return (
-    <div className="rounded-2xl border border-gray-200/70 bg-white/80 p-4 shadow-sm dark:border-gray-700/70 dark:bg-gray-950/35">
+    <div className="rounded-2xl border border-gray-200/70 bg-white p-4 shadow-sm dark:border-gray-700/70 dark:bg-gray-950/35">
       <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">{label}</p>
       <p className={`mt-3 text-2xl font-semibold ${tone}`}>{value}</p>
     </div>
@@ -185,11 +185,11 @@ export default function AnomalyHeatmap({ tableName, columns }: AnomalyHeatmapPro
           runQuery(`
             WITH stats AS (
               SELECT
-                ${statsCte.join(",\n                ")}
+                ${statsCte.join(",\n ")}
               FROM ${safeTable}
             )
             SELECT
-              ${statsSelect.join(",\n              ")}
+              ${statsSelect.join(",\n ")}
             FROM stats
           `),
           runQuery(`
@@ -243,7 +243,7 @@ export default function AnomalyHeatmap({ tableName, columns }: AnomalyHeatmapPro
   const option = useMemo(() => buildHeatmapOption(cells, sampleRows.map((row) => `Row ${row.rowId}`), stats.map((column) => column.name), dark), [cells, sampleRows, stats, dark]);
   if (numericColumns.length === 0) {
     return (
-      <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-gray-200/50 bg-white/60 p-6 shadow-xl shadow-slate-900/5 dark:border-gray-700/50 dark:bg-gray-900/60">
+      <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-gray-200/50 bg-white p-6 shadow-xl shadow-slate-900/5 dark:border-gray-700/50 dark:bg-gray-900">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">Anomaly Heatmap</p>
         <h3 className="mt-2 text-lg font-semibold text-gray-900 dark:text-gray-100">No numeric columns available</h3>
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Add numeric fields to compare cell-level deviations against each column&apos;s mean and standard deviation.</p>
@@ -251,13 +251,13 @@ export default function AnomalyHeatmap({ tableName, columns }: AnomalyHeatmapPro
     );
   }
   return (
-    <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-gray-200/50 bg-white/60 p-6 shadow-xl shadow-slate-900/5 dark:border-gray-700/50 dark:bg-gray-900/60">
+    <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-gray-200/50 bg-white p-6 shadow-xl shadow-slate-900/5 dark:border-gray-700/50 dark:bg-gray-900">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">Anomaly Heatmap</p>
           <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Z-score scan across {numericColumns.length} numeric columns</h3>
-            <span className="rounded-full border border-gray-200/70 bg-white/70 px-3 py-1 text-xs font-medium text-gray-600 dark:border-gray-700/70 dark:bg-gray-950/40 dark:text-gray-300">{sampleRows.length} sampled rows</span>
+            <span className="rounded-full border border-gray-200/70 bg-white px-3 py-1 text-xs font-medium text-gray-600 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-300">{sampleRows.length} sampled rows</span>
           </div>
           <p className="max-w-3xl text-sm text-gray-600 dark:text-gray-400">Green cells stay near the column mean, yellow cells drift, and red cells cross {ANOMALY_THRESHOLD} standard deviations.</p>
         </div>
@@ -273,7 +273,7 @@ export default function AnomalyHeatmap({ tableName, columns }: AnomalyHeatmapPro
         <StatCard label="Stable Columns" value={String(stableColumns)} tone="text-violet-600 dark:text-violet-400" />
       </div>
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="rounded-2xl border border-gray-200/70 bg-white/75 p-4 shadow-sm dark:border-gray-700/70 dark:bg-gray-950/35">
+        <div className="rounded-2xl border border-gray-200/70 bg-white p-4 shadow-sm dark:border-gray-700/70 dark:bg-gray-950/35">
           {loading ? (
             <div className="flex h-[360px] items-center justify-center gap-3 text-sm text-gray-500 dark:text-gray-400">
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -288,26 +288,26 @@ export default function AnomalyHeatmap({ tableName, columns }: AnomalyHeatmapPro
           )}
         </div>
         <div className="space-y-4">
-          <div className="rounded-2xl border border-gray-200/70 bg-white/75 p-5 shadow-sm dark:border-gray-700/70 dark:bg-gray-950/35">
+          <div className="rounded-2xl border border-gray-200/70 bg-white p-5 shadow-sm dark:border-gray-700/70 dark:bg-gray-950/35">
             <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
               <Sigma className="h-4 w-4 text-sky-500" />
               Column risk ranking
             </div>
             <div className="mt-4 space-y-3">
               {hottestColumns.map((column) => (
-                <div key={column.name} className="rounded-xl bg-gray-50/90 p-3 dark:bg-gray-900/70">
+                <div key={column.name} className="rounded-xl bg-gray-50 p-3 dark:bg-gray-900">
                   <div className="flex items-center justify-between gap-3">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{column.name}</p>
                     <span className="text-xs text-gray-500 dark:text-gray-400">{formatNumber(column.anomalyCount)} flagged</span>
                   </div>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200/80 dark:bg-gray-800/80">
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200/80 dark:bg-gray-800">
                     <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, totalFlagged === 0 ? 0 : (column.anomalyCount / totalFlagged) * 100)}%` }} transition={{ duration: 0.45, ease: "easeOut" }} className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-red-500" />
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="rounded-2xl border border-gray-200/70 bg-white/75 p-5 shadow-sm dark:border-gray-700/70 dark:bg-gray-950/35">
+          <div className="rounded-2xl border border-gray-200/70 bg-white p-5 shadow-sm dark:border-gray-700/70 dark:bg-gray-950/35">
             <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
               <Activity className="h-4 w-4 text-rose-500" />
               Strongest sampled deviations

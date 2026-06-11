@@ -124,7 +124,7 @@ function TabButton({
       className={`flex items-center gap-2 rounded-2xl border px-3 py-3 text-left text-sm font-medium transition ${
         active
           ? "border-blue-500/30 bg-blue-500/15 text-blue-700 dark:text-blue-200"
-          : "border-gray-200/60 bg-white/55 text-gray-700 hover:border-blue-400/40 hover:text-blue-600 dark:border-gray-700/60 dark:bg-gray-950/35 dark:text-gray-200 dark:hover:text-blue-300"
+          : "border-gray-200/60 bg-white text-gray-700 hover:border-blue-400/40 hover:text-blue-600 dark:border-gray-700/60 dark:bg-gray-950/35 dark:text-gray-200 dark:hover:text-blue-300"
       }`}
     >
       <Icon className="h-4 w-4 shrink-0" />
@@ -182,29 +182,29 @@ export function TransformStepEditor(props: TransformStepEditorProps) {
         ))}
       </div>
 
-      <div className="rounded-2xl border border-gray-200/60 bg-white/45 p-4 dark:border-gray-700/60 dark:bg-gray-950/35">
+      <div className="rounded-2xl border border-gray-200/60 bg-white p-4 dark:border-gray-700/60 dark:bg-gray-950/35">
         {activeTab === "filter" && (
           <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_220px]">
             <label className="space-y-2">
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Column</span>
-              <select value={filterDraft.column} onChange={(event) => setFilterDraft((current) => ({ ...current, column: event.target.value }))} className="h-11 w-full rounded-xl border border-gray-200/70 bg-white/70 px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950/50 dark:text-gray-100">
+              <select value={filterDraft.column} onChange={(event) => setFilterDraft((current) => ({ ...current, column: event.target.value }))} className="h-11 w-full rounded-xl border border-gray-200/70 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-100">
                 <option value="">Select column</option>
                 {currentColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
               </select>
             </label>
             <label className="space-y-2">
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Operator</span>
-              <select value={filterDraft.operator} onChange={(event) => setFilterDraft((current) => ({ ...current, operator: event.target.value as FilterOperator }))} className="h-11 w-full rounded-xl border border-gray-200/70 bg-white/70 px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950/50 dark:text-gray-100">
+              <select value={filterDraft.operator} onChange={(event) => setFilterDraft((current) => ({ ...current, operator: event.target.value as FilterOperator }))} className="h-11 w-full rounded-xl border border-gray-200/70 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-100">
                 {FILTER_OPERATORS.map((operator) => <option key={operator.value} value={operator.value}>{operator.label}</option>)}
               </select>
             </label>
             {getOperatorMeta(filterDraft.operator).needsValue ? (
               <label className="space-y-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Value</span>
-                <input value={filterDraft.value} onChange={(event) => setFilterDraft((current) => ({ ...current, value: event.target.value }))} placeholder="42" className="h-11 w-full rounded-xl border border-gray-200/70 bg-white/70 px-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950/50 dark:text-gray-100 dark:placeholder:text-gray-500" />
+                <input value={filterDraft.value} onChange={(event) => setFilterDraft((current) => ({ ...current, value: event.target.value }))} placeholder="42" className="h-11 w-full rounded-xl border border-gray-200/70 bg-white px-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-500" />
               </label>
             ) : (
-              <div className="rounded-xl border border-dashed border-gray-200/70 bg-white/50 px-4 py-3 text-sm text-gray-500 dark:border-gray-700/70 dark:bg-gray-950/30 dark:text-gray-400">This operator does not require a comparison value.</div>
+              <div className="rounded-xl border border-dashed border-gray-200/70 bg-white px-4 py-3 text-sm text-gray-500 dark:border-gray-700/70 dark:bg-gray-950/30 dark:text-gray-400">This operator does not require a comparison value.</div>
             )}
           </div>
         )}
@@ -213,14 +213,14 @@ export function TransformStepEditor(props: TransformStepEditorProps) {
           <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px]">
             <label className="space-y-2">
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Sort column</span>
-              <select value={sortDraft.column} onChange={(event) => setSortDraft((current) => ({ ...current, column: event.target.value }))} className="h-11 w-full rounded-xl border border-gray-200/70 bg-white/70 px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950/50 dark:text-gray-100">
+              <select value={sortDraft.column} onChange={(event) => setSortDraft((current) => ({ ...current, column: event.target.value }))} className="h-11 w-full rounded-xl border border-gray-200/70 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-100">
                 <option value="">Select column</option>
                 {currentColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
               </select>
             </label>
             <label className="space-y-2">
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Direction</span>
-              <select value={sortDraft.direction} onChange={(event) => setSortDraft((current) => ({ ...current, direction: event.target.value as SortDirection }))} className="h-11 w-full rounded-xl border border-gray-200/70 bg-white/70 px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950/50 dark:text-gray-100">
+              <select value={sortDraft.direction} onChange={(event) => setSortDraft((current) => ({ ...current, direction: event.target.value as SortDirection }))} className="h-11 w-full rounded-xl border border-gray-200/70 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-100">
                 <option value="ASC">Ascending</option>
                 <option value="DESC">Descending</option>
               </select>
@@ -237,7 +237,7 @@ export function TransformStepEditor(props: TransformStepEditorProps) {
                 {currentColumns.map((column) => {
                   const selected = groupDraft.groupBy.includes(column.name);
                   return (
-                    <button key={column.name} type="button" onClick={() => setGroupDraft((current) => ({ ...current, groupBy: selected ? current.groupBy.filter((name) => name !== column.name) : [...current.groupBy, column.name] }))} className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${selected ? "border-blue-500/30 bg-blue-500/15 text-blue-700 dark:text-blue-200" : "border-gray-200/70 bg-white/70 text-gray-700 hover:border-blue-400/50 hover:text-blue-600 dark:border-gray-700/70 dark:bg-gray-950/40 dark:text-gray-200 dark:hover:text-blue-300"}`}>
+                    <button key={column.name} type="button" onClick={() => setGroupDraft((current) => ({ ...current, groupBy: selected ? current.groupBy.filter((name) => name !== column.name) : [...current.groupBy, column.name] }))} className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${selected ? "border-blue-500/30 bg-blue-500/15 text-blue-700 dark:text-blue-200" : "border-gray-200/70 bg-white text-gray-700 hover:border-blue-400/50 hover:text-blue-600 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-200 dark:hover:text-blue-300"}`}>
                       {column.name}
                     </button>
                   );
@@ -250,27 +250,27 @@ export function TransformStepEditor(props: TransformStepEditorProps) {
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Aggregations</p>
                   <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Each aggregation becomes one output column in the transformed view.</p>
                 </div>
-                <button type="button" onClick={() => setGroupDraft((current) => ({ ...current, aggregates: [...current.aggregates, createAggregationDraft()] }))} className="inline-flex items-center gap-2 rounded-xl border border-gray-200/70 bg-white/70 px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-blue-400/50 hover:text-blue-600 dark:border-gray-700/70 dark:bg-gray-950/40 dark:text-gray-200 dark:hover:text-blue-300">
+                <button type="button" onClick={() => setGroupDraft((current) => ({ ...current, aggregates: [...current.aggregates, createAggregationDraft()] }))} className="inline-flex items-center gap-2 rounded-xl border border-gray-200/70 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-blue-400/50 hover:text-blue-600 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-200 dark:hover:text-blue-300">
                   <Plus className="h-4 w-4" />
                   Add aggregation
                 </button>
               </div>
               <AnimatePresence initial={false}>
                 {groupDraft.aggregates.map((aggregate) => (
-                  <motion.div key={aggregate.id} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="grid gap-3 rounded-2xl border border-gray-200/60 bg-white/55 p-3 dark:border-gray-700/60 dark:bg-gray-950/35 lg:grid-cols-[160px_minmax(0,1fr)_minmax(0,1fr)_48px]">
-                    <select value={aggregate.functionName} onChange={(event) => setGroupDraft((current) => ({ ...current, aggregates: current.aggregates.map((item) => item.id === aggregate.id ? { ...item, functionName: event.target.value as AggregateFunction, alias: event.target.value === "COUNT" && item.alias === "" ? "row_count" : item.alias } : item) }))} className="h-11 rounded-xl border border-gray-200/70 bg-white/70 px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950/50 dark:text-gray-100">
+                  <motion.div key={aggregate.id} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="grid gap-3 rounded-2xl border border-gray-200/60 bg-white p-3 dark:border-gray-700/60 dark:bg-gray-950/35 lg:grid-cols-[160px_minmax(0,1fr)_minmax(0,1fr)_48px]">
+                    <select value={aggregate.functionName} onChange={(event) => setGroupDraft((current) => ({ ...current, aggregates: current.aggregates.map((item) => item.id === aggregate.id ? { ...item, functionName: event.target.value as AggregateFunction, alias: event.target.value === "COUNT" && item.alias === "" ? "row_count" : item.alias } : item) }))} className="h-11 rounded-xl border border-gray-200/70 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-100">
                       <option value="COUNT">COUNT</option>
                       <option value="SUM">SUM</option>
                       <option value="AVG">AVG</option>
                       <option value="MIN">MIN</option>
                       <option value="MAX">MAX</option>
                     </select>
-                    <select value={aggregate.column} onChange={(event) => setGroupDraft((current) => ({ ...current, aggregates: current.aggregates.map((item) => item.id === aggregate.id ? { ...item, column: event.target.value } : item) }))} className="h-11 rounded-xl border border-gray-200/70 bg-white/70 px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700/70 dark:bg-gray-950/50 dark:text-gray-100">
+                    <select value={aggregate.column} onChange={(event) => setGroupDraft((current) => ({ ...current, aggregates: current.aggregates.map((item) => item.id === aggregate.id ? { ...item, column: event.target.value } : item) }))} className="h-11 rounded-xl border border-gray-200/70 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-100">
                       <option value="">{aggregate.functionName === "COUNT" ? "All rows (*)" : "Select column"}</option>
                       {currentColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
                     </select>
-                    <input value={aggregate.alias} onChange={(event) => setGroupDraft((current) => ({ ...current, aggregates: current.aggregates.map((item) => item.id === aggregate.id ? { ...item, alias: event.target.value } : item) }))} placeholder={defaultAggregateAlias(aggregate)} className="h-11 rounded-xl border border-gray-200/70 bg-white/70 px-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950/50 dark:text-gray-100 dark:placeholder:text-gray-500" />
-                    <button type="button" onClick={() => setGroupDraft((current) => ({ ...current, aggregates: current.aggregates.length === 1 ? current.aggregates : current.aggregates.filter((item) => item.id !== aggregate.id) }))} disabled={groupDraft.aggregates.length === 1} className="inline-flex h-11 items-center justify-center rounded-xl border border-gray-200/70 bg-white/70 text-gray-500 transition hover:border-red-400/50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700/70 dark:bg-gray-950/50 dark:text-gray-400" aria-label="Remove aggregation">
+                    <input value={aggregate.alias} onChange={(event) => setGroupDraft((current) => ({ ...current, aggregates: current.aggregates.map((item) => item.id === aggregate.id ? { ...item, alias: event.target.value } : item) }))} placeholder={defaultAggregateAlias(aggregate)} className="h-11 rounded-xl border border-gray-200/70 bg-white px-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-500" />
+                    <button type="button" onClick={() => setGroupDraft((current) => ({ ...current, aggregates: current.aggregates.length === 1 ? current.aggregates : current.aggregates.filter((item) => item.id !== aggregate.id) }))} disabled={groupDraft.aggregates.length === 1} className="inline-flex h-11 items-center justify-center rounded-xl border border-gray-200/70 bg-white text-gray-500 transition hover:border-red-400/50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-400" aria-label="Remove aggregation">
                       <X className="h-4 w-4" />
                     </button>
                   </motion.div>
@@ -282,7 +282,7 @@ export function TransformStepEditor(props: TransformStepEditorProps) {
 
         {activeTab === "computed" && (
           <div className="space-y-4">
-            <div className="rounded-2xl border border-dashed border-gray-200/70 bg-white/45 px-4 py-3 text-sm text-gray-600 dark:border-gray-700/70 dark:bg-gray-950/30 dark:text-gray-300">Save a formula from the embedded editor to stage it for the next transform. The SQL preview below updates only after the formula validates successfully.</div>
+            <div className="rounded-2xl border border-dashed border-gray-200/70 bg-white px-4 py-3 text-sm text-gray-600 dark:border-gray-700/70 dark:bg-gray-950/30 dark:text-gray-300">Save a formula from the embedded editor to stage it for the next transform. The SQL preview below updates only after the formula validates successfully.</div>
             <FormulaEditor key={`${currentSourceName}-${currentColumns.map((column) => column.name).join("|")}`} tableName={currentSourceName} columns={currentColumns} onSave={(name, expression) => {
               setComputedDraft({ name, expression });
               setStatus({ type: "success", message: `Staged computed column "${name}". Review the SQL preview and create the view when ready.` });
@@ -300,14 +300,14 @@ export function TransformStepEditor(props: TransformStepEditorProps) {
           <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
             <label className="space-y-2">
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Existing column</span>
-              <select value={renameDraft.column} onChange={(event) => setRenameDraft((current) => ({ ...current, column: event.target.value }))} className="h-11 w-full rounded-xl border border-gray-200/70 bg-white/70 px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950/50 dark:text-gray-100">
+              <select value={renameDraft.column} onChange={(event) => setRenameDraft((current) => ({ ...current, column: event.target.value }))} className="h-11 w-full rounded-xl border border-gray-200/70 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-100">
                 <option value="">Select column</option>
                 {currentColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
               </select>
             </label>
             <label className="space-y-2">
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">New name</span>
-              <input value={renameDraft.newName} onChange={(event) => setRenameDraft((current) => ({ ...current, newName: event.target.value }))} placeholder="renamed_column" className="h-11 w-full rounded-xl border border-gray-200/70 bg-white/70 px-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950/50 dark:text-gray-100 dark:placeholder:text-gray-500" />
+              <input value={renameDraft.newName} onChange={(event) => setRenameDraft((current) => ({ ...current, newName: event.target.value }))} placeholder="renamed_column" className="h-11 w-full rounded-xl border border-gray-200/70 bg-white px-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-500" />
             </label>
           </div>
         )}
@@ -316,7 +316,7 @@ export function TransformStepEditor(props: TransformStepEditorProps) {
           <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_280px]">
             <label className="space-y-2">
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Column to remove</span>
-              <select value={dropDraft.column} onChange={(event) => setDropDraft({ column: event.target.value })} className="h-11 w-full rounded-xl border border-gray-200/70 bg-white/70 px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950/50 dark:text-gray-100">
+              <select value={dropDraft.column} onChange={(event) => setDropDraft({ column: event.target.value })} className="h-11 w-full rounded-xl border border-gray-200/70 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-100">
                 <option value="">Select column</option>
                 {currentColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
               </select>

@@ -341,7 +341,7 @@ function PreviewColumns({ columns }: { columns: string[] }) {
       {columns.map((column) => (
         <span
           key={column}
-          className="rounded-full border border-slate-200/80 bg-white/70 px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:border-slate-700/70 dark:bg-slate-900/60 dark:text-slate-300"
+          className="rounded-full border border-slate-200/80 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:border-slate-700/70 dark:bg-slate-900 dark:text-slate-300"
         >
           {column}
         </span>
@@ -354,7 +354,7 @@ export default function SampleDatasets({ onLoad }: SampleDatasetsProps) {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
 
   return (
-    <section className="relative overflow-hidden rounded-[28px] border border-slate-200/70 bg-white/80 p-6 shadow-[0_20px_70px_-40px_rgba(15,23,42,0.55)] backdrop-blur-xl dark:border-slate-700/60 dark:bg-slate-900/70 sm:p-8">
+    <section className="relative overflow-hidden rounded-lg border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900 sm:p-8">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-400/70 to-transparent" />
       <div className="absolute -right-24 top-0 h-48 w-48 rounded-full bg-indigo-500/10 blur-3xl dark:bg-indigo-400/10" />
       <div className="absolute -left-24 bottom-0 h-48 w-48 rounded-full bg-cyan-500/10 blur-3xl dark:bg-cyan-400/10" />
@@ -375,7 +375,7 @@ export default function SampleDatasets({ onLoad }: SampleDatasetsProps) {
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white/75 px-4 py-3 text-sm text-slate-600 shadow-sm dark:border-slate-700/70 dark:bg-slate-950/50 dark:text-slate-300">
+        <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-300">
           <FileSpreadsheet className="h-4 w-4 text-indigo-500 dark:text-indigo-300" />
           Built-in CSV examples
         </div>
@@ -394,7 +394,7 @@ export default function SampleDatasets({ onLoad }: SampleDatasetsProps) {
                 setSelectedFile(dataset.fileName);
                 onLoad(dataset.fileName, dataset.csvContent);
               }}
-              className="group relative flex h-full flex-col overflow-hidden rounded-[24px] border border-slate-200/80 bg-white/85 p-5 text-left shadow-[0_18px_50px_-36px_rgba(15,23,42,0.65)] transition-colors hover:border-indigo-300/80 hover:bg-white dark:border-slate-700/70 dark:bg-slate-950/55 dark:hover:border-indigo-400/40 dark:hover:bg-slate-950/75"
+              className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-slate-200/80 bg-white p-5 text-left shadow-sm transition-colors hover:border-indigo-300/80 hover:bg-white dark:border-slate-700/70 dark:bg-slate-950 dark:hover:border-indigo-400/40 dark:hover:bg-slate-950"
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.28, delay: index * 0.08 }}
@@ -404,7 +404,7 @@ export default function SampleDatasets({ onLoad }: SampleDatasetsProps) {
               <div
                 className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${dataset.accent}`}
               />
-              <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-white/60 blur-2xl dark:bg-white/5" />
+              <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-white blur-2xl dark:bg-white/5" />
 
               <div className="relative flex items-start justify-between gap-4">
                 <div
@@ -413,7 +413,7 @@ export default function SampleDatasets({ onLoad }: SampleDatasetsProps) {
                   <Icon className="h-5 w-5" />
                 </div>
 
-                <span className="rounded-full border border-slate-200/80 bg-slate-50/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:border-slate-700/70 dark:bg-slate-900/60 dark:text-slate-400">
+                <span className="rounded-full border border-slate-200/80 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:border-slate-700/70 dark:bg-slate-900 dark:text-slate-400">
                   CSV
                 </span>
               </div>
@@ -438,7 +438,7 @@ export default function SampleDatasets({ onLoad }: SampleDatasetsProps) {
               </div>
 
               <div className="relative mt-5 grid grid-cols-2 gap-3">
-                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-slate-700/70 dark:bg-slate-900/70">
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50 p-3 dark:border-slate-700/70 dark:bg-slate-900">
                   <p className="text-[11px] uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
                     Rows
                   </p>
@@ -446,7 +446,7 @@ export default function SampleDatasets({ onLoad }: SampleDatasetsProps) {
                     {dataset.rowCount}
                   </p>
                 </div>
-                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-slate-700/70 dark:bg-slate-900/70">
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50 p-3 dark:border-slate-700/70 dark:bg-slate-900">
                   <p className="text-[11px] uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
                     Columns
                   </p>
@@ -463,7 +463,7 @@ export default function SampleDatasets({ onLoad }: SampleDatasetsProps) {
                 <PreviewColumns columns={dataset.columns} />
               </div>
 
-              <div className="relative mt-6 flex items-center justify-between rounded-2xl border border-slate-200/80 bg-slate-50/75 px-4 py-3 dark:border-slate-700/70 dark:bg-slate-900/75">
+              <div className="relative mt-6 flex items-center justify-between rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-3 dark:border-slate-700/70 dark:bg-slate-900">
                 <div>
                   <p className="text-sm font-medium text-slate-900 dark:text-white">
                     Load instantly
@@ -475,7 +475,7 @@ export default function SampleDatasets({ onLoad }: SampleDatasetsProps) {
                 <motion.div
                   animate={{ x: isSelected ? 4 : 0 }}
                   transition={{ type: "spring", stiffness: 260, damping: 18 }}
-                  className="rounded-full border border-slate-200/80 bg-white/80 p-2 text-slate-700 shadow-sm dark:border-slate-700/70 dark:bg-slate-950/80 dark:text-slate-200"
+                  className="rounded-full border border-slate-200/80 bg-white p-2 text-slate-700 shadow-sm dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-200"
                 >
                   <ArrowRight className="h-4 w-4" />
                 </motion.div>

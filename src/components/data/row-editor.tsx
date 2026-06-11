@@ -36,7 +36,7 @@ interface ParsedCell {
 }
 
 const GLASS_PANEL =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-slate-950 border border-white/20";
 const PANEL_EASE = [0.22, 1, 0.36, 1] as const;
 
 function createId(): string {
@@ -279,7 +279,7 @@ export default function RowEditor({ tableName, columns }: RowEditorProps) {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.24, ease: PANEL_EASE }}
-      className={`overflow-hidden rounded-[2rem] ${GLASS_PANEL}`}
+      className={`overflow-hidden rounded-lg ${GLASS_PANEL}`}
     >
       <div className="border-b border-white/15 px-5 py-5">
         <div className="flex items-center gap-3">
@@ -299,7 +299,7 @@ export default function RowEditor({ tableName, columns }: RowEditorProps) {
 
       <div className="grid gap-5 px-5 py-5 xl:grid-cols-[1fr_0.95fr]">
         <div className="space-y-4">
-          <div className="rounded-[1.75rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
             <div className="flex flex-wrap items-end gap-3">
               <label className="min-w-[180px] flex-1">
                 <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
@@ -308,7 +308,7 @@ export default function RowEditor({ tableName, columns }: RowEditorProps) {
                 <input
                   value={rowIndexInput}
                   onChange={(event) => setRowIndexInput(event.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-white/15 bg-white/75 px-4 py-3 text-sm text-slate-950 outline-none focus:border-sky-400 dark:bg-slate-950/55 dark:text-slate-50"
+                  className="mt-2 w-full rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-950 outline-none focus:border-sky-400 dark:bg-slate-950 dark:text-slate-50"
                 />
               </label>
 
@@ -326,7 +326,7 @@ export default function RowEditor({ tableName, columns }: RowEditorProps) {
                 type="button"
                 onClick={() => void saveRow()}
                 disabled={!loadedRow || isBusy}
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950/40 dark:text-slate-200"
+                className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950 dark:text-slate-200"
               >
                 <Save className="h-4 w-4" />
                 Save changes
@@ -336,7 +336,7 @@ export default function RowEditor({ tableName, columns }: RowEditorProps) {
                 type="button"
                 onClick={() => void undoLastEdit()}
                 disabled={!auditLog.some((entry) => !entry.undone) || isBusy}
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950/40 dark:text-slate-200"
+                className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950 dark:text-slate-200"
               >
                 <RotateCcw className="h-4 w-4" />
                 Undo last edit
@@ -350,7 +350,7 @@ export default function RowEditor({ tableName, columns }: RowEditorProps) {
             ) : null}
           </div>
 
-          <div className="rounded-[1.75rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
             <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
               Editable fields
             </h3>
@@ -360,7 +360,7 @@ export default function RowEditor({ tableName, columns }: RowEditorProps) {
                 {columns.map((column) => (
                   <label
                     key={column.name}
-                    className="grid gap-3 rounded-2xl border border-white/15 bg-white/55 p-3 dark:bg-slate-950/30 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+                    className="grid gap-3 rounded-2xl border border-white/15 bg-white p-3 dark:bg-slate-950/30 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
                   >
                     <div>
                       <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
@@ -376,7 +376,7 @@ export default function RowEditor({ tableName, columns }: RowEditorProps) {
                         updateDraft(column.name, event.target.value)
                       }
                       aria-label={`Edit ${column.name}`}
-                      className="rounded-2xl border border-white/15 bg-white/80 px-4 py-3 text-sm text-slate-950 outline-none focus:border-sky-400 dark:bg-slate-950/55 dark:text-slate-50"
+                      className="rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-950 outline-none focus:border-sky-400 dark:bg-slate-950 dark:text-slate-50"
                     />
                   </label>
                 ))}
@@ -389,7 +389,7 @@ export default function RowEditor({ tableName, columns }: RowEditorProps) {
           </div>
         </div>
 
-        <div className="rounded-[1.75rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+        <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
             <History className="h-4 w-4 text-sky-600" />
             Audit log
@@ -400,7 +400,7 @@ export default function RowEditor({ tableName, columns }: RowEditorProps) {
               auditLog.map((entry) => (
                 <div
                   key={entry.id}
-                  className="rounded-2xl border border-white/15 bg-white/55 p-4 dark:bg-slate-950/30"
+                  className="rounded-2xl border border-white/15 bg-white p-4 dark:bg-slate-950/30"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>

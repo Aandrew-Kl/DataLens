@@ -63,7 +63,7 @@ interface SampleDataset {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const CARD_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 p-5 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white p-5 shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const TAB_OPTIONS: Array<{
   value: ConnectorTab;
   label: string;
@@ -304,20 +304,20 @@ async function loadParquetFile(tableName: string, file: File): Promise<void> {
 function PreviewTable({ preview }: { preview: PreviewState | null }) {
   if (!preview || preview.columns.length === 0) {
     return (
-      <div className="rounded-[1.25rem] border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+      <div className="rounded-lg border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
         Drag in a file or load a sample to see the first five rows.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-[1.25rem] border border-white/15 bg-white/50 dark:bg-slate-900/35">
+    <div className="overflow-hidden rounded-lg border border-white/15 bg-white dark:bg-slate-900/35">
       <div className="border-b border-white/15 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
         {preview.sourceLabel}
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-white/60 dark:bg-slate-900/60">
+          <thead className="bg-white dark:bg-slate-900">
             <tr>
               {preview.columns.map((column) => (
                 <th
@@ -357,7 +357,7 @@ function SampleDatasetCard({
     <button
       type="button"
       onClick={() => onLoad(dataset)}
-      className="rounded-[1.5rem] border border-white/20 bg-white/55 p-4 text-left transition hover:-translate-y-0.5 hover:bg-white/70 dark:bg-slate-900/40 dark:hover:bg-slate-900/55"
+      className="rounded-lg border border-white/20 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:bg-white dark:bg-slate-900 dark:hover:bg-slate-900"
     >
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
@@ -577,7 +577,7 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
     <section className={`${CARD_CLASS} overflow-hidden`}>
       <div className="flex flex-col gap-5 border-b border-white/15 pb-5 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
             <Database className="h-5 w-5" />
           </div>
           <div>
@@ -589,7 +589,7 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
             </h2>
           </div>
         </div>
-        <div className="rounded-[1.1rem] border border-white/15 bg-white/50 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/35 dark:text-slate-300">
+        <div className="rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/35 dark:text-slate-300">
           {status}
         </div>
       </div>
@@ -605,10 +605,10 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
                   key={tab.value}
                   type="button"
                   onClick={() => setActiveTab(tab.value)}
-                  className={`rounded-[1.15rem] border px-3 py-3 text-left text-sm transition ${
+                  className={`rounded-lg border px-3 py-3 text-left text-sm transition ${
                     active
                       ? "border-cyan-400/40 bg-cyan-500/12 text-cyan-700 dark:border-cyan-400/30 dark:text-cyan-300"
-                      : "border-white/15 bg-white/50 text-slate-600 hover:bg-white/70 dark:bg-slate-900/35 dark:text-slate-300 dark:hover:bg-slate-900/50"
+                      : "border-white/15 bg-white text-slate-600 hover:bg-white dark:bg-slate-900/35 dark:text-slate-300 dark:hover:bg-slate-900"
                   }`}
                 >
                   <div className="flex items-center gap-2">
@@ -621,12 +621,12 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
           </div>
 
           {loading ? (
-            <div className="rounded-[1.25rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
               <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Import in progress
               </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200/70 dark:bg-slate-800/70">
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                 <motion.div
                   className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-sky-500"
                   animate={{ width: `${progress}%` }}
@@ -637,7 +637,7 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
           ) : null}
 
           {error ? (
-            <div className="rounded-[1.25rem] border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
+            <div className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
               {error}
             </div>
           ) : null}
@@ -649,7 +649,7 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.28, ease: EASE }}
-              className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30"
+              className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30"
             >
               {activeTab === "csv" ? (
                 <div className="space-y-4">
@@ -662,10 +662,10 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
                     onDragLeave={() => setIsDragging(false)}
                     onDrop={(event) => void handleDrop(event)}
                     onClick={() => csvInputRef.current?.click()}
-                    className={`flex min-h-52 w-full flex-col items-center justify-center gap-3 rounded-[1.4rem] border border-dashed px-5 py-8 text-center transition ${
+                    className={`flex min-h-52 w-full flex-col items-center justify-center gap-3 rounded-lg border border-dashed px-5 py-8 text-center transition ${
                       isDragging
                         ? "border-cyan-400/50 bg-cyan-500/10"
-                        : "border-white/20 bg-white/55 hover:bg-white/70 dark:bg-slate-950/30"
+                        : "border-white/20 bg-white hover:bg-white dark:bg-slate-950/30"
                     }`}
                   >
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
@@ -695,7 +695,7 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
                   <button
                     type="button"
                     onClick={() => jsonInputRef.current?.click()}
-                    className="flex min-h-44 w-full flex-col items-center justify-center gap-3 rounded-[1.4rem] border border-dashed border-white/20 bg-white/55 px-5 py-8 text-center transition hover:bg-white/70 dark:bg-slate-950/30"
+                    className="flex min-h-44 w-full flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-white/20 bg-white px-5 py-8 text-center transition hover:bg-white dark:bg-slate-950/30"
                   >
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-500/10 text-violet-700 dark:text-violet-300">
                       <FileJson className="h-5 w-5" />
@@ -719,7 +719,7 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
                   <button
                     type="button"
                     onClick={() => parquetInputRef.current?.click()}
-                    className="flex min-h-44 w-full flex-col items-center justify-center gap-3 rounded-[1.4rem] border border-dashed border-white/20 bg-white/55 px-5 py-8 text-center transition hover:bg-white/70 dark:bg-slate-950/30"
+                    className="flex min-h-44 w-full flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-white/20 bg-white px-5 py-8 text-center transition hover:bg-white dark:bg-slate-950/30"
                   >
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
                       <Database className="h-5 w-5" />
@@ -751,12 +751,12 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
                     value={remoteUrl}
                     onChange={(event) => setRemoteUrl(event.target.value)}
                     placeholder="https://example.com/data.csv"
-                    className="w-full rounded-[1rem] border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                    className="w-full rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
                   />
                   <button
                     type="button"
                     onClick={() => void handleRemoteImport()}
-                    className="inline-flex items-center gap-2 rounded-[1rem] bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
+                    className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
                   >
                     <Globe className="h-4 w-4" />
                     Import from URL
@@ -771,12 +771,12 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
                     onChange={(event) => setPastedText(event.target.value)}
                     placeholder="Paste CSV or TSV rows here"
                     rows={10}
-                    className="w-full rounded-[1rem] border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                    className="w-full rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
                   />
                   <button
                     type="button"
                     onClick={() => void handlePasteImport()}
-                    className="inline-flex items-center gap-2 rounded-[1rem] bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
+                    className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
                   >
                     <ClipboardPaste className="h-4 w-4" />
                     Import pasted data
@@ -800,7 +800,7 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-700 dark:text-sky-300">
                 <currentTabMeta.icon className="h-4 w-4" />
@@ -816,7 +816,7 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/25">
+              <div className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/25">
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                   File Size
                 </p>
@@ -824,7 +824,7 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
                   {fileMeta ? formatBytes(fileMeta.size) : "Waiting for import"}
                 </p>
               </div>
-              <div className="rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/25">
+              <div className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/25">
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                   Encoding Hint
                 </p>
@@ -834,7 +834,7 @@ export default function DataConnector({ onDataLoaded }: DataConnectorProps) {
               </div>
             </div>
 
-            <div className="mt-4 rounded-[1rem] border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300">
+            <div className="mt-4 rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4" />
                 <span>Uploads stay in-browser. DuckDB-WASM creates client-side tables only.</span>

@@ -85,7 +85,7 @@ const itemVariants = {
 /* ─── Skeleton Components ─── */
 function SkeletonMetricCard() {
   return (
-    <div className="rounded-xl p-5 backdrop-blur-xl bg-white/60 dark:bg-gray-900/60 border border-gray-200/50 dark:border-gray-700/50">
+    <div className="rounded-xl p-5 bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-700/50">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
         <div className="flex-1 space-y-2">
@@ -99,12 +99,12 @@ function SkeletonMetricCard() {
 
 function SkeletonChart() {
   return (
-    <div className="rounded-xl p-5 backdrop-blur-xl bg-white/60 dark:bg-gray-900/60 border border-gray-200/50 dark:border-gray-700/50">
+    <div className="rounded-xl p-5 bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-700/50">
       <div className="flex items-center justify-between mb-4">
         <div className="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
         <div className="h-5 w-14 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
       </div>
-      <div className="relative h-[320px] rounded-lg bg-gray-100 dark:bg-gray-800/50 overflow-hidden">
+      <div className="relative h-[320px] rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden">
         <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/30 to-transparent" />
       </div>
     </div>
@@ -520,7 +520,7 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
               whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
               className="
                 rounded-xl p-5
-                backdrop-blur-xl bg-white/60 dark:bg-gray-900/60
+                 bg-white dark:bg-gray-900
                 border border-gray-200/50 dark:border-gray-700/50
                 shadow-sm hover:shadow-md
                 transition-shadow duration-300
@@ -585,7 +585,7 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
                 layout
                 className="
                   rounded-xl p-5
-                  backdrop-blur-xl bg-white/60 dark:bg-gray-900/60
+                   bg-white dark:bg-gray-900
                   border border-gray-200/50 dark:border-gray-700/50
                   shadow-sm hover:shadow-md
                   transition-shadow duration-300
@@ -651,7 +651,7 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
         transition={{ duration: 0.4, delay: 0.3 }}
         className="
           rounded-xl p-5
-          backdrop-blur-xl bg-white/60 dark:bg-gray-900/60
+           bg-white dark:bg-gray-900
           border border-gray-200/50 dark:border-gray-700/50
         "
       >
@@ -700,7 +700,7 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
                 return (
                   <div
                     key={col.name}
-                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 text-xs"
+                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-xs"
                   >
                     <span className="font-medium text-gray-700 dark:text-gray-300 truncate mr-2">
                       {col.name}
@@ -743,7 +743,7 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
           >
             {/* Backdrop */}
             <motion.div
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/60 "
               onClick={() => setFullscreenChartId(null)}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -755,8 +755,8 @@ export default function DashboardView({ dataset, columns }: DashboardViewProps) 
               className="
                 relative w-full max-w-5xl max-h-[90vh]
                 rounded-2xl p-6
-                bg-white/95 dark:bg-gray-900/95
-                backdrop-blur-xl
+                bg-white dark:bg-gray-900
+                
                 border border-gray-200/50 dark:border-gray-700/50
                 shadow-2xl overflow-auto
               "

@@ -24,7 +24,7 @@ export function ExecutivePanel({
   return (
     <motion.div
       variants={itemVariants}
-      className="overflow-hidden rounded-[30px] border border-white/30 bg-white/68 p-6 shadow-[0_26px_90px_-44px_rgba(15,23,42,0.58)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/48"
+      className="overflow-hidden rounded-lg border border-white/30 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-950"
     >
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -45,7 +45,7 @@ export function ExecutivePanel({
           return (
             <div
               key={summary.key}
-              className="rounded-[22px] border border-white/35 bg-white/60 p-4 dark:border-white/10 dark:bg-slate-950/48"
+              className="rounded-lg border border-white/35 bg-white p-4 dark:border-white/10 dark:bg-slate-950"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
@@ -70,7 +70,7 @@ export function ExecutivePanel({
         })}
       </div>
 
-      <div className="mt-5 rounded-[24px] border border-white/35 bg-white/60 p-4 dark:border-white/10 dark:bg-slate-950/48">
+      <div className="mt-5 rounded-lg border border-white/35 bg-white p-4 dark:border-white/10 dark:bg-slate-950">
         <div className="flex items-center gap-2">
           {weakestColumn?.overall && weakestColumn.overall >= 75 ? (
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />

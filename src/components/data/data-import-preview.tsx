@@ -23,7 +23,7 @@ interface ParsedPreview {
 }
 
 const GLASS_PANEL =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-slate-950 border border-white/20";
 const PANEL_EASE = [0.22, 1, 0.36, 1] as const;
 const DELIMITERS = [",", ";", "\t", "|"] as const;
 const TYPE_OPTIONS: ColumnType[] = [
@@ -216,7 +216,7 @@ export default function DataImportPreview({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.24, ease: PANEL_EASE }}
-      className={`overflow-hidden rounded-[2rem] ${GLASS_PANEL}`}
+      className={`overflow-hidden rounded-lg ${GLASS_PANEL}`}
     >
       <div className="border-b border-white/15 px-5 py-5">
         <div className="flex items-center gap-3">
@@ -236,7 +236,7 @@ export default function DataImportPreview({
 
       <div className="grid gap-5 px-5 py-5 xl:grid-cols-[0.9fr_1.1fr]">
         <div className="space-y-4">
-          <div className="rounded-[1.75rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
             <label className="block">
               <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                 Upload delimited file
@@ -245,11 +245,11 @@ export default function DataImportPreview({
                 type="file"
                 accept=".csv,.txt,.tsv"
                 onChange={handleFileChange}
-                className="mt-2 block w-full rounded-2xl border border-white/15 bg-white/70 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/55 dark:text-slate-50"
+                className="mt-2 block w-full rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               />
             </label>
 
-            <div className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300">
+            <div className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300">
               Existing schema reference: {columns.length} known columns
             </div>
             {fileName ? (
@@ -264,7 +264,7 @@ export default function DataImportPreview({
             ) : null}
           </div>
 
-          <div className="rounded-[1.75rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
               <Settings2 className="h-4 w-4 text-sky-600" />
               Import options
@@ -280,7 +280,7 @@ export default function DataImportPreview({
                   onChange={(event) =>
                     updateOptions({ delimiter: event.target.value })
                   }
-                  className="w-full rounded-2xl border border-white/15 bg-white/80 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/55 dark:text-slate-50"
+                  className="w-full rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50"
                 >
                   {DELIMITERS.map((delimiter) => (
                     <option key={delimiter} value={delimiter}>
@@ -299,7 +299,7 @@ export default function DataImportPreview({
                   onChange={(event) =>
                     updateOptions({ encoding: event.target.value })
                   }
-                  className="w-full rounded-2xl border border-white/15 bg-white/80 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/55 dark:text-slate-50"
+                  className="w-full rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50"
                 >
                   <option value="ascii">ascii</option>
                   <option value="utf-8">utf-8</option>
@@ -316,7 +316,7 @@ export default function DataImportPreview({
                   onChange={(event) =>
                     updateOptions({ headerRow: event.target.value === "true" })
                   }
-                  className="w-full rounded-2xl border border-white/15 bg-white/80 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/55 dark:text-slate-50"
+                  className="w-full rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50"
                 >
                   <option value="true">present</option>
                   <option value="false">absent</option>
@@ -326,7 +326,7 @@ export default function DataImportPreview({
           </div>
 
           {preview ? (
-            <div className="rounded-[1.75rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
               <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
                 <Table className="h-4 w-4 text-sky-600" />
                 Type inference
@@ -336,7 +336,7 @@ export default function DataImportPreview({
                 {preview.headers.map((header, index) => (
                   <div
                     key={header}
-                    className="grid gap-3 rounded-2xl border border-white/15 bg-white/55 p-3 dark:bg-slate-950/30 md:grid-cols-[minmax(0,1fr)_150px]"
+                    className="grid gap-3 rounded-2xl border border-white/15 bg-white p-3 dark:bg-slate-950/30 md:grid-cols-[minmax(0,1fr)_150px]"
                   >
                     <div>
                       <p className="font-medium text-slate-900 dark:text-slate-100">
@@ -352,7 +352,7 @@ export default function DataImportPreview({
                         updateOverride(header, event.target.value as ColumnType)
                       }
                       aria-label={`Type override for ${header}`}
-                      className="rounded-2xl border border-white/15 bg-white/80 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/55 dark:text-slate-50"
+                      className="rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50"
                     >
                       {TYPE_OPTIONS.map((option) => (
                         <option key={option} value={option}>
@@ -367,14 +367,14 @@ export default function DataImportPreview({
           ) : null}
         </div>
 
-        <div className="rounded-[1.75rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+        <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
           <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
             First 100 rows preview
           </h3>
           {preview ? (
-            <div className="mt-4 overflow-auto rounded-[1.5rem] border border-white/15">
+            <div className="mt-4 overflow-auto rounded-lg border border-white/15">
               <table className="min-w-full border-separate border-spacing-0 text-sm">
-                <thead className="sticky top-0 bg-white/90 backdrop-blur-2xl dark:bg-slate-950/85">
+                <thead className="sticky top-0 bg-white dark:bg-slate-950">
                   <tr>
                     {preview.headers.map((header) => (
                       <th
@@ -403,7 +403,7 @@ export default function DataImportPreview({
               </table>
             </div>
           ) : (
-            <div className="mt-4 rounded-[1.5rem] border border-dashed border-white/20 px-5 py-14 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="mt-4 rounded-lg border border-dashed border-white/20 px-5 py-14 text-center text-sm text-slate-500 dark:text-slate-400">
               Upload a file to inspect delimiter detection, inferred types, and the
               first 100 rows before import.
             </div>

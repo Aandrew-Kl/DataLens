@@ -236,7 +236,7 @@ function buildStepSql(step: PipelineStep, source: string) {
     ];
     return [
       "SELECT",
-      `  ${selectList.join(",\n  ")}`,
+      ` ${selectList.join(",\n ")}`,
       `FROM ${source}`,
       groups.length > 0
         ? `GROUP BY ${groups.map((column) => quoteIdentifier(column)).join(", ")}`
@@ -498,7 +498,7 @@ function PipelineStepCard({
                       className={
                         selected
                           ? "rounded-full border border-cyan-400/40 bg-cyan-500/10 px-3 py-1.5 text-sm text-cyan-700 dark:text-cyan-300"
-                          : "rounded-full border border-white/20 bg-white/60 px-3 py-1.5 text-sm text-slate-600 dark:bg-slate-950/40 dark:text-slate-300"
+                          : "rounded-full border border-white/20 bg-white px-3 py-1.5 text-sm text-slate-600 dark:bg-slate-950 dark:text-slate-300"
                       }
                     >
                       {column}
@@ -626,7 +626,7 @@ function PipelineStepCard({
       </div>
 
       {preview ? (
-        <div className="space-y-3 rounded-2xl border border-white/20 bg-white/45 p-4 dark:bg-slate-950/20">
+        <div className="space-y-3 rounded-2xl border border-white/20 bg-white p-4 dark:bg-slate-950/20">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-slate-900 dark:text-white">Step preview</p>
             <p className="text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">

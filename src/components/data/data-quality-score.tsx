@@ -48,7 +48,7 @@ interface QualityAnalysis {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "border border-white/20 bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 rounded-[1.75rem] shadow-xl shadow-slate-950/10";
+  "border border-white/20 bg-white dark:bg-slate-950 rounded-lg shadow-xl shadow-slate-950/10";
 
 function toNumber(value: unknown): number {
   const numeric = Number(value);
@@ -375,7 +375,7 @@ export default function DataQualityScore({
             type="button"
             onClick={handleExport}
             disabled={!analysis}
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900/50 dark:text-slate-200"
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900 dark:text-slate-200"
           >
             <Download className="h-4 w-4" />
             Export report
@@ -383,7 +383,7 @@ export default function DataQualityScore({
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/40 dark:text-slate-300">
+      <div className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
         {status}
       </div>
 
@@ -403,7 +403,7 @@ export default function DataQualityScore({
               </p>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/50">
+                <div className="rounded-2xl bg-white p-4 dark:bg-slate-900">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Completeness
                   </p>
@@ -411,7 +411,7 @@ export default function DataQualityScore({
                     {analysis.dimensions.completeness.toFixed(1)}
                   </p>
                 </div>
-                <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/50">
+                <div className="rounded-2xl bg-white p-4 dark:bg-slate-900">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Uniqueness
                   </p>
@@ -419,7 +419,7 @@ export default function DataQualityScore({
                     {analysis.dimensions.uniqueness.toFixed(1)}
                   </p>
                 </div>
-                <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/50">
+                <div className="rounded-2xl bg-white p-4 dark:bg-slate-900">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Consistency
                   </p>
@@ -427,7 +427,7 @@ export default function DataQualityScore({
                     {analysis.dimensions.consistency.toFixed(1)}
                   </p>
                 </div>
-                <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/50">
+                <div className="rounded-2xl bg-white p-4 dark:bg-slate-900">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Validity
                   </p>
@@ -510,7 +510,7 @@ export default function DataQualityScore({
                 {analysis.recommendations.map((recommendation) => (
                   <li
                     key={recommendation}
-                    className="rounded-2xl bg-white/70 px-4 py-3 text-sm text-slate-700 dark:bg-slate-900/50 dark:text-slate-200"
+                    className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-900 dark:text-slate-200"
                   >
                     {recommendation}
                   </li>

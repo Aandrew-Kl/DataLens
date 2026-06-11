@@ -393,7 +393,7 @@ function SectionEditorCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
-          <span className="rounded-full border border-white/15 bg-white/50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-950/25 dark:text-slate-300">
+          <span className="rounded-full border border-white/15 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-950/25 dark:text-slate-300">
             {section.type}
           </span>
           <h3 className="text-lg font-semibold text-slate-950 dark:text-white">
@@ -630,7 +630,7 @@ function SectionPreviewCard({
                 <span className="truncate text-sm text-slate-600 dark:text-slate-300">
                   {point.label}
                 </span>
-                <div className="h-3 overflow-hidden rounded-full bg-slate-200/80 dark:bg-slate-800">
+                <div className="h-3 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-violet-500"
                     style={{ width: `${(point.value / maxValue) * 100}%` }}

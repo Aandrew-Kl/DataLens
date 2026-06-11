@@ -61,9 +61,9 @@ type ColorMode = "source" | "target";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100";
 const PALETTE = ["#38bdf8", "#34d399", "#f59e0b", "#a78bfa", "#fb7185", "#2dd4bf", "#f97316"] as const;
 
 function subscribeDarkMode(listener: () => void) {
@@ -433,7 +433,7 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
                 </select>
               </label>
 
-              <div className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
+              <div className="rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/35">
                 <label
                   htmlFor="sankey-node-width"
                   className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
@@ -454,7 +454,7 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
                 />
               </div>
 
-              <div className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
+              <div className="rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/35">
                 <label
                   htmlFor="sankey-node-gap"
                   className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
@@ -478,7 +478,7 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
           </div>
 
           <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-1">
-            <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+            <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <Rows3 className="h-3.5 w-3.5" />
                 Total flow
@@ -487,7 +487,7 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
                 {formatNumber(result.totalFlow)}
               </div>
             </div>
-            <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+            <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <GitBranchPlus className="h-3.5 w-3.5" />
                 Links
@@ -496,7 +496,7 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
                 {result.links.length}
               </div>
             </div>
-            <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+            <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <Palette className="h-3.5 w-3.5" />
                 Nodes
@@ -527,7 +527,7 @@ function SankeyChartReady({ tableName, columns }: SankeyChartProps) {
           <button
             type="button"
             onClick={() => exportChart(chartRef.current, dark, `${tableName}-sankey.png`)}
-            className="rounded-2xl border border-white/20 bg-white/55 px-3 py-2 text-sm text-slate-600 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
+            className="rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-600 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
           >
             <span className="flex items-center gap-2">
               <Download className="h-4 w-4" />

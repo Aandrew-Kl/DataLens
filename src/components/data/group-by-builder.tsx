@@ -70,7 +70,7 @@ function buildSql(
 
   return [
     "SELECT",
-    `  ${selectParts.join(",\n  ")}`,
+    ` ${selectParts.join(",\n ")}`,
     `FROM ${quoteIdentifier(tableName)}`,
     groupColumns.length ? `GROUP BY ${groupColumns.map((column) => quoteIdentifier(column)).join(", ")}` : "",
     `ORDER BY ${orderField}${groupColumns.length ? "" : " DESC"}`,

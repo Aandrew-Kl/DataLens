@@ -640,7 +640,7 @@ export default function RowSamplerAdvanced({
             {preview && preview.sampleRows.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
-                  <thead className="bg-white/55 dark:bg-slate-900/55">
+                  <thead className="bg-white dark:bg-slate-900">
                     <tr>
                       {Object.keys(preview.sampleRows[0] ?? {}).map((key) => (
                         <th

@@ -347,7 +347,7 @@ export default function PivotTableAdvanced({ tableName, columns }: PivotTableAdv
   }
 
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-white/20 bg-white/60 shadow-2xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45">
+    <section className="overflow-hidden rounded-lg border border-white/20 bg-white shadow-2xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950">
       <div className="border-b border-white/15 px-5 py-5">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-700 dark:text-sky-300">
@@ -364,7 +364,7 @@ export default function PivotTableAdvanced({ tableName, columns }: PivotTableAdv
         {notice ? <div className="rounded-2xl border border-sky-400/30 bg-sky-500/10 px-4 py-3 text-sm text-sky-700 dark:text-sky-300">{notice}</div> : null}
 
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE }} className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="space-y-4 rounded-[1.75rem] border border-white/15 bg-white/50 p-4 dark:bg-slate-900/40">
+          <div className="space-y-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
@@ -392,26 +392,26 @@ export default function PivotTableAdvanced({ tableName, columns }: PivotTableAdv
               </div>
             </div>
 
-            <div className="space-y-3 rounded-[1.5rem] border border-white/15 bg-white/35 p-4 dark:bg-slate-900/30">
+            <div className="space-y-3 rounded-lg border border-white/15 bg-white/35 p-4 dark:bg-slate-900/30">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                   <Plus className="h-4 w-4" />
                   Value fields
                 </div>
-                <button type="button" onClick={addValueField} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-3 py-2 text-sm text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+                <button type="button" onClick={addValueField} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-3 py-2 text-sm text-slate-700 transition hover:bg-white dark:text-slate-200">
                   <Plus className="h-4 w-4" />
                   Add measure
                 </button>
               </div>
               {valueFields.map((field) => (
                 <div key={field.id} className="grid gap-2 md:grid-cols-[1fr_auto_1fr_auto]">
-                  <select value={field.column} onChange={(event) => updateValueField(field.id, { column: event.target.value, alias: sanitizeAlias(`${field.aggregation.toLowerCase()}_${event.target.value}`) })} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+                  <select value={field.column} onChange={(event) => updateValueField(field.id, { column: event.target.value, alias: sanitizeAlias(`${field.aggregation.toLowerCase()}_${event.target.value}`) })} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                     {columns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
                   </select>
-                  <select value={field.aggregation} onChange={(event) => updateValueField(field.id, { aggregation: event.target.value as AggFn })} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+                  <select value={field.aggregation} onChange={(event) => updateValueField(field.id, { aggregation: event.target.value as AggFn })} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                     {Object.keys(aggSql).map((agg) => <option key={agg} value={agg}>{agg}</option>)}
                   </select>
-                  <input value={field.alias} onChange={(event) => updateValueField(field.id, { alias: sanitizeAlias(event.target.value) })} placeholder="Alias" className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
+                  <input value={field.alias} onChange={(event) => updateValueField(field.id, { alias: sanitizeAlias(event.target.value) })} placeholder="Alias" className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
                   <button type="button" onClick={() => removeValueField(field.id)} className="rounded-2xl border border-rose-300/40 bg-rose-500/10 px-3 py-3 text-rose-700 dark:text-rose-300">
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -419,14 +419,14 @@ export default function PivotTableAdvanced({ tableName, columns }: PivotTableAdv
               ))}
             </div>
 
-            <div className="space-y-3 rounded-[1.5rem] border border-white/15 bg-white/35 p-4 dark:bg-slate-900/30">
+            <div className="space-y-3 rounded-lg border border-white/15 bg-white/35 p-4 dark:bg-slate-900/30">
               <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                 <Calculator className="h-4 w-4" />
                 Calculated fields
               </div>
               <div className="grid gap-2 md:grid-cols-[1fr_1.2fr_auto]">
-                <input value={calcName} onChange={(event) => setCalcName(event.target.value)} placeholder="margin_pct" className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
-                <input value={calcFormula} onChange={(event) => setCalcFormula(event.target.value)} placeholder="sum_revenue / count_revenue" className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 font-mono text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
+                <input value={calcName} onChange={(event) => setCalcName(event.target.value)} placeholder="margin_pct" className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
+                <input value={calcFormula} onChange={(event) => setCalcFormula(event.target.value)} placeholder="sum_revenue / count_revenue" className="rounded-2xl border border-white/20 bg-white px-4 py-3 font-mono text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
                 <button type="button" onClick={addCalculatedField} className="rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500">
                   Add
                 </button>
@@ -449,18 +449,18 @@ export default function PivotTableAdvanced({ tableName, columns }: PivotTableAdv
                 <Table2 className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                 {loading ? "Running pivot" : "Run pivot"}
               </button>
-              <button type="button" onClick={exportCsv} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+              <button type="button" onClick={exportCsv} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:text-slate-200">
                 <Download className="h-4 w-4" />
                 Export CSV
               </button>
             </div>
           </div>
 
-          <div className="space-y-4 rounded-[1.75rem] border border-white/15 bg-white/50 p-4 dark:bg-slate-900/40">
+          <div className="space-y-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900">
             {result ? (
-              <div className="overflow-auto rounded-[1.5rem] border border-white/15">
+              <div className="overflow-auto rounded-lg border border-white/15">
                 <table className="min-w-full border-collapse text-sm">
-                  <thead className="sticky top-0 bg-white/70 backdrop-blur dark:bg-slate-950/80">
+                  <thead className="sticky top-0 bg-white dark:bg-slate-950">
                     <tr>
                       <th className="border-b border-white/10 px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300">{rowFields.join(" / ") || "Rows"}</th>
                       {displayColumns.map(({ colKey, measure }) => (
@@ -506,18 +506,18 @@ export default function PivotTableAdvanced({ tableName, columns }: PivotTableAdv
                 </table>
               </div>
             ) : (
-              <div className="rounded-[1.5rem] border border-dashed border-white/20 bg-white/35 px-5 py-12 text-center text-sm text-slate-500 dark:bg-slate-900/30 dark:text-slate-400">
+              <div className="rounded-lg border border-dashed border-white/20 bg-white/35 px-5 py-12 text-center text-sm text-slate-500 dark:bg-slate-900/30 dark:text-slate-400">
                 Configure row, column, and value fields, then run the pivot.
               </div>
             )}
 
             {drilldownRows.length > 0 ? (
-              <div className="rounded-[1.5rem] border border-white/15 bg-white/35 p-4 dark:bg-slate-900/30">
+              <div className="rounded-lg border border-white/15 bg-white/35 p-4 dark:bg-slate-900/30">
                 <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Drill-down</h3>
                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{drilldownTitle}</p>
                 <div className="mt-4 overflow-auto rounded-2xl border border-white/10">
                   <table className="min-w-full text-sm">
-                    <thead className="bg-white/40 dark:bg-slate-950/50">
+                    <thead className="bg-white dark:bg-slate-950">
                       <tr>{Object.keys(drilldownRows[0]).map((key) => <th key={key} className="px-3 py-2 text-left font-semibold text-slate-600 dark:text-slate-300">{key}</th>)}</tr>
                     </thead>
                     <tbody className="divide-y divide-white/10">

@@ -42,9 +42,9 @@ interface StepDefinition {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const GLASS_PANEL_CLASS =
-  "border border-white/20 bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45";
+  "border border-white/20 bg-white dark:bg-slate-950";
 const FIELD_CLASS =
-  "w-full rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950/65 dark:text-slate-100";
+  "w-full rounded-2xl border border-slate-200/70 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-100";
 const BUTTON_CLASS =
   "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60";
 const STEP_DEFINITIONS: readonly StepDefinition[] = [
@@ -340,7 +340,7 @@ export default function DataExportWizard({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, ease: EASE }}
-      className={`rounded-[2rem] p-6 shadow-[0_28px_90px_-52px_rgba(15,23,42,0.85)] ${GLASS_PANEL_CLASS}`}
+      className={`rounded-lg p-6 shadow-sm ${GLASS_PANEL_CLASS}`}
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
@@ -381,7 +381,7 @@ export default function DataExportWizard({
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -24 }}
           transition={{ duration: 0.24, ease: EASE }}
-          className={`mt-6 rounded-[1.75rem] p-5 ${GLASS_PANEL_CLASS}`}
+          className={`mt-6 rounded-lg p-5 ${GLASS_PANEL_CLASS}`}
         >
           {step === 0 ? (
             <div className="grid gap-4 lg:grid-cols-2">
@@ -394,10 +394,10 @@ export default function DataExportWizard({
                     key={option.id}
                     type="button"
                     onClick={() => setFormat(option.id)}
-                    className={`rounded-[1.5rem] border p-5 text-left transition ${
+                    className={`rounded-lg border p-5 text-left transition ${
                       active
                         ? "border-cyan-500/25 bg-cyan-500/10"
-                        : "border-white/20 bg-white/60 hover:bg-white dark:bg-slate-950/35 dark:hover:bg-slate-950/50"
+                        : "border-white/20 bg-white hover:bg-white dark:bg-slate-950/35 dark:hover:bg-slate-950"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-4">
@@ -439,7 +439,7 @@ export default function DataExportWizard({
               </label>
 
               {format === "csv" ? (
-                <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/60 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
+                <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
                   <input
                     type="checkbox"
                     checked={includeHeaders}
@@ -450,7 +450,7 @@ export default function DataExportWizard({
               ) : null}
 
               {format === "json" ? (
-                <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/60 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
+                <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
                   <input
                     type="checkbox"
                     checked={prettyJson}
@@ -559,7 +559,7 @@ export default function DataExportWizard({
           type="button"
           onClick={handleBack}
           disabled={step === 0 || loading}
-          className={`${BUTTON_CLASS} border border-white/20 bg-white/70 text-slate-800 hover:bg-white dark:bg-slate-950/45 dark:text-slate-100 dark:hover:bg-slate-950/60`}
+          className={`${BUTTON_CLASS} border border-white/20 bg-white text-slate-800 hover:bg-white dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-950`}
         >
           <ChevronLeft className="h-4 w-4" />
           Back

@@ -119,7 +119,7 @@ async function loadSunburstData(
   const whereClause = hierarchyColumns
     .map((columnName) => `${quoteIdentifier(columnName)} IS NOT NULL`)
     .concat(`TRY_CAST(${quoteIdentifier(valueColumn)} AS DOUBLE) IS NOT NULL`)
-    .join("\n  AND ");
+    .join("\n AND ");
 
   try {
     const rows = await runQuery(`

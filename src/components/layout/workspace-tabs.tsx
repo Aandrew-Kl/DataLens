@@ -117,7 +117,7 @@ export default function WorkspaceTabs({ tabs, activeTab, onChange }: WorkspaceTa
   return (
     <div className="flex items-center gap-2">
       <div ref={scrollRef} className="relative min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div role="tablist" aria-orientation="horizontal" tabIndex={0} onKeyDown={handleKeyDown} className="relative flex min-w-max items-center gap-1 rounded-2xl border border-gray-200/70 bg-white/75 p-1 shadow-sm dark:border-gray-700/70 dark:bg-gray-900/65">
+        <div role="tablist" aria-orientation="horizontal" tabIndex={0} onKeyDown={handleKeyDown} className="relative flex min-w-max items-center gap-1 rounded-2xl border border-gray-200/70 bg-white p-1 shadow-sm dark:border-gray-700/70 dark:bg-gray-900">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = tab.id === activeTab;
@@ -184,7 +184,7 @@ export default function WorkspaceTabs({ tabs, activeTab, onChange }: WorkspaceTa
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.96, y: -6 }}
                 transition={{ duration: 0.16, ease: "easeOut" }}
-                className="absolute right-0 top-full z-30 mt-2 w-60 rounded-2xl border border-gray-200/70 bg-white/95 p-1 shadow-xl backdrop-blur dark:border-gray-700/70 dark:bg-gray-950/95"
+                className="absolute right-0 top-full z-30 mt-2 w-60 rounded-2xl border border-gray-200/70 bg-white p-1 shadow-xl dark:border-gray-700/70 dark:bg-gray-950"
               >
                 {hiddenTabs.map((tab) => {
                   const Icon = tab.icon;

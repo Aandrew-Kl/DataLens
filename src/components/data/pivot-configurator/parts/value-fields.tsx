@@ -15,7 +15,7 @@ interface ValueFieldRowProps {
 
 export function ValueFieldRow({ field, columns, setValueFields }: ValueFieldRowProps) {
   return (
-    <div className="grid gap-2 rounded-2xl border border-white/15 bg-white/55 p-3 dark:bg-slate-950/35">
+    <div className="grid gap-2 rounded-2xl border border-white/15 bg-white p-3 dark:bg-slate-950/35">
       <div className="grid gap-2 md:grid-cols-[1fr_auto_1fr_auto]">
         <select
           value={field.column}

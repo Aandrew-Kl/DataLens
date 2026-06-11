@@ -157,8 +157,8 @@ export default function Dropdown({ trigger, items }: DropdownProps) {
               absolute right-0 z-50
               min-w-[180px] py-1
               rounded-xl
-              bg-white/95 dark:bg-gray-900/95
-              backdrop-blur-xl
+              bg-white dark:bg-gray-900
+              
               border border-gray-200/60 dark:border-gray-700/60
               shadow-lg
               ${above ? "bottom-full mb-1" : "top-full mt-1"}

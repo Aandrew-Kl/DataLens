@@ -324,7 +324,7 @@ export default function AiSchemaAnalyzer({
             </div>
             <ul className="space-y-3 text-sm leading-6 text-slate-700 dark:text-slate-200">
               {(result?.relationships ?? ["No relationship suggestions yet."]).map((item) => (
-                <li key={item} className="rounded-[1.1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/35">
+                <li key={item} className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/35">
                   {item}
                 </li>
               ))}
@@ -343,7 +343,7 @@ export default function AiSchemaAnalyzer({
             </div>
             <ul className="space-y-3 text-sm leading-6 text-slate-700 dark:text-slate-200">
               {(result?.issues ?? ["No issue scan has been run yet."]).map((item) => (
-                <li key={item} className="rounded-[1.1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/35">
+                <li key={item} className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/35">
                   {item}
                 </li>
               ))}

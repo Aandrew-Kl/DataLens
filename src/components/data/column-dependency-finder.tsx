@@ -515,7 +515,7 @@ function DependencyFinderPanel({
               {result.keyCandidates.map((candidate) => (
                 <div
                   key={candidate.column}
-                  className="rounded-2xl border border-white/10 bg-white/50 px-4 py-3 dark:bg-slate-950/35"
+                  className="rounded-2xl border border-white/10 bg-white px-4 py-3 dark:bg-slate-950/35"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="font-semibold text-slate-950 dark:text-white">

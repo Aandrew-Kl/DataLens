@@ -27,7 +27,7 @@ export interface GlassTabsProps {
 }
 
 const GLASS_PANEL =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800";
 const TAB_EASE = [0.22, 1, 0.36, 1] as const;
 
 function getFirstAvailableTab(tabs: GlassTabItem[], requested?: string): string {
@@ -134,13 +134,13 @@ export default function GlassTabs({
   }
 
   return (
-    <div className={`overflow-hidden rounded-[1.75rem] ${GLASS_PANEL}`}>
+    <div className={`overflow-hidden rounded-lg ${GLASS_PANEL}`}>
       <div
         role="tablist"
         aria-label="Glass tabs"
         tabIndex={0}
         onKeyDown={handleKeyDown}
-        className="flex flex-wrap gap-2 border-b border-white/15 p-3"
+        className="flex flex-wrap gap-1 border-b border-zinc-200 p-2 dark:border-zinc-800"
       >
         {tabs.map((tab) => {
           const isActive = tab.id === resolvedActiveTab;
@@ -159,22 +159,22 @@ export default function GlassTabs({
               aria-controls={`${tabsId}-${tab.id}-panel`}
               disabled={tab.disabled}
               onClick={() => selectTab(tab.id)}
-              className={`relative inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium transition ${
+              className={`relative inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 isActive
-                  ? "text-slate-950 dark:text-slate-50"
-                  : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+                  ? "text-zinc-900 dark:text-zinc-50"
+                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
               } ${tab.disabled ? "cursor-not-allowed opacity-50" : ""}`}
             >
               {isActive ? (
                 <motion.span
                   layoutId="glass-tabs-indicator"
-                  className="absolute inset-0 rounded-2xl bg-white/80 shadow-sm dark:bg-slate-900/75"
+                  className="absolute inset-0 rounded-md bg-zinc-100 dark:bg-zinc-900/60"
                   transition={{ duration: 0.2, ease: TAB_EASE }}
                 />
               ) : null}
               <span className="relative z-10">{tab.label}</span>
               {tab.badge ? (
-                <span className="relative z-10 rounded-full bg-slate-950/8 px-2 py-0.5 text-[11px] dark:bg-white/10">
+                <span className="relative z-10 rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] dark:bg-zinc-800">
                   {tab.badge}
                 </span>
               ) : null}
@@ -195,7 +195,7 @@ export default function GlassTabs({
               role="tabpanel"
               aria-labelledby={`${tabsId}-${tab.id}-tab`}
               hidden={hidden}
-              className="rounded-[1.5rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-950/30"
+              className="rounded-md border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950"
             >
               {tab.content}
             </div>

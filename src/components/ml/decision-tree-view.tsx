@@ -122,7 +122,7 @@ function TreeNodeView({
           {Object.entries(node.counts).map(([label, count]) => (
             <span
               key={label}
-              className="rounded-full border border-white/20 bg-white/70 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-950/55 dark:text-slate-300"
+              className="rounded-full border border-white/20 bg-white px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-950 dark:text-slate-300"
             >
               {label}: {formatNumber(count)}
             </span>
@@ -344,14 +344,14 @@ async function loadDecisionTree(
           (feature) =>
             `TRY_CAST(${quoteIdentifier(feature)} AS DOUBLE) AS ${quoteIdentifier(feature)}`,
         )
-        .join(",\n      ")}
+        .join(",\n ")}
     FROM ${quoteIdentifier(tableName)}
     WHERE ${quoteIdentifier(targetColumn)} IS NOT NULL
       ${featureColumns
         .map(
           (feature) => `AND TRY_CAST(${quoteIdentifier(feature)} AS DOUBLE) IS NOT NULL`,
         )
-        .join("\n      ")}
+        .join("\n ")}
     LIMIT ${SAMPLE_LIMIT}
   `;
 
@@ -569,7 +569,7 @@ export default function DecisionTreeView({
                     className={`rounded-full border px-3 py-1.5 text-sm transition ${
                       active
                         ? "border-cyan-400/40 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300"
-                        : "border-white/20 bg-white/70 text-slate-600 dark:bg-slate-950/55 dark:text-slate-300"
+                        : "border-white/20 bg-white text-slate-600 dark:bg-slate-950 dark:text-slate-300"
                     }`}
                   >
                     {column.name}

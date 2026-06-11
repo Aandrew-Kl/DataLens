@@ -453,9 +453,9 @@ function DataTable({
       animate={{ opacity: 1 }}
       className="w-full"
     >
-      <div className="rounded-xl border border-gray-200/60 dark:border-gray-700/60 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm overflow-hidden shadow-sm">
+      <div className="rounded-xl border border-gray-200/60 dark:border-gray-700/60 bg-white dark:bg-gray-900 overflow-hidden shadow-sm">
         {/* ---- Toolbar ---- */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-4 py-2.5 border-b border-gray-200/60 dark:border-gray-700/60 bg-gray-50/60 dark:bg-gray-800/40">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-4 py-2.5 border-b border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800">
           <div className="flex items-center gap-2 min-w-0">
             <Table2 className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
             {title && (
@@ -556,7 +556,7 @@ function DataTable({
                 stickyHeader ? "sticky top-0 z-10" : ""
               }
             >
-              <tr className="bg-gray-50/95 dark:bg-gray-800/95 backdrop-blur-sm border-b border-gray-200/60 dark:border-gray-700/60">
+              <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200/60 dark:border-gray-700/60">
                 {/* Row number header */}
                 <th
                   scope="col"
@@ -634,7 +634,7 @@ function DataTable({
                       className={`
                         border-b border-gray-100 dark:border-gray-800/50 transition-colors
                         hover:bg-purple-50/50 dark:hover:bg-purple-900/10
-                        ${rowIdx % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50/40 dark:bg-gray-800/20"}
+                        ${rowIdx % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-800/20"}
                         ${onRowClick ? "cursor-pointer" : ""}
                       `}
                     >
@@ -708,7 +708,7 @@ function DataTable({
         </div>
 
         {/* ---- Footer / Pagination ---- */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-4 py-2.5 bg-gray-50/80 dark:bg-gray-800/60 border-t border-gray-200/60 dark:border-gray-700/60 text-xs text-gray-400 dark:text-gray-500">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border-t border-gray-200/60 dark:border-gray-700/60 text-xs text-gray-400 dark:text-gray-500">
           {/* Left: info */}
           <div className="flex items-center gap-3">
             <span>

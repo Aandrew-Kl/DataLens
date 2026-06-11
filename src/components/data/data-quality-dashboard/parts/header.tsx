@@ -32,7 +32,7 @@ export function DashboardHeader({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-3 shadow-sm backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/55">
+          <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Columns
             </p>
@@ -40,7 +40,7 @@ export function DashboardHeader({
               {formatNumber(columnCount)}
             </p>
           </div>
-          <div className="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-3 shadow-sm backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/55">
+          <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Engine
             </p>
@@ -48,7 +48,7 @@ export function DashboardHeader({
               DuckDB
             </p>
           </div>
-          <div className="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-3 shadow-sm backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/55">
+          <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               View
             </p>

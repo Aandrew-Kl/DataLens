@@ -19,7 +19,7 @@ interface RenameItem {
 }
 
 const GLASS_PANEL =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-slate-950 border border-white/20";
 const PANEL_EASE = [0.22, 1, 0.36, 1] as const;
 function buildInitialDrafts(columns: ColumnProfile[]): Record<string, string> {
   return Object.fromEntries(columns.map((column) => [column.name, column.name]));
@@ -147,7 +147,7 @@ export default function ColumnRenameTool({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.22, ease: PANEL_EASE }}
-      className={`overflow-hidden rounded-[2rem] ${GLASS_PANEL}`}
+      className={`overflow-hidden rounded-lg ${GLASS_PANEL}`}
     >
       <div className="border-b border-white/15 px-5 py-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -164,7 +164,7 @@ export default function ColumnRenameTool({
             <button
               type="button"
               onClick={resetDrafts}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/70 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white/90 dark:bg-slate-950/40 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200"
             >
               <RotateCcw className="h-4 w-4" />
               Reset
@@ -172,7 +172,7 @@ export default function ColumnRenameTool({
             <button
               type="button"
               onClick={exportMapping}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/70 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white/90 dark:bg-slate-950/40 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200"
             >
               <Download className="h-4 w-4" />
               Export JSON
@@ -186,13 +186,13 @@ export default function ColumnRenameTool({
           {columns.map((column) => (
             <div
               key={column.name}
-              className="grid gap-3 rounded-[1.5rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+              className="grid gap-3 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
             >
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
                   Current name
                 </p>
-                <p className="mt-2 rounded-2xl bg-white/70 px-4 py-3 font-mono text-sm text-slate-900 dark:bg-slate-950/45 dark:text-slate-100">
+                <p className="mt-2 rounded-2xl bg-white px-4 py-3 font-mono text-sm text-slate-900 dark:bg-slate-950 dark:text-slate-100">
                   {column.name}
                 </p>
               </div>
@@ -206,7 +206,7 @@ export default function ColumnRenameTool({
                   onChange={(event) =>
                     updateDraft(column.name, event.target.value)
                   }
-                  className="mt-2 w-full rounded-2xl border border-white/15 bg-white/75 px-4 py-3 font-mono text-sm text-slate-950 outline-none focus:border-sky-400 dark:bg-slate-950/55 dark:text-slate-50"
+                  className="mt-2 w-full rounded-2xl border border-white/15 bg-white px-4 py-3 font-mono text-sm text-slate-950 outline-none focus:border-sky-400 dark:bg-slate-950 dark:text-slate-50"
                 />
               </label>
             </div>
@@ -214,7 +214,7 @@ export default function ColumnRenameTool({
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-[1.75rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
               <Wand2 className="h-4 w-4 text-sky-600" />
               Preview mapping
@@ -233,7 +233,7 @@ export default function ColumnRenameTool({
                 plan.items.map((item) => (
                   <div
                     key={item.from}
-                    className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 rounded-2xl border border-white/15 bg-white/60 px-4 py-3 dark:bg-slate-950/35"
+                    className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/35"
                   >
                     <span className="truncate font-mono text-sm text-slate-700 dark:text-slate-200">
                       {item.from}
@@ -254,7 +254,7 @@ export default function ColumnRenameTool({
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-3 rounded-[1.75rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+          <div className="flex flex-wrap gap-3 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
             <button
               type="button"
               onClick={() => void applyRenamePlan()}
@@ -269,7 +269,7 @@ export default function ColumnRenameTool({
               type="button"
               onClick={() => void undoLastRename()}
               disabled={lastApplied.length === 0 || isSubmitting}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950/40 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950 dark:text-slate-200"
             >
               <RotateCcw className="h-4 w-4" />
               Undo last batch

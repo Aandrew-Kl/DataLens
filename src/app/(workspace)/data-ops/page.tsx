@@ -9,7 +9,7 @@ import type { ColumnProfile, DatasetMeta } from "@/types/dataset";
 type CleaningAction = "remove-null" | "fix-types" | "trim-text" | "normalize-dates";
 
 const glass =
-  "rounded-2xl border border-white/30 bg-white/60 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60";
+  "rounded-2xl border border-white/30 bg-white p-5 dark:border-white/10 dark:bg-slate-900";
 
 function newId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -359,7 +359,7 @@ export default function DataOpsPage() {
             setIsDragging(false);
           }}
           className={`rounded-2xl border-2 border-dashed p-6 text-center ${
-            isDragging ? "border-cyan-400/80 bg-cyan-500/10" : "border-white/40 bg-white/40 dark:border-white/20"
+            isDragging ? "border-cyan-400/80 bg-cyan-500/10" : "border-white/40 bg-white dark:border-white/20"
           }`}
         >
           <p className="mb-3 text-sm text-slate-700 dark:text-slate-200">
@@ -385,7 +385,7 @@ export default function DataOpsPage() {
             value={importUrl}
             onChange={(event) => setImportUrl(event.target.value)}
             placeholder="https://example.com/data/dataset.csv"
-            className="min-w-0 flex-1 rounded-2xl border border-white/40 bg-white/50 p-2.5 text-sm dark:bg-slate-950/50"
+            className="min-w-0 flex-1 rounded-2xl border border-white/40 bg-white p-2.5 text-sm dark:bg-slate-950"
           />
           <button
             type="button"
@@ -410,7 +410,7 @@ export default function DataOpsPage() {
             {datasets.map((dataset) => (
               <div
                 key={dataset.id}
-                className="flex flex-col gap-2 rounded-2xl border border-white/30 bg-white/45 p-3 md:flex-row md:items-center md:justify-between dark:border-white/10"
+                className="flex flex-col gap-2 rounded-2xl border border-white/30 bg-white p-3 md:flex-row md:items-center md:justify-between dark:border-white/10"
               >
                 <div className="min-w-0 flex-1 space-y-1">
                   {editingDatasetId === dataset.id ? (
@@ -418,7 +418,7 @@ export default function DataOpsPage() {
                       <input
                         value={editingDatasetName}
                         onChange={(event) => setEditingDatasetName(event.target.value)}
-                        className="w-full rounded-2xl border border-white/40 bg-white/50 px-3 py-2 text-sm dark:bg-slate-950/50"
+                        className="w-full rounded-2xl border border-white/40 bg-white px-3 py-2 text-sm dark:bg-slate-950"
                       />
                       <div className="flex gap-2">
                         <button
@@ -513,7 +513,7 @@ export default function DataOpsPage() {
             Normalize dates
           </button>
         </div>
-        <p className="rounded-2xl border border-cyan-300/40 bg-cyan-50 p-3 text-sm text-cyan-800 dark:bg-slate-950/60 dark:text-cyan-200">
+        <p className="rounded-2xl border border-cyan-300/40 bg-cyan-50 p-3 text-sm text-cyan-800 dark:bg-slate-950 dark:text-cyan-200">
           {notice}
         </p>
       </section>
@@ -530,7 +530,7 @@ export default function DataOpsPage() {
                 {activeDataset.columns.map((column) => (
                   <div
                     key={column.name}
-                    className="rounded-2xl border border-white/40 bg-white/45 p-3 text-sm dark:border-white/20"
+                    className="rounded-2xl border border-white/40 bg-white p-3 text-sm dark:border-white/20"
                   >
                     <p className="font-semibold">{column.name}</p>
                     <p className="text-xs text-slate-600 dark:text-slate-300">
@@ -553,7 +553,7 @@ export default function DataOpsPage() {
         </p>
         <StreamingDataViewer
           datasetId={activeDataset?.id ?? null}
-          className="mt-4 border-white/20 bg-white/45 dark:bg-slate-950/45"
+          className="mt-4 border-white/20 bg-white dark:bg-slate-950"
         />
       </section>
     </div>

@@ -57,7 +57,7 @@ interface UnionFindState {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const CARD_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const PALETTE = [
   "#06b6d4",
   "#22c55e",
@@ -196,17 +196,17 @@ function SummaryTable({
 }) {
   if (summaries.length === 0) {
     return (
-      <div className="rounded-[1rem] border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+      <div className="rounded-lg border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
         Run clustering to inspect centroids, cluster sizes, and variance.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-[1rem] border border-white/15 bg-white/55 dark:bg-slate-950/25">
+    <div className="overflow-hidden rounded-lg border border-white/15 bg-white dark:bg-slate-950/25">
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-white/60 dark:bg-slate-900/60">
+          <thead className="bg-white dark:bg-slate-900">
             <tr>
               <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">Cluster</th>
               <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">Size</th>
@@ -627,7 +627,7 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
     <section className={`${CARD_CLASS} overflow-hidden p-5`}>
       <div className="flex flex-col gap-5 border-b border-white/15 pb-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
             <Orbit className="h-5 w-5" />
           </div>
           <div>
@@ -641,7 +641,7 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <label className="flex cursor-pointer items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
+          <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
             <input
               type="checkbox"
               checked={useBackend}
@@ -669,12 +669,12 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
         </div>
       </div>
 
-      <div className="rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 mt-4 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
+      <div className="rounded-lg border border-white/15 bg-white px-4 py-3 mt-4 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
         {status}
       </div>
 
       {error ? (
-        <div className="mt-4 rounded-[1.2rem] border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
+        <div className="mt-4 rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
           {error}
         </div>
       ) : null}
@@ -685,7 +685,7 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.28, ease: EASE }}
-            className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30"
+            className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30"
           >
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
               Numeric feature selection
@@ -701,7 +701,7 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
                     className={`rounded-full px-3 py-2 text-sm transition ${
                       active
                         ? "bg-cyan-500/15 text-cyan-700 dark:text-cyan-300"
-                        : "bg-slate-200/70 text-slate-700 dark:bg-slate-800/70 dark:text-slate-300"
+                        : "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
                     }`}
                   >
                     {column.name}
@@ -714,7 +714,7 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
               <select
                 value={algorithm}
                 onChange={(event) => setAlgorithm(event.target.value as ClusteringAlgorithm)}
-                className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               >
                 <option value="kmeans">K-means</option>
                 <option value="dbscan">DBSCAN</option>
@@ -726,7 +726,7 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
                   max={12}
                   value={kValue}
                   onChange={(event) => setKValue(Math.max(Number(event.target.value), 2))}
-                  className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                  className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
                 />
               ) : (
                 <div className="grid grid-cols-2 gap-3">
@@ -736,7 +736,7 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
                     step={0.1}
                     value={epsilon}
                     onChange={(event) => setEpsilon(Math.max(Number(event.target.value), 0.1))}
-                    className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                    className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
                   />
                   <input
                     type="number"
@@ -744,7 +744,7 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
                     step={1}
                     value={minPts}
                     onChange={(event) => setMinPts(Math.max(Number(event.target.value), 2))}
-                    className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                    className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
                   />
                 </div>
               )}
@@ -754,7 +754,7 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
               <button
                 type="button"
                 onClick={() => void runClustering()}
-                className="inline-flex items-center gap-2 rounded-[1rem] bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
+                className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                 Run clustering
@@ -762,7 +762,7 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
               <button
                 type="button"
                 onClick={exportAssignments}
-                className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/70 dark:bg-slate-950/35 dark:text-slate-200"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-950/35 dark:text-slate-200"
               >
                 <Download className="h-4 w-4" />
                 Export CSV
@@ -771,7 +771,7 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
           </motion.div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-[1.25rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
                 <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -782,7 +782,7 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
                 {selectedColumns.length}
               </p>
             </div>
-            <div className="rounded-[1.25rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
               <div className="flex items-center gap-2">
                 <Sigma className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
                 <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -798,14 +798,14 @@ function ClusteringView({ tableName, columns }: ClusteringViewProps) {
           <SummaryTable columns={selectedColumns} summaries={summaries} />
         </div>
 
-        <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+        <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
           <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
             Cluster scatter plot
           </p>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             The first two selected columns drive X and Y. A third column, if selected, adjusts point size.
           </p>
-          <div className="mt-4 overflow-hidden rounded-[1.2rem] border border-white/15 bg-white/55 dark:bg-slate-950/25">
+          <div className="mt-4 overflow-hidden rounded-lg border border-white/15 bg-white dark:bg-slate-950/25">
             <ReactEChartsCore
               echarts={echarts}
               option={chartOption}

@@ -62,9 +62,9 @@ interface StatusMessage {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const GLASS_PANEL_CLASS =
-  "border border-white/20 bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45";
+  "border border-white/20 bg-white dark:bg-slate-950";
 const FIELD_CLASS =
-  "w-full rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950/65 dark:text-slate-100";
+  "w-full rounded-2xl border border-slate-200/70 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-100";
 const BUTTON_CLASS =
   "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60";
 const SAVED_QUERY_STORAGE_KEY = "datalens-saved-queries";
@@ -350,7 +350,7 @@ export default function QueryScheduler({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, ease: EASE }}
-      className={`rounded-[2rem] p-6 shadow-[0_28px_90px_-52px_rgba(15,23,42,0.85)] ${GLASS_PANEL_CLASS}`}
+      className={`rounded-lg p-6 shadow-sm ${GLASS_PANEL_CLASS}`}
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
@@ -381,7 +381,7 @@ export default function QueryScheduler({
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <div className={`rounded-[1.75rem] p-5 ${GLASS_PANEL_CLASS}`}>
+        <div className={`rounded-lg p-5 ${GLASS_PANEL_CLASS}`}>
           <div className="grid gap-4">
             <label className="block">
               <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
@@ -486,7 +486,7 @@ export default function QueryScheduler({
         </div>
 
         <div className="grid gap-6">
-          <div className={`rounded-[1.75rem] p-5 ${GLASS_PANEL_CLASS}`}>
+          <div className={`rounded-lg p-5 ${GLASS_PANEL_CLASS}`}>
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h3 className="text-lg font-semibold text-slate-950 dark:text-white">
@@ -507,7 +507,7 @@ export default function QueryScheduler({
                 schedules.map((schedule) => (
                   <div
                     key={schedule.id}
-                    className="rounded-3xl border border-white/20 bg-white/60 p-4 dark:bg-slate-950/35"
+                    className="rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/35"
                   >
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                       <div>
@@ -530,7 +530,7 @@ export default function QueryScheduler({
                           type="button"
                           aria-label={`Toggle ${schedule.name}`}
                           onClick={() => handleToggleSchedule(schedule.id)}
-                          className={`${BUTTON_CLASS} border border-white/20 bg-white/70 text-slate-800 hover:bg-white dark:bg-slate-950/45 dark:text-slate-100 dark:hover:bg-slate-950/60`}
+                          className={`${BUTTON_CLASS} border border-white/20 bg-white text-slate-800 hover:bg-white dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-950`}
                         >
                           {schedule.enabled ? (
                             <ToggleRight className="h-4 w-4 text-emerald-500" />
@@ -543,7 +543,7 @@ export default function QueryScheduler({
                           type="button"
                           onClick={() => void executeSchedule(schedule.id)}
                           disabled={runningScheduleId === schedule.id}
-                          className={`${BUTTON_CLASS} border border-white/20 bg-white/70 text-slate-800 hover:bg-white dark:bg-slate-950/45 dark:text-slate-100 dark:hover:bg-slate-950/60`}
+                          className={`${BUTTON_CLASS} border border-white/20 bg-white text-slate-800 hover:bg-white dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-950`}
                         >
                           {runningScheduleId === schedule.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -568,7 +568,7 @@ export default function QueryScheduler({
             </div>
           </div>
 
-          <div className={`rounded-[1.75rem] p-5 ${GLASS_PANEL_CLASS}`}>
+          <div className={`rounded-lg p-5 ${GLASS_PANEL_CLASS}`}>
             <div className="flex items-center gap-2">
               <History className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
               <h3 className="text-lg font-semibold text-slate-950 dark:text-white">
@@ -585,7 +585,7 @@ export default function QueryScheduler({
                 history.map((entry) => (
                   <div
                     key={entry.id}
-                    className="rounded-3xl border border-white/20 bg-white/60 p-4 dark:bg-slate-950/35"
+                    className="rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/35"
                   >
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div>

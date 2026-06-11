@@ -78,7 +78,7 @@ export default function ColumnProfilerAdvanced({
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-3 backdrop-blur-md sm:p-6"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-3 sm:p-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -91,7 +91,7 @@ export default function ColumnProfilerAdvanced({
           exit={{ opacity: 0, y: 20, scale: 0.99 }}
           transition={{ duration: 0.34, ease: EASE }}
           onClick={(event) => event.stopPropagation()}
-          className="flex h-[96vh] w-full max-w-[1500px] flex-col overflow-hidden rounded-[2rem] border border-white/15 bg-slate-100/90 shadow-2xl shadow-slate-950/30 backdrop-blur-2xl dark:bg-slate-950/85"
+          className="flex h-[96vh] w-full max-w-[1500px] flex-col overflow-hidden rounded-lg border border-white/15 bg-slate-100 shadow-2xl shadow-slate-950/30 dark:bg-slate-950"
         >
           <Header
             tableName={tableName}
@@ -109,7 +109,7 @@ export default function ColumnProfilerAdvanced({
                 {Array.from({ length: 6 }).map((_, index) => (
                   <div
                     key={index}
-                    className="h-72 animate-pulse rounded-[1.75rem] border border-white/20 bg-white/60 dark:border-white/10 dark:bg-slate-900/40"
+                    className="h-72 animate-pulse rounded-lg border border-white/20 bg-white dark:border-white/10 dark:bg-slate-900"
                   />
                 ))}
               </div>

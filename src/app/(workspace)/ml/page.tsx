@@ -12,7 +12,7 @@ import RouteErrorBoundary from "@/components/workspace/route-error-boundary";
 import { sanitizeTableName } from "@/lib/utils/formatters";
 
 const GLASS_PANEL_CLASS =
-  "rounded-2xl border border-white/30 bg-white/60 p-4 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60";
+  "rounded-2xl border border-white/30 bg-white p-4 dark:border-white/10 dark:bg-slate-900";
 
 type MLTab = "regression" | "clustering" | "anomaly";
 
@@ -55,7 +55,7 @@ export default function MLPage() {
               className={`inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition ${
                 activeTab === "regression"
                   ? "border-cyan-300 bg-cyan-500/20 text-cyan-700 dark:text-cyan-200"
-                  : "border-white/30 bg-white/40 text-slate-700 hover:border-cyan-300/60 hover:bg-white/60 dark:border-white/15 dark:bg-slate-900/30 dark:text-slate-200"
+                  : "border-white/30 bg-white text-slate-700 hover:border-cyan-300/60 hover:bg-white dark:border-white/15 dark:bg-slate-900/30 dark:text-slate-200"
               }`}
             >
               <FlaskConical className="h-4 w-4" />
@@ -67,7 +67,7 @@ export default function MLPage() {
               className={`inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition ${
                 activeTab === "clustering"
                   ? "border-emerald-300 bg-emerald-500/20 text-emerald-700 dark:text-emerald-200"
-                  : "border-white/30 bg-white/40 text-slate-700 hover:border-emerald-300/60 hover:bg-white/60 dark:border-white/15 dark:bg-slate-900/30 dark:text-slate-200"
+                  : "border-white/30 bg-white text-slate-700 hover:border-emerald-300/60 hover:bg-white dark:border-white/15 dark:bg-slate-900/30 dark:text-slate-200"
               }`}
             >
               <ScatterChart className="h-4 w-4" />
@@ -79,7 +79,7 @@ export default function MLPage() {
               className={`inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition ${
                 activeTab === "anomaly"
                   ? "border-amber-300 bg-amber-500/20 text-amber-700 dark:text-amber-200"
-                  : "border-white/30 bg-white/40 text-slate-700 hover:border-amber-300/60 hover:bg-white/60 dark:border-white/15 dark:bg-slate-900/30 dark:text-slate-200"
+                  : "border-white/30 bg-white text-slate-700 hover:border-amber-300/60 hover:bg-white dark:border-white/15 dark:bg-slate-900/30 dark:text-slate-200"
               }`}
             >
               <TriangleAlert className="h-4 w-4" />
@@ -90,7 +90,7 @@ export default function MLPage() {
 
         <section className={GLASS_PANEL_CLASS}>
           {!hasDataset ? (
-            <div className="rounded-xl border border-dashed border-white/50 bg-white/50 p-6 text-sm text-slate-700 dark:bg-slate-900/40 dark:text-slate-300">
+            <div className="rounded-xl border border-dashed border-white/50 bg-white p-6 text-sm text-slate-700 dark:bg-slate-900 dark:text-slate-300">
               <div className="flex items-center gap-2 text-slate-900 dark:text-white">
                 <Radar className="h-4 w-4" />
                 No active dataset found

@@ -310,7 +310,7 @@ export default function SavedQueryManager({
                   className={`rounded-full border px-3 py-1.5 text-sm transition ${
                     activeFolder === folder
                       ? "border-cyan-400/40 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300"
-                      : "border-white/20 bg-white/70 text-slate-600 dark:bg-slate-950/55 dark:text-slate-300"
+                      : "border-white/20 bg-white text-slate-600 dark:bg-slate-950 dark:text-slate-300"
                   }`}
                 >
                   {folder}
@@ -341,7 +341,7 @@ export default function SavedQueryManager({
                           className={`rounded-full border p-1.5 ${
                             query.starred
                               ? "border-amber-400/40 bg-amber-500/10 text-amber-600 dark:text-amber-300"
-                              : "border-white/20 bg-white/70 text-slate-500 dark:bg-slate-950/55 dark:text-slate-400"
+                              : "border-white/20 bg-white text-slate-500 dark:bg-slate-950 dark:text-slate-400"
                           }`}
                           aria-label={query.starred ? `Unstar ${query.name}` : `Star ${query.name}`}
                         >
@@ -357,7 +357,7 @@ export default function SavedQueryManager({
                         {query.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="rounded-full border border-white/20 bg-white/70 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-950/55 dark:text-slate-300"
+                            className="rounded-full border border-white/20 bg-white px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-950 dark:text-slate-300"
                           >
                             {tag}
                           </span>

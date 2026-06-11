@@ -295,7 +295,7 @@ export default function CommandPalette({
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 "
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -304,7 +304,7 @@ export default function CommandPalette({
 
           {/* Palette */}
           <motion.div
-            className="relative w-full max-w-[500px] rounded-2xl border border-gray-200/50 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl overflow-hidden"
+            className="relative w-full max-w-[500px] rounded-2xl border border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-900 shadow-2xl overflow-hidden"
             initial={{ opacity: 0, scale: 0.95, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -10 }}
@@ -426,7 +426,7 @@ function CommandItem({
         ${
           selected
             ? "bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
-            : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60"
+            : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
         }
       `}
     >

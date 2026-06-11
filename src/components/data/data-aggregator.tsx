@@ -84,7 +84,7 @@ function buildAggregationSql(
 
   return [
     "SELECT",
-    `  ${selectList.join(",\n  ")}`,
+    ` ${selectList.join(",\n ")}`,
     `FROM ${quoteIdentifier(tableName)}`,
     groupByClause,
     groupColumns.length
@@ -307,7 +307,7 @@ export default function DataAggregator({
                         className={`rounded-2xl px-3 py-2 text-sm transition ${
                           metric.functions.includes(fn)
                             ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                            : "bg-white/60 text-slate-700 dark:bg-slate-950/45 dark:text-slate-200"
+                            : "bg-white text-slate-700 dark:bg-slate-950 dark:text-slate-200"
                         }`}
                       >
                         {fn}

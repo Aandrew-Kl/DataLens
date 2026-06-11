@@ -20,7 +20,7 @@ export default function MetricCard({ label, value, emoji }: MetricCardProps) {
       whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
       className="
         rounded-xl p-5
-        backdrop-blur-xl bg-white/60 dark:bg-gray-900/60
+         bg-white dark:bg-gray-900
         border border-gray-200/50 dark:border-gray-700/50
         shadow-sm hover:shadow-md
         transition-shadow duration-300

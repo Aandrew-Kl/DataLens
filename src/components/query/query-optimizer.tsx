@@ -28,7 +28,7 @@ interface OptimizationSuggestion {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 backdrop-blur-2xl shadow-xl shadow-slate-950/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:bg-slate-950";
 function defaultQuery(tableName: string) {
   return `SELECT *\nFROM ${quoteIdentifier(tableName)}\nORDER BY 1 DESC;`;
 }
@@ -130,8 +130,8 @@ function analyzeQuery(
       evidence: "Found an IN/EXISTS subquery pattern.",
       rewrite: [
         "WITH filtered_keys AS (",
-        `  SELECT DISTINCT ${filterColumn}`,
-        `  FROM ${quoteIdentifier(tableName)}`,
+        ` SELECT DISTINCT ${filterColumn}`,
+        ` FROM ${quoteIdentifier(tableName)}`,
         ")",
         `SELECT ${projection}`,
         `FROM ${quoteIdentifier(tableName)} AS base`,
@@ -215,7 +215,7 @@ function QueryOptimizerPanel({
             <button
               type="button"
               onClick={resetToSample}
-              className="rounded-2xl border border-white/20 bg-white/80 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-cyan-400 hover:text-cyan-700 dark:bg-slate-950/40 dark:text-slate-200 dark:hover:text-cyan-300"
+              className="rounded-2xl border border-white/20 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-cyan-400 hover:text-cyan-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:text-cyan-300"
             >
               Reset sample query
             </button>
@@ -235,7 +235,7 @@ function QueryOptimizerPanel({
                 setQueryText(event.target.value);
                 setAppliedSuggestionId(null);
               }}
-              className="min-h-[18rem] w-full rounded-3xl border border-white/20 bg-white/85 px-4 py-4 font-mono text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950/45 dark:text-slate-100"
+              className="min-h-[18rem] w-full rounded-3xl border border-white/20 bg-white px-4 py-4 font-mono text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950 dark:text-slate-100"
             />
           </label>
 
@@ -312,7 +312,7 @@ function QueryOptimizerPanel({
                   </button>
                 </div>
 
-                <div className="mt-4 rounded-3xl border border-white/20 bg-white/70 p-4 dark:bg-slate-950/25">
+                <div className="mt-4 rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/25">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Evidence
                   </p>

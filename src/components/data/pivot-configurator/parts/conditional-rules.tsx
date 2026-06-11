@@ -43,7 +43,7 @@ export function ConditionalRulesPanel({
   onAdd,
 }: ConditionalRulesPanelProps) {
   return (
-    <div className="rounded-[1.6rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-950/30">
+    <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/30">
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
         <Filter className="h-3.5 w-3.5" />
         Conditional formatting
@@ -83,7 +83,7 @@ export function ConditionalRulesPanel({
           className={`${FIELD_CLASS} ${ruleOperator === "between" ? "" : "opacity-60"}`}
           disabled={ruleOperator !== "between"}
         />
-        <div className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/60 px-3 py-2 dark:bg-slate-950/45">
+        <div className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-3 py-2 dark:bg-slate-950">
           <input
             type="color"
             value={ruleColor}
@@ -103,7 +103,7 @@ export function ConditionalRulesPanel({
         {conditionalRules.map((rule) => (
           <div
             key={rule.id}
-            className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/35"
+            className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/35"
           >
             <div className="text-sm text-slate-600 dark:text-slate-300">
               <span className="font-semibold text-slate-950 dark:text-white">

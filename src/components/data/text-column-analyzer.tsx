@@ -530,7 +530,7 @@ function TextColumnAnalyzerReady({
                     result.topValues.map((item) => (
                       <div
                         key={`${item.value}-${item.count}`}
-                        className="flex items-center justify-between rounded-2xl border border-white/15 bg-white/50 px-4 py-3 dark:border-white/10 dark:bg-slate-950/35"
+                        className="flex items-center justify-between rounded-2xl border border-white/15 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-950/35"
                       >
                         <span className="truncate text-sm text-slate-700 dark:text-slate-200">
                           {item.value || "(empty string)"}

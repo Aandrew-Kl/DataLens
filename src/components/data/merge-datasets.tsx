@@ -171,7 +171,7 @@ function buildStackPlan(
 
           return `${expression} AS ${quoteIdentifier(mapping.targetName)}`;
         })
-        .join(",\n  ");
+        .join(",\n ");
 
       return `SELECT
   ${selectList}
@@ -235,13 +235,13 @@ function buildJoinPlan(
 
     return [
       `LEFT JOIN ${quoteIdentifier(dataset.tableName)} t${index}`,
-      `  ON t0.${quoteIdentifier(joinColumns[datasets[0].tableName] ?? "")} = t${index}.${quoteIdentifier(joinColumns[dataset.tableName] ?? "")}`,
+      ` ON t0.${quoteIdentifier(joinColumns[datasets[0].tableName] ?? "")} = t${index}.${quoteIdentifier(joinColumns[dataset.tableName] ?? "")}`,
     ];
   });
 
   return {
     sql: `SELECT
-  ${selectList.join(",\n  ")}
+  ${selectList.join(",\n ")}
 ${fromLines.join("\n")}`,
     outputColumns,
   };
@@ -335,7 +335,7 @@ function PreviewTable({ rows }: { rows: Record<string, unknown>[] }) {
   return (
     <div className="overflow-auto rounded-2xl border border-white/10">
       <table className="min-w-full text-left text-sm">
-        <thead className="sticky top-0 bg-white/75 dark:bg-slate-950/80">
+        <thead className="sticky top-0 bg-white dark:bg-slate-950">
           <tr>
             {headers.map((header) => (
               <th key={header} className="whitespace-nowrap px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">
@@ -570,7 +570,7 @@ export default function MergeDatasets({ onMergeComplete }: MergeDatasetsProps) {
   }
 
   return (
-    <section className="overflow-hidden rounded-[30px] border border-white/15 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_24%),linear-gradient(135deg,rgba(248,250,252,0.92),rgba(226,232,240,0.75))] shadow-[0_30px_120px_-50px_rgba(15,23,42,0.9)] dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.16),transparent_22%),linear-gradient(135deg,rgba(2,6,23,0.95),rgba(15,23,42,0.88))]">
+    <section className="overflow-hidden rounded-lg border border-white/15 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_24%),linear-gradient(135deg,rgba(248,250,252,0.92),rgba(226,232,240,0.75))] shadow-sm dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.16),transparent_22%),linear-gradient(135deg,rgba(2,6,23,0.95),rgba(15,23,42,0.88))]">
       <div className="border-b border-white/10 px-6 py-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
@@ -586,7 +586,7 @@ export default function MergeDatasets({ onMergeComplete }: MergeDatasetsProps) {
             </p>
           </div>
 
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white/15 dark:bg-slate-950/40 dark:text-slate-200">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white/15 dark:bg-slate-950 dark:text-slate-200">
             {busy === "upload" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
             Upload dataset
             <input
@@ -741,7 +741,7 @@ export default function MergeDatasets({ onMergeComplete }: MergeDatasetsProps) {
                                   [dataset.tableName]: event.target.value,
                                 }))
                               }
-                              className="w-full rounded-2xl border border-white/10 bg-white/50 px-3 py-2.5 outline-none dark:bg-slate-950/45"
+                              className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2.5 outline-none dark:bg-slate-950"
                             >
                               {dataset.columns.map((column) => (
                                 <option key={column.name} value={column.name}>
@@ -783,7 +783,7 @@ export default function MergeDatasets({ onMergeComplete }: MergeDatasetsProps) {
                 ) : (
                   <div className="overflow-auto rounded-2xl border border-white/10">
                     <table className="min-w-full text-left text-sm">
-                      <thead className="bg-white/75 dark:bg-slate-950/80">
+                      <thead className="bg-white dark:bg-slate-950">
                         <tr>
                           <th className="px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">Output column</th>
                           {selectedDatasets.map((dataset) => (
@@ -809,7 +809,7 @@ export default function MergeDatasets({ onMergeComplete }: MergeDatasetsProps) {
                                         [overrideKey]: event.target.value,
                                       }))
                                     }
-                                    className="w-full rounded-2xl border border-white/10 bg-white/50 px-3 py-2 outline-none dark:bg-slate-950/45"
+                                    className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2 outline-none dark:bg-slate-950"
                                   >
                                     <option value="">No column</option>
                                     {dataset.columns.map((column) => (
@@ -856,7 +856,7 @@ export default function MergeDatasets({ onMergeComplete }: MergeDatasetsProps) {
                       <Layers3 className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
                       Merge SQL
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-slate-950/85 p-4 text-xs leading-6 text-cyan-200">
+                    <div className="rounded-2xl border border-white/10 bg-slate-950 p-4 text-xs leading-6 text-cyan-200">
                       {mergePlan?.sql ?? "-- Select at least two datasets to build the merge plan."}
                     </div>
                   </div>
@@ -874,7 +874,7 @@ export default function MergeDatasets({ onMergeComplete }: MergeDatasetsProps) {
                         value={mergedTableName}
                         onChange={(event) => setMergedTableName(event.target.value)}
                         placeholder={effectiveMergedName}
-                        className="w-full rounded-2xl border border-white/10 bg-white/50 px-3 py-2.5 outline-none dark:bg-slate-950/45"
+                        className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2.5 outline-none dark:bg-slate-950"
                       />
                     </label>
                     <button

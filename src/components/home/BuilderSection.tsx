@@ -165,7 +165,7 @@ function WorkspacePolishLab({
           <CommandBar commands={commands} onExecute={onExecuteCommand} />
         </ErrorBoundary>
       ) : (
-        <div className="rounded-2xl border border-dashed border-slate-200 bg-white/70 px-4 py-4 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-400">
+        <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-4 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
           Enable the advanced command bar to preview the richer search-driven
           command surface without replacing the existing command palette.
         </div>
@@ -173,7 +173,7 @@ function WorkspacePolishLab({
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <ErrorBoundary>
-          <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-2 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div className="rounded-2xl border border-slate-200/70 bg-white p-2 shadow-sm dark:border-slate-700/60 dark:bg-slate-900">
             <EmptyState
               icon={LayoutGrid}
               title="No preview selected"
@@ -197,7 +197,7 @@ function WorkspacePolishLab({
         <SkeletonTable rows={4} columns={5} />
       </ErrorBoundary>
 
-      <details className="group rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+      <details className="group rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900">
         <summary className="cursor-pointer list-none">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -214,7 +214,7 @@ function WorkspacePolishLab({
             </span>
           </div>
         </summary>
-        <div className="mt-4 max-h-[36rem] overflow-auto rounded-[1.75rem] border border-slate-200/70 bg-slate-50 dark:border-slate-700/60 dark:bg-slate-950/70">
+        <div className="mt-4 max-h-[36rem] overflow-auto rounded-lg border border-slate-200/70 bg-slate-50 dark:border-slate-700/60 dark:bg-slate-950">
           <ErrorBoundary>
             <NotFoundPage />
           </ErrorBoundary>

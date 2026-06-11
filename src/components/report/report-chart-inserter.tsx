@@ -491,7 +491,7 @@ export default function ReportChartInserter({
               insertedCharts.map((chart) => (
                 <div
                   key={chart.id}
-                  className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 dark:border-white/10 dark:bg-slate-950/40"
+                  className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-950"
                 >
                   <p className="font-medium text-slate-950 dark:text-white">
                     {chart.title}

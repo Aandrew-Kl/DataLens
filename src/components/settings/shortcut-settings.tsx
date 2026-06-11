@@ -235,7 +235,7 @@ export default function ShortcutSettings({
                     if (e.key === "Enter") handleSave(shortcut.id);
                     if (e.key === "Escape") handleCancel();
                   }}
-                  className="w-40 rounded-xl border border-white/20 bg-white/80 px-3 py-1.5 text-sm text-slate-700 outline-none focus:border-amber-400 dark:border-white/10 dark:bg-slate-950/55 dark:text-slate-100"
+                  className="w-40 rounded-xl border border-white/20 bg-white px-3 py-1.5 text-sm text-slate-700 outline-none focus:border-amber-400 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100"
                 />
                 <button
                   type="button"
@@ -256,7 +256,7 @@ export default function ShortcutSettings({
               <button
                 type="button"
                 onClick={() => handleEdit(shortcut.id, shortcut.keys)}
-                className="rounded-xl border border-white/20 bg-white/65 px-4 py-1.5 text-sm font-mono text-slate-700 transition hover:bg-white/90 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200 dark:hover:bg-slate-900/80"
+                className="rounded-xl border border-white/20 bg-white px-4 py-1.5 text-sm font-mono text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200 dark:hover:bg-slate-900"
               >
                 {shortcut.keys}
               </button>

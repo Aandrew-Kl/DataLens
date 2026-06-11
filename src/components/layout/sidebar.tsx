@@ -155,12 +155,12 @@ export default function Sidebar({
 
   return (
     <motion.aside
-      className="relative flex flex-col h-full border-r border-gray-200/60 dark:border-gray-700/60 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl select-none overflow-hidden"
+      className="relative flex flex-col h-full border-r border-gray-200/60 dark:border-gray-700/60 bg-white dark:bg-gray-900 select-none overflow-hidden"
       animate={{ width }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       {/* ----------------------------------------------------------------- */}
-      {/* Logo + collapse toggle                                            */}
+      {/* Logo + collapse toggle */}
       {/* ----------------------------------------------------------------- */}
       <div className="flex items-center justify-between px-3 h-14 shrink-0 border-b border-gray-100 dark:border-gray-800">
         <div className="flex items-center gap-2 overflow-hidden">
@@ -196,7 +196,7 @@ export default function Sidebar({
       </div>
 
       {/* ----------------------------------------------------------------- */}
-      {/* Datasets list                                                     */}
+      {/* Datasets list */}
       {/* ----------------------------------------------------------------- */}
       <nav
         aria-label="Main navigation"
@@ -246,7 +246,7 @@ export default function Sidebar({
                     ${
                       isActive
                         ? "bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/60"
+                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
                     }
                   `}
                   title={ds.fileName}
@@ -320,7 +320,7 @@ export default function Sidebar({
         )}
 
         {/* --------------------------------------------------------------- */}
-        {/* Recent files                                                     */}
+        {/* Recent files */}
         {/* --------------------------------------------------------------- */}
         {isOpen && recentFiles.length > 0 && (
           <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
@@ -330,7 +330,7 @@ export default function Sidebar({
             {recentFiles.map((rf, i) => (
               <div
                 key={`${rf.name}-${i}`}
-                className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors cursor-default"
+                className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-default"
               >
                 <Clock className="w-3.5 h-3.5 shrink-0 text-gray-300 dark:text-gray-600" />
                 <span className="flex-1 text-xs truncate">{rf.name}</span>
@@ -344,7 +344,7 @@ export default function Sidebar({
       </nav>
 
       {/* ----------------------------------------------------------------- */}
-      {/* Bottom actions                                                     */}
+      {/* Bottom actions */}
       {/* ----------------------------------------------------------------- */}
       <div className="shrink-0 border-t border-gray-100 dark:border-gray-800 p-2 space-y-1">
         {/* New Dataset */}

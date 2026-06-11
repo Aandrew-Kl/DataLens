@@ -7,8 +7,8 @@ import { Reveal } from "./marketing-primitives";
 
 const queryLines = [
   "SELECT region,",
-  "       SUM(revenue) AS revenue,",
-  "       AVG(retention_30d) AS retention_30d",
+  " SUM(revenue) AS revenue,",
+  " AVG(retention_30d) AS retention_30d",
   "FROM uploads.pipeline_q1",
   "WHERE segment = 'enterprise'",
   "GROUP BY 1",

@@ -68,9 +68,9 @@ type ViewMode = "side" | "unified";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100";
 function sanitizeTableName(value: string) {
   return (
     value
@@ -254,7 +254,7 @@ async function loadDiffData(
                 (column) =>
                   `SUM(CASE WHEN l.${quoteIdentifier(column)} IS DISTINCT FROM r.${quoteIdentifier(column)} THEN 1 ELSE 0 END) AS ${quoteIdentifier(`changes__${column}`)}`,
               )
-              .join(",\n            ")}
+              .join(",\n ")}
           FROM left_rows l
           JOIN right_rows r USING (diff_key)
           WHERE ${changedExpression}
@@ -275,7 +275,7 @@ async function loadDiffData(
             `l.${quoteIdentifier(column)} AS ${quoteIdentifier(`left__${column}`)}`,
             `r.${quoteIdentifier(column)} AS ${quoteIdentifier(`right__${column}`)}`,
           ])
-          .join(",\n        ")}
+          .join(",\n ")}
       FROM left_rows l
       FULL OUTER JOIN right_rows r USING (diff_key)
       WHERE l.diff_key IS NULL OR r.diff_key IS NULL OR (${changedExpression})
@@ -358,7 +358,7 @@ function DataDiffLoading() {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+    <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
       <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
         {label}
       </div>
@@ -384,7 +384,7 @@ function SideBySideRow({
         : "border-amber-400/30";
 
   return (
-    <div className={`rounded-3xl border ${toneClass} bg-white/45 p-4 dark:bg-slate-950/35`}>
+    <div className={`rounded-3xl border ${toneClass} bg-white p-4 dark:bg-slate-950/35`}>
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
@@ -400,7 +400,7 @@ function SideBySideRow({
       </div>
 
       <div className="grid gap-3 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/15 bg-white/55 p-3 dark:bg-slate-950/35">
+        <div className="rounded-2xl border border-white/15 bg-white p-3 dark:bg-slate-950/35">
           <div className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
             Left
           </div>
@@ -421,7 +421,7 @@ function SideBySideRow({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/15 bg-white/55 p-3 dark:bg-slate-950/35">
+        <div className="rounded-2xl border border-white/15 bg-white p-3 dark:bg-slate-950/35">
           <div className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
             Right
           </div>
@@ -452,7 +452,7 @@ function UnifiedRow({
   row: DiffRow;
 }) {
   return (
-    <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+    <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
@@ -470,7 +470,7 @@ function UnifiedRow({
         {row.changedColumns.map((column) => (
           <div
             key={`${row.diffKey}-${column}`}
-            className="rounded-2xl border border-white/15 bg-white/55 px-3 py-3 dark:bg-slate-950/35"
+            className="rounded-2xl border border-white/15 bg-white px-3 py-3 dark:bg-slate-950/35"
           >
             <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
               {column}
@@ -696,7 +696,7 @@ function DataDiffReady({ tableName }: DataDiffProps) {
             </div>
 
             {versionOptions.length > 1 ? (
-              <div className="block rounded-2xl border border-white/15 bg-white/45 px-4 py-4 dark:bg-slate-950/35">
+              <div className="block rounded-2xl border border-white/15 bg-white px-4 py-4 dark:bg-slate-950/35">
                 <label
                   htmlFor="data-diff-version-timeline"
                   className="mb-3 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
@@ -736,7 +736,7 @@ function DataDiffReady({ tableName }: DataDiffProps) {
                 className={`rounded-2xl border px-3 py-2 text-sm transition ${
                   viewMode === "side"
                     ? "border-cyan-400/50 bg-cyan-500/15 text-cyan-700 dark:text-cyan-200"
-                    : "border-white/20 bg-white/55 text-slate-600 dark:bg-slate-950/35 dark:text-slate-200"
+                    : "border-white/20 bg-white text-slate-600 dark:bg-slate-950/35 dark:text-slate-200"
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -750,7 +750,7 @@ function DataDiffReady({ tableName }: DataDiffProps) {
                 className={`rounded-2xl border px-3 py-2 text-sm transition ${
                   viewMode === "unified"
                     ? "border-cyan-400/50 bg-cyan-500/15 text-cyan-700 dark:text-cyan-200"
-                    : "border-white/20 bg-white/55 text-slate-600 dark:bg-slate-950/35 dark:text-slate-200"
+                    : "border-white/20 bg-white text-slate-600 dark:bg-slate-950/35 dark:text-slate-200"
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -761,7 +761,7 @@ function DataDiffReady({ tableName }: DataDiffProps) {
               <button
                 type="button"
                 onClick={handleExport}
-                className="rounded-2xl border border-white/20 bg-white/55 px-3 py-2 text-sm text-slate-600 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
+                className="rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-600 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
               >
                 <span className="flex items-center gap-2">
                   <Download className="h-4 w-4" />
@@ -806,7 +806,7 @@ function DataDiffReady({ tableName }: DataDiffProps) {
               {result.columnSummary.slice(0, 9).map((entry) => (
                 <div
                   key={entry.column}
-                  className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35"
+                  className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35"
                 >
                   <div className="text-sm font-semibold text-slate-950 dark:text-white">
                     {entry.column}
@@ -814,7 +814,7 @@ function DataDiffReady({ tableName }: DataDiffProps) {
                   <div className="mt-2 text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                     {formatNumber(entry.changes)} row deltas
                   </div>
-                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/60 dark:bg-slate-900/80">
+                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-white dark:bg-slate-900">
                     <div
                       className="h-full rounded-full bg-cyan-500"
                       style={{
@@ -839,7 +839,7 @@ function DataDiffReady({ tableName }: DataDiffProps) {
             </div>
             <div className="space-y-4">
               {result.rows.length === 0 ? (
-                <div className="rounded-3xl border border-white/15 bg-white/45 px-4 py-5 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300">
+                <div className="rounded-3xl border border-white/15 bg-white px-4 py-5 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300">
                   No row-level changes were detected for the selected comparison.
                 </div>
               ) : viewMode === "side" ? (

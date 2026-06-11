@@ -164,7 +164,7 @@ function compileRecipe(tableName: string, steps: RecipeStep[]) {
       const alias = step.targetColumn.trim() || "metric_value";
       sql = [
         "SELECT",
-        `  ${[...groups.map((column) => quoteIdentifier(column)), `${buildAggregateExpression(step)} AS ${quoteIdentifier(alias)}`].join(",\n  ")}`,
+        ` ${[...groups.map((column) => quoteIdentifier(column)), `${buildAggregateExpression(step)} AS ${quoteIdentifier(alias)}`].join(",\n ")}`,
         `FROM ${source}`,
         groups.length > 0
           ? `GROUP BY ${groups.map((column) => quoteIdentifier(column)).join(", ")}`
@@ -449,7 +449,7 @@ export default function DataRecipeBuilder({
                                 className={
                                   selected
                                     ? "rounded-full border border-cyan-400/40 bg-cyan-500/10 px-3 py-1.5 text-sm text-cyan-700 dark:text-cyan-300"
-                                    : "rounded-full border border-white/20 bg-white/60 px-3 py-1.5 text-sm text-slate-600 dark:bg-slate-950/40 dark:text-slate-300"
+                                    : "rounded-full border border-white/20 bg-white px-3 py-1.5 text-sm text-slate-600 dark:bg-slate-950 dark:text-slate-300"
                                 }
                               >
                                 {column}
@@ -548,7 +548,7 @@ export default function DataRecipeBuilder({
             </div>
             <div className="space-y-3">
               {savedRecipes.map((recipe) => (
-                <div key={recipe.id} className="rounded-2xl border border-white/20 bg-white/50 p-4 dark:bg-slate-950/25">
+                <div key={recipe.id} className="rounded-2xl border border-white/20 bg-white p-4 dark:bg-slate-950/25">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">{recipe.name}</p>

@@ -29,7 +29,7 @@ function formatCompactNumber(value: number | null) {
 }
 
 export default function MarketingPageClient() {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
   const [githubStars, setGithubStars] = useState<number | null>(null);
 
   useEffect(() => {
@@ -84,7 +84,7 @@ export default function MarketingPageClient() {
   return (
     <div className={theme === "dark" ? "dark" : undefined}>
       <div className="min-h-screen bg-white text-zinc-900 transition-colors dark:bg-zinc-950 dark:text-zinc-50">
-        <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/90 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90">
+        <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3 sm:px-8 lg:px-12">
             <Link href="/" className="inline-flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-900 text-xs font-semibold text-white dark:bg-zinc-50 dark:text-zinc-900">

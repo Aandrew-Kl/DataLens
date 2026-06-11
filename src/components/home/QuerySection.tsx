@@ -123,7 +123,7 @@ export default function QuerySection({
         <ErrorBoundary>
           <AiPlayground />
         </ErrorBoundary>
-        <details className="group mt-2 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+        <details className="group mt-2 rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900">
           <summary className="cursor-pointer list-none">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>

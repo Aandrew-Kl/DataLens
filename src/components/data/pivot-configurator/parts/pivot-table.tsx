@@ -31,16 +31,16 @@ export function PivotTable({
 }: PivotTableProps) {
   if (!result) {
     return (
-      <div className="rounded-[1.4rem] border border-dashed border-white/20 bg-white/35 px-5 py-12 text-center text-sm text-slate-500 dark:bg-slate-950/30 dark:text-slate-400">
+      <div className="rounded-lg border border-dashed border-white/20 bg-white/35 px-5 py-12 text-center text-sm text-slate-500 dark:bg-slate-950/30 dark:text-slate-400">
         Configure the drop zones, then run the pivot to render results here.
       </div>
     );
   }
 
   return (
-    <div className="overflow-auto rounded-[1.4rem] border border-white/15">
+    <div className="overflow-auto rounded-lg border border-white/15">
       <table className="min-w-full border-collapse text-sm">
-        <thead className="sticky top-0 bg-white/70 backdrop-blur dark:bg-slate-950/80">
+        <thead className="sticky top-0 bg-white dark:bg-slate-950">
           <tr>
             <th className="border-b border-white/10 px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300">
               {rowFields.join(" / ") || "Rows"}

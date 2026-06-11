@@ -382,7 +382,7 @@ export default function DataMaskingTool({
                     className={`rounded-full border px-3 py-1.5 text-sm transition ${
                       selected
                         ? "border-cyan-400/50 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300"
-                        : "border-white/20 bg-white/50 text-slate-700 dark:bg-slate-950/40 dark:text-slate-200"
+                        : "border-white/20 bg-white text-slate-700 dark:bg-slate-950 dark:text-slate-200"
                     }`}
                   >
                     {column.name}
@@ -400,7 +400,7 @@ export default function DataMaskingTool({
                 activeSelectedColumns.map((columnName) => (
                   <div
                     key={columnName}
-                    className="rounded-2xl border border-white/20 bg-white/55 p-4 dark:bg-slate-950/35"
+                    className="rounded-2xl border border-white/20 bg-white p-4 dark:bg-slate-950/35"
                   >
                     <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       {columnName}
@@ -500,7 +500,7 @@ export default function DataMaskingTool({
                   previewRows.map((row) => (
                     <div
                       key={row.key}
-                      className="rounded-2xl border border-white/20 bg-white/55 p-4 dark:bg-slate-950/35"
+                      className="rounded-2xl border border-white/20 bg-white p-4 dark:bg-slate-950/35"
                     >
                       <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                         Row {row.key}

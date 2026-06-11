@@ -9,7 +9,7 @@ type AggregateType = "sum" | "count" | "avg" | "min" | "max";
 type DropTarget = "rows" | "columns" | "values" | "unassigned";
 
 const glass =
-  "rounded-2xl border border-white/30 bg-white/60 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60";
+  "rounded-2xl border border-white/30 bg-white p-5 dark:border-white/10 dark:bg-slate-900";
 
 const aggregateLabels: Record<AggregateType, string> = {
   sum: "Sum",
@@ -171,7 +171,7 @@ export default function PivotPage() {
               key={field}
               draggable
               onDragStart={() => setDraggedField(field)}
-              className="inline-flex items-center gap-2 rounded-2xl border border-cyan-300/40 bg-cyan-50 px-3 py-2 text-xs text-cyan-900 dark:bg-slate-950/50 dark:text-cyan-100"
+              className="inline-flex items-center gap-2 rounded-2xl border border-cyan-300/40 bg-cyan-50 px-3 py-2 text-xs text-cyan-900 dark:bg-slate-950 dark:text-cyan-100"
             >
               {field}
               <button
@@ -214,7 +214,7 @@ export default function PivotPage() {
                     key={column.name}
                     draggable
                     onDragStart={() => setDraggedField(column.name)}
-                    className="inline-flex items-center rounded-2xl border border-slate-300/40 bg-white/45 px-3 py-2 text-xs"
+                    className="inline-flex items-center rounded-2xl border border-slate-300/40 bg-white px-3 py-2 text-xs"
                   >
                     {column.name}
                   </span>

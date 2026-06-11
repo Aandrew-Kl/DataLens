@@ -378,7 +378,7 @@ export default function PolarChart({ tableName, columns }: PolarChartProps) {
                     className={`rounded-full border px-3 py-1.5 text-sm transition ${
                       selected
                         ? "border-cyan-400/50 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300"
-                        : "border-white/20 bg-white/50 text-slate-700 dark:bg-slate-950/40 dark:text-slate-200"
+                        : "border-white/20 bg-white text-slate-700 dark:bg-slate-950 dark:text-slate-200"
                     }`}
                   >
                     {column.name}

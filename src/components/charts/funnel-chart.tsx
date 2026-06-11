@@ -39,9 +39,9 @@ type FunnelOrientation = "vertical" | "horizontal";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950/45 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950 dark:text-slate-100";
 
 function subscribeDarkMode(listener: () => void) {
   if (typeof document === "undefined") return () => undefined;
@@ -208,7 +208,7 @@ function FunnelMetric({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 dark:bg-slate-950/45">
+    <div className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-950">
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{label}</p>
       <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100">{value}</p>
     </div>
@@ -308,7 +308,7 @@ export default function FunnelChart({ tableName, columns }: FunnelChartProps) {
             </option>
           ))}
         </select>
-        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/45 dark:text-slate-200">
+        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-200">
           <FlipHorizontal2 className="h-4 w-4 text-cyan-500" />
           <select value={orientation} onChange={(event) => setOrientation(event.target.value as FunnelOrientation)} className="w-full bg-transparent outline-none">
             <option value="vertical">Vertical</option>
@@ -333,9 +333,9 @@ export default function FunnelChart({ tableName, columns }: FunnelChartProps) {
       ) : null}
 
       <div className="mt-6 grid gap-5 xl:grid-cols-[1.45fr_0.8fr]">
-        <div className="rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+        <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           {stages.length === 0 ? (
-            <div className="flex min-h-[380px] items-center justify-center rounded-[1.25rem] border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex min-h-[380px] items-center justify-center rounded-lg border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
               Build the funnel to compare stage volume and conversion rates.
             </div>
           ) : (
@@ -350,7 +350,7 @@ export default function FunnelChart({ tableName, columns }: FunnelChartProps) {
           )}
         </div>
 
-        <div className="space-y-4 rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+        <div className="space-y-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Conversion ladder</p>
@@ -360,7 +360,7 @@ export default function FunnelChart({ tableName, columns }: FunnelChartProps) {
               type="button"
               onClick={() => exportChartImage(chartRef.current, dark, `${tableName}-funnel.png`)}
               disabled={stages.length === 0}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-950/65"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-950"
             >
               <Download className="h-4 w-4" />
               Export PNG
@@ -369,7 +369,7 @@ export default function FunnelChart({ tableName, columns }: FunnelChartProps) {
 
           <div className="max-h-[340px] space-y-3 overflow-y-auto pr-1">
             {stages.map((stage, index) => (
-              <div key={stage.name} className="rounded-2xl border border-white/15 bg-white/70 p-4 dark:bg-slate-950/45">
+              <div key={stage.name} className="rounded-2xl border border-white/15 bg-white p-4 dark:bg-slate-950">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -383,7 +383,7 @@ export default function FunnelChart({ tableName, columns }: FunnelChartProps) {
                     {formatNumber(stage.value)}
                   </span>
                 </div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200/70 dark:bg-slate-800/70">
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                   <div
                     className="h-full rounded-full"
                     style={{

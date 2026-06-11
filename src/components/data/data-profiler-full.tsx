@@ -94,7 +94,7 @@ interface ColumnDetailResult {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 
 function subscribeDarkMode(listener: () => void) {
   if (typeof document === "undefined") return () => undefined;
@@ -645,7 +645,7 @@ function ProfilerLoading() {
 
 function DetailLoading() {
   return (
-    <div className="flex min-h-[18rem] items-center justify-center rounded-3xl border border-white/15 bg-white/45 dark:bg-slate-950/35">
+    <div className="flex min-h-[18rem] items-center justify-center rounded-3xl border border-white/15 bg-white dark:bg-slate-950/35">
       <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-300">
         <Loader2 className="h-4 w-4 animate-spin" />
         Profiling column…
@@ -675,7 +675,7 @@ function ColumnDetailPanel({
   return (
     <div className="space-y-4">
       <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+        <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
             Distribution histogram
           </div>
@@ -689,7 +689,7 @@ function ColumnDetailPanel({
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+          <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Value lengths
             </div>
@@ -709,7 +709,7 @@ function ColumnDetailPanel({
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+          <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Recommendation
             </div>
@@ -719,7 +719,7 @@ function ColumnDetailPanel({
       </div>
 
       <div className="grid gap-4 xl:grid-cols-3">
-        <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+        <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
             Top values
           </div>
@@ -733,7 +733,7 @@ function ColumnDetailPanel({
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+        <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
             Bottom values
           </div>
@@ -747,7 +747,7 @@ function ColumnDetailPanel({
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+        <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
             Pattern detection
           </div>
@@ -824,7 +824,7 @@ function FullProfilerReady({ tableName, columns, rowCount }: DataProfilerFullPro
             <button
               type="button"
               onClick={() => void handleExport()}
-              className="rounded-2xl border border-white/20 bg-white/55 px-3 py-2 text-sm text-slate-600 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
+              className="rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-600 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
             >
               <span className="flex items-center gap-2">
                 <Download className="h-4 w-4" />
@@ -835,28 +835,28 @@ function FullProfilerReady({ tableName, columns, rowCount }: DataProfilerFullPro
         </div>
 
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+          <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               <Database className="h-3.5 w-3.5" />
               Rows
             </div>
             <div className="mt-3 text-2xl font-semibold text-slate-950 dark:text-white">{formatNumber(rowCount)}</div>
           </div>
-          <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+          <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               <BarChart3 className="h-3.5 w-3.5" />
               Columns
             </div>
             <div className="mt-3 text-2xl font-semibold text-slate-950 dark:text-white">{formatNumber(columns.length)}</div>
           </div>
-          <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+          <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               <HardDrive className="h-3.5 w-3.5" />
               Memory estimate
             </div>
             <div className="mt-3 text-2xl font-semibold text-slate-950 dark:text-white">{formatNumber(overview.memoryBytes / 1024)} KB</div>
           </div>
-          <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+          <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               <Sparkles className="h-3.5 w-3.5" />
               Quality score
@@ -874,7 +874,7 @@ function FullProfilerReady({ tableName, columns, rowCount }: DataProfilerFullPro
       >
         <div className="grid gap-4 xl:grid-cols-[0.92fr_1.08fr]">
           <div className="space-y-4">
-            <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+            <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
               <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <AlertTriangle className="h-3.5 w-3.5" />
                 Quality breakdown
@@ -890,14 +890,14 @@ function FullProfilerReady({ tableName, columns, rowCount }: DataProfilerFullPro
                     <span>{label}</span>
                     <span>{Number(value).toFixed(1)}%</span>
                   </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-white/60 dark:bg-slate-900/80">
+                  <div className="h-2 overflow-hidden rounded-full bg-white dark:bg-slate-900">
                     <div className="h-full rounded-full bg-cyan-500" style={{ width: `${Math.max(0, Math.min(Number(value), 100))}%` }} />
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+            <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
               <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <CopyCheck className="h-3.5 w-3.5" />
                 Duplicate rows
@@ -905,7 +905,7 @@ function FullProfilerReady({ tableName, columns, rowCount }: DataProfilerFullPro
               <div className="text-3xl font-semibold text-slate-950 dark:text-white">{formatNumber(overview.duplicateRows)}</div>
             </div>
 
-            <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+            <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
               <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 Data type breakdown
               </div>
@@ -921,7 +921,7 @@ function FullProfilerReady({ tableName, columns, rowCount }: DataProfilerFullPro
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+            <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
               <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 Correlations heatmap
               </div>
@@ -934,13 +934,13 @@ function FullProfilerReady({ tableName, columns, rowCount }: DataProfilerFullPro
                   style={{ height: 340 }}
                 />
               ) : (
-                <div className="rounded-2xl border border-white/15 bg-white/55 px-4 py-6 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300">
+                <div className="rounded-2xl border border-white/15 bg-white px-4 py-6 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300">
                   Add at least two numeric columns to render the correlation matrix.
                 </div>
               )}
             </div>
 
-            <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+            <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
               <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 Missing values matrix
               </div>
@@ -963,7 +963,7 @@ function FullProfilerReady({ tableName, columns, rowCount }: DataProfilerFullPro
         className={`${PANEL_CLASS} p-5`}
       >
         <div className="grid gap-4 xl:grid-cols-[0.36fr_0.64fr]">
-          <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+          <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
             <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               <FileSearch className="h-3.5 w-3.5" />
               Column navigator
@@ -977,7 +977,7 @@ function FullProfilerReady({ tableName, columns, rowCount }: DataProfilerFullPro
                   className={`w-full rounded-2xl border px-3 py-3 text-left text-sm transition ${
                     column.name === safeSelectedColumn
                       ? "border-cyan-400/50 bg-cyan-500/15 text-cyan-700 dark:text-cyan-200"
-                      : "border-white/15 bg-white/55 text-slate-600 dark:bg-slate-950/35 dark:text-slate-300"
+                      : "border-white/15 bg-white text-slate-600 dark:bg-slate-950/35 dark:text-slate-300"
                   }`}
                 >
                   <div className="font-medium">{column.name}</div>
@@ -993,7 +993,7 @@ function FullProfilerReady({ tableName, columns, rowCount }: DataProfilerFullPro
                 <ColumnDetailPanel tableName={tableName} column={activeColumn} />
               </Suspense>
             ) : (
-              <div className="rounded-3xl border border-white/15 bg-white/45 px-4 py-6 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300">
+              <div className="rounded-3xl border border-white/15 bg-white px-4 py-6 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300">
                 No columns are available to profile.
               </div>
             )}
@@ -1013,13 +1013,13 @@ function FullProfilerReady({ tableName, columns, rowCount }: DataProfilerFullPro
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {overview.recommendations.length > 0 ? (
             overview.recommendations.map((item) => (
-              <div key={`${item.column}-${item.message}`} className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+              <div key={`${item.column}-${item.message}`} className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
                 <div className="font-semibold text-slate-950 dark:text-white">{item.column}</div>
                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{item.message}</p>
               </div>
             ))
           ) : (
-            <div className="rounded-3xl border border-white/15 bg-white/45 px-4 py-5 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300">
+            <div className="rounded-3xl border border-white/15 bg-white px-4 py-5 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300">
               No type recommendations were triggered from the current profile.
             </div>
           )}

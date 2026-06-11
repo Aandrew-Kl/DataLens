@@ -158,7 +158,7 @@ function SchedulerRow({
             className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${
               schedule.enabled
                 ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                : "bg-slate-200/70 text-slate-600 dark:bg-slate-800/70 dark:text-slate-300"
+                : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
             }`}
           >
             {schedule.enabled ? "Enabled" : "Paused"}

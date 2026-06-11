@@ -111,7 +111,7 @@ function KeyCombo({ keys, isMac }: { keys: string[]; isMac: boolean }) {
               +
             </span>
           )}
-          <kbd className="min-w-9 rounded-lg border border-white/60 bg-white/70 px-2.5 py-1.5 text-center text-xs font-semibold text-slate-700 shadow-sm backdrop-blur dark:border-slate-700/70 dark:bg-slate-950/70 dark:text-slate-200">
+          <kbd className="min-w-9 rounded-lg border border-white/60 bg-white px-2.5 py-1.5 text-center text-xs font-semibold text-slate-700 shadow-sm dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-200">
             {getKeyLabel(key, isMac)}
           </kbd>
         </div>
@@ -177,7 +177,7 @@ export default function KeyboardShortcutsDialog({
           <motion.button
             type="button"
             aria-label="Close keyboard shortcuts dialog"
-            className="absolute inset-0 bg-slate-950/55 backdrop-blur-md"
+            className="absolute inset-0 bg-slate-950/60 "
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -188,7 +188,7 @@ export default function KeyboardShortcutsDialog({
             role="dialog"
             aria-modal="true"
             aria-labelledby="keyboard-shortcuts-title"
-            className="relative w-full max-w-4xl overflow-hidden rounded-[28px] border border-white/30 bg-white/75 shadow-[0_30px_120px_-48px_rgba(15,23,42,0.9)] backdrop-blur-2xl dark:border-slate-700/70 dark:bg-slate-900/80"
+            className="relative w-full max-w-4xl overflow-hidden rounded-lg border border-white/30 bg-white shadow-sm dark:border-slate-700/70 dark:bg-slate-900"
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.96 }}
@@ -221,7 +221,7 @@ export default function KeyboardShortcutsDialog({
                   ref={closeButtonRef}
                   type="button"
                   onClick={onClose}
-                  className="rounded-2xl border border-slate-200/80 bg-white/70 p-2.5 text-slate-500 shadow-sm transition-colors hover:text-slate-900 dark:border-slate-700/70 dark:bg-slate-950/60 dark:text-slate-400 dark:hover:text-white"
+                  className="rounded-2xl border border-slate-200/80 bg-white p-2.5 text-slate-500 shadow-sm transition-colors hover:text-slate-900 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-400 dark:hover:text-white"
                   aria-label="Close dialog"
                 >
                   <X className="h-4 w-4" />
@@ -236,7 +236,7 @@ export default function KeyboardShortcutsDialog({
                 return (
                   <motion.section
                     key={section.title}
-                    className="rounded-[24px] border border-slate-200/70 bg-white/70 p-5 shadow-[0_18px_50px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl dark:border-slate-700/70 dark:bg-slate-950/55"
+                    className="rounded-lg border border-slate-200/70 bg-white p-5 shadow-sm dark:border-slate-700/70 dark:bg-slate-950"
                     initial={{ opacity: 0, y: 18 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.24, delay: index * 0.08 }}
@@ -260,7 +260,7 @@ export default function KeyboardShortcutsDialog({
                       {section.shortcuts.map((shortcut) => (
                         <div
                           key={`${section.title}-${shortcut.description}`}
-                          className="grid grid-cols-[auto,1fr] items-center gap-3 rounded-2xl border border-slate-200/70 bg-slate-50/70 px-3.5 py-3 dark:border-slate-700/70 dark:bg-slate-900/70"
+                          className="grid grid-cols-[auto,1fr] items-center gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 px-3.5 py-3 dark:border-slate-700/70 dark:bg-slate-900"
                         >
                           <KeyCombo keys={shortcut.keys} isMac={isMac} />
                           <p className="text-sm font-medium text-slate-700 dark:text-slate-200">

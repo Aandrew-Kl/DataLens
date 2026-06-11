@@ -372,12 +372,12 @@ function AnomalyFallback() {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div className={`${GLASS_CARD_CLASS} animate-pulse p-5`}>
-        <div className="h-5 w-36 rounded-full bg-slate-200/80 dark:bg-slate-800/80" />
-        <div className="mt-4 h-28 rounded-3xl bg-slate-200/70 dark:bg-slate-800/70" />
+        <div className="h-5 w-36 rounded-full bg-slate-200 dark:bg-slate-800" />
+        <div className="mt-4 h-28 rounded-3xl bg-slate-200 dark:bg-slate-800" />
       </div>
       <div className={`${GLASS_CARD_CLASS} animate-pulse p-5`}>
-        <div className="h-5 w-36 rounded-full bg-slate-200/80 dark:bg-slate-800/80" />
-        <div className="mt-4 h-28 rounded-3xl bg-slate-200/70 dark:bg-slate-800/70" />
+        <div className="h-5 w-36 rounded-full bg-slate-200 dark:bg-slate-800" />
+        <div className="mt-4 h-28 rounded-3xl bg-slate-200 dark:bg-slate-800" />
       </div>
     </div>
   );
@@ -452,14 +452,14 @@ function AnomalyBody({
                 </div>
               </div>
 
-              <div className="mt-4 rounded-3xl border border-white/20 bg-white/60 p-4 dark:bg-slate-950/30">
+              <div className="mt-4 rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/30">
                 <p className="text-sm leading-7 text-slate-700 dark:text-slate-200">
                   {card.explanation}
                 </p>
               </div>
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-3xl border border-white/20 bg-white/60 p-4 dark:bg-slate-950/30">
+                <div className="rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/30">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Fence distance
                   </p>
@@ -468,7 +468,7 @@ function AnomalyBody({
                   </p>
                 </div>
 
-                <div className="rounded-3xl border border-white/20 bg-white/60 p-4 dark:bg-slate-950/30">
+                <div className="rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/30">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Explanation source
                   </p>
@@ -478,7 +478,7 @@ function AnomalyBody({
                 </div>
               </div>
 
-              <div className="mt-4 rounded-3xl border border-white/20 bg-white/60 p-4 dark:bg-slate-950/30">
+              <div className="mt-4 rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-950/30">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Row preview
                 </p>

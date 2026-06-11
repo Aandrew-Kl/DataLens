@@ -39,9 +39,9 @@ type RunState = { tone: "error" | "info"; message: string } | null;
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const panelClass =
-  "overflow-hidden rounded-[28px] border border-white/20 bg-white/75 shadow-[0_24px_90px_-48px_rgba(15,23,42,0.75)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "overflow-hidden rounded-lg border border-white/20 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 const fieldClass =
-  "w-full rounded-2xl border border-slate-200/70 bg-white/85 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950/65 dark:text-slate-100";
+  "w-full rounded-2xl border border-slate-200/70 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-100";
 const HISTORY_KEY = "datalens:statistical-tests";
 
 const TEST_META: Record<TestType, { label: string; hint: string }> = {
@@ -102,10 +102,10 @@ function ResultCards({ result }: { result: TestResult }) {
   return (
     <>
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        {cards.map((card) => <div key={card.label} className="rounded-2xl border border-white/25 bg-white/70 p-4 dark:border-white/10 dark:bg-slate-950/40"><div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400"><card.icon className="h-3.5 w-3.5" />{card.label}</div><p className="mt-3 text-xl font-semibold text-slate-900 dark:text-white">{card.value}</p></div>)}
+        {cards.map((card) => <div key={card.label} className="rounded-2xl border border-white/25 bg-white p-4 dark:border-white/10 dark:bg-slate-950"><div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400"><card.icon className="h-3.5 w-3.5" />{card.label}</div><p className="mt-3 text-xl font-semibold text-slate-900 dark:text-white">{card.value}</p></div>)}
       </div>
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        {result.details.map((detail) => <div key={detail.label} className="rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/30"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{detail.label}</p><p className="mt-2 text-sm font-medium text-slate-900 dark:text-white">{detail.value}</p></div>)}
+        {result.details.map((detail) => <div key={detail.label} className="rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/30"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{detail.label}</p><p className="mt-2 text-sm font-medium text-slate-900 dark:text-white">{detail.value}</p></div>)}
       </div>
     </>
   );
@@ -122,7 +122,7 @@ function ParameterSummary({
     <div className="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-900 dark:text-cyan-200">
       <p className="font-semibold">{title}</p>
       <div className="mt-2 flex flex-wrap gap-2">
-        {items.filter(Boolean).map((item) => <span key={item} className="rounded-full bg-white/65 px-2.5 py-1 text-xs font-medium text-cyan-800 dark:bg-slate-950/45 dark:text-cyan-200">{item}</span>)}
+        {items.filter(Boolean).map((item) => <span key={item} className="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-cyan-800 dark:bg-slate-950 dark:text-cyan-200">{item}</span>)}
       </div>
     </div>
   );
@@ -139,7 +139,7 @@ function TestChecklist({ type }: { type: TestType }) {
           : ["Works with exactly two groups", "Numeric measure required", "Confidence interval is shown for the mean gap"];
 
   return (
-    <div className="rounded-2xl border border-slate-200/70 bg-slate-50/80 px-4 py-4 dark:border-slate-800 dark:bg-slate-900/25">
+    <div className="rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-4 dark:border-slate-800 dark:bg-slate-900/25">
       <p className="text-sm font-semibold text-slate-900 dark:text-white">Before you run</p>
       <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
         {tips.map((tip) => <li key={tip}>{tip}</li>)}
@@ -150,7 +150,7 @@ function TestChecklist({ type }: { type: TestType }) {
 
 function EmptyResultState() {
   return (
-    <div className="rounded-[26px] border border-dashed border-slate-300/80 bg-slate-50/80 p-8 text-center dark:border-slate-700 dark:bg-slate-950/30">
+    <div className="rounded-lg border border-dashed border-slate-300/80 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-950/30">
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
         <FlaskConical className="h-5 w-5" />
       </div>
@@ -169,7 +169,7 @@ function AnalysisNotes() {
   ];
 
   return (
-    <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/70 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+    <div className="rounded-lg border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/35">
       <p className="text-sm font-semibold text-slate-900 dark:text-white">How to read the output</p>
       <div className="mt-3 space-y-3">
         {notes.map((note, index) => (
@@ -185,7 +185,7 @@ function AnalysisNotes() {
 
 function CaveatsCard() {
   return (
-    <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+    <div className="rounded-lg border border-slate-200/70 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
       <p className="text-sm font-semibold text-slate-900 dark:text-white">Interpretation caveats</p>
       <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
         <li>Large samples can make tiny differences look significant, so always read the effect size alongside the p-value.</li>
@@ -199,7 +199,7 @@ function CaveatsCard() {
 
 function ResultLegend() {
   return (
-    <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/70 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+    <div className="rounded-lg border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/35">
       <p className="text-sm font-semibold text-slate-900 dark:text-white">Result legend</p>
       <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">Green badges highlight tests where the selected confidence threshold was met. Amber badges mean the observed signal was too weak for the current settings or sample.</p>
     </div>
@@ -318,10 +318,10 @@ export default function StatisticalTests({ tableName, columns, rowCount }: Stati
       <div className="grid gap-6 px-6 py-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-5">
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {(Object.keys(TEST_META) as TestType[]).map((type) => <button key={type} type="button" onClick={() => setTestType(type)} className={`rounded-3xl border p-4 text-left transition ${testType === type ? "border-cyan-400/50 bg-cyan-500/10 text-cyan-800 dark:border-cyan-500/35 dark:bg-cyan-500/10 dark:text-cyan-200" : "border-slate-200/70 bg-white/65 text-slate-700 hover:border-slate-300 dark:border-slate-700/70 dark:bg-slate-950/35 dark:text-slate-200 dark:hover:border-slate-600"}`}><p className="text-sm font-semibold">{TEST_META[type].label}</p><p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{TEST_META[type].hint}</p></button>)}
+            {(Object.keys(TEST_META) as TestType[]).map((type) => <button key={type} type="button" onClick={() => setTestType(type)} className={`rounded-3xl border p-4 text-left transition ${testType === type ? "border-cyan-400/50 bg-cyan-500/10 text-cyan-800 dark:border-cyan-500/35 dark:bg-cyan-500/10 dark:text-cyan-200" : "border-slate-200/70 bg-white text-slate-700 hover:border-slate-300 dark:border-slate-700/70 dark:bg-slate-950/35 dark:text-slate-200 dark:hover:border-slate-600"}`}><p className="text-sm font-semibold">{TEST_META[type].label}</p><p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{TEST_META[type].hint}</p></button>)}
           </div>
 
-          <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800/80 dark:bg-slate-950/40">
+          <div className="rounded-lg border border-slate-200/70 bg-white p-5 dark:border-slate-800/80 dark:bg-slate-950">
             {(testType === "t-test" || testType === "mann-whitney" || testType === "kolmogorov-smirnov") && (
               <div className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
@@ -365,7 +365,7 @@ export default function StatisticalTests({ tableName, columns, rowCount }: Stati
 
           <AnimatePresence mode="wait">
             {result && (
-              <motion.div key={result.id} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.28, ease }} className="space-y-4 rounded-[26px] border border-slate-200/70 bg-gradient-to-br from-white/75 to-slate-100/55 p-5 dark:border-slate-800 dark:from-slate-950/60 dark:to-slate-900/35">
+              <motion.div key={result.id} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.28, ease }} className="space-y-4 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white/75 to-slate-100/55 p-5 dark:border-slate-800 dark:from-slate-950/60 dark:to-slate-900/35">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                   <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{TEST_META[result.type].label}</p><h3 className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">{result.title}</h3><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{result.interpretation}</p></div>
                   <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium ${result.significant ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-amber-500/10 text-amber-700 dark:text-amber-300"}`}>{result.significant ? <CheckCircle2 className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}{result.significant ? "Signal detected" : "No strong signal"}</div>
@@ -378,14 +378,14 @@ export default function StatisticalTests({ tableName, columns, rowCount }: Stati
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+          <div className="rounded-lg border border-slate-200/70 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white"><History className="h-4 w-4 text-cyan-500" />Session history</div>
             <div className="mt-4 space-y-3">
-              {history.length === 0 ? <p className="text-sm text-slate-500 dark:text-slate-400">No tests have been run in this session yet.</p> : history.map((entry) => <button key={entry.id} type="button" onClick={() => setActiveResult(entry)} className="w-full rounded-2xl border border-slate-200/70 bg-white/80 p-4 text-left transition hover:border-cyan-300 dark:border-slate-800 dark:bg-slate-950/45 dark:hover:border-cyan-500/35"><div className="flex items-center justify-between gap-3"><p className="text-sm font-medium text-slate-900 dark:text-white">{entry.title}</p><span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${entry.significant ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-slate-200/70 text-slate-600 dark:bg-slate-800 dark:text-slate-300"}`}>{entry.type}</span></div><div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400"><span>{entry.statisticLabel}: {formatMetric(entry.statistic, 3)}</span><span>p: {formatPValue(entry.pValue)}</span><span>{new Date(entry.runAt).toLocaleTimeString()}</span></div></button>)}
+              {history.length === 0 ? <p className="text-sm text-slate-500 dark:text-slate-400">No tests have been run in this session yet.</p> : history.map((entry) => <button key={entry.id} type="button" onClick={() => setActiveResult(entry)} className="w-full rounded-2xl border border-slate-200/70 bg-white p-4 text-left transition hover:border-cyan-300 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-cyan-500/35"><div className="flex items-center justify-between gap-3"><p className="text-sm font-medium text-slate-900 dark:text-white">{entry.title}</p><span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${entry.significant ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300"}`}>{entry.type}</span></div><div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400"><span>{entry.statisticLabel}: {formatMetric(entry.statistic, 3)}</span><span>p: {formatPValue(entry.pValue)}</span><span>{new Date(entry.runAt).toLocaleTimeString()}</span></div></button>)}
             </div>
           </div>
 
-          <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/70 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+          <div className="rounded-lg border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/35">
             <p className="text-sm font-semibold text-slate-900 dark:text-white">Quick guidance</p>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
               <li>Use `t-test` or `Mann-Whitney U` for two-group numeric comparisons.</li>

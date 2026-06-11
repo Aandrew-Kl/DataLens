@@ -38,7 +38,7 @@ interface Settings {
 const DEFAULT_SETTINGS: Settings = {
   ollamaUrl: "http://localhost:11434",
   ollamaModel: "llama3.2",
-  theme: "system",
+  theme: "light",
   compact: false,
   pageSize: 25,
   autoDashboard: true,
@@ -245,7 +245,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 "
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -257,8 +257,8 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             className="
               relative w-full max-w-lg max-h-[85vh]
               rounded-2xl
-              bg-white/90 dark:bg-gray-900/90
-              backdrop-blur-xl
+              bg-white dark:bg-gray-900
+              
               border border-gray-200/50 dark:border-gray-700/50
               shadow-xl
               flex flex-col
@@ -507,7 +507,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                       className={`
                         flex items-center justify-between px-3 py-2.5
                         ${i !== SHORTCUTS.length - 1 ? "border-b border-gray-100 dark:border-gray-800" : ""}
-                        ${i % 2 === 0 ? "bg-gray-50/50 dark:bg-gray-800/30" : ""}
+                        ${i % 2 === 0 ? "bg-gray-50 dark:bg-gray-800/30" : ""}
                       `}
                     >
                       <span className="text-xs text-gray-600 dark:text-gray-400">
@@ -542,7 +542,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               <section>
                 <SectionHeader icon={Info} label="About" />
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between rounded-lg border border-gray-200/60 bg-white/70 px-4 py-3 dark:border-gray-700/50 dark:bg-gray-800/40">
+                  <div className="flex items-center justify-between rounded-lg border border-gray-200/60 bg-white px-4 py-3 dark:border-gray-700/50 dark:bg-gray-800">
                     <div>
                       <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                         Replay welcome tour
@@ -562,7 +562,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                       Show tour
                     </button>
                   </div>
-                  <div className="rounded-lg bg-gray-50 dark:bg-gray-800/60 px-4 py-3 space-y-2">
+                  <div className="rounded-lg bg-gray-50 dark:bg-gray-800 px-4 py-3 space-y-2">
                     <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                       DataLens
                     </p>

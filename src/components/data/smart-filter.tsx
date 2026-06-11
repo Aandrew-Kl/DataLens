@@ -440,7 +440,7 @@ function RuleEditor({
                 valueTo: "",
               });
             }}
-            className="w-full rounded-2xl border border-white/10 bg-white/60 px-3 py-2.5 outline-none dark:bg-slate-950/50"
+            className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2.5 outline-none dark:bg-slate-950"
           >
             {columns.map((column) => (
               <option key={column.name} value={column.name}>
@@ -457,7 +457,7 @@ function RuleEditor({
           <select
             value={rule.operator}
             onChange={(event) => onChange({ ...rule, operator: event.target.value as RuleOperator, valueTo: "" })}
-            className="w-full rounded-2xl border border-white/10 bg-white/60 px-3 py-2.5 outline-none dark:bg-slate-950/50"
+            className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2.5 outline-none dark:bg-slate-950"
           >
             {operators.map((operator) => (
               <option key={operator} value={operator}>
@@ -481,14 +481,14 @@ function RuleEditor({
                 value={rule.value}
                 onChange={(event) => onChange({ ...rule, value: event.target.value })}
                 placeholder={activeColumn?.type === "date" ? "2026-01-01" : "Value"}
-                className="w-full rounded-2xl border border-white/10 bg-white/60 px-3 py-2.5 outline-none dark:bg-slate-950/50"
+                className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2.5 outline-none dark:bg-slate-950"
               />
               {needsRange ? (
                 <input
                   value={rule.valueTo}
                   onChange={(event) => onChange({ ...rule, valueTo: event.target.value })}
                   placeholder={activeColumn?.type === "date" ? "2026-12-31" : "To"}
-                  className="w-full rounded-2xl border border-white/10 bg-white/60 px-3 py-2.5 outline-none dark:bg-slate-950/50"
+                  className="w-full rounded-2xl border border-white/10 bg-white px-3 py-2.5 outline-none dark:bg-slate-950"
                 />
               ) : null}
             </div>
@@ -528,9 +528,9 @@ function GroupEditor({
   onRemoveNode: (nodeId: string) => void;
 }) {
   return (
-    <div className="rounded-[28px] border border-white/10 bg-white/5 p-4 dark:bg-slate-950/25">
+    <div className="rounded-lg border border-white/10 bg-white/5 p-4 dark:bg-slate-950/25">
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <div className="inline-flex rounded-full border border-white/10 bg-white/10 p-1 dark:bg-slate-950/45">
+        <div className="inline-flex rounded-full border border-white/10 bg-white/10 p-1 dark:bg-slate-950">
           {(["AND", "OR"] as const).map((value) => (
             <button
               key={value}
@@ -550,7 +550,7 @@ function GroupEditor({
         <button
           type="button"
           onClick={() => onAddRule(group.id)}
-          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 transition hover:border-cyan-400/20 dark:bg-slate-950/40 dark:text-slate-300"
+          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 transition hover:border-cyan-400/20 dark:bg-slate-950 dark:text-slate-300"
         >
           <Plus className="h-3.5 w-3.5" />
           Rule
@@ -558,7 +558,7 @@ function GroupEditor({
         <button
           type="button"
           onClick={() => onAddGroup(group.id)}
-          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 transition hover:border-cyan-400/20 dark:bg-slate-950/40 dark:text-slate-300"
+          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 transition hover:border-cyan-400/20 dark:bg-slate-950 dark:text-slate-300"
         >
           <GitBranch className="h-3.5 w-3.5" />
           Group
@@ -584,7 +584,7 @@ function GroupEditor({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.24, ease: EASE }}
-                className="rounded-[26px] border border-white/10 bg-slate-950/10 p-3 dark:bg-slate-950/20"
+                className="rounded-lg border border-white/10 bg-slate-950/10 p-3 dark:bg-slate-950/20"
               >
                 <div className="mb-3 flex justify-end">
                   <button
@@ -617,7 +617,7 @@ function GroupEditor({
 function FilterTreePreview({ group }: { group: FilterGroup }) {
   return (
     <div className="space-y-3">
-      <div className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:bg-slate-950/40 dark:text-slate-400">
+      <div className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:bg-slate-950 dark:text-slate-400">
         {group.combinator} group
       </div>
       <div className="space-y-2 pl-3">
@@ -881,7 +881,7 @@ export default function SmartFilter({ tableName, columns }: SmartFilterProps) {
   }
 
   return (
-    <section className="overflow-hidden rounded-[30px] border border-white/15 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.16),transparent_24%),linear-gradient(135deg,rgba(248,250,252,0.92),rgba(226,232,240,0.78))] shadow-[0_30px_120px_-50px_rgba(15,23,42,0.9)] dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.18),transparent_24%),linear-gradient(135deg,rgba(2,6,23,0.95),rgba(15,23,42,0.88))]">
+    <section className="overflow-hidden rounded-lg border border-white/15 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.16),transparent_24%),linear-gradient(135deg,rgba(248,250,252,0.92),rgba(226,232,240,0.78))] shadow-sm dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.18),transparent_24%),linear-gradient(135deg,rgba(2,6,23,0.95),rgba(15,23,42,0.88))]">
       <div className="border-b border-white/10 px-6 py-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
@@ -898,7 +898,7 @@ export default function SmartFilter({ tableName, columns }: SmartFilterProps) {
             </p>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-xl dark:bg-slate-950/45">
+          <div className="rounded-3xl border border-white/10 bg-white/10 px-4 py-3 dark:bg-slate-950">
             <div className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Preview rows</div>
             <div className="mt-2 flex items-center gap-2 text-xl font-semibold text-slate-950 dark:text-slate-50">
               {busy ? <Loader2 className="h-4 w-4 animate-spin text-sky-500" /> : null}
@@ -910,7 +910,7 @@ export default function SmartFilter({ tableName, columns }: SmartFilterProps) {
 
       <div className="grid gap-5 px-6 py-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-5">
-          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45">
+          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 dark:border-white/10 dark:bg-slate-950">
             <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100">
               <Wand2 className="h-4 w-4 text-sky-600 dark:text-sky-300" />
               Natural language parser
@@ -921,7 +921,7 @@ export default function SmartFilter({ tableName, columns }: SmartFilterProps) {
               onChange={(event) => setNaturalLanguage(event.target.value)}
               rows={4}
               placeholder="revenue > 1000 AND region contains East"
-              className="w-full rounded-2xl border border-white/10 bg-white/50 px-4 py-3 text-sm outline-none transition focus:border-sky-400/30 dark:bg-slate-950/45"
+              className="w-full rounded-2xl border border-white/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-sky-400/30 dark:bg-slate-950"
             />
 
             <div className="mt-4 flex flex-wrap gap-3">
@@ -937,14 +937,14 @@ export default function SmartFilter({ tableName, columns }: SmartFilterProps) {
               <button
                 type="button"
                 onClick={savePreset}
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/15 dark:bg-slate-950/40 dark:text-slate-200"
+                className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/15 dark:bg-slate-950 dark:text-slate-200"
               >
                 <Save className="h-4 w-4" />
                 Save preset
               </button>
             </div>
 
-            <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/85 p-4 text-xs leading-6 text-cyan-200">
+            <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950 p-4 text-xs leading-6 text-cyan-200">
               {parsedLanguage.error
                 ? `-- ${parsedLanguage.error}`
                 : parsedLanguage.filter
@@ -953,7 +953,7 @@ export default function SmartFilter({ tableName, columns }: SmartFilterProps) {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45">
+          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 dark:border-white/10 dark:bg-slate-950">
             <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100">
               <Filter className="h-4 w-4 text-sky-600 dark:text-sky-300" />
               Visual builder
@@ -983,7 +983,7 @@ export default function SmartFilter({ tableName, columns }: SmartFilterProps) {
         </div>
 
         <div className="space-y-5">
-          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45">
+          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 dark:border-white/10 dark:bg-slate-950">
             <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100">
               <GitBranch className="h-4 w-4 text-sky-600 dark:text-sky-300" />
               Logic tree
@@ -991,7 +991,7 @@ export default function SmartFilter({ tableName, columns }: SmartFilterProps) {
             <FilterTreePreview group={filterTree} />
           </div>
 
-          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45">
+          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 dark:border-white/10 dark:bg-slate-950">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
                 <BarChart3 className="h-4 w-4 text-sky-600 dark:text-sky-300" />
@@ -1000,7 +1000,7 @@ export default function SmartFilter({ tableName, columns }: SmartFilterProps) {
               <select
                 value={quickColumn}
                 onChange={(event) => setQuickColumn(event.target.value)}
-                className="rounded-2xl border border-white/10 bg-white/50 px-3 py-2 text-sm outline-none dark:bg-slate-950/45"
+                className="rounded-2xl border border-white/10 bg-white px-3 py-2 text-sm outline-none dark:bg-slate-950"
               >
                 {columns.map((column) => (
                   <option key={column.name} value={column.name}>
@@ -1031,7 +1031,7 @@ export default function SmartFilter({ tableName, columns }: SmartFilterProps) {
                         <span className="font-medium text-slate-800 dark:text-slate-100">{item.label}</span>
                         <span className="text-slate-500 dark:text-slate-400">{item.count.toLocaleString()}</span>
                       </div>
-                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200/80 dark:bg-slate-800/80">
+                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                         <div className="h-full rounded-full bg-gradient-to-r from-sky-500 to-cyan-400" style={{ width }} />
                       </div>
                     </button>
@@ -1041,7 +1041,7 @@ export default function SmartFilter({ tableName, columns }: SmartFilterProps) {
             )}
           </div>
 
-          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45">
+          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 dark:border-white/10 dark:bg-slate-950">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
                 <Sparkles className="h-4 w-4 text-sky-600 dark:text-sky-300" />
@@ -1051,18 +1051,18 @@ export default function SmartFilter({ tableName, columns }: SmartFilterProps) {
                 type="button"
                 onClick={() => void copyWhereClause()}
                 disabled={!whereClause}
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 disabled:opacity-50 dark:bg-slate-950/40 dark:text-slate-300"
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 disabled:opacity-50 dark:bg-slate-950 dark:text-slate-300"
               >
                 <Copy className="h-3.5 w-3.5" />
                 Copy WHERE
               </button>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/85 p-4 text-xs leading-6 text-cyan-200">
+            <div className="rounded-2xl border border-white/10 bg-slate-950 p-4 text-xs leading-6 text-cyan-200">
               {whereClause || "-- Add valid filter rules to build a WHERE clause."}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45">
+          <div className="rounded-3xl border border-white/15 bg-white/10 p-5 dark:border-white/10 dark:bg-slate-950">
             <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100">
               <Save className="h-4 w-4 text-sky-600 dark:text-sky-300" />
               Saved presets

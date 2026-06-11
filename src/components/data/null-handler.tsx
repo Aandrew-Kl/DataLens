@@ -62,10 +62,10 @@ function buildTransformSql(tableName: string, columns: ColumnProfile[], configs:
       if (config.action === "custom") return `COALESCE(${field}, ${customSql(column.type, config.customValue)}) AS ${field}`;
       return `COALESCE(${field}, MAX(${field}) OVER (PARTITION BY ${quote(forwardMap.get(column.name) ?? "__nh_ff")})) AS ${field}`;
     })
-    .join(",\n      ");
+    .join(",\n ");
   const windowFields = forward
     .map((column, index) => `SUM(CASE WHEN ${quote(column.name)} IS NOT NULL THEN 1 ELSE 0 END) OVER (ORDER BY __nh_row_id) AS ${quote(`__nh_ff_${index}`)}`)
-    .join(",\n      ");
+    .join(",\n ");
   return `
     WITH base AS (
       SELECT *, ROW_NUMBER() OVER () AS __nh_row_id
@@ -89,7 +89,7 @@ function buildTransformSql(tableName: string, columns: ColumnProfile[], configs:
 }
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-gray-200/80 bg-gray-50/80 p-4 dark:border-gray-800/80 dark:bg-gray-900/40">
+    <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-4 dark:border-gray-800/80 dark:bg-gray-900">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">{label}</p>
       <p className="mt-2 text-2xl font-semibold text-gray-900 dark:text-gray-100">{value}</p>
     </div>
@@ -147,8 +147,8 @@ export default function NullHandler({ tableName, columns, onComplete }: NullHand
     setPreviewLoading(true);
     setStatus(null);
     try {
-      const nullClauses = missingColumns.map((column, index) => `COUNT(*) FILTER (WHERE ${quote(column.name)} IS NULL) AS "n${index}"`).join(",\n          ");
-      const summarySql = `SELECT COUNT(*) AS row_count${nullClauses ? `,\n          ${nullClauses}` : ""} FROM (${transformSql}) AS transformed`;
+      const nullClauses = missingColumns.map((column, index) => `COUNT(*) FILTER (WHERE ${quote(column.name)} IS NULL) AS "n${index}"`).join(",\n ");
+      const summarySql = `SELECT COUNT(*) AS row_count${nullClauses ? `,\n ${nullClauses}` : ""} FROM (${transformSql}) AS transformed`;
       const [summaryRows, rows] = await Promise.all([runQuery(summarySql), runQuery(`SELECT * FROM (${transformSql}) AS transformed LIMIT ${PREVIEW_LIMIT}`)]);
       const summary = summaryRows[0] ?? {};
       const unresolved = missingColumns.reduce((sum, _column, index) => sum + Number(summary[`n${index}`] ?? 0), 0);
@@ -202,7 +202,7 @@ export default function NullHandler({ tableName, columns, onComplete }: NullHand
   }
   if (!missingColumns.length) {
     return (
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-emerald-500/20 bg-white/85 p-6 shadow-sm backdrop-blur-sm dark:border-emerald-400/20 dark:bg-gray-950/50">
+      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-emerald-500/20 bg-white p-6 shadow-sm dark:border-emerald-400/20 dark:bg-gray-950">
         <div className="flex items-start gap-3">
           <CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-500" />
           <div>
@@ -218,7 +218,7 @@ export default function NullHandler({ tableName, columns, onComplete }: NullHand
     );
   }
   return (
-    <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.24, ease: "easeOut" }} className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white/85 shadow-sm backdrop-blur-sm dark:border-gray-800/80 dark:bg-gray-950/45">
+    <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.24, ease: "easeOut" }} className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white shadow-sm dark:border-gray-800/80 dark:bg-gray-950">
       <div className="border-b border-gray-200/70 px-6 py-5 dark:border-gray-800/80">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -254,7 +254,7 @@ export default function NullHandler({ tableName, columns, onComplete }: NullHand
             const config = configs[column.name] ?? { action: defaultAction(column.type), customValue: "" };
             const percentage = rowCount > 0 ? (column.nullCount / rowCount) * 100 : 0;
             return (
-              <motion.div key={column.name} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03, duration: 0.18 }} className="rounded-2xl border border-gray-200/80 bg-gray-50/80 p-4 dark:border-gray-800/80 dark:bg-gray-900/35">
+              <motion.div key={column.name} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03, duration: 0.18 }} className="rounded-2xl border border-gray-200/80 bg-gray-50 p-4 dark:border-gray-800/80 dark:bg-gray-900/35">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{column.name}</p>
@@ -290,7 +290,7 @@ export default function NullHandler({ tableName, columns, onComplete }: NullHand
             );
           })}
         </div>
-        <div className="rounded-2xl border border-gray-200/80 bg-gray-50/80 p-4 dark:border-gray-800/80 dark:bg-gray-900/35">
+        <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-4 dark:border-gray-800/80 dark:bg-gray-900/35">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100"><Sparkles className="h-4 w-4 text-cyan-500" />Preview result</p>
@@ -313,12 +313,12 @@ export default function NullHandler({ tableName, columns, onComplete }: NullHand
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-                  <thead className="bg-gray-100/80 dark:bg-gray-900/80">
+                  <thead className="bg-gray-100 dark:bg-gray-900">
                     <tr>{columns.map((column) => <th key={column.name} className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{column.name}</th>)}</tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                     {previewRows.map((row, rowIndex) => (
-                      <tr key={rowIndex} className="bg-white/80 dark:bg-gray-950/40">
+                      <tr key={rowIndex} className="bg-white dark:bg-gray-950">
                         {columns.map((column) => <td key={column.name} className="max-w-[180px] truncate px-3 py-2 text-sm text-gray-700 dark:text-gray-200">{cellText(row[column.name])}</td>)}
                       </tr>
                     ))}

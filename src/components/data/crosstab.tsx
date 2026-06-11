@@ -110,7 +110,7 @@ export default function CrossTabulation({ tableName, columns }: CrossTabProps) {
           )
           SELECT
             row_key,
-            ${aliases.map(({ label, alias }) => `SUM(CASE WHEN col_key = ${quoteText(label)} THEN cell_count ELSE 0 END) AS ${quoteId(alias)}`).join(",\n            ")},
+            ${aliases.map(({ label, alias }) => `SUM(CASE WHEN col_key = ${quoteText(label)} THEN cell_count ELSE 0 END) AS ${quoteId(alias)}`).join(",\n ")},
             SUM(cell_count) AS "__row_total__"
           FROM counts
           GROUP BY 1
@@ -188,7 +188,7 @@ export default function CrossTabulation({ tableName, columns }: CrossTabProps) {
 
   if (eligibleColumns.length < 2) {
     return (
-      <section className="rounded-[26px] border border-gray-200/70 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-gray-700/70 dark:bg-gray-900/60">
+      <section className="rounded-lg border border-gray-200/70 bg-white p-6 shadow-sm dark:border-gray-700/70 dark:bg-gray-900">
         <div className="flex items-start gap-3 text-sm text-gray-600 dark:text-gray-300">
           <AlertCircle className="mt-0.5 h-5 w-5 text-amber-500" />
           <div>
@@ -206,7 +206,7 @@ export default function CrossTabulation({ tableName, columns }: CrossTabProps) {
     : "border-emerald-300/60 text-emerald-700 dark:border-emerald-500/40 dark:text-emerald-300";
 
   return (
-    <section className="overflow-hidden rounded-[28px] border border-gray-200/70 bg-white/85 shadow-[0_20px_70px_-40px_rgba(15,23,42,0.55)] backdrop-blur dark:border-gray-700/70 dark:bg-gray-900/65">
+    <section className="overflow-hidden rounded-lg border border-gray-200/70 bg-white shadow-sm dark:border-gray-700/70 dark:bg-gray-900">
       <div className="border-b border-gray-200/70 p-6 dark:border-gray-700/70">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -226,19 +226,19 @@ export default function CrossTabulation({ tableName, columns }: CrossTabProps) {
         </div>
 
         <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
-          <label className="rounded-2xl border border-gray-200/70 bg-white px-3 py-3 dark:border-gray-700/70 dark:bg-gray-950/40">
+          <label className="rounded-2xl border border-gray-200/70 bg-white px-3 py-3 dark:border-gray-700/70 dark:bg-gray-950">
             <span className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400"><Rows3 className="h-3.5 w-3.5" /> Row variable</span>
             <select value={rowDim} onChange={(event) => setRowDim(event.target.value)} className="w-full bg-transparent text-sm text-gray-900 outline-none dark:text-gray-100">
               {eligibleColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
             </select>
           </label>
-          <label className="rounded-2xl border border-gray-200/70 bg-white px-3 py-3 dark:border-gray-700/70 dark:bg-gray-950/40">
+          <label className="rounded-2xl border border-gray-200/70 bg-white px-3 py-3 dark:border-gray-700/70 dark:bg-gray-950">
             <span className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400"><Columns3 className="h-3.5 w-3.5" /> Column variable</span>
             <select value={colDim} onChange={(event) => setColDim(event.target.value)} className="w-full bg-transparent text-sm text-gray-900 outline-none dark:text-gray-100">
               {eligibleColumns.map((column) => <option key={column.name} value={column.name} disabled={column.name === rowDim}>{column.name}</option>)}
             </select>
           </label>
-          <div className="rounded-2xl border border-gray-200/70 bg-gray-50/80 p-1 dark:border-gray-700/70 dark:bg-gray-950/45">
+          <div className="rounded-2xl border border-gray-200/70 bg-gray-50 p-1 dark:border-gray-700/70 dark:bg-gray-950">
             <div className="mb-2 flex items-center gap-2 px-3 pt-2 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400"><BadgePercent className="h-3.5 w-3.5" /> View</div>
             <div className="flex flex-wrap gap-1">
               {DISPLAY_MODES.map((option) => (
@@ -266,7 +266,7 @@ export default function CrossTabulation({ tableName, columns }: CrossTabProps) {
 
       <div className="relative p-6">
         {loading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-sm dark:bg-gray-950/70">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white dark:bg-gray-950/60">
             <Loader2 className="h-5 w-5 animate-spin text-sky-500" />
           </div>
         )}
@@ -277,16 +277,16 @@ export default function CrossTabulation({ tableName, columns }: CrossTabProps) {
               {error}
             </motion.div>
           ) : data ? (
-            <motion.div key={`${rowDim}-${colDim}-${mode}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="overflow-hidden rounded-[24px] border border-gray-200/70 dark:border-gray-700/70">
+            <motion.div key={`${rowDim}-${colDim}-${mode}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="overflow-hidden rounded-lg border border-gray-200/70 dark:border-gray-700/70">
               <div className="max-h-[32rem] overflow-auto">
                 <table className="min-w-full border-separate border-spacing-0 text-sm">
-                  <thead className="sticky top-0 z-[1] bg-gray-50/95 backdrop-blur dark:bg-gray-950/95">
+                  <thead className="sticky top-0 z-[1] bg-gray-50 dark:bg-gray-950">
                     <tr>
-                      <th className="sticky left-0 z-[2] border-b border-r border-gray-200/70 bg-gray-50/95 px-4 py-3 text-left font-semibold text-gray-700 dark:border-gray-700/70 dark:bg-gray-950/95 dark:text-gray-200">{rowDim}</th>
+                      <th className="sticky left-0 z-[2] border-b border-r border-gray-200/70 bg-gray-50 px-4 py-3 text-left font-semibold text-gray-700 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-200">{rowDim}</th>
                       {data.colKeys.map((colKey) => (
                         <th key={colKey} className="border-b border-gray-200/70 px-3 py-3 text-center font-semibold text-gray-700 dark:border-gray-700/70 dark:text-gray-200">{colKey}</th>
                       ))}
-                      <th className="border-b border-l border-gray-200/70 bg-gray-50/95 px-4 py-3 text-right font-semibold text-gray-700 dark:border-gray-700/70 dark:bg-gray-950/95 dark:text-gray-200">Row total</th>
+                      <th className="border-b border-l border-gray-200/70 bg-gray-50 px-4 py-3 text-right font-semibold text-gray-700 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-200">Row total</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -294,7 +294,7 @@ export default function CrossTabulation({ tableName, columns }: CrossTabProps) {
                       const rowTotal = data.rowTotals.get(rowKey) ?? 0;
                       return (
                         <tr key={rowKey}>
-                          <th className="sticky left-0 border-b border-r border-gray-200/70 bg-white/95 px-4 py-3 text-left font-medium text-gray-700 dark:border-gray-700/70 dark:bg-gray-900/95 dark:text-gray-200">{rowKey}</th>
+                          <th className="sticky left-0 border-b border-r border-gray-200/70 bg-white px-4 py-3 text-left font-medium text-gray-700 dark:border-gray-700/70 dark:bg-gray-900 dark:text-gray-200">{rowKey}</th>
                           {data.colKeys.map((colKey) => {
                             const count = data.grid.get(gridKey(rowKey, colKey)) ?? 0;
                             const colTotal = data.colTotals.get(colKey) ?? 0;
@@ -307,7 +307,7 @@ export default function CrossTabulation({ tableName, columns }: CrossTabProps) {
                               </td>
                             );
                           })}
-                          <td className="border-b border-l border-gray-200/70 bg-gray-50/60 px-4 py-2 text-right dark:border-gray-700/70 dark:bg-gray-950/35">
+                          <td className="border-b border-l border-gray-200/70 bg-gray-50 px-4 py-2 text-right dark:border-gray-700/70 dark:bg-gray-950/35">
                             <div className="font-semibold text-gray-900 dark:text-gray-100">{formatNumber(rowTotal)}</div>
                             <div className="text-[11px] text-gray-500 dark:text-gray-400">{formatPct(data.grandTotal ? (rowTotal / data.grandTotal) * 100 : 0)}</div>
                           </td>
@@ -315,9 +315,9 @@ export default function CrossTabulation({ tableName, columns }: CrossTabProps) {
                       );
                     })}
                   </tbody>
-                  <tfoot className="sticky bottom-0 bg-gray-50/95 backdrop-blur dark:bg-gray-950/95">
+                  <tfoot className="sticky bottom-0 bg-gray-50 dark:bg-gray-950">
                     <tr>
-                      <th className="sticky left-0 border-r border-t border-gray-200/70 bg-gray-50/95 px-4 py-3 text-left font-semibold text-gray-700 dark:border-gray-700/70 dark:bg-gray-950/95 dark:text-gray-200">Column total</th>
+                      <th className="sticky left-0 border-r border-t border-gray-200/70 bg-gray-50 px-4 py-3 text-left font-semibold text-gray-700 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-200">Column total</th>
                       {data.colKeys.map((colKey) => {
                         const total = data.colTotals.get(colKey) ?? 0;
                         return (
@@ -327,7 +327,7 @@ export default function CrossTabulation({ tableName, columns }: CrossTabProps) {
                           </td>
                         );
                       })}
-                      <td className="border-l border-t border-gray-200/70 bg-gray-50/95 px-4 py-3 text-right font-semibold text-gray-900 dark:border-gray-700/70 dark:bg-gray-950/95 dark:text-gray-100">{formatNumber(data.grandTotal)}</td>
+                      <td className="border-l border-t border-gray-200/70 bg-gray-50 px-4 py-3 text-right font-semibold text-gray-900 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-100">{formatNumber(data.grandTotal)}</td>
                     </tr>
                   </tfoot>
                 </table>

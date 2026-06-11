@@ -40,7 +40,7 @@ export default function FeatureShowcase({
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + index * 0.08 }}
-              className="rounded-xl border border-slate-200/60 dark:border-slate-700/50 bg-white/60 dark:bg-gray-900/40 backdrop-blur-sm p-5 space-y-2"
+              className="rounded-xl border border-slate-200/60 dark:border-slate-700/50 bg-white dark:bg-gray-900 p-5 space-y-2"
             >
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">

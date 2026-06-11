@@ -10,7 +10,7 @@ import { useDatasetStore } from "@/stores/dataset-store";
 import type { ColumnProfile, ColumnType } from "@/types/dataset";
 
 const EMPTY_PREVIEW_ROWS: Array<Record<string, unknown>> = [];
-const GLASS = "rounded-2xl border border-white/20 bg-white/60 backdrop-blur-xl dark:bg-slate-900/60";
+const GLASS = "rounded-2xl border border-white/20 bg-white dark:bg-slate-900";
 const FILTERS = ["all", "string", "number", "date", "boolean", "unknown"] as const;
 const MOTION = { initial: { opacity: 0, y: 18 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.3, ease: ANALYTICS_EASE } };
 const TYPE_META = {
@@ -54,7 +54,7 @@ export default function ExplorePage() {
           transition={{ duration: 0.34, delay: 0.06, ease: ANALYTICS_EASE }}
           className={`${GLASS} flex min-h-[22rem] flex-col items-center justify-center gap-4 p-8 text-center`}
         >
-          <div className="rounded-2xl border border-white/20 bg-white/70 p-4 dark:bg-slate-950/50"><FileSearch className="h-8 w-8 text-cyan-600 dark:text-cyan-300" /></div>
+          <div className="rounded-2xl border border-white/20 bg-white p-4 dark:bg-slate-950"><FileSearch className="h-8 w-8 text-cyan-600 dark:text-cyan-300" /></div>
           <div className="space-y-2">
             <h2 className="text-xl font-semibold text-slate-900 dark:text-white">No dataset loaded</h2>
             <p className="max-w-xl text-sm text-slate-600 dark:text-slate-300">Select a dataset from the workspace sidebar to load an explorable table.</p>
@@ -90,9 +90,9 @@ export default function ExplorePage() {
             <p className="text-2xl font-semibold text-slate-900 dark:text-white">{activeDataset.fileName}</p>
             <p className="text-sm text-slate-600 dark:text-slate-300">Browse the active dataset with searchable column statistics and a preview table.</p>
             <div className="flex flex-wrap gap-2 text-xs text-slate-600 dark:text-slate-300">
-              <span className="rounded-full border border-white/20 bg-white/55 px-3 py-1.5 dark:bg-slate-950/45">{formatNumber(activeDataset.rowCount)} rows</span>
-              <span className="rounded-full border border-white/20 bg-white/55 px-3 py-1.5 dark:bg-slate-950/45">{formatNumber(activeDataset.columnCount)} columns</span>
-              <span className="rounded-full border border-white/20 bg-white/55 px-3 py-1.5 dark:bg-slate-950/45">Uploaded {formatRelativeTime(activeDataset.uploadedAt)}</span>
+              <span className="rounded-full border border-white/20 bg-white px-3 py-1.5 dark:bg-slate-950">{formatNumber(activeDataset.rowCount)} rows</span>
+              <span className="rounded-full border border-white/20 bg-white px-3 py-1.5 dark:bg-slate-950">{formatNumber(activeDataset.columnCount)} columns</span>
+              <span className="rounded-full border border-white/20 bg-white px-3 py-1.5 dark:bg-slate-950">Uploaded {formatRelativeTime(activeDataset.uploadedAt)}</span>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -102,7 +102,7 @@ export default function ExplorePage() {
               ["Null cells", formatNumber(totalNulls)],
               ["Size", formatBytes(activeDataset.sizeBytes)],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-2xl border border-white/20 bg-white/50 px-4 py-3 dark:bg-slate-950/45">
+              <div key={label} className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-950">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{label}</p>
                 <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">{value}</p>
               </div>
@@ -122,7 +122,7 @@ export default function ExplorePage() {
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Column explorer</h2>
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Search the schema, filter by type, and inspect nulls, uniqueness, and profile stats.</p>
           </div>
-          <label className="flex w-full items-center gap-3 rounded-2xl border border-white/20 bg-white/50 px-4 py-3 text-sm text-slate-600 dark:bg-slate-950/45 dark:text-slate-300 lg:max-w-sm">
+          <label className="flex w-full items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-950 dark:text-slate-300 lg:max-w-sm">
             <Search className="h-4 w-4 text-slate-400" />
             <input
               value={columnQuery}
@@ -140,7 +140,7 @@ export default function ExplorePage() {
               type="button"
               onClick={() => startTransition(() => setActiveFilter(filter))}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                activeFilter === filter ? "border-cyan-400/40 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300" : "border-white/20 bg-white/45 text-slate-600 dark:bg-slate-950/40 dark:text-slate-300"
+                activeFilter === filter ? "border-cyan-400/40 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300" : "border-white/20 bg-white text-slate-600 dark:bg-slate-950 dark:text-slate-300"
               }`}
             >
               {filter === "all" ? "All" : TYPE_META[filter].label} · {typeCounts[filter]}
@@ -154,7 +154,7 @@ export default function ExplorePage() {
             ["Completeness", completeness],
             ["Active table", tableName],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-2xl border border-white/20 bg-white/45 px-4 py-3 dark:bg-slate-950/40">
+            <div key={label} className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-950">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{label}</p>
               <p className="mt-1 truncate text-lg font-semibold text-slate-900 dark:text-white">{value}</p>
             </div>
@@ -171,7 +171,7 @@ export default function ExplorePage() {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.24, delay: index * 0.02, ease: ANALYTICS_EASE }}
-                className="rounded-2xl border border-white/20 bg-white/45 p-4 dark:bg-slate-950/40"
+                className="rounded-2xl border border-white/20 bg-white p-4 dark:bg-slate-950"
               >
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                   <div className="min-w-0">
@@ -189,7 +189,7 @@ export default function ExplorePage() {
                       ["Null rate", nullRate],
                       ["Unique", formatNumber(column.uniqueCount)],
                     ].map(([label, value]) => (
-                      <div key={label} className="rounded-2xl border border-white/15 bg-white/55 px-3 py-2 text-center dark:bg-slate-950/45">
+                      <div key={label} className="rounded-2xl border border-white/15 bg-white px-3 py-2 text-center dark:bg-slate-950">
                         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{label}</p>
                         <p className="mt-1 font-semibold text-slate-900 dark:text-white">{value}</p>
                       </div>
@@ -215,7 +215,7 @@ export default function ExplorePage() {
         {activeDataset.columns.length > 0 ? (
           <DataPreview tableName={tableName} columns={activeDataset.columns} previewRows={EMPTY_PREVIEW_ROWS} initialPageSize={100} />
         ) : (
-          <div className="rounded-2xl border border-white/20 bg-white/45 p-5 text-sm text-slate-600 dark:bg-slate-950/40 dark:text-slate-300">
+          <div className="rounded-2xl border border-white/20 bg-white p-5 text-sm text-slate-600 dark:bg-slate-950 dark:text-slate-300">
             This dataset has no columns to display.
           </div>
         )}

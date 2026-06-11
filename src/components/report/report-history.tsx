@@ -240,7 +240,7 @@ export default function ReportHistory() {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
-              <thead className="bg-white/55 dark:bg-slate-900/55">
+              <thead className="bg-white dark:bg-slate-900">
                 <tr>
                   {[
                     { key: "reportName", label: "Report" },

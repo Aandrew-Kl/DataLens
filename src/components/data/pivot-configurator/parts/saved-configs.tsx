@@ -31,7 +31,7 @@ export function SavedConfigsPanel({
   onDelete,
 }: SavedConfigsPanelProps) {
   return (
-    <div className="rounded-[1.6rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-950/30">
+    <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/30">
       <div className="grid gap-3 md:grid-cols-[1fr_auto_auto]">
         <input
           value={configName}
@@ -42,18 +42,18 @@ export function SavedConfigsPanel({
         <button
           type="button"
           onClick={onSave}
-          className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/55 px-4 py-3 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
+          className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
         >
           <Save className="h-4 w-4" />
           Save layout
         </button>
-        <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white/55 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
+        <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={showSubtotals}
               onChange={(event) => setShowSubtotals(event.target.checked)}
-              className="h-4 w-4 rounded border-white/20 bg-white/70 text-cyan-500"
+              className="h-4 w-4 rounded border-white/20 bg-white text-cyan-500"
             />
             Subtotals
           </label>
@@ -62,7 +62,7 @@ export function SavedConfigsPanel({
               type="checkbox"
               checked={showGrandTotals}
               onChange={(event) => setShowGrandTotals(event.target.checked)}
-              className="h-4 w-4 rounded border-white/20 bg-white/70 text-cyan-500"
+              className="h-4 w-4 rounded border-white/20 bg-white text-cyan-500"
             />
             Grand totals
           </label>
@@ -77,7 +77,7 @@ export function SavedConfigsPanel({
           savedConfigs.map((config) => (
             <div
               key={config.id}
-              className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/35"
+              className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/35"
             >
               <div>
                 <div className="text-sm font-semibold text-slate-950 dark:text-white">
@@ -91,7 +91,7 @@ export function SavedConfigsPanel({
                 <button
                   type="button"
                   onClick={() => onApply(config)}
-                  className="rounded-2xl border border-white/20 bg-white/70 px-3 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-900/60 dark:text-slate-200"
+                  className="rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-900 dark:text-slate-200"
                 >
                   Load
                 </button>

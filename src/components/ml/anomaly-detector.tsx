@@ -558,7 +558,7 @@ export default function AnomalyDetector({
                   return nextMode;
                 });
               }}
-              className={`${BUTTON_CLASS} ${useBackend ? "bg-cyan-500 text-white" : "bg-white/20 text-slate-700 dark:bg-slate-900/50 dark:text-white"}`}
+              className={`${BUTTON_CLASS} ${useBackend ? "bg-cyan-500 text-white" : "bg-white/20 text-slate-700 dark:bg-slate-900 dark:text-white"}`}
             >
               {useBackend ? "Backend" : "Client"}
             </button>
@@ -638,7 +638,7 @@ export default function AnomalyDetector({
             {result && result.outliers.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
-                  <thead className="bg-white/55 dark:bg-slate-900/55">
+                  <thead className="bg-white dark:bg-slate-900">
                     <tr>
                       <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">
                         Row

@@ -299,7 +299,7 @@ export default function GeographicAnalysis({
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/40 dark:text-slate-300">
+      <div className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
         {status}
       </div>
 
@@ -381,7 +381,7 @@ export default function GeographicAnalysis({
             </div>
             {result ? (
               <table className="min-w-full text-left text-sm">
-                <thead className="bg-white/50 dark:bg-slate-950/20">
+                <thead className="bg-white dark:bg-slate-950/20">
                   <tr className="text-slate-500 dark:text-slate-400">
                     <th className="px-5 py-3 font-medium">Zone</th>
                     <th className="px-5 py-3 font-medium">Count</th>
@@ -413,7 +413,7 @@ export default function GeographicAnalysis({
             </div>
             {result ? (
               <table className="min-w-full text-left text-sm">
-                <thead className="bg-white/50 dark:bg-slate-950/20">
+                <thead className="bg-white dark:bg-slate-950/20">
                   <tr className="text-slate-500 dark:text-slate-400">
                     <th className="px-5 py-3 font-medium">Region</th>
                     <th className="px-5 py-3 font-medium">Count</th>

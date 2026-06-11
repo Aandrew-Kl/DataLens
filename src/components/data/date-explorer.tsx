@@ -612,7 +612,7 @@ function DateExplorerReady({ tableName, columns }: DateExplorerProps) {
                     result.missingDates.slice(0, 6).map((gap) => (
                       <div
                         key={gap}
-                        className="rounded-2xl border border-white/15 bg-white/50 px-4 py-3 text-sm text-slate-700 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200"
+                        className="rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200"
                       >
                         {formatIso(gap)}
                       </div>

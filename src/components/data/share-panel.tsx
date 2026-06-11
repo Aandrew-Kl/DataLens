@@ -58,12 +58,12 @@ function buildArtifacts(dataset: DatasetMeta, currentTab: string, currentSQL?: s
 
   const embedHtml = [
     "<iframe",
-    `  src="${embedUrl.toString()}"`,
-    '  title="DataLens share embed"',
-    '  width="100%"',
-    '  height="640"',
-    '  style="border: 1px solid #334155; border-radius: 18px; overflow: hidden;"',
-    '  loading="lazy"',
+    ` src="${embedUrl.toString()}"`,
+    ' title="DataLens share embed"',
+    ' width="100%"',
+    ' height="640"',
+    ' style="border: 1px solid #334155; border-radius: 18px; overflow: hidden;"',
+    ' loading="lazy"',
     "></iframe>",
   ].join("\n");
 
@@ -100,7 +100,7 @@ function ArtifactCard({ artifact, copied, onCopy, onExport }: { artifact: ShareA
   const Icon = artifact.icon;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white/75 shadow-sm dark:border-gray-700/70 dark:bg-gray-900/70">
+    <article className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white shadow-sm dark:border-gray-700/70 dark:bg-gray-900">
       <div className="flex items-start gap-3 border-b border-gray-200/70 px-4 py-4 dark:border-gray-800/80">
         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ring-1 ${artifact.tone}`}>
           <Icon className="h-4 w-4" />
@@ -118,7 +118,7 @@ function ArtifactCard({ artifact, copied, onCopy, onExport }: { artifact: ShareA
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
-      <div className="bg-gray-50/80 px-4 py-3 dark:bg-gray-950/60">
+      <div className="bg-gray-50 px-4 py-3 dark:bg-gray-950">
         <div className="mb-2 flex items-center justify-between gap-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">Preview</p>
           {artifact.fileName && artifact.mimeType ? (
@@ -201,14 +201,14 @@ export default function SharePanel({ open, onClose, dataset, currentTab, current
           <motion.button
             type="button"
             aria-label="Close share panel"
-            className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 "
             onClick={handleClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           />
           <motion.aside
-            className="relative flex h-full w-full max-w-2xl flex-col border-l border-gray-200/60 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-gray-700/60 dark:bg-gray-900/95"
+            className="relative flex h-full w-full max-w-2xl flex-col border-l border-gray-200/60 bg-white shadow-2xl dark:border-gray-700/60 dark:bg-gray-900"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -239,7 +239,7 @@ export default function SharePanel({ open, onClose, dataset, currentTab, current
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {stats.map((stat) => (
-                  <div key={stat.label} className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-3 py-3 dark:border-gray-700/70 dark:bg-gray-950/40">
+                  <div key={stat.label} className="rounded-xl border border-gray-200/70 bg-gray-50 px-3 py-3 dark:border-gray-700/70 dark:bg-gray-950">
                     <p className="text-[10px] uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{stat.label}</p>
                     <p className={`mt-2 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100 ${stat.truncate ? "truncate" : ""}`}>{stat.icon}{stat.value}</p>
                   </div>

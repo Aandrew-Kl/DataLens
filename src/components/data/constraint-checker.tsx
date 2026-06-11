@@ -330,7 +330,7 @@ export default function ConstraintChecker({
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/40 dark:text-slate-300">
+      <div className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
         {status}
       </div>
 
@@ -440,7 +440,7 @@ export default function ConstraintChecker({
                     className={`rounded-full border px-3 py-2 text-sm transition ${
                       active
                         ? "border-emerald-400 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                        : "border-white/20 bg-white/70 text-slate-700 dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-200"
+                        : "border-white/20 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200"
                     }`}
                   >
                     {column.name}

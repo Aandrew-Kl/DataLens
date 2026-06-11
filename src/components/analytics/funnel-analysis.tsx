@@ -318,7 +318,7 @@ export default function FunnelAnalysis({ tableName, columns }: FunnelAnalysisPro
                 className={`rounded-full border px-4 py-2 text-sm transition ${
                   active
                     ? "border-emerald-400/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-200"
-                    : "border-white/20 bg-white/65 text-slate-700 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200"
+                    : "border-white/20 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200"
                 }`}
               >
                 {column.name}
@@ -379,7 +379,7 @@ export default function FunnelAnalysis({ tableName, columns }: FunnelAnalysisPro
             style={{ height: 420 }}
           />
         ) : (
-          <div className="flex min-h-[20rem] items-center justify-center rounded-[1.5rem] border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
+          <div className="flex min-h-[20rem] items-center justify-center rounded-lg border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
             Choose at least two step columns, then build the funnel.
           </div>
         )}

@@ -526,13 +526,13 @@ function CrossTabulationPanel({
           <table className="min-w-full border-separate border-spacing-0 text-sm">
             <thead>
               <tr>
-                <th className="sticky left-0 z-10 rounded-l-2xl bg-white/90 px-4 py-3 text-left font-semibold text-slate-700 backdrop-blur dark:bg-slate-950/85 dark:text-slate-200">
+                <th className="sticky left-0 z-10 rounded-l-2xl bg-white px-4 py-3 text-left font-semibold text-slate-700 dark:bg-slate-950 dark:text-slate-200">
                   {rowColumn}
                 </th>
                 {result.columnKeys.map((columnKeyValue) => (
                   <th
                     key={columnKeyValue}
-                    className="bg-white/60 px-4 py-3 text-left font-semibold text-slate-700 dark:bg-slate-950/45 dark:text-slate-200"
+                    className="bg-white px-4 py-3 text-left font-semibold text-slate-700 dark:bg-slate-950 dark:text-slate-200"
                   >
                     {columnKeyValue}
                   </th>
@@ -542,7 +542,7 @@ function CrossTabulationPanel({
             <tbody>
               {result.rowKeys.map((rowKeyValue) => (
                 <tr key={rowKeyValue}>
-                  <th className="sticky left-0 z-10 border-t border-white/15 bg-white/90 px-4 py-3 text-left font-medium text-slate-800 backdrop-blur dark:bg-slate-950/85 dark:text-slate-100">
+                  <th className="sticky left-0 z-10 border-t border-white/15 bg-white px-4 py-3 text-left font-medium text-slate-800 dark:bg-slate-950 dark:text-slate-100">
                     {rowKeyValue}
                   </th>
                   {result.columnKeys.map((columnKeyValue) => {

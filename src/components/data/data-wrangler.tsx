@@ -48,7 +48,7 @@ interface DataWranglerProps {
 }
 
 const PANEL_CLASS =
-  "rounded-[1.85rem] border border-white/15 bg-white/60 shadow-[0_24px_90px_-46px_rgba(15,23,42,0.78)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/15 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 
 export default function DataWrangler({ tableName, columns }: DataWranglerProps) {
   const [workingColumns, setWorkingColumns] = useState(columns);

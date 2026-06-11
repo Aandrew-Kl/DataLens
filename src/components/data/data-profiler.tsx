@@ -148,7 +148,7 @@ function ColumnCard({
       onClick={onClick}
       className={`
         rounded-xl border border-gray-200/60 dark:border-gray-700/50
-        bg-white/80 dark:bg-gray-900/60 backdrop-blur-sm
+        bg-white dark:bg-gray-900 
         flex flex-col gap-3
         transition-all duration-200
         ${onClick ? "cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md hover:shadow-indigo-500/5" : ""}
@@ -292,7 +292,7 @@ function QualityOverview({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white/80 dark:bg-gray-900/60 backdrop-blur-sm p-5"
+      className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white dark:bg-gray-900 p-5"
     >
       <div className="flex items-center gap-2 mb-4">
         <Shield className="h-4 w-4 text-indigo-500" />
@@ -507,7 +507,7 @@ function DataProfiler({
         <div className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 dark:bg-gray-800/60">
+              <tr className="bg-gray-50 dark:bg-gray-800">
                 <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Column
                 </th>
@@ -549,7 +549,7 @@ function DataProfiler({
                     onClick={
                       onColumnClick ? () => onColumnClick(col) : undefined
                     }
-                    className={`hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors ${
+                    className={`hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors ${
                       onColumnClick ? "cursor-pointer" : ""
                     }`}
                   >

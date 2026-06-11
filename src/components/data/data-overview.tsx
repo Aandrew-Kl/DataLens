@@ -318,7 +318,7 @@ function StatCard({
   tint: string;
 }) {
   return (
-    <div className="rounded-[24px] border border-white/15 bg-white/55 p-5 shadow-[0_18px_48px_-28px_rgba(15,23,42,0.65)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/48">
+    <div className="rounded-lg border border-white/15 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
@@ -352,7 +352,7 @@ function ActionButton({
     <button
       type="button"
       onClick={onClick}
-      className="group rounded-[24px] border border-white/15 bg-white/55 p-4 text-left shadow-[0_16px_44px_-30px_rgba(15,23,42,0.8)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-cyan-400/30 hover:bg-white/70 dark:border-white/10 dark:bg-slate-950/44 dark:hover:bg-slate-900/60"
+      className="group rounded-lg border border-white/15 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400/30 hover:bg-white dark:border-white/10 dark:bg-slate-950 dark:hover:bg-slate-900"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="rounded-2xl bg-cyan-500/12 p-3 text-cyan-700 dark:text-cyan-300">
@@ -575,7 +575,7 @@ export default function DataOverview({
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="relative overflow-hidden rounded-[32px] border border-white/15 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.2),transparent_28%),radial-gradient(circle_at_top_right,rgba(167,139,250,0.18),transparent_26%),linear-gradient(180deg,rgba(255,255,255,0.72),rgba(248,250,252,0.68))] p-6 shadow-[0_28px_90px_-42px_rgba(15,23,42,0.75)] backdrop-blur-2xl dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.12),transparent_28%),radial-gradient(circle_at_top_right,rgba(168,85,247,0.14),transparent_28%),linear-gradient(180deg,rgba(2,6,23,0.88),rgba(15,23,42,0.82))] sm:p-7"
+      className="relative overflow-hidden rounded-lg border border-white/15 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.2),transparent_28%),radial-gradient(circle_at_top_right,rgba(167,139,250,0.18),transparent_26%),linear-gradient(180deg,rgba(255,255,255,0.72),rgba(248,250,252,0.68))] p-6 shadow-sm dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.12),transparent_28%),radial-gradient(circle_at_top_right,rgba(168,85,247,0.14),transparent_28%),linear-gradient(180deg,rgba(2,6,23,0.88),rgba(15,23,42,0.82))] sm:p-7"
     >
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.18),transparent_40%,rgba(255,255,255,0.06))]" />
 
@@ -595,7 +595,7 @@ export default function DataOverview({
             </p>
           </div>
 
-          <div className="rounded-[24px] border border-white/15 bg-white/60 px-4 py-3 shadow-[0_16px_48px_-32px_rgba(15,23,42,0.85)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/46">
+          <div className="rounded-lg border border-white/15 bg-white px-4 py-3 shadow-sm dark:border-white/10 dark:bg-slate-950">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Quality Grade
             </p>
@@ -675,7 +675,7 @@ export default function DataOverview({
       {error ? (
         <motion.div
           variants={cardVariants}
-          className="relative mt-4 rounded-[24px] border border-rose-300/40 bg-rose-500/10 px-5 py-4 text-sm text-rose-700 dark:border-rose-500/20 dark:text-rose-300"
+          className="relative mt-4 rounded-lg border border-rose-300/40 bg-rose-500/10 px-5 py-4 text-sm text-rose-700 dark:border-rose-500/20 dark:text-rose-300"
         >
           {error}
         </motion.div>
@@ -705,7 +705,7 @@ export default function DataOverview({
       >
         <motion.article
           variants={cardVariants}
-          className="rounded-[28px] border border-white/15 bg-white/58 p-5 shadow-[0_18px_54px_-36px_rgba(15,23,42,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/46"
+          className="rounded-lg border border-white/15 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950"
         >
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -733,7 +733,7 @@ export default function DataOverview({
 
         <motion.article
           variants={cardVariants}
-          className="rounded-[28px] border border-white/15 bg-white/58 p-5 shadow-[0_18px_54px_-36px_rgba(15,23,42,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/46"
+          className="rounded-lg border border-white/15 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950"
         >
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -767,7 +767,7 @@ export default function DataOverview({
 
         <motion.article
           variants={cardVariants}
-          className="rounded-[28px] border border-white/15 bg-white/58 p-5 shadow-[0_18px_54px_-36px_rgba(15,23,42,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/46"
+          className="rounded-lg border border-white/15 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950"
         >
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -804,7 +804,7 @@ export default function DataOverview({
         variants={cardVariants}
         className="relative mt-6 grid gap-5 xl:grid-cols-[1.15fr_0.85fr]"
       >
-        <div className="rounded-[28px] border border-white/15 bg-white/58 p-5 shadow-[0_18px_54px_-36px_rgba(15,23,42,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/46">
+        <div className="rounded-lg border border-white/15 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
@@ -846,7 +846,7 @@ export default function DataOverview({
           </div>
         </div>
 
-        <div className="rounded-[28px] border border-white/15 bg-white/58 p-5 shadow-[0_18px_54px_-36px_rgba(15,23,42,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/46">
+        <div className="rounded-lg border border-white/15 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
@@ -862,19 +862,19 @@ export default function DataOverview({
           </div>
           <div className="mt-5 space-y-3">
             {health.issues.length === 0 && !health.loading ? (
-              <div className="rounded-[24px] border border-emerald-400/20 bg-emerald-500/10 px-4 py-4 text-sm text-emerald-700 dark:text-emerald-300">
+              <div className="rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-4 py-4 text-sm text-emerald-700 dark:text-emerald-300">
                 No material issues surfaced. The dataset looks clean enough to move straight into analysis.
               </div>
             ) : null}
             {health.loading ? (
-              <div className="rounded-[24px] border border-white/15 bg-white/45 px-4 py-4 text-sm text-slate-600 dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-400">
+              <div className="rounded-lg border border-white/15 bg-white px-4 py-4 text-sm text-slate-600 dark:border-white/10 dark:bg-slate-900 dark:text-slate-400">
                 Running health diagnostics with DuckDB…
               </div>
             ) : null}
             {health.issues.slice(0, 4).map((issue) => (
               <div
                 key={`${issue.column}-${issue.metric}`}
-                className="rounded-[22px] border border-white/15 bg-white/48 px-4 py-4 dark:border-white/10 dark:bg-slate-900/38"
+                className="rounded-lg border border-white/15 bg-white px-4 py-4 dark:border-white/10 dark:bg-slate-900/38"
               >
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -905,7 +905,7 @@ export default function DataOverview({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="pointer-events-none absolute inset-0 rounded-[32px] bg-white/18 backdrop-blur-[2px] dark:bg-slate-950/16"
+          className="pointer-events-none absolute inset-0 rounded-lg bg-white/18 -[2px] dark:bg-slate-950/16"
         />
       )}
     </motion.section>
