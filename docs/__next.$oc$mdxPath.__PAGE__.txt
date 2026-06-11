@@ -2,15 +2,107 @@
 2:I[55169,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"TOCProvider"]
 3:I[769,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"Sidebar"]
 4:I[47486,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"ClientWrapper"]
-5:I[63894,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"HeadingAnchor"]
-6:I[22016,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],""]
-d:I[97367,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"OutletBoundary"]
-e:"$Sreact.suspense"
-0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"Start Here","id":"start-here","depth":2},{"value":"Tech Stack Highlights","id":"tech-stack-highlights","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"Welcome","description":"DataLens is privacy-first AI data analytics.","filePath":"content/index.mdx","timestamp":1776877494000},"sourceCode":"---\ntitle: Frontend\ndescription: Explore the Next.js frontend, state model, and browser-first analytics path.\n---\n\n# Frontend\n\nThe frontend is a Next.js 16 application built with React 19, TypeScript, and Tailwind CSS v4.\n\n## Core Responsibilities\n\n- ingest local CSV, JSON, and Excel files\n- manage the analytics workspace and feature panels\n- run DuckDB-WASM queries in browser memory\n- render charts, pivot views, dashboards, and guided analysis tools\n- orchestrate AI-assisted actions from the UI\n\n## Important Frontend Building Blocks\n\n- `src/app` for route entrypoints and layouts\n- `src/components` for feature UIs grouped by domain\n- `src/lib/duckdb` for browser-side SQL execution\n- `src/stores` for Zustand-backed state such as datasets, query history, UI state, and bookmarks\n\n## Frontend Design Principle\n\nKeep the exploratory loop close to the user: parse locally, query locally, and only cross the network when the workflow actually needs backend behavior.","children":[["$","div",null,{"id":"nextra-skip-nav"}],["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["DataLens","$undefined"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"DataLens is privacy-first AI data analytics."}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"It combines DuckDB-WASM in the browser, a Next.js workspace for exploration, and FastAPI services for authentication, persistence, machine learning, and optional local AI assistance. The result is a local-first analytics stack that feels fast without forcing every workflow through a remote warehouse."}],"\n",["$","h2",null,{"id":"start-here","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Start Here",["$","$L5",null,{"id":"start-here"}]]}],"\n",["$","div",null,{"className":"nextra-cards x:mt-4 x:gap-4 x:grid not-prose","style":{"--rows":2},"children":[["$","$L6",null,{"href":"/getting-started","className":"x:group x:focus-visible:nextra-focus nextra-card x:flex x:flex-col x:justify-start x:overflow-hidden x:rounded-lg x:border x:border-gray-200 x:text-current x:no-underline x:dark:shadow-none x:hover:shadow-gray-100 x:dark:hover:shadow-none x:shadow-gray-100 x:active:shadow-sm x:active:shadow-gray-200 x:transition-all x:duration-200 x:hover:border-gray-300 x:bg-transparent x:shadow-sm x:dark:border-neutral-800 x:hover:bg-slate-50 x:hover:shadow-md x:dark:hover:border-neutral-700 x:dark:hover:bg-neutral-900","children":["$undefined",["$","span",null,{"className":"x:flex x:font-semibold x:items-center x:gap-2 x:p-4 x:text-gray-700 x:hover:text-gray-900 x:after:content-[\"→\"] x:after:transition-transform x:after:duration-75 x:group-hover:after:translate-x-0.5 x:group-focus:after:translate-x-0.5 x:dark:text-neutral-200 x:dark:hover:text-neutral-50","title":"Getting Started","children":["$undefined",["$","span",null,{"className":"_truncate","children":"Getting Started"}]]}]]}],["$","$L6",null,{"href":"/guides/sql-editor","className":"x:group x:focus-visible:nextra-focus nextra-card x:flex x:flex-col x:justify-start x:overflow-hidden x:rounded-lg x:border x:border-gray-200 x:text-current x:no-underline x:dark:shadow-none x:hover:shadow-gray-100 x:dark:hover:shadow-none x:shadow-gray-100 x:active:shadow-sm x:active:shadow-gray-200 x:transition-all x:duration-200 x:hover:border-gray-300 x:bg-transparent x:shadow-sm x:dark:border-neutral-800 x:hover:bg-slate-50 x:hover:shadow-md x:dark:hover:border-neutral-700 x:dark:hover:bg-neutral-900","children":["$undefined","$L7"]}],"$L8","$L9"]}],"\n","$La","\n","$Lb"]}]]}]]}]}],null,"$Lc"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"d5voidjT3pMIfs3hOF7tU"}
-7:["$","span",null,{"className":"x:flex x:font-semibold x:items-center x:gap-2 x:p-4 x:text-gray-700 x:hover:text-gray-900 x:after:content-[\"→\"] x:after:transition-transform x:after:duration-75 x:group-hover:after:translate-x-0.5 x:group-focus:after:translate-x-0.5 x:dark:text-neutral-200 x:dark:hover:text-neutral-50","title":"Guides","children":["$undefined",["$","span",null,{"className":"_truncate","children":"Guides"}]]}]
-8:["$","$L6",null,{"href":"/architecture/overview","className":"x:group x:focus-visible:nextra-focus nextra-card x:flex x:flex-col x:justify-start x:overflow-hidden x:rounded-lg x:border x:border-gray-200 x:text-current x:no-underline x:dark:shadow-none x:hover:shadow-gray-100 x:dark:hover:shadow-none x:shadow-gray-100 x:active:shadow-sm x:active:shadow-gray-200 x:transition-all x:duration-200 x:hover:border-gray-300 x:bg-transparent x:shadow-sm x:dark:border-neutral-800 x:hover:bg-slate-50 x:hover:shadow-md x:dark:hover:border-neutral-700 x:dark:hover:bg-neutral-900","children":["$undefined",["$","span",null,{"className":"x:flex x:font-semibold x:items-center x:gap-2 x:p-4 x:text-gray-700 x:hover:text-gray-900 x:after:content-[\"→\"] x:after:transition-transform x:after:duration-75 x:group-hover:after:translate-x-0.5 x:group-focus:after:translate-x-0.5 x:dark:text-neutral-200 x:dark:hover:text-neutral-50","title":"Architecture","children":["$undefined",["$","span",null,{"className":"_truncate","children":"Architecture"}]]}]]}]
-9:["$","$L6",null,{"href":"/api/reference","className":"x:group x:focus-visible:nextra-focus nextra-card x:flex x:flex-col x:justify-start x:overflow-hidden x:rounded-lg x:border x:border-gray-200 x:text-current x:no-underline x:dark:shadow-none x:hover:shadow-gray-100 x:dark:hover:shadow-none x:shadow-gray-100 x:active:shadow-sm x:active:shadow-gray-200 x:transition-all x:duration-200 x:hover:border-gray-300 x:bg-transparent x:shadow-sm x:dark:border-neutral-800 x:hover:bg-slate-50 x:hover:shadow-md x:dark:hover:border-neutral-700 x:dark:hover:bg-neutral-900","children":["$undefined",["$","span",null,{"className":"x:flex x:font-semibold x:items-center x:gap-2 x:p-4 x:text-gray-700 x:hover:text-gray-900 x:after:content-[\"→\"] x:after:transition-transform x:after:duration-75 x:group-hover:after:translate-x-0.5 x:group-focus:after:translate-x-0.5 x:dark:text-neutral-200 x:dark:hover:text-neutral-50","title":"API","children":["$undefined",["$","span",null,{"className":"_truncate","children":"API"}]]}]]}]
-a:["$","h2",null,{"id":"tech-stack-highlights","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Tech Stack Highlights",["$","$L5",null,{"id":"tech-stack-highlights"}]]}]
-b:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"Browser-first analytics with DuckDB-WASM for local profiling, previews, and ad hoc SQL."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Next.js 16, React 19, TypeScript, and Tailwind CSS v4 for the interactive workspace."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"FastAPI, PostgreSQL, JWT auth, and WebSocket streaming for persistence and backend workflows."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Optional Ollama-backed AI for natural-language querying, explanations, and dashboard suggestions."}],"\n"]}]
-c:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
-f:null
+b:I[63894,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"HeadingAnchor"]
+c:I[22016,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],""]
+e:I[97367,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"OutletBoundary"]
+f:"$Sreact.suspense"
+5:T994,---
+title: Installation
+description: Run DataLens locally with Docker Compose or a manual frontend and backend setup.
+---
+
+# Installation
+
+## Recommended: Docker Compose
+
+For most contributors and self-hosted deployments, Docker Compose is the quickest way to get everything running.
+
+```bash
+cp .env.example .env
+docker-compose up
+```
+
+If you use the newer Docker CLI plugin, the equivalent command is:
+
+```bash
+docker compose up --build
+```
+
+Services started by the repository compose file:
+
+- Frontend on `http://localhost:3000`
+- Backend on `http://localhost:8000`
+- PostgreSQL on `localhost:5432`
+
+## Manual Installation
+
+Use the manual path when you want to work on the frontend and backend independently.
+
+### Requirements
+
+- Node.js `22+`
+- Python `3.12+`
+- PostgreSQL `16+`
+- npm `10+`
+
+### Frontend
+
+From the repository root:
+
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+### Backend
+
+From `backend/`:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+alembic upgrade head
+uvicorn app.main:app --reload --port 8000
+```
+
+## Required Environment Variables
+
+These are the three values you should verify first:
+
+- `JWT_SECRET`: Signs bearer tokens for login and protected API access.
+- `DATABASE_URL`: Points the backend at PostgreSQL before migrations and API requests run.
+- `OLLAMA_URL`: Points AI-assisted flows at your local or network-reachable Ollama instance.
+
+The sample repository defaults also define `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WS_URL`, and `OLLAMA_MODEL`.
+
+## Troubleshooting
+
+### `docker-compose up` fails because ports are already in use
+
+Stop the local services bound to `3000`, `8000`, or `5432`, or override ports in your compose override file.
+
+### The backend cannot connect to PostgreSQL
+
+Check that `DATABASE_URL` matches the running host, port, user, password, and database name. For local development, run migrations again after fixing the connection string.
+
+### The frontend loads but API requests fail
+
+Confirm `NEXT_PUBLIC_API_URL` points at the FastAPI server and that CORS still allows `http://localhost:3000`.
+
+### AI actions hang or fall back unexpectedly
+
+Verify that Ollama is running and that `OLLAMA_URL` resolves from the process that is making the request.
+
+### Uploads are rejected as too large
+
+The backend defaults to `50 MiB` (`~52 MB`) via `MAX_UPLOAD_SIZE`. Increase that limit if your deployment needs larger files.0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"Start Here","id":"start-here","depth":2},{"value":"Tech Stack Highlights","id":"tech-stack-highlights","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"Welcome","description":"DataLens is privacy-first AI data analytics.","filePath":"content/index.mdx","timestamp":1781216064000},"sourceCode":"$5","children":[["$","div",null,{"id":"nextra-skip-nav"}],["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["DataLens","$undefined"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"DataLens is privacy-first AI data analytics."}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"It combines DuckDB-WASM in the browser, a Next.js workspace for exploration, and FastAPI services for authentication, persistence, machine learning, and optional local AI assistance. The result is a local-first analytics stack that feels fast without forcing every workflow through a remote warehouse."}],"\n","$L6","\n","$L7","\n","$L8","\n","$L9"]}]]}]]}]}],null,"$La"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"hsBZISoX9JPQ1bCeNLo_x"}
+6:["$","h2",null,{"id":"start-here","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Start Here",["$","$Lb",null,{"id":"start-here"}]]}]
+7:["$","div",null,{"className":"nextra-cards x:mt-4 x:gap-4 x:grid not-prose","style":{"--rows":2},"children":[["$","$Lc",null,{"href":"/getting-started","className":"x:group x:focus-visible:nextra-focus nextra-card x:flex x:flex-col x:justify-start x:overflow-hidden x:rounded-lg x:border x:border-gray-200 x:text-current x:no-underline x:dark:shadow-none x:hover:shadow-gray-100 x:dark:hover:shadow-none x:shadow-gray-100 x:active:shadow-sm x:active:shadow-gray-200 x:transition-all x:duration-200 x:hover:border-gray-300 x:bg-transparent x:shadow-sm x:dark:border-neutral-800 x:hover:bg-slate-50 x:hover:shadow-md x:dark:hover:border-neutral-700 x:dark:hover:bg-neutral-900","children":["$undefined",["$","span",null,{"className":"x:flex x:font-semibold x:items-center x:gap-2 x:p-4 x:text-gray-700 x:hover:text-gray-900 x:after:content-[\"→\"] x:after:transition-transform x:after:duration-75 x:group-hover:after:translate-x-0.5 x:group-focus:after:translate-x-0.5 x:dark:text-neutral-200 x:dark:hover:text-neutral-50","title":"Getting Started","children":["$undefined",["$","span",null,{"className":"_truncate","children":"Getting Started"}]]}]]}],["$","$Lc",null,{"href":"/guides/sql-editor","className":"x:group x:focus-visible:nextra-focus nextra-card x:flex x:flex-col x:justify-start x:overflow-hidden x:rounded-lg x:border x:border-gray-200 x:text-current x:no-underline x:dark:shadow-none x:hover:shadow-gray-100 x:dark:hover:shadow-none x:shadow-gray-100 x:active:shadow-sm x:active:shadow-gray-200 x:transition-all x:duration-200 x:hover:border-gray-300 x:bg-transparent x:shadow-sm x:dark:border-neutral-800 x:hover:bg-slate-50 x:hover:shadow-md x:dark:hover:border-neutral-700 x:dark:hover:bg-neutral-900","children":["$undefined",["$","span",null,{"className":"x:flex x:font-semibold x:items-center x:gap-2 x:p-4 x:text-gray-700 x:hover:text-gray-900 x:after:content-[\"→\"] x:after:transition-transform x:after:duration-75 x:group-hover:after:translate-x-0.5 x:group-focus:after:translate-x-0.5 x:dark:text-neutral-200 x:dark:hover:text-neutral-50","title":"Guides","children":["$undefined",["$","span",null,{"className":"_truncate","children":"Guides"}]]}]]}],["$","$Lc",null,{"href":"/architecture/overview","className":"x:group x:focus-visible:nextra-focus nextra-card x:flex x:flex-col x:justify-start x:overflow-hidden x:rounded-lg x:border x:border-gray-200 x:text-current x:no-underline x:dark:shadow-none x:hover:shadow-gray-100 x:dark:hover:shadow-none x:shadow-gray-100 x:active:shadow-sm x:active:shadow-gray-200 x:transition-all x:duration-200 x:hover:border-gray-300 x:bg-transparent x:shadow-sm x:dark:border-neutral-800 x:hover:bg-slate-50 x:hover:shadow-md x:dark:hover:border-neutral-700 x:dark:hover:bg-neutral-900","children":["$undefined",["$","span",null,{"className":"x:flex x:font-semibold x:items-center x:gap-2 x:p-4 x:text-gray-700 x:hover:text-gray-900 x:after:content-[\"→\"] x:after:transition-transform x:after:duration-75 x:group-hover:after:translate-x-0.5 x:group-focus:after:translate-x-0.5 x:dark:text-neutral-200 x:dark:hover:text-neutral-50","title":"Architecture","children":["$undefined",["$","span",null,{"className":"_truncate","children":"Architecture"}]]}]]}],["$","$Lc",null,{"href":"/api/reference","className":"x:group x:focus-visible:nextra-focus nextra-card x:flex x:flex-col x:justify-start x:overflow-hidden x:rounded-lg x:border x:border-gray-200 x:text-current x:no-underline x:dark:shadow-none x:hover:shadow-gray-100 x:dark:hover:shadow-none x:shadow-gray-100 x:active:shadow-sm x:active:shadow-gray-200 x:transition-all x:duration-200 x:hover:border-gray-300 x:bg-transparent x:shadow-sm x:dark:border-neutral-800 x:hover:bg-slate-50 x:hover:shadow-md x:dark:hover:border-neutral-700 x:dark:hover:bg-neutral-900","children":["$undefined","$Ld"]}]]}]
+8:["$","h2",null,{"id":"tech-stack-highlights","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Tech Stack Highlights",["$","$Lb",null,{"id":"tech-stack-highlights"}]]}]
+9:["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"Browser-first analytics with DuckDB-WASM for local profiling, previews, and ad hoc SQL."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Next.js 16, React 19, TypeScript, and Tailwind CSS v4 for the interactive workspace."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"FastAPI, PostgreSQL, JWT auth, and WebSocket streaming for persistence and backend workflows."}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"Optional Ollama-backed AI for natural-language querying, explanations, and dashboard suggestions."}],"\n"]}]
+a:["$","$Le",null,{"children":["$","$f",null,{"name":"Next.MetadataOutlet","children":"$@10"}]}]
+d:["$","span",null,{"className":"x:flex x:font-semibold x:items-center x:gap-2 x:p-4 x:text-gray-700 x:hover:text-gray-900 x:after:content-[\"→\"] x:after:transition-transform x:after:duration-75 x:group-hover:after:translate-x-0.5 x:group-focus:after:translate-x-0.5 x:dark:text-neutral-200 x:dark:hover:text-neutral-50","title":"API","children":["$undefined",["$","span",null,{"className":"_truncate","children":"API"}]]}]
+10:null

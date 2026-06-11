@@ -3,48 +3,67 @@
 3:I[769,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"Sidebar"]
 4:I[47486,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"ClientWrapper"]
 6:I[63894,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"HeadingAnchor"]
-d:I[97367,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"OutletBoundary"]
-e:"$Sreact.suspense"
-5:T43e,---
-title: ML Workflows
-description: Train models, compare predictions, and evaluate analytical ML workflows in DataLens.
+f:I[97367,["/DataLens/docs/_next/static/chunks/0x56skhob._h5.js","/DataLens/docs/_next/static/chunks/0pr0tem4wzmkk.js","/DataLens/docs/_next/static/chunks/0fsnked599-tv.js","/DataLens/docs/_next/static/chunks/0d3shmwh5_nmn.js","/DataLens/docs/_next/static/chunks/020epq0u9exm5.js"],"OutletBoundary"]
+10:"$Sreact.suspense"
+5:T5b5,---
+title: AI Setup
+description: Configure local Ollama so DataLens can translate natural language into SQL and explain results.
 ---
 
-# ML Workflows
+# AI Setup
 
-## Available Models
+DataLens is designed to work without cloud AI by default. For natural-language features, run Ollama locally and point the app at it.
 
-DataLens includes workflows for:
+## 1. Install Ollama
 
-- regression
-- classification
-- clustering
-- anomaly detection
-- PCA
-- forecasting
+Install Ollama on the same machine as DataLens, or on a reachable machine inside your local network.
 
-You will also find decision-tree and related analytical helpers in the broader modeling surface.
+## 2. Pull a Model
 
-## Train a Model
+The default example model in the repository is `llama3.2`:
 
-The standard loop is:
+```bash
+ollama pull llama3.2
+```
 
-1. profile the dataset
-2. choose target and feature columns
-3. run the model from the ML or analytics workspace
-4. inspect metrics, coefficients, feature importance, clusters, or anomaly scores
+## 3. Configure `OLLAMA_URL`
 
-## Make Predictions
+Update your `.env` file so the AI routes can reach Ollama:
 
-Prediction-oriented flows return scored rows, labels, or future points that can be exported, charted, or fed back into dashboards.
+```bash
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2
+```
 
-## Cross-Validation
+If you are using manual development, keep the frontend and backend env files aligned with the same Ollama host.
 
-Use holdout metrics as the first quality gate, then compare alternative feature sets and algorithms before promoting a workflow. If your process requires stricter k-fold cross-validation, export the prepared feature matrix and run the extended validation in your notebook or pipeline environment.0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"Available Models","id":"available-models","depth":2},{"value":"Train a Model","id":"train-a-model","depth":2},{"value":"Make Predictions","id":"make-predictions","depth":2},{"value":"Cross-Validation","id":"cross-validation","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"ML Workflows","description":"Train models, compare predictions, and evaluate analytical ML workflows in DataLens.","filePath":"content/guides/ml-workflows.mdx","timestamp":1776877494000},"sourceCode":"$5","children":[["$","div",null,{"id":"nextra-skip-nav"}],["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["ML Workflows","$undefined"]}],"\n",["$","h2",null,{"id":"available-models","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Available Models",["$","$L6",null,{"id":"available-models"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"DataLens includes workflows for:"}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"regression"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"classification"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"clustering"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"anomaly detection"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"PCA"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"forecasting"}],"\n"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"You will also find decision-tree and related analytical helpers in the broader modeling surface."}],"\n",["$","h2",null,{"id":"train-a-model","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Train a Model",["$","$L6",null,{"id":"train-a-model"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"The standard loop is:"}],"\n",["$","ol",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-decimal x:ms-6","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"profile the dataset"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"choose target and feature columns"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"run the model from the ML or analytics workspace"}],"\n","$L7","\n"]}],"\n","$L8","\n","$L9","\n","$La","\n","$Lb"]}]]}]]}]}],null,"$Lc"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"d5voidjT3pMIfs3hOF7tU"}
-7:["$","li",null,{"className":"x:my-[.5em]","children":"inspect metrics, coefficients, feature importance, clusters, or anomaly scores"}]
-8:["$","h2",null,{"id":"make-predictions","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Make Predictions",["$","$L6",null,{"id":"make-predictions"}]]}]
-9:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Prediction-oriented flows return scored rows, labels, or future points that can be exported, charted, or fed back into dashboards."}]
-a:["$","h2",null,{"id":"cross-validation","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Cross-Validation",["$","$L6",null,{"id":"cross-validation"}]]}]
-b:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Use holdout metrics as the first quality gate, then compare alternative feature sets and algorithms before promoting a workflow. If your process requires stricter k-fold cross-validation, export the prepared feature matrix and run the extended validation in your notebook or pipeline environment."}]
-c:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
-f:null
+## 4. Test Natural Language to SQL
+
+With a dataset loaded, try a prompt like:
+
+```text
+Show total revenue by region for the last 30 days.
+```
+
+Expected flow:
+
+1. DataLens sends the prompt plus schema context to the AI route.
+2. The route checks Ollama health.
+3. If the model is reachable, SQL is generated and explained.
+4. If Ollama is unavailable, DataLens falls back to deterministic helpers where possible.
+
+## Verification Checklist
+
+- `OLLAMA_URL` resolves from the running app process.
+- The selected model has been pulled locally.
+- AI routes stop timing out once Ollama is running.
+- Generated SQL references the active table and real columns from your dataset.0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"x:mx-auto x:flex x:max-w-(--nextra-content-width)","children":["$","$L2",null,{"value":[{"value":"Available Models","id":"available-models","depth":2},{"value":"Train a Model","id":"train-a-model","depth":2},{"value":"Make Predictions","id":"make-predictions","depth":2},{"value":"Cross-Validation","id":"cross-validation","depth":2}],"children":[["$","$L3",null,{}],["$","$L4",null,{"metadata":{"title":"ML Workflows","description":"Train models, compare predictions, and evaluate analytical ML workflows in DataLens.","filePath":"content/guides/ml-workflows.mdx","timestamp":1781216064000},"sourceCode":"$5","children":[["$","div",null,{"id":"nextra-skip-nav"}],["$","main",null,{"data-pagefind-body":true,"children":[["$","h1",null,{"className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-bold x:mt-2 x:text-4xl","children":["ML Workflows","$undefined"]}],"\n",["$","h2",null,{"id":"available-models","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Available Models",["$","$L6",null,{"id":"available-models"}]]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"DataLens includes workflows for:"}],"\n",["$","ul",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-disc x:ms-[1.5em]","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"regression"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"classification"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"clustering"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"anomaly detection"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"PCA"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"forecasting"}],"\n"]}],"\n",["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"You will also find decision-tree and related analytical helpers in the broader modeling surface."}],"\n",["$","h2",null,{"id":"train-a-model","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Train a Model","$L7"]}],"\n","$L8","\n","$L9","\n","$La","\n","$Lb","\n","$Lc","\n","$Ld"]}]]}]]}]}],null,"$Le"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"hsBZISoX9JPQ1bCeNLo_x"}
+7:["$","$L6",null,{"id":"train-a-model"}]
+8:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"The standard loop is:"}]
+9:["$","ol",null,{"className":"x:[:is(ol,ul)_&]:my-[.75em] x:not-first:mt-[1.25em] x:list-decimal x:ms-6","children":["\n",["$","li",null,{"className":"x:my-[.5em]","children":"profile the dataset"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"choose target and feature columns"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"run the model from the ML or analytics workspace"}],"\n",["$","li",null,{"className":"x:my-[.5em]","children":"inspect metrics, coefficients, feature importance, clusters, or anomaly scores"}],"\n"]}]
+a:["$","h2",null,{"id":"make-predictions","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Make Predictions",["$","$L6",null,{"id":"make-predictions"}]]}]
+b:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Prediction-oriented flows return scored rows, labels, or future points that can be exported, charted, or fed back into dashboards."}]
+c:["$","h2",null,{"id":"cross-validation","className":"x:tracking-tight x:text-slate-900 x:dark:text-slate-100 x:font-semibold x:target:animate-[fade-in_1.5s] x:mt-10 x:border-b x:pb-1 x:text-3xl nextra-border","children":["Cross-Validation",["$","$L6",null,{"id":"cross-validation"}]]}]
+d:["$","p",null,{"className":"x:not-first:mt-[1.25em] x:leading-7","children":"Use holdout metrics as the first quality gate, then compare alternative feature sets and algorithms before promoting a workflow. If your process requires stricter k-fold cross-validation, export the prepared feature matrix and run the extended validation in your notebook or pipeline environment."}]
+e:["$","$Lf",null,{"children":["$","$10",null,{"name":"Next.MetadataOutlet","children":"$@11"}]}]
+11:null
