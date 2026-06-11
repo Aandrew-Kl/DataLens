@@ -13,10 +13,7 @@ The latest release of DataLens is supported with security updates. Earlier relea
 
 If you believe you have found a security vulnerability in DataLens, please report it privately and do not open a public issue.
 
-You can report vulnerabilities by:
-
-- Emailing `security@example.com`
-- Using GitHub Security Advisories for this repository
+Report vulnerabilities privately through [GitHub Security Advisories](https://github.com/Aandrew-Kl/DataLens/security/advisories/new) ("Report a vulnerability"). Private vulnerability reporting is enabled for this repository, so your report is visible only to the maintainers until a fix is released.
 
 Please include, where possible:
 

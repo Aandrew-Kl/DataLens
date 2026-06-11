@@ -50,3 +50,24 @@ def test_settings_allow_weak_secrets_in_development() -> None:
     # first run. The production guard is where it matters.
     configured = Settings(_env_file=None, ENVIRONMENT="development", JWT_SECRET="")
     assert configured.JWT_SECRET == ""
+
+
+def test_settings_reject_wildcard_cors_origin() -> None:
+    # CORSMiddleware runs with allow_credentials=True, so a wildcard origin
+    # would reflect any Origin header back with credentials allowed.
+    with pytest.raises(ValidationError, match="explicit allowlist"):
+        Settings(_env_file=None, CORS_ORIGINS="*")
+
+    with pytest.raises(ValidationError, match="explicit allowlist"):
+        Settings(_env_file=None, CORS_ORIGINS="https://app.example.org, *")
+
+
+def test_settings_accept_explicit_cors_allowlist() -> None:
+    configured = Settings(
+        _env_file=None, CORS_ORIGINS="https://app.example.org,http://localhost:3000"
+    )
+
+    assert configured.CORS_ORIGINS == [
+        "https://app.example.org",
+        "http://localhost:3000",
+    ]

@@ -31,7 +31,9 @@ jobs:
         run: npm ci
 
       - name: Security audit
-        run: npm audit --audit-level=high || true
+        # Blocking: high/critical advisories fail the build. Moderates that
+        # only "fix" via breaking downgrades (exceljs/uuid) do not trip this.
+        run: npm audit --audit-level=high
 
       - name: Run linter
         run: npm run lint
@@ -76,7 +78,10 @@ jobs:
         run: pip install -r backend/requirements.txt
 
       - name: Security audit
-        run: pip install safety && safety check --output text || true
+        # Blocking pip-audit over the installed environment (default PyPI
+        # advisory feed). Use --ignore-vuln <id> for unfixable advisories
+        # rather than reintroducing a global `|| true` bypass.
+        run: pip install pip-audit && pip-audit
 
       - name: Run backend tests with coverage gate
         # Coverage gate is defined in backend/pyproject.toml (60% floor,
