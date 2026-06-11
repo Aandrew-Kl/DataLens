@@ -552,7 +552,7 @@ function LineageReady({
               {selectedLinks.map((link) => (
                 <div
                   key={`${link.source}-${link.target}`}
-                  className="rounded-2xl border border-white/20 bg-white/50 px-4 py-3 text-sm text-slate-700 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200"
+                  className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200"
                 >
                   <div className="flex items-center gap-2 font-medium">
                     <span>{link.source}</span>
@@ -578,7 +578,7 @@ function LineageReady({
               {result.history.map((entry) => (
                 <div
                   key={entry.id}
-                  className="rounded-2xl border border-white/20 bg-white/50 px-4 py-3 dark:border-white/10 dark:bg-slate-950/35"
+                  className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-950/35"
                 >
                   <div className="text-sm font-semibold text-slate-950 dark:text-white">
                     {entry.label}

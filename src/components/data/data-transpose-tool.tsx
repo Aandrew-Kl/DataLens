@@ -52,14 +52,14 @@ function buildTransposeSql(
         WHERE ${quoteIdentifier(idColumn)} IS NOT NULL
       `,
     )
-    .join("\n        UNION ALL\n");
+    .join("\n UNION ALL\n");
 
   const projectedIds = ids
     .map(
       (idValue) =>
         `MAX(CASE WHEN entity_id = ${quoteLiteral(idValue)} THEN metric_value END) AS ${quoteIdentifier(idValue)}`,
     )
-    .join(",\n      ");
+    .join(",\n ");
 
   return `
     WITH stacked AS (

@@ -42,7 +42,7 @@ interface ThemeSettings {
 const STORAGE_KEY = "datalens:theme";
 const EASE = [0.22, 1, 0.36, 1] as const;
 const CARD_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const PRESET_COLORS: Record<ThemePreset, string> = {
   Ocean: "#0891b2",
   Forest: "#15803d",
@@ -174,10 +174,10 @@ function ThemePresetButton({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-[1.1rem] border px-3 py-3 text-left transition ${
+      className={`rounded-lg border px-3 py-3 text-left transition ${
         active
-          ? "border-white/20 bg-white/70 dark:bg-slate-900/60"
-          : "border-white/15 bg-white/45 hover:bg-white/60 dark:bg-slate-900/30 dark:hover:bg-slate-900/45"
+          ? "border-white/20 bg-white dark:bg-slate-900"
+          : "border-white/15 bg-white hover:bg-white dark:bg-slate-900/30 dark:hover:bg-slate-900"
       }`}
     >
       <div className="flex items-center gap-3">
@@ -207,7 +207,7 @@ function ToggleRow({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-900/30">
+    <div className="flex items-center justify-between rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-900/30">
       <div>
         <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{label}</p>
         <p className="text-xs text-slate-500 dark:text-slate-400">{description}</p>
@@ -247,7 +247,7 @@ function SliderRow({
   onChange: (value: number) => void;
 }) {
   return (
-    <div className="rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-900/30">
+    <div className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-900/30">
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{label}</p>
         <span className="text-xs text-slate-500 dark:text-slate-400">
@@ -284,10 +284,10 @@ function ModeButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-2 rounded-[1rem] border px-3 py-2 text-sm transition ${
+      className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition ${
         active
           ? "border-cyan-400/40 bg-cyan-500/12 text-cyan-700 dark:text-cyan-300"
-          : "border-white/15 bg-white/45 text-slate-600 hover:bg-white/60 dark:bg-slate-900/30 dark:text-slate-300"
+          : "border-white/15 bg-white text-slate-600 hover:bg-white dark:bg-slate-900/30 dark:text-slate-300"
       }`}
     >
       <Icon className="h-4 w-4" />
@@ -365,7 +365,7 @@ export default function ThemeCustomizer() {
 
       <div className="flex flex-col gap-5 border-b border-white/15 pb-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
             <Palette className="h-5 w-5" />
           </div>
           <div>
@@ -382,7 +382,7 @@ export default function ThemeCustomizer() {
           <button
             type="button"
             onClick={exportTheme}
-            className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/60 dark:bg-slate-900/30 dark:text-slate-200"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-900/30 dark:text-slate-200"
           >
             <Download className="h-4 w-4" />
             Export JSON
@@ -390,7 +390,7 @@ export default function ThemeCustomizer() {
           <button
             type="button"
             onClick={() => importInputRef.current?.click()}
-            className="inline-flex items-center gap-2 rounded-[1rem] bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
+            className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
           >
             <Upload className="h-4 w-4" />
             Import JSON
@@ -411,7 +411,7 @@ export default function ThemeCustomizer() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, ease: EASE }}
-            className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30"
+            className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30"
           >
             <div className="flex items-center gap-3">
               <Settings2 className="h-4 w-4 text-slate-500 dark:text-slate-400" />
@@ -439,7 +439,7 @@ export default function ThemeCustomizer() {
           </motion.div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
               <label
                 htmlFor="theme-customizer-accent-color"
                 className="block text-sm font-semibold text-slate-900 dark:text-slate-50"
@@ -470,7 +470,7 @@ export default function ThemeCustomizer() {
               </div>
             </div>
 
-            <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
                 Display mode
               </p>
@@ -537,7 +537,7 @@ export default function ThemeCustomizer() {
               description="Tighten spacing for denser dashboards and data tools."
               onChange={(checked) => updateTheme((current) => ({ ...current, compactMode: checked }))}
             />
-            <div className="rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-900/30">
+            <div className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-900/30">
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
                 Active mode
               </p>
@@ -549,7 +549,7 @@ export default function ThemeCustomizer() {
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">Preview panel</p>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
               Live sample of cards, chips, accent usage, and typography.
@@ -576,7 +576,7 @@ export default function ThemeCustomizer() {
                 </div>
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-900/25">
+                  <div className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-900/25">
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                       Query Time
                     </p>
@@ -584,7 +584,7 @@ export default function ThemeCustomizer() {
                       284 ms
                     </p>
                   </div>
-                  <div className="rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-900/25">
+                  <div className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-900/25">
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                       Rows Scanned
                     </p>
@@ -605,7 +605,7 @@ export default function ThemeCustomizer() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.24, ease: EASE }}
-                className="rounded-[1.2rem] border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300"
+                className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300"
               >
                 {notice}
               </motion.div>

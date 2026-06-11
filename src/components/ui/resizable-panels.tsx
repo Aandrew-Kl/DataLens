@@ -15,7 +15,7 @@ import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, GripVertical } from 
 import { clamp } from "@/lib/utils/formatters";
 
 const GLASS_PANEL_CLASS =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-slate-950 border border-white/20";
 const COLLAPSED_SIZE = 8;
 const DEFAULT_MIN_SIZE = 12;
 const DEFAULT_MAX_SIZE = 88;
@@ -210,7 +210,7 @@ function PanelHeaderButton({
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-1 rounded-xl border border-white/20 bg-white/60 px-2.5 py-1 text-xs font-medium text-slate-700 transition-colors hover:bg-white dark:bg-slate-900/50 dark:text-slate-100 dark:hover:bg-slate-900"
+      className="inline-flex items-center gap-1 rounded-xl border border-white/20 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition-colors hover:bg-white dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-900"
       aria-label={`${collapsed ? "Expand" : "Collapse"} ${title} panel`}
     >
       <Icon className="h-3.5 w-3.5" />

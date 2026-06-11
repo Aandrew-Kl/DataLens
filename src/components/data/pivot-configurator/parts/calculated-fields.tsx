@@ -25,7 +25,7 @@ export function CalculatedFieldsPanel({
   onAdd,
 }: CalculatedFieldsPanelProps) {
   return (
-    <div className="rounded-[1.6rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-950/30">
+    <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/30">
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
         <Calculator className="h-3.5 w-3.5" />
         Calculated fields
@@ -58,7 +58,7 @@ export function CalculatedFieldsPanel({
         {calculatedFields.map((field) => (
           <div
             key={field.id}
-            className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/35"
+            className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/35"
           >
             <div>
               <div className="text-sm font-semibold text-slate-950 dark:text-white">

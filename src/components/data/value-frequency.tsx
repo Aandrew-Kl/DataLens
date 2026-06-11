@@ -417,7 +417,7 @@ function FrequencyPanel({
 
       <section className={`${GLASS_PANEL_CLASS} overflow-hidden`}>
         <table className="min-w-full border-collapse">
-          <thead className="bg-white/55 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:bg-slate-900/35 dark:text-slate-400">
+          <thead className="bg-white text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:bg-slate-900/35 dark:text-slate-400">
             <tr>
               <th className="px-4 py-3">Value</th>
               <th className="px-4 py-3">Frequency</th>

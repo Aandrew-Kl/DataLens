@@ -186,14 +186,14 @@ export default function FrequencyTable({ tableName, columns }: FrequencyTablePro
 
   if (!columns.length) {
     return (
-      <section className="rounded-2xl border border-gray-200/70 bg-white/80 p-6 shadow-sm dark:border-gray-700/70 dark:bg-gray-900/60">
+      <section className="rounded-2xl border border-gray-200/70 bg-white p-6 shadow-sm dark:border-gray-700/70 dark:bg-gray-900">
         <p className="text-sm text-gray-600 dark:text-gray-300">No columns available for frequency analysis.</p>
       </section>
     );
   }
 
   return (
-    <section className="rounded-2xl border border-gray-200/70 bg-white/80 p-6 shadow-sm dark:border-gray-700/70 dark:bg-gray-900/60">
+    <section className="rounded-2xl border border-gray-200/70 bg-white p-6 shadow-sm dark:border-gray-700/70 dark:bg-gray-900">
       <div className="flex flex-wrap items-start justify-between gap-4 border-b border-gray-200/70 pb-5 dark:border-gray-700/70">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-sky-600 dark:text-sky-400"><Table2 className="h-4 w-4" /> Frequency Table</div>
@@ -208,10 +208,10 @@ export default function FrequencyTable({ tableName, columns }: FrequencyTablePro
       </div>
 
       <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,220px)_minmax(0,1fr)_auto_auto]">
-        <select value={selectedColumn?.name ?? ""} onChange={(event) => setSelectedName(event.target.value)} className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-sky-400 dark:border-gray-700 dark:bg-gray-950/60 dark:text-gray-100">
+        <select value={selectedColumn?.name ?? ""} onChange={(event) => setSelectedName(event.target.value)} className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-sky-400 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
           {columns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
         </select>
-        <label className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 dark:border-gray-700 dark:bg-gray-950/60">
+        <label className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 dark:border-gray-700 dark:bg-gray-950">
           <Search className="h-4 w-4 text-gray-400" />
           <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search values or bins" className="w-full bg-transparent py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 dark:text-gray-100" />
         </label>
@@ -226,7 +226,7 @@ export default function FrequencyTable({ tableName, columns }: FrequencyTablePro
       <AnimatePresence initial={false}>
         {isNumeric && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="mt-3 flex flex-wrap items-center gap-3">
-            <div className="inline-flex rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-gray-700 dark:bg-gray-950/50">
+            <div className="inline-flex rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-gray-700 dark:bg-gray-950">
               {(["auto", "custom"] as const).map((mode) => (
                 <button key={mode} type="button" onClick={() => setBinMode(mode)} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${binMode === mode ? "bg-sky-500 text-white" : "text-gray-600 dark:text-gray-300"}`}>
                   {mode === "auto" ? `Auto (${autoBinCount})` : "Custom"}
@@ -234,7 +234,7 @@ export default function FrequencyTable({ tableName, columns }: FrequencyTablePro
               ))}
             </div>
             {binMode === "custom" && (
-              <label className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-950/60 dark:text-gray-200">
+              <label className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200">
                 <BarChart3 className="h-4 w-4 text-gray-400" />
                 <span>Bins</span>
                 <input type="number" min={2} max={60} value={customBinCount} onChange={(event) => setCustomBinCount(Number(event.target.value) || 12)} className="w-16 bg-transparent text-right outline-none" />
@@ -246,7 +246,7 @@ export default function FrequencyTable({ tableName, columns }: FrequencyTablePro
 
       <AnimatePresence mode="wait">
         {isNumeric && displayRows.length > 0 && (
-          <motion.div key={`${selectedName}-${binCount}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="mt-5 rounded-2xl border border-gray-200/70 bg-gray-50/80 p-4 dark:border-gray-700/70 dark:bg-gray-950/35">
+          <motion.div key={`${selectedName}-${binCount}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="mt-5 rounded-2xl border border-gray-200/70 bg-gray-50 p-4 dark:border-gray-700/70 dark:bg-gray-950/35">
             <div className="mb-3 flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"><BarChart3 className="h-4 w-4 text-sky-500" /> Histogram</div>
             <ReactECharts option={buildHistogram(displayRows, dark)} style={{ height: 240, width: "100%" }} />
           </motion.div>
@@ -254,11 +254,11 @@ export default function FrequencyTable({ tableName, columns }: FrequencyTablePro
       </AnimatePresence>
 
       <div className="relative mt-5 overflow-hidden rounded-2xl border border-gray-200/70 dark:border-gray-700/70">
-        {loading && <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-sm dark:bg-gray-950/70"><Loader2 className="h-5 w-5 animate-spin text-sky-500" /></div>}
+        {loading && <div className="absolute inset-0 z-10 flex items-center justify-center bg-white dark:bg-gray-950/60"><Loader2 className="h-5 w-5 animate-spin text-sky-500" /></div>}
         {displayRows.length > 0 ? (
           <div className="max-h-[28rem] overflow-auto">
             <table className="min-w-full divide-y divide-gray-200/70 text-sm dark:divide-gray-700/70">
-              <thead className="sticky top-0 bg-gray-50/90 backdrop-blur dark:bg-gray-950/90">
+              <thead className="sticky top-0 bg-gray-50 dark:bg-gray-950">
                 <tr className="text-left text-xs uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
                   <th className="px-4 py-3 font-semibold">Value</th>
                   <th className="px-4 py-3 font-semibold">Count</th>
@@ -267,7 +267,7 @@ export default function FrequencyTable({ tableName, columns }: FrequencyTablePro
                   <th className="px-4 py-3 font-semibold">Share</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200/70 bg-white/70 dark:divide-gray-800/70 dark:bg-gray-900/40">
+              <tbody className="divide-y divide-gray-200/70 bg-white dark:divide-gray-800/70 dark:bg-gray-900">
                 {displayRows.map((row) => (
                   <tr key={row.key} className="align-top transition hover:bg-sky-50/60 dark:hover:bg-sky-500/5">
                     <td className="max-w-[18rem] px-4 py-3 font-medium text-gray-900 dark:text-gray-100" title={row.label}>{row.label}</td>

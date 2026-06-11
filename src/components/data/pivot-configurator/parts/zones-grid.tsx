@@ -36,7 +36,7 @@ export function ZonesGrid({
 }: ZonesGridProps) {
   return (
     <>
-      <div className="rounded-[1.6rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-950/30">
+      <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/30">
         <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
           <Table2 className="h-3.5 w-3.5" />
           Available columns

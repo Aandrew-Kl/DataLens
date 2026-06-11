@@ -244,11 +244,11 @@ async function fetchPCASamples(tableName: string, selectedColumns: string[]): Pr
           (column) =>
             `TRY_CAST(${quoteIdentifier(column)} AS DOUBLE) AS ${quoteIdentifier(column)}`,
         )
-        .join(",\n      ")}
+        .join(",\n ")}
     FROM ${quoteIdentifier(tableName)}
     WHERE ${selectedColumns
       .map((column) => `TRY_CAST(${quoteIdentifier(column)} AS DOUBLE) IS NOT NULL`)
-      .join("\n      AND ")}
+      .join("\n AND ")}
     LIMIT ${SAMPLE_LIMIT}
   `;
 
@@ -498,7 +498,7 @@ export default function PCAView({ tableName, columns }: PCAViewProps): ReactNode
                   className={`rounded-full border px-3 py-1.5 text-sm transition ${
                     active
                       ? "border-cyan-400/40 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300"
-                      : "border-white/20 bg-white/70 text-slate-600 dark:bg-slate-950/55 dark:text-slate-300"
+                      : "border-white/20 bg-white text-slate-600 dark:bg-slate-950 dark:text-slate-300"
                   }`}
                 >
                   {column.name}

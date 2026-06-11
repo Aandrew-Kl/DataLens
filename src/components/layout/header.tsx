@@ -108,10 +108,10 @@ export default function Header({
   return (
     <header
       role="banner"
-      className="flex items-center gap-3 px-4 h-14 shrink-0 border-b border-gray-200/60 dark:border-gray-700/60 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl"
+      className="flex items-center gap-3 px-4 h-14 shrink-0 border-b border-gray-200/60 dark:border-gray-700/60 bg-white dark:bg-gray-900 "
     >
       {/* --------------------------------------------------------------- */}
-      {/* Left: sidebar toggle + dataset info                              */}
+      {/* Left: sidebar toggle + dataset info */}
       {/* --------------------------------------------------------------- */}
       <div className="flex items-center gap-3 shrink-0">
         <button
@@ -147,13 +147,13 @@ export default function Header({
       </div>
 
       {/* --------------------------------------------------------------- */}
-      {/* Center: search bar                                               */}
+      {/* Center: search bar */}
       {/* --------------------------------------------------------------- */}
       <div className="flex-1 flex justify-center px-2">
         <div
           className={`
             relative flex items-center w-full max-w-md transition-all duration-200
-            rounded-lg border bg-gray-50 dark:bg-gray-800/60
+            rounded-lg border bg-gray-50 dark:bg-gray-800
             ${
               searchFocused
                 ? "border-purple-300 dark:border-purple-600 ring-2 ring-purple-200/40 dark:ring-purple-800/30"
@@ -190,7 +190,7 @@ export default function Header({
       </div>
 
       {/* --------------------------------------------------------------- */}
-      {/* Right: export, theme, settings                                   */}
+      {/* Right: export, theme, settings */}
       {/* --------------------------------------------------------------- */}
       <div className="flex items-center gap-1 shrink-0">
         {/* Export dropdown */}

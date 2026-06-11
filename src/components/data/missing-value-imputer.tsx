@@ -189,14 +189,14 @@ function buildImputationQueries(
     ${windowExpressions.length > 0 ? `,
     windowed AS (
       SELECT *,
-        ${windowExpressions.join(",\n        ")}
+        ${windowExpressions.join(",\n ")}
       FROM base
     )` : ""}
     ,
     filled AS (
       SELECT
         "__dli_row_id",
-        ${selectExpressions.join(",\n        ")}
+        ${selectExpressions.join(",\n ")}
       FROM ${sourceName}
     )
   `;
@@ -239,13 +239,13 @@ function buildImputationQueries(
     summarySql: `
       ${filledCte}
       SELECT
-        ${summaryExpressions.join(",\n        ")}
+        ${summaryExpressions.join(",\n ")}
       FROM filled
     `,
     applySql: `
       ${filledCte}
       SELECT
-        ${columns.map((column) => quoteIdentifier(column.name)).join(",\n        ")}
+        ${columns.map((column) => quoteIdentifier(column.name)).join(",\n ")}
       FROM filled
       ORDER BY "__dli_row_id"
     `,
@@ -325,7 +325,7 @@ function StrategyCard({
               }`}
             />
           ) : (
-            <div className="flex items-center rounded-2xl border border-white/20 bg-white/55 px-4 py-3 text-sm text-slate-500 dark:bg-slate-900/35 dark:text-slate-400">
+            <div className="flex items-center rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-500 dark:bg-slate-900/35 dark:text-slate-400">
               {config.strategy === "forward_fill"
                 ? "Uses prior observed value"
                 : "Column-level statistic"}
@@ -348,9 +348,9 @@ function PreviewTable({
   rows: PreviewRow[];
 }) {
   return (
-    <div className="overflow-auto rounded-3xl border border-white/20 bg-white/55 dark:bg-slate-900/35">
+    <div className="overflow-auto rounded-3xl border border-white/20 bg-white dark:bg-slate-900/35">
       <table className="min-w-full border-collapse">
-        <thead className="bg-white/65 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:bg-slate-900/45 dark:text-slate-400">
+        <thead className="bg-white text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:bg-slate-900 dark:text-slate-400">
           <tr>
             <th className="px-4 py-3">Row</th>
             <th className="px-4 py-3">Column</th>
@@ -735,7 +735,7 @@ export default function MissingValueImputer({
             <PreviewTable rows={previewRows} />
           </div>
         ) : (
-          <div className="mt-4 rounded-3xl border border-dashed border-white/20 bg-white/40 px-4 py-8 text-sm text-slate-500 dark:bg-slate-900/25 dark:text-slate-400">
+          <div className="mt-4 rounded-3xl border border-dashed border-white/20 bg-white px-4 py-8 text-sm text-slate-500 dark:bg-slate-900/25 dark:text-slate-400">
             Run a preview to compare original and imputed values.
           </div>
         )}

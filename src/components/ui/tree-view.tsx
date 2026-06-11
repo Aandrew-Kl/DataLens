@@ -13,7 +13,7 @@ import {
 import { ChevronDown, ChevronRight, Search } from "lucide-react";
 
 const GLASS_PANEL_CLASS =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-slate-950 border border-white/20";
 
 export interface TreeNode<T = unknown> {
   id: string;
@@ -180,7 +180,7 @@ function TreeCheckbox({
       aria-label={`Select ${label}`}
       disabled={disabled}
       onChange={onChange}
-      className="h-4 w-4 rounded border-white/20 bg-white/70 text-cyan-600 focus:ring-cyan-400 dark:bg-slate-900/60"
+      className="h-4 w-4 rounded border-white/20 bg-white text-cyan-600 focus:ring-cyan-400 dark:bg-slate-900"
     />
   );
 }
@@ -218,7 +218,7 @@ function TreeRow<T>({
           type="button"
           onClick={() => onToggleExpand(row.node.id)}
           aria-label={`${row.expanded ? "Collapse" : "Expand"} ${row.node.label}`}
-          className="rounded-lg p-1 text-slate-500 transition-colors hover:bg-white/60 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-900/60 dark:hover:text-slate-100"
+          className="rounded-lg p-1 text-slate-500 transition-colors hover:bg-white hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100"
         >
           {row.expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </button>
@@ -243,7 +243,7 @@ function TreeRow<T>({
         onFocus={() => onActivate(row.node.id)}
         onClick={() => onActivate(row.node.id)}
         onKeyDown={(event) => onKeyDown(event, row)}
-        className="flex min-w-0 flex-1 items-center gap-2 rounded-xl px-2 py-1 text-left transition-colors hover:bg-white/60 dark:hover:bg-slate-900/50"
+        className="flex min-w-0 flex-1 items-center gap-2 rounded-xl px-2 py-1 text-left transition-colors hover:bg-white dark:hover:bg-slate-900"
       >
         {row.node.icon ? <span className="shrink-0">{row.node.icon}</span> : null}
         <span className={`truncate text-sm font-medium ${row.matchesSearch ? "text-cyan-700 dark:text-cyan-300" : ""}`}>
@@ -421,7 +421,7 @@ export default function TreeView<T>({
 
   return (
     <section className={wrapperClassName}>
-      <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/60 px-3 py-2 dark:bg-slate-900/50">
+      <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-3 py-2 dark:bg-slate-900">
         <Search className="h-4 w-4 text-slate-400" />
         <input
           value={query}

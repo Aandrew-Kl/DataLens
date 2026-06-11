@@ -122,8 +122,8 @@ function NotificationItem({
       transition={{ duration: 0.22, ease: "easeOut" }}
       role={notification.type === "error" ? "alert" : "status"}
       className={mergeClasses(
-        "pointer-events-auto relative overflow-hidden rounded-2xl border backdrop-blur-2xl shadow-2xl",
-        "w-full max-w-sm bg-white/90 dark:bg-slate-950/88 dark:text-slate-100",
+        "pointer-events-auto relative overflow-hidden rounded-2xl border shadow-2xl",
+        "w-full max-w-sm bg-white dark:bg-slate-950 dark:text-slate-100",
         shellStyles[notification.type],
       )}
     >
@@ -223,7 +223,7 @@ export default function NotificationCenter({
           <button
             type="button"
             onClick={clearAll}
-            className="pointer-events-auto rounded-full border border-slate-700/80 bg-slate-950/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-300 backdrop-blur-xl transition-colors hover:border-slate-600 hover:text-white"
+            className="pointer-events-auto rounded-full border border-slate-700/80 bg-slate-950 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-300 transition-colors hover:border-slate-600 hover:text-white"
           >
             Clear all
           </button>

@@ -65,9 +65,9 @@ type SortMode = "name" | "size" | "date_loaded";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950/45 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950 dark:text-slate-100";
 const TAGS_STORAGE_KEY = "datalens:data-catalog:tags";
 const catalogListeners = new Set<() => void>();
 const tagListeners = new Set<() => void>();
@@ -313,7 +313,7 @@ function CatalogTableCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.24, ease: EASE }}
-      className={`rounded-[1.5rem] border p-4 transition ${isDropTarget ? "border-cyan-400/40 bg-cyan-500/8" : "border-white/15 bg-white/70 dark:bg-slate-950/45"}`}
+      className={`rounded-lg border p-4 transition ${isDropTarget ? "border-cyan-400/40 bg-cyan-500/8" : "border-white/15 bg-white dark:bg-slate-950"}`}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -329,13 +329,13 @@ function CatalogTableCard({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => onPreview(item.name)} className="rounded-xl border border-white/20 bg-white/80 p-2 text-slate-700 transition hover:bg-white dark:bg-slate-950/45 dark:text-slate-200">
+          <button type="button" onClick={() => onPreview(item.name)} className="rounded-xl border border-white/20 bg-white p-2 text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200">
             <Eye className="h-4 w-4" />
           </button>
-          <button type="button" onClick={() => onProfile(item.name)} className="rounded-xl border border-white/20 bg-white/80 p-2 text-slate-700 transition hover:bg-white dark:bg-slate-950/45 dark:text-slate-200">
+          <button type="button" onClick={() => onProfile(item.name)} className="rounded-xl border border-white/20 bg-white p-2 text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200">
             <FileSearch className="h-4 w-4" />
           </button>
-          <button type="button" onClick={() => onExport(item.name)} className="rounded-xl border border-white/20 bg-white/80 p-2 text-slate-700 transition hover:bg-white dark:bg-slate-950/45 dark:text-slate-200">
+          <button type="button" onClick={() => onExport(item.name)} className="rounded-xl border border-white/20 bg-white p-2 text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200">
             <Download className="h-4 w-4" />
           </button>
           <button type="button" onClick={() => onDelete(item.name)} className="rounded-xl border border-rose-300/50 bg-rose-500/10 p-2 text-rose-700 transition hover:bg-rose-500/20 dark:border-rose-500/30 dark:text-rose-300">
@@ -369,7 +369,7 @@ function CatalogTableCard({
         <button
           type="button"
           onClick={() => onAddTag(item.name)}
-          className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-950/65"
+          className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-950"
         >
           <Tag className="h-4 w-4" />
           Save tag
@@ -584,18 +584,18 @@ export default function DataCatalog() {
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 dark:bg-slate-950/45">
+          <div className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-950">
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Loaded tables</p>
             <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100">{formatNumber(snapshot.items.length)}</p>
           </div>
-          <div className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 dark:bg-slate-950/45">
+          <div className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-950">
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Catalog status</p>
             <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100">{snapshot.status}</p>
           </div>
           <button
             type="button"
             onClick={() => void refreshCatalog()}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/80 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-950/65"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-950"
           >
             <RefreshCw className={`h-4 w-4 ${snapshot.status === "loading" ? "animate-spin" : ""}`} />
             Refresh catalog
@@ -604,7 +604,7 @@ export default function DataCatalog() {
       </div>
 
       <div className="mt-6 grid gap-4 xl:grid-cols-[1fr_240px]">
-        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/45 dark:text-slate-100">
+        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-100">
           <Search className="h-4 w-4 text-cyan-500" />
           <input
             value={search}
@@ -613,7 +613,7 @@ export default function DataCatalog() {
             className="w-full bg-transparent outline-none"
           />
         </label>
-        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/45 dark:text-slate-100">
+        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-100">
           <ArrowUpDown className="h-4 w-4 text-cyan-500" />
           <select value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)} className="w-full bg-transparent outline-none">
             <option value="name">Sort by name</option>
@@ -630,13 +630,13 @@ export default function DataCatalog() {
       ) : null}
 
       {snapshot.status === "loading" && snapshot.items.length === 0 ? (
-        <div className="mt-6 flex min-h-[220px] items-center justify-center rounded-[1.5rem] border border-dashed border-white/20 text-sm text-slate-500 dark:text-slate-400">
+        <div className="mt-6 flex min-h-[220px] items-center justify-center rounded-lg border border-dashed border-white/20 text-sm text-slate-500 dark:text-slate-400">
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           Inspecting DuckDB tables...
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="mt-6 rounded-[1.5rem] border border-dashed border-white/20 px-6 py-14 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-white/20 bg-white/80 text-slate-400 dark:bg-slate-950/45 dark:text-slate-500">
+        <div className="mt-6 rounded-lg border border-dashed border-white/20 px-6 py-14 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-white/20 bg-white text-slate-400 dark:bg-slate-950 dark:text-slate-500">
             <Import className="h-7 w-7" />
           </div>
           <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">No DuckDB tables available</h3>
@@ -677,7 +677,7 @@ export default function DataCatalog() {
       )}
 
       {joinDraft ? (
-        <div className="mt-6 rounded-[1.5rem] border border-cyan-400/20 bg-cyan-500/8 p-5">
+        <div className="mt-6 rounded-lg border border-cyan-400/20 bg-cyan-500/8 p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-cyan-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-cyan-700 dark:text-cyan-300">
@@ -694,7 +694,7 @@ export default function DataCatalog() {
             <button
               type="button"
               onClick={() => setJoinDraft(null)}
-              className="rounded-2xl border border-white/20 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-950/65"
+              className="rounded-2xl border border-white/20 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-950"
             >
               Dismiss
             </button>
@@ -755,7 +755,7 @@ export default function DataCatalog() {
                   key={`${suggestion.leftColumn}:${suggestion.rightColumn}`}
                   type="button"
                   onClick={() => setJoinDraft((current) => current ? { ...current, leftColumn: suggestion.leftColumn, rightColumn: suggestion.rightColumn } : current)}
-                  className="rounded-full border border-white/20 bg-white/80 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-white dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-950/65"
+                  className="rounded-full border border-white/20 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-950"
                 >
                   {suggestion.leftColumn} ↔ {suggestion.rightColumn}
                 </button>
@@ -766,7 +766,7 @@ export default function DataCatalog() {
       ) : null}
 
       <div className="mt-6 grid gap-5 xl:grid-cols-2">
-        <div className="rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+        <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Preview</p>
@@ -776,16 +776,16 @@ export default function DataCatalog() {
           </div>
 
           {!previewState ? (
-            <div className="mt-4 rounded-[1.25rem] border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="mt-4 rounded-lg border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
               Choose Preview on any table card to inspect its first 10 rows.
             </div>
           ) : (
             <div className="mt-4 space-y-3">
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{previewState.tableName}</p>
-              <div className="overflow-hidden rounded-[1.25rem] border border-white/15">
+              <div className="overflow-hidden rounded-lg border border-white/15">
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-left text-sm">
-                    <thead className="bg-white/85 dark:bg-slate-950/70">
+                    <thead className="bg-white dark:bg-slate-950">
                       <tr>
                         {Object.keys(previewState.rows[0] ?? {}).map((header) => (
                           <th key={header} className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
@@ -794,7 +794,7 @@ export default function DataCatalog() {
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/10 bg-white/60 dark:bg-slate-950/45">
+                    <tbody className="divide-y divide-white/10 bg-white dark:bg-slate-950">
                       {previewState.rows.map((row, rowIndex) => (
                         <tr key={`${previewState.tableName}-${rowIndex}`}>
                           {Object.keys(previewState.rows[0] ?? {}).map((header) => (
@@ -812,7 +812,7 @@ export default function DataCatalog() {
           )}
         </div>
 
-        <div className="rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+        <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Profile</p>
@@ -822,16 +822,16 @@ export default function DataCatalog() {
           </div>
 
           {!profileState ? (
-            <div className="mt-4 rounded-[1.25rem] border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="mt-4 rounded-lg border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
               Use Profile on any table card to fetch null counts, sample values, and numeric ranges.
             </div>
           ) : (
             <div className="mt-4 space-y-3">
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{profileState.tableName}</p>
-              <div className="overflow-hidden rounded-[1.25rem] border border-white/15">
+              <div className="overflow-hidden rounded-lg border border-white/15">
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-left text-sm">
-                    <thead className="bg-white/85 dark:bg-slate-950/70">
+                    <thead className="bg-white dark:bg-slate-950">
                       <tr>
                         <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Column</th>
                         <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Type</th>
@@ -839,7 +839,7 @@ export default function DataCatalog() {
                         <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Unique</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/10 bg-white/60 dark:bg-slate-950/45">
+                    <tbody className="divide-y divide-white/10 bg-white dark:bg-slate-950">
                       {profileState.columns.map((column) => (
                         <tr key={column.name}>
                           <td className="px-3 py-2 text-slate-700 dark:text-slate-200">{column.name}</td>

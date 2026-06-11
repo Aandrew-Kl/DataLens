@@ -316,12 +316,12 @@ function ExplorerFallback() {
   return (
     <div className="grid gap-4 lg:grid-cols-[0.95fr,1.05fr]">
       <div className={`${GLASS_CARD_CLASS} animate-pulse p-5`}>
-        <div className="h-4 w-28 rounded-full bg-slate-200/80 dark:bg-slate-800/80" />
-        <div className="mt-4 h-40 rounded-3xl bg-slate-200/70 dark:bg-slate-800/70" />
+        <div className="h-4 w-28 rounded-full bg-slate-200 dark:bg-slate-800" />
+        <div className="mt-4 h-40 rounded-3xl bg-slate-200 dark:bg-slate-800" />
       </div>
       <div className={`${GLASS_CARD_CLASS} animate-pulse p-5`}>
-        <div className="h-4 w-28 rounded-full bg-slate-200/80 dark:bg-slate-800/80" />
-        <div className="mt-4 h-40 rounded-3xl bg-slate-200/70 dark:bg-slate-800/70" />
+        <div className="h-4 w-28 rounded-full bg-slate-200 dark:bg-slate-800" />
+        <div className="mt-4 h-40 rounded-3xl bg-slate-200 dark:bg-slate-800" />
       </div>
     </div>
   );

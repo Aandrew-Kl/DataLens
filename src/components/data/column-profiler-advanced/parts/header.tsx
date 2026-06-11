@@ -22,7 +22,7 @@ export function Header({
   onClose,
 }: HeaderProps) {
   return (
-    <div className="sticky top-0 z-10 border-b border-slate-200/70 bg-white/80 px-5 py-4 backdrop-blur-xl dark:border-slate-800/70 dark:bg-slate-950/80">
+    <div className="sticky top-0 z-10 border-b border-slate-200/70 bg-white px-5 py-4 dark:border-slate-800/70 dark:bg-slate-950">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-600 dark:text-cyan-400">

@@ -242,7 +242,7 @@ export default function ColumnGrouper({ tableName, columns }: ColumnGrouperProps
   }
 
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-white/20 bg-white/60 shadow-2xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45">
+    <section className="overflow-hidden rounded-lg border border-white/20 bg-white shadow-2xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950">
       <div className="border-b border-white/15 px-5 py-5">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-500/10 text-teal-700 dark:text-teal-300">
@@ -266,11 +266,11 @@ export default function ColumnGrouper({ tableName, columns }: ColumnGrouperProps
         ) : null}
 
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE }} className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="space-y-4 rounded-[1.75rem] border border-white/15 bg-white/50 p-4 dark:bg-slate-900/40">
+          <div className="space-y-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900">
             <div className="space-y-3">
               <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Create group</h3>
-              <input value={groupName} onChange={(event) => setGroupName(event.target.value)} placeholder="Financial Columns" className="w-full rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
-              <textarea value={groupDescription} onChange={(event) => setGroupDescription(event.target.value)} rows={3} placeholder="Metrics used in revenue and margin analysis" className="w-full rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
+              <input value={groupName} onChange={(event) => setGroupName(event.target.value)} placeholder="Financial Columns" className="w-full rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
+              <textarea value={groupDescription} onChange={(event) => setGroupDescription(event.target.value)} rows={3} placeholder="Metrics used in revenue and margin analysis" className="w-full rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
               <div className="flex flex-wrap gap-2">
                 {colorOptions.map((color) => (
                   <button key={color} type="button" onClick={() => setGroupColor(color)} className={`flex h-9 w-9 items-center justify-center rounded-full border ${groupColor === color ? "border-slate-950 dark:border-white" : "border-white/20"}`} style={{ backgroundColor: color }}>
@@ -288,12 +288,12 @@ export default function ColumnGrouper({ tableName, columns }: ColumnGrouperProps
               <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Existing groups</h3>
               <AnimatePresence initial={false}>
                 {store.groups.length === 0 ? (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-[1.5rem] border border-dashed border-white/20 bg-white/35 px-5 py-8 text-center text-sm text-slate-500 dark:bg-slate-900/30 dark:text-slate-400">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-lg border border-dashed border-white/20 bg-white/35 px-5 py-8 text-center text-sm text-slate-500 dark:bg-slate-900/30 dark:text-slate-400">
                     No groups saved yet.
                   </motion.div>
                 ) : (
                   store.groups.map((group) => (
-                    <motion.button key={group.id} layout type="button" onClick={() => setActiveGroupId(group.id)} className={`w-full rounded-[1.5rem] border px-4 py-4 text-left transition ${activeGroupId === group.id ? "border-teal-400/50 bg-teal-500/10" : "border-white/15 bg-white/35 dark:bg-slate-900/30"}`}>
+                    <motion.button key={group.id} layout type="button" onClick={() => setActiveGroupId(group.id)} className={`w-full rounded-lg border px-4 py-4 text-left transition ${activeGroupId === group.id ? "border-teal-400/50 bg-teal-500/10" : "border-white/15 bg-white/35 dark:bg-slate-900/30"}`}>
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-2">
@@ -315,18 +315,18 @@ export default function ColumnGrouper({ tableName, columns }: ColumnGrouperProps
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-[1.75rem] border border-white/15 bg-white/50 p-4 dark:bg-slate-900/40">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Assign columns</h3>
                   <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{activeGroup ? `Selected group: ${activeGroup.name}` : "Choose a group, then add or remove selected columns."}</p>
                 </div>
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => updateGroupColumns("add")} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-3 py-2 text-sm text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+                  <button type="button" onClick={() => updateGroupColumns("add")} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-3 py-2 text-sm text-slate-700 transition hover:bg-white dark:text-slate-200">
                     <Plus className="h-4 w-4" />
                     Add selected
                   </button>
-                  <button type="button" onClick={() => updateGroupColumns("remove")} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-3 py-2 text-sm text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+                  <button type="button" onClick={() => updateGroupColumns("remove")} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-3 py-2 text-sm text-slate-700 transition hover:bg-white dark:text-slate-200">
                     <Trash2 className="h-4 w-4" />
                     Remove selected
                   </button>
@@ -339,7 +339,7 @@ export default function ColumnGrouper({ tableName, columns }: ColumnGrouperProps
                     key={column.name}
                     htmlFor={`column-grouper-select-${column.name}`}
                     aria-label={`Select column ${column.name}`}
-                    className="rounded-[1.25rem] border border-white/15 bg-white/35 p-3 dark:bg-slate-900/30"
+                    className="rounded-lg border border-white/15 bg-white/35 p-3 dark:bg-slate-900/30"
                   >
                     <div className="flex items-start gap-3">
                       <input
@@ -352,7 +352,7 @@ export default function ColumnGrouper({ tableName, columns }: ColumnGrouperProps
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="truncate font-medium text-slate-950 dark:text-slate-50">{column.name}</span>
-                          <span className="rounded-full bg-white/50 px-2 py-0.5 text-[11px] uppercase tracking-[0.16em] text-slate-500 dark:bg-slate-950/60 dark:text-slate-400">{column.type}</span>
+                          <span className="rounded-full bg-white px-2 py-0.5 text-[11px] uppercase tracking-[0.16em] text-slate-500 dark:bg-slate-950 dark:text-slate-400">{column.type}</span>
                         </div>
                         <div className="mt-2 flex flex-wrap gap-1.5">
                           {groups.length === 0 ? <span className="text-xs text-slate-400">Ungrouped</span> : null}
@@ -369,16 +369,16 @@ export default function ColumnGrouper({ tableName, columns }: ColumnGrouperProps
               </div>
             </div>
 
-            <div className="rounded-[1.75rem] border border-white/15 bg-white/50 p-4 dark:bg-slate-900/40">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900">
               <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <Calculator className="h-4 w-4" />
                 Computed columns
               </div>
               <div className="mt-4 grid gap-3">
-                <input value={computedName} onChange={(event) => setComputedName(event.target.value)} placeholder="gross_margin_pct" className="w-full rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
-                <textarea value={computedExpression} onChange={(event) => setComputedExpression(event.target.value)} rows={4} placeholder='("revenue" - "cost") / NULLIF("revenue", 0)' className="w-full rounded-2xl border border-white/20 bg-white/70 px-4 py-3 font-mono text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
+                <input value={computedName} onChange={(event) => setComputedName(event.target.value)} placeholder="gross_margin_pct" className="w-full rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
+                <textarea value={computedExpression} onChange={(event) => setComputedExpression(event.target.value)} rows={4} placeholder='("revenue" - "cost") / NULLIF("revenue", 0)' className="w-full rounded-2xl border border-white/20 bg-white px-4 py-3 font-mono text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
                 <div className="grid gap-2 sm:grid-cols-2">
-                  <button type="button" onClick={() => void previewComputedColumn()} disabled={busy !== null} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white/40 disabled:opacity-60 dark:text-slate-200">
+                  <button type="button" onClick={() => void previewComputedColumn()} disabled={busy !== null} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white disabled:opacity-60 dark:text-slate-200">
                     <Sparkles className={`h-4 w-4 ${busy === "preview" ? "animate-spin" : ""}`} />
                     Preview in DuckDB
                   </button>
@@ -389,9 +389,9 @@ export default function ColumnGrouper({ tableName, columns }: ColumnGrouperProps
                 </div>
                 {previewError ? <div className="rounded-2xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">{previewError}</div> : null}
                 {previewRows.length > 0 ? (
-                  <div className="overflow-hidden rounded-[1.25rem] border border-white/15">
+                  <div className="overflow-hidden rounded-lg border border-white/15">
                     <table className="min-w-full divide-y divide-white/10 text-sm">
-                      <thead className="bg-white/35 dark:bg-slate-900/50">
+                      <thead className="bg-white/35 dark:bg-slate-900">
                         <tr>{Object.keys(previewRows[0]).map((key) => <th key={key} className="px-3 py-2 text-left font-semibold text-slate-600 dark:text-slate-300">{key}</th>)}</tr>
                       </thead>
                       <tbody className="divide-y divide-white/10 bg-white/20 dark:bg-slate-950/30">
@@ -406,7 +406,7 @@ export default function ColumnGrouper({ tableName, columns }: ColumnGrouperProps
 
               <div className="mt-5 space-y-2">
                 {store.computedColumns.map((column) => (
-                  <div key={column.id} className="flex flex-col gap-3 rounded-[1.25rem] border border-white/15 bg-white/35 px-4 py-3 dark:bg-slate-900/30 lg:flex-row lg:items-center lg:justify-between">
+                  <div key={column.id} className="flex flex-col gap-3 rounded-lg border border-white/15 bg-white/35 px-4 py-3 dark:bg-slate-900/30 lg:flex-row lg:items-center lg:justify-between">
                     <div>
                       <p className="font-semibold text-slate-950 dark:text-slate-50">{column.name}</p>
                       <p className="mt-1 font-mono text-xs text-slate-500 dark:text-slate-400">{column.expression}</p>

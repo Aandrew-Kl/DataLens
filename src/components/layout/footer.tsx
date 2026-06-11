@@ -11,7 +11,7 @@ const TECH_STACK = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-slate-200/70 bg-white/50 dark:border-slate-800/80 dark:bg-slate-950/20">
+    <footer className="border-t border-slate-200/70 bg-white dark:border-slate-800/80 dark:bg-slate-950/20">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-6 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
@@ -39,7 +39,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-3 py-1 text-xs text-slate-600 shadow-sm shadow-slate-200/30 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-300 dark:shadow-black/10">
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white px-3 py-1 text-xs text-slate-600 shadow-sm shadow-slate-200/30 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:shadow-black/10">
             <Sparkles className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" />
             <span>Built with AI</span>
           </div>

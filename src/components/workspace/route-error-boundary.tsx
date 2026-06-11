@@ -35,9 +35,9 @@ export class RouteErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) return this.props.fallback;
 
       return (
-        <div className="rounded-[1.3rem] border border-rose-200/50 bg-rose-50/70 p-5 text-rose-950 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.35)] backdrop-blur-xl dark:bg-rose-950/20 dark:text-rose-100">
+        <div className="rounded-lg border border-rose-200/50 bg-rose-50/70 p-5 text-rose-950 shadow-sm dark:bg-rose-950/20 dark:text-rose-100">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-rose-200/70 bg-white/70 dark:border-rose-400/20 dark:bg-rose-950/30">
+            <div className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-rose-200/70 bg-white dark:border-rose-400/20 dark:bg-rose-950/30">
               <AlertCircle className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
@@ -50,7 +50,7 @@ export class RouteErrorBoundary extends Component<Props, State> {
           <button
             type="button"
             onClick={this.handleReset}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-rose-200/70 bg-white/80 px-4 py-2 text-sm font-semibold text-rose-900 transition hover:bg-white dark:border-rose-400/20 dark:bg-rose-950/40 dark:text-rose-100 dark:hover:bg-rose-950/60"
+            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-rose-200/70 bg-white px-4 py-2 text-sm font-semibold text-rose-900 transition hover:bg-white dark:border-rose-400/20 dark:bg-rose-950/40 dark:text-rose-100 dark:hover:bg-rose-950/60"
           >
             <RotateCcw className="h-4 w-4" />
             Retry

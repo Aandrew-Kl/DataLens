@@ -17,7 +17,7 @@ export interface StreamingDataViewerProps {
 const DEFAULT_WS_URL =
   process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000/ws/data-stream";
 const PANEL_CLASS =
-  "rounded-2xl border border-white/20 bg-white/60 backdrop-blur-xl dark:bg-slate-900/60";
+  "rounded-2xl border border-white/20 bg-white dark:bg-slate-900";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 function mergeClasses(...classNames: Array<string | false | null | undefined>) {
@@ -80,7 +80,7 @@ export default function StreamingDataViewer({
     <motion.section
       className={mergeClasses(
         PANEL_CLASS,
-        "overflow-hidden p-5 shadow-[0_24px_90px_-46px_rgba(15,23,42,0.76)]",
+        "overflow-hidden p-5 shadow-sm",
         className,
       )}
       initial={{ opacity: 0, y: 18 }}
@@ -104,7 +104,7 @@ export default function StreamingDataViewer({
           </div>
 
           <div
-            className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/55 px-3 py-2 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200"
+            className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white px-3 py-2 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200"
             role="status"
             aria-live="polite"
           >
@@ -129,7 +129,7 @@ export default function StreamingDataViewer({
         >
           <input
             aria-label="SQL query"
-            className="min-h-12 flex-1 rounded-xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950/45 dark:text-slate-50 dark:placeholder:text-slate-500"
+            className="min-h-12 flex-1 rounded-xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950 dark:text-slate-50 dark:placeholder:text-slate-500"
             onChange={(event) => setQuery(event.target.value)}
             placeholder="SELECT * FROM dataset LIMIT 100"
             spellCheck={false}
@@ -180,7 +180,7 @@ export default function StreamingDataViewer({
               aria-valuemax={100}
               aria-valuemin={0}
               aria-valuenow={progressPercent}
-              className="h-2 overflow-hidden rounded-full bg-slate-200/80 dark:bg-slate-800/80"
+              className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"
               role="progressbar"
             >
               <motion.div
@@ -202,7 +202,7 @@ export default function StreamingDataViewer({
           >
             <div className="max-h-[26rem] overflow-y-auto">
               <table className="min-w-full divide-y divide-white/10 text-left text-sm">
-                <thead className="sticky top-0 bg-white/85 backdrop-blur dark:bg-slate-950/80">
+                <thead className="sticky top-0 bg-white dark:bg-slate-950">
                   <tr>
                     {columns.map((column) => (
                       <th
@@ -218,7 +218,7 @@ export default function StreamingDataViewer({
                 <tbody className="divide-y divide-white/10">
                   {rows.map((row, index) => (
                     <tr
-                      className="bg-white/30 text-slate-700 transition hover:bg-white/45 dark:bg-slate-950/20 dark:text-slate-200 dark:hover:bg-slate-950/35"
+                      className="bg-white/30 text-slate-700 transition hover:bg-white dark:bg-slate-950/20 dark:text-slate-200 dark:hover:bg-slate-950/35"
                       key={`row-${index}`}
                     >
                       {columns.map((column) => (

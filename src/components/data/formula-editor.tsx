@@ -171,8 +171,8 @@ export default function FormulaEditor({
   const previewAlias = name.trim() || "preview";
   const previewSql =
     expression.trim().length > 0
-      ? `SELECT\n  ${expression.trim()} AS ${quoteIdentifier(previewAlias)}\nFROM ${quoteIdentifier(tableName)}\nLIMIT 5;`
-      : `SELECT\n  <expression> AS ${quoteIdentifier(previewAlias)}\nFROM ${quoteIdentifier(tableName)}\nLIMIT 5;`;
+      ? `SELECT\n ${expression.trim()} AS ${quoteIdentifier(previewAlias)}\nFROM ${quoteIdentifier(tableName)}\nLIMIT 5;`
+      : `SELECT\n <expression> AS ${quoteIdentifier(previewAlias)}\nFROM ${quoteIdentifier(tableName)}\nLIMIT 5;`;
 
   function insertSnippet(rawSnippet: string) {
     const textarea = textareaRef.current;
@@ -300,8 +300,8 @@ export default function FormulaEditor({
       transition={{ duration: 0.28, ease: "easeOut" }}
       className="
         rounded-2xl border border-white/30 dark:border-white/10
-        bg-white/55 dark:bg-gray-900/55 backdrop-blur-xl
-        shadow-[0_20px_80px_-30px_rgba(15,23,42,0.35)]
+        bg-white dark:bg-gray-900 
+        shadow-sm
         overflow-hidden
       "
     >
@@ -321,7 +321,7 @@ export default function FormulaEditor({
             </p>
           </div>
 
-          <div className="inline-flex items-center gap-2 rounded-xl border border-gray-200/60 dark:border-gray-700/60 bg-white/50 dark:bg-gray-950/40 px-3 py-2 text-xs text-gray-600 dark:text-gray-300">
+          <div className="inline-flex items-center gap-2 rounded-xl border border-gray-200/60 dark:border-gray-700/60 bg-white dark:bg-gray-950 px-3 py-2 text-xs text-gray-600 dark:text-gray-300">
             <Table2 className="h-4 w-4 text-blue-500 dark:text-blue-300" />
             <span className="font-medium">{columns.length}</span>
             <span>available columns</span>
@@ -346,7 +346,7 @@ export default function FormulaEditor({
                 placeholder="profit_margin"
                 className="
                   h-11 w-full rounded-xl border border-gray-200/70 dark:border-gray-700/70
-                  bg-white/70 dark:bg-gray-950/50
+                  bg-white dark:bg-gray-950
                   px-3 text-sm text-gray-900 dark:text-gray-100
                   outline-none transition
                   placeholder:text-gray-400 dark:placeholder:text-gray-500
@@ -365,7 +365,7 @@ export default function FormulaEditor({
                 </span>
               </div>
 
-              <div className="flex flex-wrap gap-2 rounded-2xl border border-gray-200/60 dark:border-gray-700/60 bg-white/40 dark:bg-gray-950/30 p-3">
+              <div className="flex flex-wrap gap-2 rounded-2xl border border-gray-200/60 dark:border-gray-700/60 bg-white dark:bg-gray-950/30 p-3">
                 {columns.map((column, index) => (
                   <motion.button
                     key={column.name}
@@ -376,7 +376,7 @@ export default function FormulaEditor({
                     onClick={() => insertSnippet(quoteIdentifier(column.name))}
                     className="
                       inline-flex items-center gap-2 rounded-full border border-gray-200/70 dark:border-gray-700/70
-                      bg-white/75 dark:bg-gray-900/70 px-3 py-1.5 text-xs font-medium
+                      bg-white dark:bg-gray-900 px-3 py-1.5 text-xs font-medium
                       text-gray-700 dark:text-gray-200 transition
                       hover:border-blue-400/60 hover:text-blue-600 dark:hover:text-blue-300
                     "
@@ -419,14 +419,14 @@ export default function FormulaEditor({
               placeholder='COALESCE("revenue", 0) - COALESCE("cost", 0)'
               className="
                 min-h-[180px] w-full rounded-2xl border border-gray-200/70 dark:border-gray-700/70
-                bg-slate-950/95 px-4 py-3 font-mono text-sm leading-6 text-slate-100
+                bg-slate-950 px-4 py-3 font-mono text-sm leading-6 text-slate-100
                 outline-none transition placeholder:text-slate-500
                 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20
               "
             />
           </div>
 
-          <div className="rounded-2xl border border-gray-200/60 dark:border-gray-700/60 bg-white/45 dark:bg-gray-950/35 p-4">
+          <div className="rounded-2xl border border-gray-200/60 dark:border-gray-700/60 bg-white dark:bg-gray-950/35 p-4">
             <div className="mb-2 flex items-center justify-between gap-3">
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
                 Preview query
@@ -434,7 +434,7 @@ export default function FormulaEditor({
               <span className="text-xs text-gray-500 dark:text-gray-400">Generated from the current editor state</span>
             </div>
 
-            <pre className="overflow-x-auto rounded-xl bg-slate-950/95 px-4 py-3 text-xs leading-6 text-slate-200">
+            <pre className="overflow-x-auto rounded-xl bg-slate-950 px-4 py-3 text-xs leading-6 text-slate-200">
               {previewSql}
             </pre>
           </div>
@@ -497,7 +497,7 @@ export default function FormulaEditor({
             )}
           </AnimatePresence>
 
-          <div className="rounded-2xl border border-gray-200/60 dark:border-gray-700/60 bg-white/45 dark:bg-gray-950/35 p-4">
+          <div className="rounded-2xl border border-gray-200/60 dark:border-gray-700/60 bg-white dark:bg-gray-950/35 p-4">
             <div className="mb-3 flex items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">
@@ -512,7 +512,7 @@ export default function FormulaEditor({
             {previewRows.length > 0 ? (
               <div className="overflow-hidden rounded-xl border border-gray-200/60 dark:border-gray-700/60">
                 <table className="min-w-full divide-y divide-gray-200/60 dark:divide-gray-700/60 text-sm">
-                  <thead className="bg-gray-50/80 dark:bg-gray-900/70">
+                  <thead className="bg-gray-50 dark:bg-gray-900">
                     <tr>
                       <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
                         #
@@ -524,7 +524,7 @@ export default function FormulaEditor({
                   </thead>
                   <tbody className="divide-y divide-gray-200/60 dark:divide-gray-700/60">
                     {previewRows.map((row, index) => (
-                      <tr key={`${previewAlias}-${index}`} className="bg-white/60 dark:bg-gray-950/30">
+                      <tr key={`${previewAlias}-${index}`} className="bg-white dark:bg-gray-950/30">
                         <td className="px-3 py-2 font-mono text-xs text-gray-500 dark:text-gray-400">
                           {index + 1}
                         </td>
@@ -545,7 +545,7 @@ export default function FormulaEditor({
         </div>
 
         <aside className="space-y-4">
-          <div className="rounded-2xl border border-gray-200/60 dark:border-gray-700/60 bg-white/45 dark:bg-gray-950/35 p-4">
+          <div className="rounded-2xl border border-gray-200/60 dark:border-gray-700/60 bg-white dark:bg-gray-950/35 p-4">
             <div className="mb-4 flex items-center gap-2">
               <BookOpen className="h-4 w-4 text-blue-500 dark:text-blue-300" />
               <div>
@@ -573,7 +573,7 @@ export default function FormulaEditor({
                         onClick={() => insertSnippet(item.snippet)}
                         className="
                           block w-full rounded-xl border border-gray-200/60 dark:border-gray-700/60
-                          bg-white/70 dark:bg-gray-950/40 px-3 py-3 text-left transition
+                          bg-white dark:bg-gray-950 px-3 py-3 text-left transition
                           hover:border-blue-400/50 hover:bg-blue-500/5
                         "
                       >

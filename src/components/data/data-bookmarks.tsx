@@ -389,7 +389,7 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
   }
 
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-white/20 bg-white/60 shadow-2xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45">
+    <section className="overflow-hidden rounded-lg border border-white/20 bg-white shadow-2xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950">
       <div className="border-b border-white/15 px-5 py-5">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-fuchsia-500/10 text-fuchsia-700 dark:text-fuchsia-300">
@@ -408,22 +408,22 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
       <div className="space-y-5 px-5 py-5">
         {notice ? <div className="rounded-2xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-4 py-3 text-sm text-fuchsia-700 dark:text-fuchsia-300">{notice}</div> : null}
 
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE }} className="grid gap-4 rounded-[1.75rem] border border-white/15 bg-white/50 p-4 dark:bg-slate-900/40 lg:grid-cols-[1.2fr_0.9fr]">
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE }} className="grid gap-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900 lg:grid-cols-[1.2fr_0.9fr]">
           <div className="space-y-4">
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="space-y-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Selected tab</span>
-                <select value={currentView.selectedTab} onChange={(event) => updateView({ ...currentView, selectedTab: event.target.value })} className="w-full rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+                <select value={currentView.selectedTab} onChange={(event) => updateView({ ...currentView, selectedTab: event.target.value })} className="w-full rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                   {tabs.map((tab) => <option key={tab} value={tab}>{tab}</option>)}
                 </select>
               </label>
               <label className="space-y-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Sort</span>
                 <div className="grid grid-cols-[1fr_auto] gap-2">
-                  <select value={currentView.sortColumn} onChange={(event) => updateView({ ...currentView, sortColumn: event.target.value })} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+                  <select value={currentView.sortColumn} onChange={(event) => updateView({ ...currentView, sortColumn: event.target.value })} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                     {columns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
                   </select>
-                  <select value={currentView.sortDirection} onChange={(event) => updateView({ ...currentView, sortDirection: event.target.value as ViewState["sortDirection"] })} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+                  <select value={currentView.sortDirection} onChange={(event) => updateView({ ...currentView, sortDirection: event.target.value as ViewState["sortDirection"] })} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                     <option value="asc">ASC</option>
                     <option value="desc">DESC</option>
                   </select>
@@ -431,10 +431,10 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
               </label>
             </div>
 
-            <div className="space-y-3 rounded-[1.5rem] border border-white/15 bg-white/40 p-4 dark:bg-slate-900/40">
+            <div className="space-y-3 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Filters</h3>
-                <button type="button" onClick={addFilter} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-3 py-2 text-sm text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+                <button type="button" onClick={addFilter} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-3 py-2 text-sm text-slate-700 transition hover:bg-white dark:text-slate-200">
                   <Plus className="h-4 w-4" />
                   Add filter
                 </button>
@@ -442,17 +442,17 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
               {currentView.filters.length === 0 ? <p className="text-sm text-slate-500 dark:text-slate-400">No filters in this view.</p> : null}
               {currentView.filters.map((filter) => (
                 <div key={filter.id} className="grid gap-2 sm:grid-cols-[1fr_auto_1fr_auto]">
-                  <select value={filter.column} onChange={(event) => updateFilter(filter.id, { column: event.target.value })} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+                  <select value={filter.column} onChange={(event) => updateFilter(filter.id, { column: event.target.value })} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                     {columns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
                   </select>
-                  <select value={filter.operator} onChange={(event) => updateFilter(filter.id, { operator: event.target.value as ViewFilter["operator"] })} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+                  <select value={filter.operator} onChange={(event) => updateFilter(filter.id, { operator: event.target.value as ViewFilter["operator"] })} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                     <option value="=">=</option>
                     <option value="!=">!=</option>
                     <option value="contains">contains</option>
                     <option value=">">{">"}</option>
                     <option value="<">{"<"}</option>
                   </select>
-                  <input value={filter.value} onChange={(event) => updateFilter(filter.id, { value: event.target.value })} placeholder="Value" className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
+                  <input value={filter.value} onChange={(event) => updateFilter(filter.id, { value: event.target.value })} placeholder="Value" className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
                   <button type="button" onClick={() => removeFilter(filter.id)} className="rounded-2xl border border-rose-300/40 bg-rose-500/10 px-3 py-3 text-rose-700 transition hover:bg-rose-500/15 dark:text-rose-300">
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -467,7 +467,7 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
               </div>
               <div className="grid gap-2 sm:grid-cols-2">
                 {columns.map((column) => (
-                  <label key={column.name} className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white/40 px-3 py-2.5 text-sm text-slate-700 dark:bg-slate-900/35 dark:text-slate-200">
+                  <label key={column.name} className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white px-3 py-2.5 text-sm text-slate-700 dark:bg-slate-900/35 dark:text-slate-200">
                     <input type="checkbox" checked={currentView.selectedColumns.includes(column.name)} onChange={() => toggleColumn(column.name)} className="h-4 w-4 rounded border-white/20 bg-transparent" />
                     <span>{column.name}</span>
                   </label>
@@ -476,25 +476,25 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
             </div>
           </div>
 
-          <div className="space-y-3 rounded-[1.5rem] border border-white/15 bg-slate-950/5 p-4 dark:bg-white/5">
-            <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Bookmark name" className="w-full rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
-            <textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={4} placeholder="What makes this view useful?" className="w-full rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
+          <div className="space-y-3 rounded-lg border border-white/15 bg-slate-950/5 p-4 dark:bg-white/5">
+            <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Bookmark name" className="w-full rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
+            <textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={4} placeholder="What makes this view useful?" className="w-full rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
             <button type="button" onClick={saveBookmark} className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-fuchsia-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-fuchsia-500">
               <Bookmark className="h-4 w-4" />
               {editingId ? "Update bookmark" : "Save bookmark"}
             </button>
             <div className="grid gap-2 sm:grid-cols-2">
-              <button type="button" onClick={exportBookmarks} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+              <button type="button" onClick={exportBookmarks} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white dark:text-slate-200">
                 <Download className="h-4 w-4" />
                 Export JSON
               </button>
-              <label htmlFor={`bookmark-import-${tableName}`} className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+              <label htmlFor={`bookmark-import-${tableName}`} className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white dark:text-slate-200">
                 <Upload className="h-4 w-4" />
                 Import JSON
               </label>
             </div>
             <input id={`bookmark-import-${tableName}`} type="file" accept="application/json" onChange={(event) => void importBookmarks(event)} className="hidden" />
-            <button type="button" onClick={() => updateView(defaultViewState(columns))} className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+            <button type="button" onClick={() => updateView(defaultViewState(columns))} className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white dark:text-slate-200">
               <RotateCcw className="h-4 w-4" />
               Reset current view
             </button>
@@ -508,12 +508,12 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
           </div>
           <AnimatePresence initial={false}>
             {bookmarks.length === 0 ? (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-[1.75rem] border border-dashed border-white/20 bg-white/35 px-6 py-10 text-center text-sm text-slate-500 dark:bg-slate-900/30 dark:text-slate-400">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-lg border border-dashed border-white/20 bg-white/35 px-6 py-10 text-center text-sm text-slate-500 dark:bg-slate-900/30 dark:text-slate-400">
                 No saved views yet. Configure the current view, then bookmark it.
               </motion.div>
             ) : (
               bookmarks.map((bookmark) => (
-                <motion.article key={bookmark.id} layout initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -14 }} transition={{ duration: 0.25, ease: EASE }} className="rounded-[1.5rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+                <motion.article key={bookmark.id} layout initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -14 }} transition={{ duration: 0.25, ease: EASE }} className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                     <div>
                       <div className="flex items-center gap-2">
@@ -522,17 +522,17 @@ export default function DataBookmarks({ tableName, columns }: DataBookmarksProps
                       </div>
                       <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{bookmark.description || "No description."}</p>
                       <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">
-                        <span className="rounded-full bg-white/50 px-2.5 py-1 dark:bg-slate-950/60">{formatTimestamp(bookmark.timestamp)}</span>
-                        <span className="rounded-full bg-white/50 px-2.5 py-1 dark:bg-slate-950/60">{bookmark.state.selectedColumns.length} columns</span>
-                        <span className="rounded-full bg-white/50 px-2.5 py-1 dark:bg-slate-950/60">{bookmark.state.filters.length} filters</span>
+                        <span className="rounded-full bg-white px-2.5 py-1 dark:bg-slate-950">{formatTimestamp(bookmark.timestamp)}</span>
+                        <span className="rounded-full bg-white px-2.5 py-1 dark:bg-slate-950">{bookmark.state.selectedColumns.length} columns</span>
+                        <span className="rounded-full bg-white px-2.5 py-1 dark:bg-slate-950">{bookmark.state.filters.length} filters</span>
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <button type="button" onClick={() => restoreBookmark(bookmark)} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-3 py-2 text-sm text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+                      <button type="button" onClick={() => restoreBookmark(bookmark)} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-3 py-2 text-sm text-slate-700 transition hover:bg-white dark:text-slate-200">
                         <RotateCcw className="h-4 w-4" />
                         Restore
                       </button>
-                      <button type="button" onClick={() => startEditing(bookmark)} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-3 py-2 text-sm text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+                      <button type="button" onClick={() => startEditing(bookmark)} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-3 py-2 text-sm text-slate-700 transition hover:bg-white dark:text-slate-200">
                         <Pencil className="h-4 w-4" />
                         Edit
                       </button>

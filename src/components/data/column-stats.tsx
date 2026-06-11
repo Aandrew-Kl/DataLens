@@ -87,7 +87,7 @@ function buildBoxPlot(stats: NumericStats, dark: boolean) {
 function Panel({ title, icon: Icon, accent, children }: { title: string; icon: ElementType; accent: string; children: ReactNode }) {
   return (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: "easeOut" }}
-      className="rounded-2xl border border-gray-200/70 bg-white/80 p-5 shadow-sm dark:border-gray-700/70 dark:bg-gray-900/60">
+      className="rounded-2xl border border-gray-200/70 bg-white p-5 shadow-sm dark:border-gray-700/70 dark:bg-gray-900">
       <div className="mb-4 flex items-center gap-3">
         <div className={`rounded-xl p-2 ${accent}`}><Icon className="h-4 w-4" /></div>
         <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
@@ -100,7 +100,7 @@ function MetricGrid({ items }: { items: { label: string; value: string | number;
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       {items.map((item) => (
-        <div key={item.label} className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
+        <div key={item.label} className="rounded-xl border border-gray-200/70 bg-gray-50 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">{item.label}</p>
           <p className={`mt-1 text-xl font-semibold ${item.tone === "danger" ? "text-amber-600 dark:text-amber-400" : "text-gray-900 dark:text-gray-100"}`}>{item.value}</p>
         </div>
@@ -113,7 +113,7 @@ function InsightList({ items }: { items: string[] }) {
     <div className="space-y-3">
       {items.map((item, index) => (
         <motion.div key={item} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.03, duration: 0.22 }}
-          className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-4 py-3 text-sm leading-6 text-gray-700 dark:border-gray-800/70 dark:bg-gray-950/35 dark:text-gray-300">
+          className="rounded-xl border border-gray-200/70 bg-gray-50 px-4 py-3 text-sm leading-6 text-gray-700 dark:border-gray-800/70 dark:bg-gray-950/35 dark:text-gray-300">
           {item}
         </motion.div>
       ))}
@@ -122,7 +122,7 @@ function InsightList({ items }: { items: string[] }) {
 }
 function LoadingView({ name }: { name: string }) {
   return (
-    <section className="rounded-2xl border border-gray-200/70 bg-white/80 p-6 dark:border-gray-700/70 dark:bg-gray-900/60">
+    <section className="rounded-2xl border border-gray-200/70 bg-white p-6 dark:border-gray-700/70 dark:bg-gray-900">
       <div className="mb-6 flex items-start justify-between gap-4 border-b border-gray-200/70 pb-5 dark:border-gray-700/70">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-600 dark:text-cyan-400">Column Statistics</p>
@@ -378,7 +378,7 @@ function ColumnStats({ tableName, column, rowCount }: ColumnStatsProps) {
 
   return (
     <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.32, ease: "easeOut" }}
-      className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white/80 dark:border-gray-700/70 dark:bg-gray-900/60">
+      className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white dark:border-gray-700/70 dark:bg-gray-900">
       <div className="border-b border-gray-200/70 px-6 py-5 dark:border-gray-700/70">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
           <div className="max-w-3xl">
@@ -394,7 +394,7 @@ function ColumnStats({ tableName, column, rowCount }: ColumnStatsProps) {
             {column.sampleValues.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">
                 {column.sampleValues.slice(0, 5).map((sample, index) => (
-                  <span key={`${column.name}-sample-${index}`} className="rounded-full border border-gray-200/70 bg-gray-50/80 px-3 py-1 text-xs text-gray-600 dark:border-gray-800/70 dark:bg-gray-950/35 dark:text-gray-300">
+                  <span key={`${column.name}-sample-${index}`} className="rounded-full border border-gray-200/70 bg-gray-50 px-3 py-1 text-xs text-gray-600 dark:border-gray-800/70 dark:bg-gray-950/35 dark:text-gray-300">
                     {sample == null ? "null" : truncate(String(sample), 28)}
                   </span>
                 ))}
@@ -403,7 +403,7 @@ function ColumnStats({ tableName, column, rowCount }: ColumnStatsProps) {
           </div>
           <div className="grid gap-3 sm:grid-cols-2 xl:w-[360px]">
             {summary.map((card) => (
-              <div key={card.label} className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
+              <div key={card.label} className="rounded-xl border border-gray-200/70 bg-gray-50 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">{card.label}</p>
                 <p className={`mt-1 text-xl font-semibold ${card.tone === "danger" ? "text-amber-600 dark:text-amber-400" : "text-gray-900 dark:text-gray-100"}`}>{card.value}</p>
               </div>
@@ -465,7 +465,7 @@ function ColumnStats({ tableName, column, rowCount }: ColumnStatsProps) {
                 ) : (
                   <div className="space-y-3">
                     {stats.gaps.map((gap) => (
-                      <div key={`${gap.start}-${gap.end}`} className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
+                      <div key={`${gap.start}-${gap.end}`} className="rounded-xl border border-gray-200/70 bg-gray-50 px-4 py-3 dark:border-gray-800/70 dark:bg-gray-950/35">
                         <div className="flex items-center justify-between gap-4">
                           <div>
                             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{formatDateLabel(gap.start)} → {formatDateLabel(gap.end)}</p>

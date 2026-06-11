@@ -718,13 +718,13 @@ export default function OnboardingTour({
         exit="exit"
         variants={overlayVariants}
       >
-        <div className="absolute inset-0 bg-slate-950/72 backdrop-blur-md" />
+        <div className="absolute inset-0 bg-slate-950/60 " />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.16),transparent_32%)]" />
 
         {glowStyle && (
           <motion.div
             key={`${activeStep.id}-glow`}
-            className={`pointer-events-none absolute rounded-[34px] bg-gradient-to-r ${activeStep.gradient} opacity-20 blur-3xl`}
+            className={`pointer-events-none absolute rounded-lg bg-gradient-to-r ${activeStep.gradient} opacity-20 blur-3xl`}
             style={glowStyle}
             variants={spotlightVariants}
             initial="hidden"
@@ -736,16 +736,16 @@ export default function OnboardingTour({
         {spotlightStyle && (
           <motion.div
             key={`${activeStep.id}-spotlight`}
-            className="pointer-events-none absolute rounded-[28px] border border-white/55 bg-white/[0.05] shadow-[0_0_0_9999px_rgba(2,6,23,0.72)] backdrop-blur-[2px] dark:border-sky-300/35 dark:bg-slate-900/[0.08]"
+            className="pointer-events-none absolute rounded-lg border border-white/55 bg-white/[0.05] shadow-sm -[2px] dark:border-sky-300/35 dark:bg-slate-900/[0.08]"
             style={spotlightStyle}
             variants={spotlightVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
           >
-            <div className="absolute inset-0 rounded-[28px] ring-1 ring-inset ring-white/55 dark:ring-sky-300/30" />
+            <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-white/55 dark:ring-sky-300/30" />
             <motion.div
-              className={`absolute inset-0 rounded-[28px] bg-gradient-to-r ${activeStep.gradient} opacity-[0.14]`}
+              className={`absolute inset-0 rounded-lg bg-gradient-to-r ${activeStep.gradient} opacity-[0.14]`}
               animate={{ opacity: [0.1, 0.18, 0.1] }}
               transition={{
                 duration: 2.2,
@@ -762,7 +762,7 @@ export default function OnboardingTour({
         >
           {placement !== "center" && (
             <div
-              className={`absolute h-4 w-4 rotate-45 border border-white/20 bg-slate-950/85 ${ARROW_CLASS_NAMES[placement]}`}
+              className={`absolute h-4 w-4 rotate-45 border border-white/20 bg-slate-950 ${ARROW_CLASS_NAMES[placement]}`}
             />
           )}
 
@@ -774,7 +774,7 @@ export default function OnboardingTour({
               animate="visible"
               exit="exit"
               variants={panelVariants}
-              className="relative overflow-hidden rounded-[28px] border border-white/16 bg-white/72 p-5 shadow-[0_24px_80px_-30px_rgba(15,23,42,0.8)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-900/78 sm:p-6"
+              className="relative overflow-hidden rounded-lg border border-white/16 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 sm:p-6"
               role="dialog"
               aria-modal="true"
               aria-labelledby={titleId}
@@ -824,7 +824,7 @@ export default function OnboardingTour({
                   {activeStep.description}
                 </p>
 
-                <div className="mt-4 rounded-2xl border border-white/45 bg-white/55 px-4 py-3 text-sm text-slate-600 shadow-sm dark:border-white/8 dark:bg-white/[0.03] dark:text-slate-300">
+                <div className="mt-4 rounded-2xl border border-white/45 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm dark:border-white/8 dark:bg-white/[0.03] dark:text-slate-300">
                   {activeStep.note}
                 </div>
 
@@ -836,7 +836,7 @@ export default function OnboardingTour({
                     <span>{Math.round(progress)}%</span>
                   </div>
 
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200/70 dark:bg-slate-800/80">
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                     <motion.div
                       className={`h-full rounded-full bg-gradient-to-r ${activeStep.gradient}`}
                       animate={{ width: `${progress}%` }}
@@ -868,7 +868,7 @@ export default function OnboardingTour({
                       setCurrentStepIndex((previous) => Math.max(previous - 1, 0))
                     }
                     disabled={isFirstStep}
-                    className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white/80 px-3.5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-white disabled:cursor-not-allowed disabled:opacity-45 dark:border-slate-700/80 dark:bg-slate-950/40 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-950/60"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-white disabled:cursor-not-allowed disabled:opacity-45 dark:border-slate-700/80 dark:bg-slate-950 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-950"
                   >
                     <ArrowLeft className="h-4 w-4" />
                     Back

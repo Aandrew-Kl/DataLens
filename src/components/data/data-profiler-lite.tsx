@@ -311,7 +311,7 @@ function SummaryCard({
 
 function UniqueColumnRow({ entry }: { entry: UniqueColumnSummary }) {
   return (
-    <li className="flex items-center justify-between gap-4 rounded-2xl border border-white/20 bg-white/55 px-4 py-3 dark:bg-slate-900/35">
+    <li className="flex items-center justify-between gap-4 rounded-2xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-900/35">
       <div className="min-w-0">
         <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
           {entry.name}

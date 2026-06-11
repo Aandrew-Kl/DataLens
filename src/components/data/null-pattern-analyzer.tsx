@@ -489,9 +489,9 @@ function CorrelationMatrix({
   }, [result.pairStats]);
 
   return (
-    <div className="overflow-auto rounded-3xl border border-white/20 bg-white/55 dark:bg-slate-900/35">
+    <div className="overflow-auto rounded-3xl border border-white/20 bg-white dark:bg-slate-900/35">
       <table className="min-w-full border-collapse">
-        <thead className="bg-white/65 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:bg-slate-900/45 dark:text-slate-400">
+        <thead className="bg-white text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:bg-slate-900 dark:text-slate-400">
           <tr>
             <th className="px-4 py-3">Column</th>
             {result.columnNames.map((name) => (
@@ -657,7 +657,7 @@ function NullPatternPanel({
             </span>
           </p>
           {result.strongestPair ? (
-            <div className="mt-4 rounded-3xl border border-white/20 bg-white/55 p-4 dark:bg-slate-900/35">
+            <div className="mt-4 rounded-3xl border border-white/20 bg-white p-4 dark:bg-slate-900/35">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 Strongest Pair
               </p>

@@ -409,10 +409,10 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
         variants={panelVariants}
         initial="hidden"
         animate="show"
-        className="overflow-hidden rounded-3xl border border-white/30 bg-white/60 shadow-[0_24px_80px_-36px_rgba(15,23,42,0.55)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45"
+        className="overflow-hidden rounded-3xl border border-white/30 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950"
       >
         <div className="border-b border-slate-200/70 bg-linear-to-br from-white/70 to-slate-100/40 p-6 dark:border-slate-800/80 dark:from-slate-900/70 dark:to-slate-950/40">
-          <div className="mb-4 inline-flex rounded-2xl border border-white/60 bg-white/60 p-3 shadow-sm dark:border-white/10 dark:bg-white/5">
+          <div className="mb-4 inline-flex rounded-2xl border border-white/60 bg-white p-3 shadow-sm dark:border-white/10 dark:bg-white/5">
             <Sparkles className="h-5 w-5 text-violet-500" />
           </div>
           <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
@@ -450,7 +450,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
                     className={`rounded-2xl border px-3 py-3 text-left transition-all ${
                       active
                         ? `border-white/80 bg-linear-to-br ${meta.accent} shadow-sm dark:border-white/15`
-                        : "border-slate-200/80 bg-white/60 hover:border-slate-300 hover:bg-white/80 dark:border-slate-800/80 dark:bg-white/5 dark:hover:border-slate-700 dark:hover:bg-white/8"
+                        : "border-slate-200/80 bg-white hover:border-slate-300 hover:bg-white dark:border-slate-800/80 dark:bg-white/5 dark:hover:border-slate-700 dark:hover:bg-white/8"
                     }`}
                   >
                     <div className="mb-2 flex items-center gap-2">
@@ -482,7 +482,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
                 value={requiresXAxis ? xAxis : ""}
                 onChange={(event) => setXAxis(event.target.value)}
                 disabled={!requiresXAxis}
-                className="w-full rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-500/10 disabled:cursor-not-allowed disabled:bg-slate-100/80 disabled:text-slate-400 dark:border-slate-800/80 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-violet-400 dark:disabled:bg-slate-900/30 dark:disabled:text-slate-500"
+                className="w-full rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-500/10 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:border-slate-800/80 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-violet-400 dark:disabled:bg-slate-900/30 dark:disabled:text-slate-500"
               >
                 <option value="">
                   {requiresXAxis ? "Select a column" : "Histogram uses the selected measure"}
@@ -503,7 +503,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
                 value={yAxis}
                 onChange={(event) => setYAxis(event.target.value)}
                 disabled={numericColumns.length === 0}
-                className="w-full rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-500/10 disabled:cursor-not-allowed disabled:bg-slate-100/80 disabled:text-slate-400 dark:border-slate-800/80 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-violet-400 dark:disabled:bg-slate-900/30 dark:disabled:text-slate-500"
+                className="w-full rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-500/10 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:border-slate-800/80 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-violet-400 dark:disabled:bg-slate-900/30 dark:disabled:text-slate-500"
               >
                 <option value="">Select a numeric column</option>
                 {numericColumns.map((column) => (
@@ -522,7 +522,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
                 value={supportsAggregation ? aggregation : "sum"}
                 onChange={(event) => setAggregation(event.target.value as Aggregation)}
                 disabled={!supportsAggregation}
-                className="w-full rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-500/10 disabled:cursor-not-allowed disabled:bg-slate-100/80 disabled:text-slate-400 dark:border-slate-800/80 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-violet-400 dark:disabled:bg-slate-900/30 dark:disabled:text-slate-500"
+                className="w-full rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-500/10 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:border-slate-800/80 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-violet-400 dark:disabled:bg-slate-900/30 dark:disabled:text-slate-500"
               >
                 {AGGREGATIONS.map((value) => (
                   <option key={value} value={value}>
@@ -540,7 +540,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
                 value={supportsGroupBy ? groupBy : ""}
                 onChange={(event) => setGroupBy(event.target.value)}
                 disabled={!supportsGroupBy}
-                className="w-full rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-500/10 disabled:cursor-not-allowed disabled:bg-slate-100/80 disabled:text-slate-400 dark:border-slate-800/80 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-violet-400 dark:disabled:bg-slate-900/30 dark:disabled:text-slate-500"
+                className="w-full rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-500/10 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:border-slate-800/80 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-violet-400 dark:disabled:bg-slate-900/30 dark:disabled:text-slate-500"
               >
                 <option value="">
                   {supportsGroupBy ? "No segmentation" : "Not available for this chart type"}
@@ -562,7 +562,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 placeholder={buildDefaultTitle(chartType, xAxis, yAxis, aggregation, groupBy)}
-                className="w-full rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-500/10 dark:border-slate-800/80 dark:bg-slate-900/70 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-violet-400"
+                className="w-full rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-500/10 dark:border-slate-800/80 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-violet-400"
               />
             </label>
           </section>
@@ -572,7 +572,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
               <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
                 Generated SQL
               </div>
-              <div className="rounded-full border border-slate-200/80 bg-white/70 px-2.5 py-1 text-[11px] font-medium text-slate-500 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-400">
+              <div className="rounded-full border border-slate-200/80 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
                 {data.length} rows
               </div>
             </div>
@@ -588,7 +588,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
         initial="hidden"
         animate="show"
         transition={{ delay: 0.05 }}
-        className="overflow-hidden rounded-3xl border border-white/30 bg-white/60 shadow-[0_24px_80px_-36px_rgba(15,23,42,0.55)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45"
+        className="overflow-hidden rounded-3xl border border-white/30 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950"
       >
         <div className="flex flex-col gap-4 border-b border-slate-200/70 p-6 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800/80">
           <div>
@@ -615,7 +615,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
               type="button"
               onClick={() => void handleSave()}
               disabled={!sql || isLoading || data.length === 0 || isSaving}
-              className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-700 dark:hover:bg-slate-900"
+              className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-700 dark:hover:bg-slate-900"
             >
               {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Save
@@ -635,7 +635,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
         <div className="space-y-4 p-6">
           <div
             ref={previewRef}
-            className="relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-linear-to-br from-white/90 via-white/70 to-slate-100/60 p-5 shadow-inner dark:border-slate-800/80 dark:from-slate-900/95 dark:via-slate-950/80 dark:to-slate-900/70"
+            className="relative overflow-hidden rounded-lg border border-slate-200/80 bg-linear-to-br from-white/90 via-white/70 to-slate-100/60 p-5 shadow-inner dark:border-slate-800/80 dark:from-slate-900/95 dark:via-slate-950/80 dark:to-slate-900/70"
           >
             <div className="pointer-events-none absolute inset-x-10 top-0 h-24 rounded-full bg-violet-500/10 blur-3xl" />
             <AnimatePresence mode="wait">
@@ -645,7 +645,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
-                  className="relative flex min-h-[460px] flex-col items-center justify-center gap-3 rounded-[22px] border border-red-300/60 bg-red-50/80 px-6 text-center dark:border-red-500/20 dark:bg-red-950/20"
+                  className="relative flex min-h-[460px] flex-col items-center justify-center gap-3 rounded-lg border border-red-300/60 bg-red-50/80 px-6 text-center dark:border-red-500/20 dark:bg-red-950/20"
                 >
                   <CircleAlert className="h-9 w-9 text-red-500" />
                   <div>
@@ -665,7 +665,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
                   exit={{ opacity: 0 }}
                   className="relative flex min-h-[460px] flex-col items-center justify-center gap-4 text-slate-500 dark:text-slate-400"
                 >
-                  <div className="rounded-2xl border border-white/60 bg-white/70 p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
+                  <div className="rounded-2xl border border-white/60 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
                     <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
                   </div>
                   <div className="text-center">
@@ -685,7 +685,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
                   exit={{ opacity: 0, y: -12 }}
                   className="relative flex min-h-[460px] flex-col items-center justify-center gap-3 text-center text-slate-500 dark:text-slate-400"
                 >
-                  <div className="rounded-2xl border border-white/60 bg-white/70 p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
+                  <div className="rounded-2xl border border-white/60 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
                     <BarChart3 className="h-8 w-8 text-slate-400 dark:text-slate-500" />
                   </div>
                   <div>
@@ -705,7 +705,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
                   exit={{ opacity: 0, y: -12 }}
                   className="relative flex min-h-[460px] flex-col items-center justify-center gap-3 text-center text-slate-500 dark:text-slate-400"
                 >
-                  <div className="rounded-2xl border border-white/60 bg-white/70 p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
+                  <div className="rounded-2xl border border-white/60 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
                     <BarChart3 className="h-8 w-8 text-slate-400 dark:text-slate-500" />
                   </div>
                   <div>
@@ -731,7 +731,7 @@ export default function ChartBuilder({ tableName, columns }: ChartBuilderProps) 
             </AnimatePresence>
           </div>
 
-          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white/65 px-4 py-3 text-sm dark:border-slate-800/80 dark:bg-slate-900/55 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm dark:border-slate-800/80 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-slate-600 dark:text-slate-400">
               <span className="font-medium text-slate-900 dark:text-slate-100">
                 {data.length.toLocaleString()}

@@ -71,7 +71,7 @@ export default function SearchInput({
         className="
           w-full pl-9 pr-9 py-2 text-sm
           rounded-lg
-          bg-white/70 dark:bg-gray-900/70
+          bg-white dark:bg-gray-900
           border border-gray-200/60 dark:border-gray-700/60
           text-gray-900 dark:text-gray-100
           placeholder:text-gray-400 dark:placeholder:text-gray-500

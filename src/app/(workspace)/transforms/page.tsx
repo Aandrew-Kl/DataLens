@@ -207,7 +207,7 @@ export default function TransformsPage() {
           <button
             type="button"
             onClick={createNewPipeline}
-            className="inline-flex rounded-2xl border border-white/20 bg-white/80 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:bg-white dark:border-white/10 dark:bg-slate-950/55 dark:text-slate-100 dark:hover:bg-slate-900/90"
+            className="inline-flex rounded-2xl border border-white/20 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:bg-white dark:border-white/10 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900"
           >
             + New pipeline
           </button>
@@ -228,7 +228,7 @@ export default function TransformsPage() {
         )}
 
         {pipelines.length === 0 ? (
-          <div className="mt-4 rounded-2xl border border-white/25 bg-white/50 px-4 py-4 text-sm text-slate-500 dark:border-white/10 dark:bg-slate-950/35">
+          <div className="mt-4 rounded-2xl border border-white/25 bg-white px-4 py-4 text-sm text-slate-500 dark:border-white/10 dark:bg-slate-950/35">
             No pipelines yet. Click <span className="font-medium">New pipeline</span> to begin.
           </div>
         ) : (
@@ -241,7 +241,7 @@ export default function TransformsPage() {
                   className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm ${
                     isActive
                       ? "border-cyan-400/40 bg-cyan-500/10 text-slate-900 dark:text-white"
-                      : "border-white/20 bg-white/60 text-slate-700 dark:bg-slate-950/40 dark:text-slate-200"
+                      : "border-white/20 bg-white text-slate-700 dark:bg-slate-950 dark:text-slate-200"
                   }`}
                 >
                   <button
@@ -270,7 +270,7 @@ export default function TransformsPage() {
 
       <section className={`${GLASS_PANEL_CLASS} p-4`}>
         {!activePipeline ? (
-          <div className="rounded-2xl border border-white/25 bg-white/55 px-4 py-4 text-sm text-slate-500 dark:border-white/10 dark:bg-slate-950/35">
+          <div className="rounded-2xl border border-white/25 bg-white px-4 py-4 text-sm text-slate-500 dark:border-white/10 dark:bg-slate-950/35">
             Pick a saved pipeline to begin editing its steps.
           </div>
         ) : (
@@ -294,7 +294,7 @@ export default function TransformsPage() {
                   />
                   <button
                     type="submit"
-                    className="rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-slate-950/55"
+                    className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-slate-950"
                   >
                     Save
                   </button>
@@ -317,7 +317,7 @@ export default function TransformsPage() {
                   <button
                     type="button"
                     onClick={addStep}
-                    className="rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-slate-950/55 dark:text-slate-100"
+                    className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100"
                   >
                     Add
                   </button>
@@ -346,7 +346,7 @@ export default function TransformsPage() {
               {activePipeline.steps.map((step, index) => (
                 <div
                   key={step.id}
-                  className="rounded-2xl border border-white/20 bg-white/55 p-4 dark:border-white/10 dark:bg-slate-950/35"
+                  className="rounded-2xl border border-white/20 bg-white p-4 dark:border-white/10 dark:bg-slate-950/35"
                 >
                   <div className="mb-3 flex items-center justify-between gap-2">
                     <div>
@@ -772,14 +772,14 @@ export default function TransformsPage() {
           <button
             type="button"
             onClick={clearHistory}
-            className="rounded-2xl border border-white/20 bg-white/80 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-slate-950/55 dark:text-slate-100"
+            className="rounded-2xl border border-white/20 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100"
           >
             Clear history
           </button>
         </div>
 
         {historyToShow.length === 0 ? (
-          <div className="rounded-2xl border border-white/25 bg-white/50 px-4 py-4 text-sm text-slate-500 dark:border-white/10 dark:bg-slate-950/35">
+          <div className="rounded-2xl border border-white/25 bg-white px-4 py-4 text-sm text-slate-500 dark:border-white/10 dark:bg-slate-950/35">
             Run a pipeline to populate execution history.
           </div>
         ) : (
@@ -805,7 +805,7 @@ export default function TransformsPage() {
                   Rows: {record.rowCount.toLocaleString()} • Pipeline ID: {record.pipelineId}
                 </p>
                 {record.sql ? (
-                  <pre className="mt-2 overflow-x-auto rounded-xl border border-white/15 bg-slate-950/80 p-3 text-xs text-slate-100">
+                  <pre className="mt-2 overflow-x-auto rounded-xl border border-white/15 bg-slate-950 p-3 text-xs text-slate-100">
                     {record.sql}
                   </pre>
                 ) : null}

@@ -41,9 +41,9 @@ interface StatusMessage {
 const PREVIEW_LIMIT = 24;
 const EASE = [0.22, 1, 0.36, 1] as const;
 const GLASS_PANEL_CLASS =
-  "border border-white/20 bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45";
+  "border border-white/20 bg-white dark:bg-slate-950";
 const FIELD_CLASS =
-  "w-full rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950/65 dark:text-slate-100";
+  "w-full rounded-2xl border border-slate-200/70 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-100";
 const BUTTON_CLASS =
   "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60";
 function escapeSqlLiteral(value: string) {
@@ -331,7 +331,7 @@ export default function RegexTool({ tableName, columns }: RegexToolProps) {
     const extractColumns = Array.from({ length: groupCount }, (_, index) => {
       const alias = `${activePrefix}_${index + 1}`;
       return `${buildExtractExpression(activeColumn, pattern, index + 1, sqlFlags)} AS ${quoteIdentifier(alias)}`;
-    }).join(",\n        ");
+    }).join(",\n ");
 
     try {
       await runQuery(`DROP TABLE IF EXISTS ${quoteIdentifier(tempTableName)}`);
@@ -400,7 +400,7 @@ export default function RegexTool({ tableName, columns }: RegexToolProps) {
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, ease: EASE }}
-      className={`rounded-[2rem] p-6 shadow-[0_28px_90px_-52px_rgba(15,23,42,0.85)] ${GLASS_PANEL_CLASS}`}
+      className={`rounded-lg p-6 shadow-sm ${GLASS_PANEL_CLASS}`}
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
@@ -435,7 +435,7 @@ export default function RegexTool({ tableName, columns }: RegexToolProps) {
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
-        <div className={`rounded-[1.75rem] p-5 ${GLASS_PANEL_CLASS}`}>
+        <div className={`rounded-lg p-5 ${GLASS_PANEL_CLASS}`}>
           <div className="grid gap-4">
             <label className="block">
               <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
@@ -501,7 +501,7 @@ export default function RegexTool({ tableName, columns }: RegexToolProps) {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/60 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/30 dark:text-slate-200">
+              <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/30 dark:text-slate-200">
                 <input
                   type="checkbox"
                   checked={caseInsensitive}
@@ -509,7 +509,7 @@ export default function RegexTool({ tableName, columns }: RegexToolProps) {
                 />
                 Case insensitive
               </label>
-              <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/60 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/30 dark:text-slate-200">
+              <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/30 dark:text-slate-200">
                 <input
                   type="checkbox"
                   checked={multiline}
@@ -539,7 +539,7 @@ export default function RegexTool({ tableName, columns }: RegexToolProps) {
                 type="button"
                 onClick={handleApplyExtraction}
                 disabled={applying || previewRows.length === 0}
-                className={`${BUTTON_CLASS} border border-white/20 bg-white/70 text-slate-800 hover:bg-white dark:bg-slate-950/45 dark:text-slate-100 dark:hover:bg-slate-950/60`}
+                className={`${BUTTON_CLASS} border border-white/20 bg-white text-slate-800 hover:bg-white dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-950`}
               >
                 {applying ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -552,7 +552,7 @@ export default function RegexTool({ tableName, columns }: RegexToolProps) {
                 type="button"
                 onClick={handleExportCsv}
                 disabled={previewRows.length === 0}
-                className={`${BUTTON_CLASS} border border-white/20 bg-white/70 text-slate-800 hover:bg-white dark:bg-slate-950/45 dark:text-slate-100 dark:hover:bg-slate-950/60`}
+                className={`${BUTTON_CLASS} border border-white/20 bg-white text-slate-800 hover:bg-white dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-950`}
               >
                 <Download className="h-4 w-4" />
                 Export CSV
@@ -561,7 +561,7 @@ export default function RegexTool({ tableName, columns }: RegexToolProps) {
           </div>
         </div>
 
-        <div className={`rounded-[1.75rem] p-5 ${GLASS_PANEL_CLASS}`}>
+        <div className={`rounded-lg p-5 ${GLASS_PANEL_CLASS}`}>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="text-lg font-semibold text-slate-950 dark:text-white">

@@ -30,9 +30,9 @@ interface PreviewRow {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "border border-white/20 bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 rounded-[1.75rem] shadow-xl shadow-slate-950/10";
+  "border border-white/20 bg-white dark:bg-slate-950 rounded-lg shadow-xl shadow-slate-950/10";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950/50 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950 dark:text-slate-100";
 
 const TARGET_OPTIONS = [
   { value: "string", label: "String", sql: "VARCHAR" },
@@ -212,7 +212,7 @@ export default function TypeCastTool({
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/40 dark:text-slate-300">
+      <div className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
         {status}
       </div>
 
@@ -255,7 +255,7 @@ export default function TypeCastTool({
                 void handleApply();
               }}
               disabled={!selectedColumn || applyLoading}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900/50 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900 dark:text-slate-200"
             >
               {applyLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -268,14 +268,14 @@ export default function TypeCastTool({
               type="button"
               onClick={handleExport}
               disabled={previewRows.length === 0}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900/50 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900 dark:text-slate-200"
             >
               <Download className="h-4 w-4" />
               Export preview CSV
             </button>
           </div>
 
-          <div className="mt-5 rounded-2xl bg-white/70 p-4 text-sm text-slate-700 dark:bg-slate-900/50 dark:text-slate-200">
+          <div className="mt-5 rounded-2xl bg-white p-4 text-sm text-slate-700 dark:bg-slate-900 dark:text-slate-200">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-amber-500" />
               <span>

@@ -47,14 +47,14 @@ export function FrequencyCard({ frequencyRows }: { frequencyRows: FrequencyRow[]
     >
       <div className="max-h-[320px] overflow-auto rounded-3xl border border-white/20 dark:border-white/10">
         <table className="min-w-full divide-y divide-slate-200/70 text-sm dark:divide-slate-800/70">
-          <thead className="sticky top-0 bg-slate-50/90 backdrop-blur dark:bg-slate-950/90">
+          <thead className="sticky top-0 bg-slate-50 dark:bg-slate-950">
             <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
               <th className="px-4 py-3">Value</th>
               <th className="px-4 py-3">Count</th>
               <th className="px-4 py-3">Share</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200/70 bg-white/50 dark:divide-slate-800/70 dark:bg-slate-950/30">
+          <tbody className="divide-y divide-slate-200/70 bg-white dark:divide-slate-800/70 dark:bg-slate-950/30">
             {frequencyRows.map((row) => (
               <tr key={`${row.value}-${row.count}`}>
                 <td

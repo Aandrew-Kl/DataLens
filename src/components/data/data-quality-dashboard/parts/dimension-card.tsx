@@ -24,7 +24,7 @@ export function DimensionCard({
   return (
     <motion.article
       variants={itemVariants}
-      className="group relative overflow-hidden rounded-[28px] border border-white/30 bg-white/65 p-5 shadow-[0_24px_80px_-42px_rgba(15,23,42,0.55)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/48"
+      className="group relative overflow-hidden rounded-lg border border-white/30 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950"
     >
       <div className={`absolute inset-x-0 top-0 h-24 bg-linear-to-br ${meta.accent}`} />
       <div className="relative">
@@ -38,7 +38,7 @@ export function DimensionCard({
               {formatPercent(summary.score)}
             </p>
           </div>
-          <div className="rounded-2xl border border-white/40 bg-white/65 px-3 py-2 text-right shadow-sm dark:border-white/10 dark:bg-slate-950/55">
+          <div className="rounded-2xl border border-white/40 bg-white px-3 py-2 text-right shadow-sm dark:border-white/10 dark:bg-slate-950">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               {summary.detailLabel}
             </p>
@@ -52,7 +52,7 @@ export function DimensionCard({
           {summary.helper}
         </p>
 
-        <div className="mt-5 h-[170px] overflow-hidden rounded-[22px] border border-white/35 bg-white/55 p-2 shadow-inner dark:border-white/10 dark:bg-slate-950/52">
+        <div className="mt-5 h-[170px] overflow-hidden rounded-lg border border-white/35 bg-white p-2 shadow-inner dark:border-white/10 dark:bg-slate-950">
           {summary.chartData.length ? (
             <ReactECharts
               option={buildDimensionOption(summary.chartData, meta.color, dark)}
@@ -72,7 +72,7 @@ export function DimensionCard({
           {summary.details.map((detail) => (
             <div
               key={detail}
-              className="flex items-start gap-2 rounded-2xl border border-white/35 bg-white/55 px-3 py-3 text-sm leading-6 text-slate-700 dark:border-white/10 dark:bg-slate-950/46 dark:text-slate-300"
+              className="flex items-start gap-2 rounded-2xl border border-white/35 bg-white px-3 py-3 text-sm leading-6 text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-300"
             >
               <span
                 className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full"

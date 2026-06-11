@@ -31,7 +31,7 @@ function GlassSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-white/30 bg-white/55 p-4 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/55 sm:p-5">
+    <section className="rounded-2xl border border-white/30 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-slate-900 sm:p-5">
       <div className="mb-4">
         <h2 className="text-base font-semibold text-slate-900 dark:text-white">
           {title}
@@ -51,7 +51,7 @@ export default function AnalyticsPage() {
 
   if (!activeDataset) {
     return (
-      <div className="rounded-2xl border border-white/30 bg-white/55 p-6 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/55">
+      <div className="rounded-2xl border border-white/30 bg-white p-6 dark:border-white/10 dark:bg-slate-900">
         <h1 className="text-lg font-semibold text-slate-900 dark:text-white">Analytics</h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Select a dataset from the sidebar to unlock the analytics workspace.
@@ -62,19 +62,19 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-white/30 bg-white/55 p-4 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/55 sm:p-5">
+      <section className="rounded-2xl border border-white/30 bg-white p-4 dark:border-white/10 dark:bg-slate-900 sm:p-5">
         <h1 className="text-lg font-semibold text-slate-900 dark:text-white">Analytics</h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Advanced analytical tooling for the active dataset.
         </p>
-        <div className="mt-3 inline-flex flex-wrap gap-2 rounded-xl border border-white/25 bg-white/60 px-3 py-2 text-xs text-slate-700 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-300">
-          <span className="rounded-md bg-white/75 px-2 py-1 dark:bg-slate-950/45">
+        <div className="mt-3 inline-flex flex-wrap gap-2 rounded-xl border border-white/25 bg-white px-3 py-2 text-xs text-slate-700 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-300">
+          <span className="rounded-md bg-white px-2 py-1 dark:bg-slate-950">
             Dataset: {activeDataset.fileName}
           </span>
-          <span className="rounded-md bg-white/75 px-2 py-1 dark:bg-slate-950/45">
+          <span className="rounded-md bg-white px-2 py-1 dark:bg-slate-950">
             Rows: {activeDataset.rowCount.toLocaleString()}
           </span>
-          <span className="rounded-md bg-white/75 px-2 py-1 dark:bg-slate-950/45">
+          <span className="rounded-md bg-white px-2 py-1 dark:bg-slate-950">
             Columns: {activeDataset.columnCount}
           </span>
         </div>
@@ -104,7 +104,7 @@ export default function AnalyticsPage() {
         </ErrorBoundary>
       </GlassSection>
 
-      <section className="overflow-hidden rounded-2xl border border-white/30 bg-white/55 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/55">
+      <section className="overflow-hidden rounded-2xl border border-white/30 bg-white dark:border-white/10 dark:bg-slate-900">
         <button
           type="button"
           onClick={() => setShowAdvancedAnalytics((value) => !value)}
@@ -125,7 +125,7 @@ export default function AnalyticsPage() {
 
         {showAdvancedAnalytics && (
           <div className="space-y-6 border-t border-white/30 p-4 dark:border-white/10">
-            <div className="space-y-4 rounded-2xl border border-white/25 bg-white/45 p-4 dark:border-white/10 dark:bg-slate-950/35">
+            <div className="space-y-4 rounded-2xl border border-white/25 bg-white p-4 dark:border-white/10 dark:bg-slate-950/35">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                 Customer Analytics
               </h3>
@@ -148,7 +148,7 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
-            <div className="space-y-4 rounded-2xl border border-white/25 bg-white/45 p-4 dark:border-white/10 dark:bg-slate-950/35">
+            <div className="space-y-4 rounded-2xl border border-white/25 bg-white p-4 dark:border-white/10 dark:bg-slate-950/35">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                 Business Analytics
               </h3>
@@ -168,7 +168,7 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
-            <div className="space-y-4 rounded-2xl border border-white/25 bg-white/45 p-4 dark:border-white/10 dark:bg-slate-950/35">
+            <div className="space-y-4 rounded-2xl border border-white/25 bg-white p-4 dark:border-white/10 dark:bg-slate-950/35">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                 Statistical & Text Analytics
               </h3>

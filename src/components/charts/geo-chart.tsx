@@ -38,9 +38,9 @@ interface GeoPoint {
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const panelClass =
-  "overflow-hidden rounded-[28px] border border-white/20 bg-white/75 shadow-[0_24px_90px_-48px_rgba(15,23,42,0.75)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "overflow-hidden rounded-lg border border-white/20 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 const fieldClass =
-  "w-full rounded-2xl border border-slate-200/70 bg-white/85 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950/65 dark:text-slate-100";
+  "w-full rounded-2xl border border-slate-200/70 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-100";
 const WORLD_MAP = "datalens-world-frame";
 const USA_MAP = "datalens-usa-frame";
 
@@ -167,7 +167,7 @@ function DetectionSummary({
     <div className="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-900 dark:text-cyan-200">
       <p className="font-semibold">{mode.kind === "coordinates" ? "Coordinate scatter" : "Region intensity map"}</p>
       <div className="mt-2 flex flex-wrap gap-2">
-        {lines.map((line) => <span key={line} className="rounded-full bg-white/65 px-2.5 py-1 text-xs font-medium text-cyan-800 dark:bg-slate-950/45 dark:text-cyan-200">{line}</span>)}
+        {lines.map((line) => <span key={line} className="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-cyan-800 dark:bg-slate-950 dark:text-cyan-200">{line}</span>)}
       </div>
     </div>
   );
@@ -176,7 +176,7 @@ function DetectionSummary({
 function TopLocations({ points }: { points: GeoPoint[] }) {
   const topPoints = [...points].sort((left, right) => right.value - left.value).slice(0, 5);
   return (
-    <div className="rounded-2xl border border-slate-200/70 bg-slate-50/80 px-4 py-4 dark:border-slate-800 dark:bg-slate-900/30">
+    <div className="rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-4 dark:border-slate-800 dark:bg-slate-900/30">
       <p className="text-sm font-semibold text-slate-900 dark:text-white">Top plotted locations</p>
       <div className="mt-3 space-y-2">
         {topPoints.length === 0 ? <p className="text-sm text-slate-500 dark:text-slate-400">No mapped points yet.</p> : topPoints.map((point) => <div key={point.name} className="flex items-center justify-between gap-3 text-sm"><span className="truncate text-slate-700 dark:text-slate-200">{point.name}</span><span className="shrink-0 text-slate-500 dark:text-slate-400">{formatNumber(point.value)}</span></div>)}
@@ -187,7 +187,7 @@ function TopLocations({ points }: { points: GeoPoint[] }) {
 
 function MapNotes() {
   return (
-    <div className="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-4 dark:border-slate-800 dark:bg-slate-950/35">
+    <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-950/35">
       <p className="text-sm font-semibold text-slate-900 dark:text-white">Map notes</p>
       <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">This component is intentionally offline-safe, so it renders on compact built-in geo frames and projects region values to centroids when full polygon packs are not available in the bundle.</p>
     </div>
@@ -298,7 +298,7 @@ export default function GeoChart({ tableName, columns }: GeoChartProps) {
       </div>
 
       <div className="grid gap-5 px-6 py-6 xl:grid-cols-[0.75fr_1.25fr]">
-        <div className="space-y-4 rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+        <div className="space-y-4 rounded-lg border border-slate-200/70 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
           {detectedMode.kind !== "coordinates" && (
             <select value={mode?.kind ?? detectedMode.kind} onChange={(event) => setMode(event.target.value === "country" ? { kind: "country", locationColumn: detectedMode.locationColumn } : { kind: "state", locationColumn: detectedMode.locationColumn })} className={fieldClass}>
               <option value="country">Country map</option>
@@ -318,7 +318,7 @@ export default function GeoChart({ tableName, columns }: GeoChartProps) {
           <TopLocations points={points} />
           <MapNotes />
 
-          <div className="rounded-2xl border border-slate-200/70 bg-slate-50/80 px-4 py-4 dark:border-slate-800 dark:bg-slate-900/30">
+          <div className="rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-4 dark:border-slate-800 dark:bg-slate-900/30">
             <p className="text-sm font-semibold text-slate-900 dark:text-white">Requirements</p>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
               <li>Country and state columns are matched against a built-in offline location dictionary.</li>
@@ -328,7 +328,7 @@ export default function GeoChart({ tableName, columns }: GeoChartProps) {
           </div>
         </div>
 
-        <div className="rounded-[26px] border border-slate-200/70 bg-white/70 p-4 dark:border-slate-800 dark:bg-slate-950/40">
+        <div className="rounded-lg border border-slate-200/70 bg-white p-4 dark:border-slate-800 dark:bg-slate-950">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white"><Globe2 className="h-4 w-4 text-cyan-500" />Map preview</div>
             {loading && <Loader2 className="h-4 w-4 animate-spin text-cyan-500" />}

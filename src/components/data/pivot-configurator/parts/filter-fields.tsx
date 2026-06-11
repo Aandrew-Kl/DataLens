@@ -17,7 +17,7 @@ export function FilterFieldRow({ filterItem, columns, setFilters }: FilterFieldR
   const dataListId = `pivot-filter-${filterItem.id}`;
 
   return (
-    <div className="grid gap-2 rounded-2xl border border-white/15 bg-white/55 p-3 dark:bg-slate-950/35">
+    <div className="grid gap-2 rounded-2xl border border-white/15 bg-white p-3 dark:bg-slate-950/35">
       <div className="grid gap-2 md:grid-cols-[1fr_auto_1fr_auto]">
         <input value={filterItem.column} readOnly className={FIELD_CLASS} />
         <select

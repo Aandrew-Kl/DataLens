@@ -35,7 +35,7 @@ function StatusBadge({ status }: { status: OllamaConnectionState }) {
         ? "bg-rose-500/15 text-rose-700 dark:text-rose-300"
         : status.kind === "checking"
           ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
-          : "bg-slate-200/70 text-slate-600 dark:bg-slate-800/70 dark:text-slate-300";
+          : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300";
 
   return (
     <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${className}`}>

@@ -367,7 +367,7 @@ function WidgetCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.2, ease: EASE }}
-      className={`rounded-3xl border border-white/10 bg-white/10 p-4 shadow-xl shadow-slate-950/10 backdrop-blur-xl dark:bg-slate-950/40 ${widget.type === "table" ? "xl:col-span-2" : ""}`}
+      className={`rounded-3xl border border-white/10 bg-white/10 p-4 shadow-xl shadow-slate-950/10 dark:bg-slate-950 ${widget.type === "table" ? "xl:col-span-2" : ""}`}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
@@ -573,7 +573,7 @@ function DashboardBuilder({ tableName, columns, rowCount }: DashboardBuilderProp
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, ease: EASE }}
-      className="overflow-hidden rounded-3xl border border-white/10 bg-white/10 shadow-2xl shadow-slate-950/10 backdrop-blur-xl dark:bg-slate-950/45"
+      className="overflow-hidden rounded-3xl border border-white/10 bg-white/10 shadow-2xl shadow-slate-950/10 dark:bg-slate-950"
     >
       <div className="border-b border-white/10 px-6 py-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">

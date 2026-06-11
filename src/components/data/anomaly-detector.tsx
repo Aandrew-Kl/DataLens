@@ -53,9 +53,9 @@ interface AnomalyPoint extends CandidatePoint {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950/45 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950 dark:text-slate-100";
 
 function subscribeDarkMode(listener: () => void) {
   if (typeof document === "undefined") return () => undefined;
@@ -387,7 +387,7 @@ function SummaryMetric({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 dark:bg-slate-950/45">
+    <div className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-950">
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{label}</p>
       <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100">{value}</p>
     </div>
@@ -535,7 +535,7 @@ export default function AnomalyDetector({ tableName, columns }: AnomalyDetectorP
           <option value="modified_zscore">Modified Z-score</option>
           <option value="isolation_forest">Isolation Forest approximation</option>
         </select>
-        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/45 dark:text-slate-200">
+        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-200">
           <Sigma className="h-4 w-4 text-cyan-500" />
           <span className="whitespace-nowrap">Sensitivity {sensitivity}</span>
           <input
@@ -548,7 +548,7 @@ export default function AnomalyDetector({ tableName, columns }: AnomalyDetectorP
             className="w-full accent-cyan-500"
           />
         </label>
-        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/45 dark:text-slate-200">
+        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-200">
           <TimerReset className="h-4 w-4 text-cyan-500" />
           <input
             type="checkbox"
@@ -584,9 +584,9 @@ export default function AnomalyDetector({ tableName, columns }: AnomalyDetectorP
       ) : null}
 
       <div className="mt-6 grid gap-5 xl:grid-cols-[1.45fr_0.8fr]">
-        <div className="rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+        <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           {points.length === 0 ? (
-            <div className="flex min-h-[400px] items-center justify-center rounded-[1.25rem] border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
               Run the detector to plot normal observations and anomalies.
             </div>
           ) : (
@@ -601,7 +601,7 @@ export default function AnomalyDetector({ tableName, columns }: AnomalyDetectorP
           )}
         </div>
 
-        <div className="space-y-4 rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+        <div className="space-y-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Severity distribution</p>
@@ -612,7 +612,7 @@ export default function AnomalyDetector({ tableName, columns }: AnomalyDetectorP
                 type="button"
                 onClick={exportChart}
                 disabled={points.length === 0}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-950/65"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-950"
               >
                 <Download className="h-4 w-4" />
                 PNG
@@ -621,7 +621,7 @@ export default function AnomalyDetector({ tableName, columns }: AnomalyDetectorP
                 type="button"
                 onClick={exportAnomalies}
                 disabled={anomalies.length === 0}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-950/65"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-950"
               >
                 <Download className="h-4 w-4" />
                 Export CSV
@@ -630,15 +630,15 @@ export default function AnomalyDetector({ tableName, columns }: AnomalyDetectorP
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/15 bg-white/70 p-4 dark:bg-slate-950/45">
+            <div className="rounded-2xl border border-white/15 bg-white p-4 dark:bg-slate-950">
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Mild</p>
               <p className="mt-1 text-lg font-semibold text-amber-600 dark:text-amber-300">{formatNumber(severityDistribution.mild)}</p>
             </div>
-            <div className="rounded-2xl border border-white/15 bg-white/70 p-4 dark:bg-slate-950/45">
+            <div className="rounded-2xl border border-white/15 bg-white p-4 dark:bg-slate-950">
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Moderate</p>
               <p className="mt-1 text-lg font-semibold text-orange-600 dark:text-orange-300">{formatNumber(severityDistribution.moderate)}</p>
             </div>
-            <div className="rounded-2xl border border-white/15 bg-white/70 p-4 dark:bg-slate-950/45">
+            <div className="rounded-2xl border border-white/15 bg-white p-4 dark:bg-slate-950">
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Severe</p>
               <p className="mt-1 text-lg font-semibold text-rose-600 dark:text-rose-300">{formatNumber(severityDistribution.severe)}</p>
             </div>
@@ -646,12 +646,12 @@ export default function AnomalyDetector({ tableName, columns }: AnomalyDetectorP
 
           <div className="max-h-[280px] space-y-3 overflow-y-auto pr-1">
             {anomalies.length === 0 ? (
-              <div className="rounded-[1.25rem] border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+              <div className="rounded-lg border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
                 No anomalies were flagged with the current settings.
               </div>
             ) : (
               anomalies.slice(0, 20).map((point) => (
-                <div key={point.rowId} className="rounded-2xl border border-white/15 bg-white/70 p-4 dark:bg-slate-950/45">
+                <div key={point.rowId} className="rounded-2xl border border-white/15 bg-white p-4 dark:bg-slate-950">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{point.label}</p>
@@ -673,7 +673,7 @@ export default function AnomalyDetector({ tableName, columns }: AnomalyDetectorP
         </div>
       </div>
 
-      <div className="mt-6 rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+      <div className="mt-6 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Anomalous rows</p>
@@ -682,14 +682,14 @@ export default function AnomalyDetector({ tableName, columns }: AnomalyDetectorP
         </div>
 
         {anomalies.length === 0 ? (
-          <div className="mt-4 rounded-[1.25rem] border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+          <div className="mt-4 rounded-lg border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
             No anomalies to list yet.
           </div>
         ) : (
-          <div className="mt-4 overflow-hidden rounded-[1.25rem] border border-white/15">
+          <div className="mt-4 overflow-hidden rounded-lg border border-white/15">
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
-                <thead className="bg-white/85 dark:bg-slate-950/70">
+                <thead className="bg-white dark:bg-slate-950">
                   <tr>
                     <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Observation</th>
                     <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Value</th>
@@ -698,7 +698,7 @@ export default function AnomalyDetector({ tableName, columns }: AnomalyDetectorP
                     <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Row preview</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/10 bg-white/60 dark:bg-slate-950/45">
+                <tbody className="divide-y divide-white/10 bg-white dark:bg-slate-950">
                   {anomalies.slice(0, 50).map((point) => (
                     <tr key={`${point.rowId}-${point.label}`}>
                       <td className="px-3 py-2 text-slate-700 dark:text-slate-200">{point.label}</td>

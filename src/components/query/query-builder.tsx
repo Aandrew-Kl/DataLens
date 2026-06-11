@@ -183,7 +183,7 @@ function StepCard({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.34, delay: index * 0.04, ease: EASE }}
-      className="rounded-[1.75rem] border border-white/20 bg-white/70 p-5 shadow-xl shadow-slate-950/5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45"
+      className="rounded-lg border border-white/20 bg-white p-5 shadow-xl shadow-slate-950/5 dark:border-white/10 dark:bg-slate-950"
     >
       <div className="mb-4 flex items-start gap-3">
         <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-cyan-500/15 text-sm font-semibold text-cyan-700 dark:text-cyan-300">
@@ -215,7 +215,7 @@ function TogglePill({
       className={`rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] transition ${
         active
           ? "bg-cyan-500 text-white"
-          : "bg-slate-200/70 text-slate-600 hover:bg-slate-300/70 dark:bg-slate-800/70 dark:text-slate-300 dark:hover:bg-slate-700/70"
+          : "bg-slate-200 text-slate-600 hover:bg-slate-300/70 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700/70"
       }`}
     >
       {children}
@@ -270,7 +270,7 @@ export default function QueryBuilder({
       .filter((clause): clause is string => Boolean(clause));
 
     const clauses = [
-      `SELECT ${selectExpressions.join(",\n       ")}`,
+      `SELECT ${selectExpressions.join(",\n ")}`,
       `FROM ${quotedTable}`,
     ];
 
@@ -339,7 +339,7 @@ export default function QueryBuilder({
   };
 
   return (
-    <section className="rounded-[2rem] border border-white/20 bg-white/70 p-6 shadow-xl shadow-slate-950/5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45">
+    <section className="rounded-lg border border-white/20 bg-white p-6 shadow-xl shadow-slate-950/5 dark:border-white/10 dark:bg-slate-950">
       <div className="flex flex-col gap-4 border-b border-slate-200/70 pb-5 dark:border-slate-800/70 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-600 dark:text-cyan-400">
@@ -389,7 +389,7 @@ export default function QueryBuilder({
               {columns.map((column) => (
                 <label
                   key={column.name}
-                  className="flex items-center gap-3 rounded-2xl border border-white/20 bg-slate-50/80 px-4 py-3 dark:border-white/10 dark:bg-slate-900/45"
+                  className="flex items-center gap-3 rounded-2xl border border-white/20 bg-slate-50 px-4 py-3 dark:border-white/10 dark:bg-slate-900"
                 >
                   <input
                     type="checkbox"
@@ -434,7 +434,7 @@ export default function QueryBuilder({
 
           <StepCard index={2} title="Where" description="Add one or more filter conditions and choose how they combine.">
             <div className="mb-4 flex flex-wrap items-center gap-2">
-              <div className="inline-flex rounded-full bg-slate-200/70 p-1 dark:bg-slate-800/70">
+              <div className="inline-flex rounded-full bg-slate-200 p-1 dark:bg-slate-800">
                 {(["AND", "OR"] as const).map((join) => (
                   <button
                     key={join}
@@ -462,7 +462,7 @@ export default function QueryBuilder({
               {filters.length > 0 ? filters.map((condition) => (
                 <div
                   key={condition.id}
-                  className="grid gap-3 rounded-2xl border border-white/20 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-slate-900/45 lg:grid-cols-[minmax(0,1fr)_180px_minmax(0,1fr)_auto]"
+                  className="grid gap-3 rounded-2xl border border-white/20 bg-slate-50 p-4 dark:border-white/10 dark:bg-slate-900 lg:grid-cols-[minmax(0,1fr)_180px_minmax(0,1fr)_auto]"
                 >
                   <select
                     value={condition.column}
@@ -543,7 +543,7 @@ export default function QueryBuilder({
                         className={`rounded-full px-3 py-2 text-sm transition ${
                           active
                             ? "bg-cyan-500 text-white"
-                            : "bg-slate-200/70 text-slate-600 dark:bg-slate-800/70 dark:text-slate-300"
+                            : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
                         }`}
                       >
                         {column.name}
@@ -556,7 +556,7 @@ export default function QueryBuilder({
 
               <div>
                 <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <div className="inline-flex rounded-full bg-slate-200/70 p-1 dark:bg-slate-800/70">
+                  <div className="inline-flex rounded-full bg-slate-200 p-1 dark:bg-slate-800">
                     {(["AND", "OR"] as const).map((join) => (
                       <button
                         key={join}
@@ -584,7 +584,7 @@ export default function QueryBuilder({
                   {havingConditions.length > 0 ? havingConditions.map((condition) => (
                     <div
                       key={condition.id}
-                      className="grid gap-3 rounded-2xl border border-white/20 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-slate-900/45 lg:grid-cols-[180px_minmax(0,1fr)_150px_minmax(0,1fr)_auto]"
+                      className="grid gap-3 rounded-2xl border border-white/20 bg-slate-50 p-4 dark:border-white/10 dark:bg-slate-900 lg:grid-cols-[180px_minmax(0,1fr)_150px_minmax(0,1fr)_auto]"
                     >
                       <select
                         value={condition.aggregate}
@@ -670,7 +670,7 @@ export default function QueryBuilder({
                 <Plus className="h-4 w-4" />
                 Add Sort Rule
               </button>
-              <label className="ml-auto flex items-center gap-2 rounded-2xl border border-white/20 bg-slate-50/80 px-4 py-2.5 text-sm dark:border-white/10 dark:bg-slate-900/45">
+              <label className="ml-auto flex items-center gap-2 rounded-2xl border border-white/20 bg-slate-50 px-4 py-2.5 text-sm dark:border-white/10 dark:bg-slate-900">
                 Limit
                 <input
                   type="number"
@@ -686,7 +686,7 @@ export default function QueryBuilder({
               {orderRules.length > 0 ? orderRules.map((rule) => (
                 <div
                   key={rule.id}
-                  className="grid gap-3 rounded-2xl border border-white/20 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-slate-900/45 lg:grid-cols-[minmax(0,1fr)_160px_auto]"
+                  className="grid gap-3 rounded-2xl border border-white/20 bg-slate-50 p-4 dark:border-white/10 dark:bg-slate-900 lg:grid-cols-[minmax(0,1fr)_160px_auto]"
                 >
                   <select
                     value={rule.column}
@@ -734,7 +734,7 @@ export default function QueryBuilder({
 
         <div className="grid gap-4">
           <StepCard index={5} title="Preview" description="Inspect the generated SQL before sending it to the editor or execution pipeline.">
-            <div className="rounded-[1.5rem] border border-slate-200/70 bg-slate-950 p-4 shadow-inner shadow-black/20">
+            <div className="rounded-lg border border-slate-200/70 bg-slate-950 p-4 shadow-inner shadow-black/20">
               <pre className="overflow-x-auto whitespace-pre-wrap text-sm leading-7 text-slate-100">
                 <code>{sql}</code>
               </pre>
@@ -749,7 +749,7 @@ export default function QueryBuilder({
               ].map((item) => (
                 <div
                   key={item.label}
-                  className="flex items-center justify-between rounded-2xl border border-white/20 bg-slate-50/80 px-4 py-3 dark:border-white/10 dark:bg-slate-900/45"
+                  className="flex items-center justify-between rounded-2xl border border-white/20 bg-slate-50 px-4 py-3 dark:border-white/10 dark:bg-slate-900"
                 >
                   <div className="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-200">
                     <item.icon className="h-4 w-4 text-cyan-500" />

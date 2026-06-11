@@ -69,7 +69,7 @@ interface ProfileResult {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const CARD =
-  "rounded-3xl border border-white/15 bg-white/10 shadow-[0_22px_70px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/40";
+  "rounded-3xl border border-white/15 bg-white/10 shadow-sm dark:border-white/10 dark:bg-slate-950";
 function readNumber(value: unknown): number {
   if (typeof value === "number") {
     return Number.isFinite(value) ? value : 0;
@@ -660,7 +660,7 @@ export default function DataProfilerAI({ tableName, columns, rowCount }: DataPro
   }
 
   return (
-    <section className="overflow-hidden rounded-[30px] border border-white/15 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.16),transparent_30%),linear-gradient(135deg,rgba(248,250,252,0.92),rgba(226,232,240,0.75))] shadow-[0_30px_120px_-50px_rgba(15,23,42,0.9)] dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.12),transparent_26%),linear-gradient(135deg,rgba(2,6,23,0.94),rgba(15,23,42,0.88))]">
+    <section className="overflow-hidden rounded-lg border border-white/15 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.16),transparent_30%),linear-gradient(135deg,rgba(248,250,252,0.92),rgba(226,232,240,0.75))] shadow-sm dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.12),transparent_26%),linear-gradient(135deg,rgba(2,6,23,0.94),rgba(15,23,42,0.88))]">
       <div className="border-b border-white/10 px-6 py-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>

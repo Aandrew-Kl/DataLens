@@ -128,9 +128,9 @@ interface NarrativeReport {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const NAV_BUTTON_CLASS =
-  "rounded-2xl border border-white/15 bg-white/45 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-cyan-300/35 hover:text-slate-950 dark:bg-slate-950/35 dark:text-slate-200";
+  "rounded-2xl border border-white/15 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-cyan-300/35 hover:text-slate-950 dark:bg-slate-950/35 dark:text-slate-200";
 const VISUAL_COLORS = [
   "#38bdf8",
   "#2dd4bf",
@@ -1068,7 +1068,7 @@ function DataNarratorReady({ tableName, columns, rowCount }: DataNarratorProps) 
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <div className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
+              <div className="rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/35">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Quality score
                 </div>
@@ -1076,7 +1076,7 @@ function DataNarratorReady({ tableName, columns, rowCount }: DataNarratorProps) 
                   {report.qualityScore}/100
                 </div>
               </div>
-              <div className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
+              <div className="rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/35">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Completeness
                 </div>
@@ -1135,7 +1135,7 @@ function DataNarratorReady({ tableName, columns, rowCount }: DataNarratorProps) 
               <div className="grid gap-5 xl:grid-cols-[1.06fr_0.94fr]">
                 <div>
                   <div className={`inline-flex rounded-2xl bg-gradient-to-br p-[1px] ${section.accent}`}>
-                    <div className="rounded-[15px] bg-white/85 p-2.5 dark:bg-slate-950/75">
+                    <div className="rounded-lg bg-white p-2.5 dark:bg-slate-950">
                       <Icon className="h-4 w-4 text-slate-700 dark:text-slate-200" />
                     </div>
                   </div>
@@ -1152,7 +1152,7 @@ function DataNarratorReady({ tableName, columns, rowCount }: DataNarratorProps) 
                     {section.bullets.map((bullet) => (
                       <div
                         key={bullet}
-                        className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200"
+                        className="rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/35 dark:text-slate-200"
                       >
                         {bullet}
                       </div>
@@ -1160,7 +1160,7 @@ function DataNarratorReady({ tableName, columns, rowCount }: DataNarratorProps) 
                   </div>
                 </div>
 
-                <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+                <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
                   {option ? (
                     <>
                       <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">

@@ -59,9 +59,9 @@ function generateMarkdown(cols: string[], rows: Record<string, unknown>[]): stri
 }
 
 function generateHTML(cols: string[], rows: Record<string, unknown>[]): string {
-  const ths = cols.map((c) => `      <th>${c}</th>`).join("\n");
+  const ths = cols.map((c) => ` <th>${c}</th>`).join("\n");
   const trs = rows.map((r) =>
-    `    <tr>\n${cols.map((c) => `      <td>${String(r[c] ?? "")}</td>`).join("\n")}\n    </tr>`
+    ` <tr>\n${cols.map((c) => ` <td>${String(r[c] ?? "")}</td>`).join("\n")}\n </tr>`
   ).join("\n");
   return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"/><title>Export</title>
@@ -203,7 +203,7 @@ export default function ExportWizard({ open, onClose, tableName, columns, rowCou
           <motion.button
             type="button"
             aria-label="Close export wizard"
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 "
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -211,7 +211,7 @@ export default function ExportWizard({ open, onClose, tableName, columns, rowCou
           />
 
           <motion.div
-            className="relative w-full max-w-2xl max-h-[85vh] flex flex-col rounded-2xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden"
+            className="relative w-full max-w-2xl max-h-[85vh] flex flex-col rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden"
             initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.92 }}
             transition={{ duration: 0.2, ease: "easeOut" }} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Export Wizard"
           >
@@ -240,7 +240,7 @@ export default function ExportWizard({ open, onClose, tableName, columns, rowCou
                         const active = format === opt.id;
                         const Icon = opt.icon;
                         return (
-                          <button key={opt.id} onClick={() => setFormat(opt.id)} className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all duration-150 ${active ? "border-indigo-400 dark:border-indigo-600 bg-indigo-50/60 dark:bg-indigo-950/40 ring-1 ring-indigo-400/30" : "border-gray-200/60 dark:border-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600 bg-white/60 dark:bg-gray-800/40"}`}>
+                          <button key={opt.id} onClick={() => setFormat(opt.id)} className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all duration-150 ${active ? "border-indigo-400 dark:border-indigo-600 bg-indigo-50/60 dark:bg-indigo-950/40 ring-1 ring-indigo-400/30" : "border-gray-200/60 dark:border-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-800"}`}>
                             <div className={`p-2 rounded-lg ${active ? "bg-indigo-100 dark:bg-indigo-900/50" : "bg-gray-100 dark:bg-gray-800"}`}>
                               <Icon className={`w-4 h-4 ${active ? "text-indigo-600 dark:text-indigo-400" : "text-gray-500 dark:text-gray-400"}`} />
                             </div>
@@ -267,7 +267,7 @@ export default function ExportWizard({ open, onClose, tableName, columns, rowCou
                       </div>
                       <div className="max-h-64 overflow-y-auto rounded-xl border border-gray-200/60 dark:border-gray-700/50 divide-y divide-gray-100 dark:divide-gray-800">
                         {columns.map((col) => (
-                          <label key={col.name} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+                          <label key={col.name} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                             <input type="checkbox" checked={selectedCols.has(col.name)} onChange={() => toggleCol(col.name)} className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500" />
                             <span className="text-sm text-gray-800 dark:text-gray-200 font-medium truncate">{col.name}</span>
                             <span className="ml-auto text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500 font-semibold">{col.type}</span>
@@ -324,7 +324,7 @@ export default function ExportWizard({ open, onClose, tableName, columns, rowCou
                         <div className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 overflow-auto max-h-56">
                           <table className="w-full text-xs">
                             <thead>
-                              <tr className="bg-gray-50 dark:bg-gray-800/60">
+                              <tr className="bg-gray-50 dark:bg-gray-800">
                                 {previewCols.map((col) => (
                                   <th key={col} className="px-3 py-2 text-left font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">{col}</th>
                                 ))}
@@ -332,7 +332,7 @@ export default function ExportWizard({ open, onClose, tableName, columns, rowCou
                             </thead>
                             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                               {preview.map((row, ri) => (
-                                <tr key={ri} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                                <tr key={ri} className="hover:bg-gray-50 dark:hover:bg-gray-800/30">
                                   {previewCols.map((col) => (
                                     <td key={col} className="px-3 py-1.5 font-mono text-gray-700 dark:text-gray-300 whitespace-nowrap max-w-[200px] truncate">
                                       {row[col] === null ? <span className="italic text-gray-400">null</span> : String(row[col])}
@@ -353,7 +353,7 @@ export default function ExportWizard({ open, onClose, tableName, columns, rowCou
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200/60 dark:border-gray-700/50 shrink-0 bg-gray-50/50 dark:bg-gray-800/30">
+            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200/60 dark:border-gray-700/50 shrink-0 bg-gray-50 dark:bg-gray-800/30">
               <button onClick={goBackward} disabled={step === 0} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${step === 0 ? "text-gray-300 dark:text-gray-600 cursor-not-allowed" : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"}`}>
                 <ChevronLeft className="w-4 h-4" />Back
               </button>

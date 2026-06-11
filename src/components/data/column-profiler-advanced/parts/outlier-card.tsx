@@ -33,7 +33,7 @@ export function OutlierCard({
             <MetricCell label="Upper Bound" value={formatMetric(outliers.upperBound)} />
             <MetricCell label="Outliers" value={formatNumber(outliers.outlierCount)} />
           </div>
-          <div className="rounded-3xl border border-white/20 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-slate-900/45">
+          <div className="rounded-3xl border border-white/20 bg-slate-50 p-4 dark:border-white/10 dark:bg-slate-900">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
               Most Frequent Outlier Values
             </p>
@@ -42,7 +42,7 @@ export function OutlierCard({
                 outliers.topOutliers.map((row) => (
                   <div
                     key={`${row.value}-${row.count}`}
-                    className="flex items-center justify-between rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm dark:border-white/10 dark:bg-slate-950/50"
+                    className="flex items-center justify-between rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-slate-950"
                   >
                     <span className="truncate pr-3 text-slate-700 dark:text-slate-200">
                       {row.value}
@@ -61,7 +61,7 @@ export function OutlierCard({
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/20 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-slate-900/45">
+        <div className="rounded-3xl border border-white/20 bg-slate-50 p-4 dark:border-white/10 dark:bg-slate-900">
           <ReactECharts
             option={buildBoxPlotOption(outliers, dark)}
             style={{ height: 320, width: "100%" }}

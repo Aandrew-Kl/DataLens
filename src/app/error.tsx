@@ -25,7 +25,7 @@ export default function Error({
 
   return (
     <main className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4 md:p-8">
-      <section className="w-full max-w-2xl rounded-[1.75rem] border border-white/15 bg-white/50 p-6 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.55)] backdrop-blur-2xl dark:bg-slate-900/35 md:p-8">
+      <section className="w-full max-w-2xl rounded-lg border border-white/15 bg-white p-6 shadow-sm dark:bg-slate-900/35 md:p-8">
         <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-200/60 bg-amber-50/80 text-amber-600 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-300">
           <AlertTriangle className="h-7 w-7" />
         </div>
@@ -36,7 +36,7 @@ export default function Error({
         <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600 dark:text-slate-300">
           DataLens hit an unexpected error. The page may still work after a reload.
         </p>
-        <p className="mt-4 rounded-xl border border-white/20 bg-white/65 px-4 py-3 text-sm text-slate-700 dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-200">
+        <p className="mt-4 rounded-xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200">
           {error.message}
         </p>
 
@@ -54,7 +54,7 @@ export default function Error({
             href={issueUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/70 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-white/90 dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-200 dark:hover:bg-slate-900/80"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
           >
             <Bug className="h-4 w-4" />
             Report issue
@@ -62,11 +62,11 @@ export default function Error({
         </div>
 
         {isDev ? (
-          <details className="mt-6 rounded-[1.3rem] border border-white/20 bg-white/65 p-4 dark:border-white/10 dark:bg-slate-950/45">
+          <details className="mt-6 rounded-lg border border-white/20 bg-white p-4 dark:border-white/10 dark:bg-slate-950">
             <summary className="cursor-pointer text-sm font-semibold text-slate-700 dark:text-slate-200">
               Developer details
             </summary>
-            <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-xl border border-white/20 bg-slate-950/90 p-4 text-xs leading-6 text-slate-100 dark:border-white/10">
+            <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-xl border border-white/20 bg-slate-950 p-4 text-xs leading-6 text-slate-100 dark:border-white/10">
               {error.stack ?? error.message}
             </pre>
           </details>

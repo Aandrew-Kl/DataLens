@@ -63,11 +63,11 @@ function PreviewTable({ title, rows }: { title: string; rows: Record<string, unk
   );
 
   return (
-    <div className="overflow-hidden rounded-[1.2rem] border border-white/10 bg-white/40 dark:bg-slate-950/35">
+    <div className="overflow-hidden rounded-lg border border-white/10 bg-white dark:bg-slate-950/35">
       <div className="border-b border-white/10 px-4 py-3 text-sm font-semibold text-slate-950 dark:text-white">{title}</div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
-          <thead className="bg-white/70 dark:bg-slate-950/65">
+          <thead className="bg-white dark:bg-slate-950">
             <tr>
               {visibleColumns.map((column) => (
                 <th key={column} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{column}</th>
@@ -102,11 +102,11 @@ function PreviewContent({ tableName, request }: { tableName: string; request: Pr
   return (
     <div className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-white/40 px-4 py-3 dark:bg-slate-950/35">
+        <div className="rounded-2xl border border-white/10 bg-white px-4 py-3 dark:bg-slate-950/35">
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Before</div>
           <div className="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">{formatNumber(preview.beforeCount)}</div>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-white/40 px-4 py-3 dark:bg-slate-950/35">
+        <div className="rounded-2xl border border-white/10 bg-white px-4 py-3 dark:bg-slate-950/35">
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">After</div>
           <div className="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">{formatNumber(preview.afterCount)}</div>
         </div>
@@ -123,12 +123,12 @@ function PreviewFallback() {
   return (
     <div className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="h-20 animate-pulse rounded-2xl bg-white/35 dark:bg-slate-800/55" />
-        <div className="h-20 animate-pulse rounded-2xl bg-white/35 dark:bg-slate-800/55" />
+        <div className="h-20 animate-pulse rounded-2xl bg-white/35 dark:bg-slate-800" />
+        <div className="h-20 animate-pulse rounded-2xl bg-white/35 dark:bg-slate-800" />
       </div>
       <div className="grid gap-4 xl:grid-cols-2">
-        <div className="h-64 animate-pulse rounded-[1.2rem] bg-white/30 dark:bg-slate-800/50" />
-        <div className="h-64 animate-pulse rounded-[1.2rem] bg-white/30 dark:bg-slate-800/50" />
+        <div className="h-64 animate-pulse rounded-lg bg-white/30 dark:bg-slate-800" />
+        <div className="h-64 animate-pulse rounded-lg bg-white/30 dark:bg-slate-800" />
       </div>
     </div>
   );
@@ -157,7 +157,7 @@ export function WranglerGrid({
 }: WranglerGridProps) {
   return (
     <>
-      {showPreview ? <div className="rounded-[1.35rem] border border-white/12 bg-white/45 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/35">
+      {showPreview ? <div className="rounded-lg border border-white/12 bg-white p-5 dark:border-white/10 dark:bg-slate-950/35">
         <div className="mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
           <Columns2 className="h-3.5 w-3.5" />
           Before / after preview
@@ -177,7 +177,7 @@ export function WranglerGrid({
         )}
       </div> : null}
 
-      {showHistory ? <div className="rounded-[1.35rem] border border-white/12 bg-white/45 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/35">
+      {showHistory ? <div className="rounded-lg border border-white/12 bg-white p-5 dark:border-white/10 dark:bg-slate-950/35">
         <div className="mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
           <History className="h-3.5 w-3.5" />
           Operation history
@@ -196,7 +196,7 @@ export function WranglerGrid({
             {history.map((entry) => {
               const undoable = latestUndoableEntry?.id === entry.id && entry.status === "applied";
               return (
-                <motion.article key={entry.id} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: EASE }} className="overflow-hidden rounded-[1.2rem] border border-white/12 bg-white/40 dark:border-white/10 dark:bg-slate-950/34">
+                <motion.article key={entry.id} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: EASE }} className="overflow-hidden rounded-lg border border-white/12 bg-white dark:border-white/10 dark:bg-slate-950/34">
                   <div className="flex flex-wrap items-start justify-between gap-3 px-4 py-4">
                     <div>
                       <div className="text-sm font-semibold text-slate-950 dark:text-white">{entry.label}</div>
@@ -216,11 +216,11 @@ export function WranglerGrid({
                     </div>
                   </div>
 
-                  <pre className="overflow-x-auto border-t border-white/10 bg-slate-950/90 px-4 py-4 text-xs leading-6 text-slate-200">{entry.sql}</pre>
+                  <pre className="overflow-x-auto border-t border-white/10 bg-slate-950 px-4 py-4 text-xs leading-6 text-slate-200">{entry.sql}</pre>
 
                   {undoable ? (
                     <div className="border-t border-white/10 px-4 py-4">
-                      <button type="button" onClick={onUndoLatest} disabled={busy} className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/30 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100">
+                      <button type="button" onClick={onUndoLatest} disabled={busy} className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/30 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100">
                         <RotateCcw className="h-4 w-4" />
                         Undo this step
                       </button>

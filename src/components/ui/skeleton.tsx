@@ -3,7 +3,7 @@
 /* ─── Shimmer base ─── */
 const shimmerClass = `
   relative overflow-hidden
-  bg-gray-200/70 dark:bg-gray-800/70
+  bg-gray-200/70 dark:bg-gray-800
   rounded-lg
   before:absolute before:inset-0
   before:bg-gradient-to-r before:from-transparent before:via-white/40 dark:before:via-white/5 before:to-transparent
@@ -41,7 +41,7 @@ export function SkeletonCard({ className = "" }: SkeletonCardProps) {
     <div
       className={`
         rounded-xl p-5
-        bg-white/60 dark:bg-gray-900/60
+        bg-white dark:bg-gray-900
         border border-gray-200/50 dark:border-gray-700/50
         space-y-3
         ${className}
@@ -71,7 +71,7 @@ export function SkeletonTable({
     <div
       className={`
         rounded-xl overflow-hidden
-        bg-white/60 dark:bg-gray-900/60
+        bg-white dark:bg-gray-900
         border border-gray-200/50 dark:border-gray-700/50
         ${className}
       `}
@@ -112,7 +112,7 @@ export function SkeletonChart({ className = "" }: SkeletonChartProps) {
     <div
       className={`
         rounded-xl p-5
-        bg-white/60 dark:bg-gray-900/60
+        bg-white dark:bg-gray-900
         border border-gray-200/50 dark:border-gray-700/50
         ${className}
       `}

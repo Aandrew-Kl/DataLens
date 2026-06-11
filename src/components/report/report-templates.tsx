@@ -152,9 +152,9 @@ function TemplatePreview({
 }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-[1.35rem] border border-white/20 bg-gradient-to-br ${accentClassName}`}
+      className={`relative overflow-hidden rounded-lg border border-white/20 bg-gradient-to-br ${accentClassName}`}
     >
-      <div className="absolute inset-0 bg-white/55 dark:bg-slate-950/35" />
+      <div className="absolute inset-0 bg-white dark:bg-slate-950/35" />
       <div className="relative space-y-3 px-4 py-4">
         {preview.map((item) => (
           <div key={item.label}>
@@ -162,9 +162,9 @@ function TemplatePreview({
               <span>{item.label}</span>
               <span>{item.value}%</span>
             </div>
-            <div className="h-2.5 overflow-hidden rounded-full bg-white/55 dark:bg-slate-950/45">
+            <div className="h-2.5 overflow-hidden rounded-full bg-white dark:bg-slate-950">
               <div
-                className="h-full rounded-full bg-slate-950/75 dark:bg-white/85"
+                className="h-full rounded-full bg-slate-950 dark:bg-white"
                 style={{ width: `${item.value}%` }}
               />
             </div>
@@ -185,7 +185,7 @@ function TemplateBadge({
       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${
         selected
           ? "bg-cyan-500/15 text-cyan-700 dark:text-cyan-300"
-          : "bg-slate-200/70 text-slate-600 dark:bg-slate-800/70 dark:text-slate-300"
+          : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
       }`}
     >
       <CheckCircle2 className="h-3.5 w-3.5" />
@@ -284,7 +284,7 @@ export default function ReportTemplates() {
               className={`${GLASS_CARD_CLASS} flex h-full flex-col p-4`}
             >
               <div className="mb-4 flex items-center justify-between gap-3">
-                <div className="rounded-2xl bg-white/65 p-3 text-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
+                <div className="rounded-2xl bg-white p-3 text-slate-700 dark:bg-slate-900 dark:text-slate-200">
                   {template.id === "executive-summary" ? (
                     <ClipboardList className="h-5 w-5" />
                   ) : template.id === "data-quality-report" ? (
@@ -318,7 +318,7 @@ export default function ReportTemplates() {
                 {template.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:bg-slate-900/60 dark:text-slate-300"
+                    className="rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:bg-slate-900 dark:text-slate-300"
                   >
                     {tag}
                   </span>

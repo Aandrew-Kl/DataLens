@@ -440,7 +440,7 @@ export default function ColumnSplitter({
                 previewRows.map((row) => (
                   <div
                     key={row.key}
-                    className="rounded-2xl border border-white/20 bg-white/55 p-4 dark:bg-slate-950/35"
+                    className="rounded-2xl border border-white/20 bg-white p-4 dark:bg-slate-950/35"
                   >
                     <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       Original

@@ -11,7 +11,7 @@ import {
 import { CalendarRange, X } from "lucide-react";
 
 const GLASS_PANEL_CLASS =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-slate-950 border border-white/20";
 
 export interface DateRangeValue {
   start: string | null;
@@ -272,7 +272,7 @@ export default function DateRangePicker({
                     key={preset.id}
                     type="button"
                     onClick={() => handlePresetClick(preset)}
-                    className="rounded-2xl border border-white/20 bg-white/60 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-white dark:bg-slate-900/55 dark:text-slate-100 dark:hover:bg-slate-900"
+                    className="rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-white dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-900"
                   >
                     {preset.label}
                   </button>
@@ -287,7 +287,7 @@ export default function DateRangePicker({
                   type="date"
                   value={draftRange.start ?? ""}
                   onChange={handleDraftChange("start")}
-                  className="w-full rounded-2xl border border-white/20 bg-white/60 px-3 py-2 text-sm text-slate-900 outline-none focus:border-cyan-300 dark:bg-slate-900/55 dark:text-slate-100"
+                  className="w-full rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-cyan-300 dark:bg-slate-900 dark:text-slate-100"
                 />
               </label>
               <label className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
@@ -296,7 +296,7 @@ export default function DateRangePicker({
                   type="date"
                   value={draftRange.end ?? ""}
                   onChange={handleDraftChange("end")}
-                  className="w-full rounded-2xl border border-white/20 bg-white/60 px-3 py-2 text-sm text-slate-900 outline-none focus:border-cyan-300 dark:bg-slate-900/55 dark:text-slate-100"
+                  className="w-full rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-cyan-300 dark:bg-slate-900 dark:text-slate-100"
                 />
               </label>
             </div>
@@ -305,7 +305,7 @@ export default function DateRangePicker({
               <button
                 type="button"
                 onClick={handleClear}
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/60 px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-white dark:bg-slate-900/55 dark:text-slate-300 dark:hover:bg-slate-900"
+                className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-white dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-900"
               >
                 <X className="h-4 w-4" />
                 Clear range

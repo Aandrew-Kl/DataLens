@@ -84,7 +84,7 @@ function DatasetSelector({
       </p>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between gap-2 rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white/80 dark:bg-gray-900/60 backdrop-blur-sm px-4 py-2.5 text-sm text-left transition-colors hover:border-indigo-300 dark:hover:border-indigo-700"
+        className="w-full flex items-center justify-between gap-2 rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-left transition-colors hover:border-indigo-300 dark:hover:border-indigo-700"
       >
         <span className="truncate text-gray-900 dark:text-white font-medium">
           {current ? current.name : "Select dataset\u2026"}
@@ -98,7 +98,7 @@ function DatasetSelector({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 mt-1 w-full rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg py-1 max-h-60 overflow-auto"
+            className="absolute z-50 mt-1 w-full rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white dark:bg-gray-900 shadow-lg py-1 max-h-60 overflow-auto"
           >
             {datasets.map((ds) => (
               <button
@@ -141,7 +141,7 @@ function StatCard({
 }) {
   const diff = diffLabel(leftValue, rightValue);
   return (
-    <div className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white/80 dark:bg-gray-900/60 backdrop-blur-sm p-4">
+    <div className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white dark:bg-gray-900 p-4">
       <div className="flex items-center gap-2 mb-3">
         <Icon className="w-4 h-4 text-indigo-500" />
         <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
@@ -277,7 +277,7 @@ export default function DataComparison({ datasets }: DataComparisonProps) {
     <motion.section
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-gray-200/50 dark:border-gray-700/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl p-6 shadow-xl shadow-slate-900/5 space-y-6"
+      className="rounded-2xl border border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-900 p-6 shadow-xl shadow-slate-900/5 space-y-6"
     >
       {/* Header */}
       <div className="flex items-center gap-2">
@@ -355,7 +355,7 @@ export default function DataComparison({ datasets }: DataComparisonProps) {
           <div className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 dark:bg-gray-800/60">
+                <tr className="bg-gray-50 dark:bg-gray-800">
                   <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Column
                   </th>
@@ -409,7 +409,7 @@ export default function DataComparison({ datasets }: DataComparisonProps) {
                       initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.02 }}
-                      className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors"
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors"
                     >
                       <td className="px-4 py-2.5">
                         <div className="flex items-center gap-2">
@@ -467,7 +467,7 @@ export default function DataComparison({ datasets }: DataComparisonProps) {
                       const rStr = rv != null ? formatNumber(rv) : "\u2014";
                       const d = lv != null && rv != null ? diffLabel(lv, rv) : { text: "\u2014", color: "text-gray-400 dark:text-gray-500" };
                       return (
-                        <tr key={key} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors bg-gray-50/30 dark:bg-gray-800/10">
+                        <tr key={key} className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors bg-gray-50/30 dark:bg-gray-800/10">
                           <td className="px-4 py-1.5 pl-12">
                             <span className="text-[11px] text-gray-400 dark:text-gray-500">{name} ({metric})</span>
                           </td>

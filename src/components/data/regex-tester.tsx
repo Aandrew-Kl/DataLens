@@ -23,9 +23,9 @@ type StatusState = { kind: "success" | "error"; message: string } | null;
 const PREVIEW_LIMIT = 100;
 const ease = [0.16, 1, 0.3, 1] as const;
 const panelClass =
-  "overflow-hidden rounded-[28px] border border-white/25 bg-white/70 shadow-[0_24px_90px_-48px_rgba(15,23,42,0.7)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "overflow-hidden rounded-lg border border-white/25 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 const fieldClass =
-  "w-full rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950/60 dark:text-slate-100";
+  "w-full rounded-2xl border border-slate-200/70 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-100";
 const buttonClass =
   "inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-55";
 const QUICK_PATTERNS = [
@@ -185,7 +185,7 @@ async function applyRegexFilter(
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200/70 bg-white/65 p-4 shadow-sm backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-950/35">
+    <div className="rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-950/35">
       <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
         {label}
       </p>
@@ -376,7 +376,7 @@ export default function RegexTester({ tableName, columns }: RegexTesterProps) {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/25 bg-white/55 p-4 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-slate-950/30">
+          <div className="rounded-2xl border border-white/25 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-slate-950/30">
             <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
               <Search className="h-4 w-4 text-cyan-500" />
               Quick patterns
@@ -387,7 +387,7 @@ export default function RegexTester({ tableName, columns }: RegexTesterProps) {
                   key={preset.id}
                   type="button"
                   onClick={() => setPattern(preset.pattern)}
-                  className="rounded-full border border-slate-200/70 bg-white/80 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-cyan-400/50 hover:text-cyan-700 dark:border-slate-700/70 dark:bg-slate-950/60 dark:text-slate-200 dark:hover:text-cyan-300"
+                  className="rounded-full border border-slate-200/70 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-cyan-400/50 hover:text-cyan-700 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-200 dark:hover:text-cyan-300"
                 >
                   {preset.label}
                 </button>
@@ -395,10 +395,10 @@ export default function RegexTester({ tableName, columns }: RegexTesterProps) {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/25 bg-white/55 p-4 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-slate-950/30">
+          <div className="rounded-2xl border border-white/25 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-slate-950/30">
             <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Regex flags</p>
             <div className="mt-3 flex flex-wrap gap-3">
-              <label className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/80 px-3 py-2 text-sm text-slate-700 dark:border-slate-700/70 dark:bg-slate-950/60 dark:text-slate-200">
+              <label className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white px-3 py-2 text-sm text-slate-700 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-200">
                 <input
                   type="checkbox"
                   checked={caseInsensitive}
@@ -407,7 +407,7 @@ export default function RegexTester({ tableName, columns }: RegexTesterProps) {
                 />
                 Case-insensitive
               </label>
-              <label className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/80 px-3 py-2 text-sm text-slate-700 dark:border-slate-700/70 dark:bg-slate-950/60 dark:text-slate-200">
+              <label className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white px-3 py-2 text-sm text-slate-700 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-200">
                 <input
                   type="checkbox"
                   checked={multiline}
@@ -433,7 +433,7 @@ export default function RegexTester({ tableName, columns }: RegexTesterProps) {
               type="button"
               onClick={() => void handleApplyFilter()}
               disabled={testing || applying || !regexState.regex}
-              className={`${buttonClass} border border-slate-300/80 bg-white/75 text-slate-700 hover:bg-slate-100 dark:border-slate-700/70 dark:bg-slate-950/55 dark:text-slate-200 dark:hover:bg-slate-900`}
+              className={`${buttonClass} border border-slate-300/80 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900`}
             >
               {applying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Filter className="h-4 w-4" />}
               Filter Data
@@ -460,7 +460,7 @@ export default function RegexTester({ tableName, columns }: RegexTesterProps) {
           </AnimatePresence>
         </div>
 
-        <div className="rounded-[26px] border border-white/25 bg-white/55 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-slate-950/30">
+        <div className="rounded-lg border border-white/25 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950/30">
           <div className="flex items-center justify-between border-b border-white/25 px-5 py-4 dark:border-white/10">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
               <Table2 className={`h-4 w-4 ${dark ? "text-cyan-300" : "text-cyan-600"}`} />
@@ -478,7 +478,7 @@ export default function RegexTester({ tableName, columns }: RegexTesterProps) {
               </div>
             ) : (
               <table className="min-w-full text-left text-sm">
-                <thead className="sticky top-0 bg-white/90 backdrop-blur dark:bg-slate-950/90">
+                <thead className="sticky top-0 bg-white dark:bg-slate-950">
                   <tr className="border-b border-slate-200/70 dark:border-slate-700/70">
                     <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       Row

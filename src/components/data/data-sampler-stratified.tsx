@@ -78,7 +78,7 @@ function buildLimitsClause(strata: StratumAllocation[]): string {
   return strata
     .filter((stratum) => stratum.sampleSize > 0)
     .map((stratum) => `(${quoteLiteral(stratum.label)}, ${Math.max(0, Math.round(stratum.sampleSize))})`)
-    .join(",\n          ");
+    .join(",\n ");
 }
 
 function buildSamplingSql(
@@ -92,7 +92,7 @@ function buildSamplingSql(
   const safeColumn = quoteIdentifier(stratifyColumn);
   const limitsClause = buildLimitsClause(strata);
 
-  const limitSql = typeof previewLimit === "number" ? `\n      LIMIT ${previewLimit}` : "";
+  const limitSql = typeof previewLimit === "number" ? `\n LIMIT ${previewLimit}` : "";
 
   return `
     WITH seeded AS (

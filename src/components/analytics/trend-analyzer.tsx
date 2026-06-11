@@ -541,7 +541,7 @@ export default function TrendAnalyzer({
               {(result?.changePoints ?? []).map((changePoint) => (
                 <div
                   key={changePoint.isoDate}
-                  className="rounded-[1.15rem] border border-white/15 bg-white/55 px-4 py-3 text-sm dark:bg-slate-950/35"
+                  className="rounded-lg border border-white/15 bg-white px-4 py-3 text-sm dark:bg-slate-950/35"
                 >
                   <div className="font-medium text-slate-900 dark:text-white">
                     {changePoint.isoDate}
@@ -552,7 +552,7 @@ export default function TrendAnalyzer({
                 </div>
               ))}
               {result?.changePoints.length === 0 ? (
-                <div className="rounded-[1.15rem] border border-white/15 bg-white/55 px-4 py-3 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300">
+                <div className="rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-950/35 dark:text-slate-300">
                   No change points highlighted yet.
                 </div>
               ) : null}

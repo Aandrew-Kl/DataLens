@@ -198,7 +198,7 @@ function CorrelationMatrix({
         animate={{ opacity: 1, y: 0 }}
         className="
           rounded-2xl border border-gray-200/50 dark:border-gray-700/50
-          bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl
+          bg-white dark:bg-gray-900 
           p-6 shadow-xl shadow-slate-900/5
         "
       >
@@ -223,7 +223,7 @@ function CorrelationMatrix({
       animate={{ opacity: 1, y: 0 }}
       className="
         rounded-2xl border border-gray-200/50 dark:border-gray-700/50
-        bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl
+        bg-white dark:bg-gray-900 
         p-6 shadow-xl shadow-slate-900/5
       "
     >
@@ -236,7 +236,7 @@ function CorrelationMatrix({
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               Pearson heatmap across {numericColumns.length} numeric columns
             </h3>
-            <span className="rounded-full border border-gray-200/70 bg-white/70 px-3 py-1 text-xs font-medium text-gray-600 dark:border-gray-700/70 dark:bg-gray-950/40 dark:text-gray-300">
+            <span className="rounded-full border border-gray-200/70 bg-white px-3 py-1 text-xs font-medium text-gray-600 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-300">
               {numericColumns.length ** 2} cells
             </span>
           </div>
@@ -281,7 +281,7 @@ function CorrelationMatrix({
         </div>
       </div>
 
-      <div className="mt-5 overflow-hidden rounded-2xl border border-gray-200/60 bg-white/55 p-4 dark:border-gray-800/70 dark:bg-gray-950/35">
+      <div className="mt-5 overflow-hidden rounded-2xl border border-gray-200/60 bg-white p-4 dark:border-gray-800/70 dark:bg-gray-950/35">
         {loading ? (
           <div className="grid min-h-[240px] place-items-center">
             <motion.div
@@ -316,7 +316,7 @@ function CorrelationMatrix({
 
               {numericColumns.map((rowColumn, rowIndex) => (
                 <Fragment key={rowColumn.name}>
-                  <div className="flex items-center rounded-xl border border-gray-200/60 bg-white/70 px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-700/70 dark:bg-gray-950/40 dark:text-gray-200">
+                  <div className="flex items-center rounded-xl border border-gray-200/60 bg-white px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-700/70 dark:bg-gray-950 dark:text-gray-200">
                     <span className="truncate" title={rowColumn.name}>
                       {rowColumn.name}
                     </span>
@@ -386,7 +386,7 @@ function CorrelationMatrix({
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -6 }}
-          className="mt-4 flex min-h-[64px] items-center justify-between rounded-2xl border border-gray-200/60 bg-white/55 px-4 py-3 text-sm dark:border-gray-800/70 dark:bg-gray-950/35"
+          className="mt-4 flex min-h-[64px] items-center justify-between rounded-2xl border border-gray-200/60 bg-white px-4 py-3 text-sm dark:border-gray-800/70 dark:bg-gray-950/35"
         >
           {hoveredCell ? (
             <>

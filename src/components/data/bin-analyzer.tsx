@@ -469,7 +469,7 @@ function BinAnalyzerPanel({
                 {["Bin", "Count", "Mean", "Min", "Max"].map((header) => (
                   <th
                     key={header}
-                    className="bg-white/60 px-4 py-3 text-left font-semibold text-slate-700 dark:bg-slate-950/45 dark:text-slate-200"
+                    className="bg-white px-4 py-3 text-left font-semibold text-slate-700 dark:bg-slate-950 dark:text-slate-200"
                   >
                     {header}
                   </th>

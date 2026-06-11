@@ -29,7 +29,7 @@ interface GaugeChartProps {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.8rem] border border-white/15 bg-white/60 p-5 shadow-[0_24px_90px_-46px_rgba(15,23,42,0.76)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/15 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950";
 
 function subscribeDarkMode(listener: () => void) {
   if (typeof document === "undefined") {
@@ -226,7 +226,7 @@ export default function GaugeChart({
           </div>
           <h2 className="mt-2 text-lg font-semibold text-slate-950 dark:text-white">{title}</h2>
         </div>
-        <div className="rounded-2xl border border-white/15 bg-white/50 px-3 py-2 text-right dark:border-white/10 dark:bg-slate-950/35">
+        <div className="rounded-2xl border border-white/15 bg-white px-3 py-2 text-right dark:border-white/10 dark:bg-slate-950/35">
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
             Utilization
           </div>

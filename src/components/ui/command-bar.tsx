@@ -161,7 +161,7 @@ function CommandRow({
       type="button"
       onMouseEnter={onHover}
       onClick={onRun}
-      className={`flex w-full items-center justify-between gap-4 rounded-[1.1rem] border px-4 py-3 text-left transition ${
+      className={`flex w-full items-center justify-between gap-4 rounded-lg border px-4 py-3 text-left transition ${
         active
           ? "border-cyan-400/45 bg-cyan-500/14 text-slate-950 dark:text-white"
           : "border-transparent bg-white/0 text-slate-700 hover:border-white/12 hover:bg-white/10 dark:text-slate-200 dark:hover:bg-white/5"
@@ -308,7 +308,7 @@ export default function CommandBar({ commands, onExecute }: CommandBarProps) {
       <button
         type="button"
         onClick={openBar}
-        className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/55 px-4 py-2.5 text-sm text-slate-600 shadow-[0_12px_32px_-24px_rgba(15,23,42,0.85)] backdrop-blur-xl transition hover:border-cyan-300/30 dark:border-white/10 dark:bg-slate-950/40 dark:text-slate-200"
+        className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white px-4 py-2.5 text-sm text-slate-600 shadow-sm transition hover:border-cyan-300/30 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200"
       >
         <Search className="h-4 w-4 text-cyan-500" />
         <span>Command bar</span>
@@ -324,7 +324,7 @@ export default function CommandBar({ commands, onExecute }: CommandBarProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
-            className="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/45 px-4 py-20 backdrop-blur-md"
+            className="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/60 px-4 py-20 "
           >
             <motion.button
               type="button"
@@ -340,10 +340,10 @@ export default function CommandBar({ commands, onExecute }: CommandBarProps) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -12, scale: 0.99 }}
               transition={{ duration: 0.24, ease: EASE }}
-              className="w-full max-w-3xl overflow-hidden rounded-[2rem] border border-white/15 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(248,250,252,0.58))] shadow-[0_32px_120px_-42px_rgba(15,23,42,0.85)] backdrop-blur-2xl dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(2,6,23,0.9),rgba(15,23,42,0.78))]"
+              className="w-full max-w-3xl overflow-hidden rounded-lg border border-white/15 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(248,250,252,0.58))] shadow-sm dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(2,6,23,0.9),rgba(15,23,42,0.78))]"
             >
               <div className="border-b border-white/10 px-5 py-4">
-                <div className="flex items-center gap-3 rounded-[1.2rem] border border-white/12 bg-white/20 px-4 py-3 dark:bg-white/5">
+                <div className="flex items-center gap-3 rounded-lg border border-white/12 bg-white/20 px-4 py-3 dark:bg-white/5">
                   <Search className="h-5 w-5 text-cyan-500" />
                   <input
                     ref={searchInputRef}

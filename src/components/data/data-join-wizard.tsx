@@ -38,7 +38,7 @@ interface JoinPair {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const CARD_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const STEP_META = [
   { id: 1, label: "Tables", icon: Database },
   { id: 2, label: "Type", icon: ArrowRightLeft },
@@ -138,7 +138,7 @@ function buildJoinSql(
   includedColumns: Record<string, string[]>,
 ): string {
   const projectionList = buildProjectionList(selectedTables, includedColumns);
-  const selectClause = projectionList.length > 0 ? projectionList.join(",\n  ") : "*";
+  const selectClause = projectionList.length > 0 ? projectionList.join(",\n ") : "*";
 
   const joinFragments = selectedTables.slice(1).map((tableName, index) => {
     const rightAlias = createTableAlias(index + 1);
@@ -151,13 +151,13 @@ function buildJoinSql(
 
     return [
       `${joinKeyword} JOIN ${quoteIdentifier(tableName)} ${rightAlias}`,
-      `  ON ${createTableAlias(index)}.${quoteIdentifier(pair.leftColumn)} = ${rightAlias}.${quoteIdentifier(pair.rightColumn)}`,
+      ` ON ${createTableAlias(index)}.${quoteIdentifier(pair.leftColumn)} = ${rightAlias}.${quoteIdentifier(pair.rightColumn)}`,
     ].join("\n");
   });
 
   return [
     "SELECT",
-    `  ${selectClause}`,
+    ` ${selectClause}`,
     `FROM ${quoteIdentifier(selectedTables[0])} ${createTableAlias(0)}`,
     ...joinFragments,
   ].join("\n");
@@ -182,7 +182,7 @@ function StepBadge({
             ? "bg-cyan-500 text-white"
             : completed
               ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-              : "bg-slate-200/70 text-slate-600 dark:bg-slate-800/70 dark:text-slate-300"
+              : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
         }`}
       >
         {step}
@@ -389,7 +389,7 @@ export default function DataJoinWizard({
     <section className={`${CARD_CLASS} overflow-hidden p-5`}>
       <div className="flex flex-col gap-5 border-b border-white/15 pb-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
             <ArrowRightLeft className="h-5 w-5" />
           </div>
           <div>
@@ -406,12 +406,12 @@ export default function DataJoinWizard({
           <button
             type="button"
             onClick={() => void refreshSchemas()}
-            className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/60 dark:bg-slate-900/30 dark:text-slate-200"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-900/30 dark:text-slate-200"
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Database className="h-4 w-4" />}
             Refresh schemas
           </button>
-          <div className="rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
+          <div className="rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/30 dark:text-slate-300">
             {status}
           </div>
         </div>
@@ -430,7 +430,7 @@ export default function DataJoinWizard({
       </div>
 
       {error ? (
-        <div className="mt-4 rounded-[1.2rem] border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
+        <div className="mt-4 rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4" />
             {error}
@@ -445,7 +445,7 @@ export default function DataJoinWizard({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.28, ease: EASE }}
-          className="mt-5 rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30"
+          className="mt-5 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30"
         >
           {step === 1 ? (
             <div className="space-y-4">
@@ -460,10 +460,10 @@ export default function DataJoinWizard({
                       key={tableName}
                       type="button"
                       onClick={() => toggleSelectedTable(tableName)}
-                      className={`rounded-[1.1rem] border px-4 py-4 text-left transition ${
+                      className={`rounded-lg border px-4 py-4 text-left transition ${
                         selected
                           ? "border-cyan-400/40 bg-cyan-500/12 text-cyan-700 dark:border-cyan-400/30 dark:text-cyan-300"
-                          : "border-white/15 bg-white/55 text-slate-700 hover:bg-white/70 dark:bg-slate-950/25 dark:text-slate-200"
+                          : "border-white/15 bg-white text-slate-700 hover:bg-white dark:bg-slate-950/25 dark:text-slate-200"
                       }`}
                     >
                       <p className="text-sm font-semibold">{tableName}</p>
@@ -472,7 +472,7 @@ export default function DataJoinWizard({
                 })}
               </div>
 
-              <div className="rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/25">
+              <div className="rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/25">
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                   Join chain preview
                 </p>
@@ -480,7 +480,7 @@ export default function DataJoinWizard({
                   {selectedTables.map((tableName, index) => (
                     <div key={tableName} className="flex items-center gap-2">
                       {index > 0 ? <ChevronsRight className="h-4 w-4 text-slate-400" /> : null}
-                      <span className="rounded-full bg-white/60 px-3 py-1 dark:bg-slate-900/50">
+                      <span className="rounded-full bg-white px-3 py-1 dark:bg-slate-900">
                         {tableName}
                       </span>
                     </div>
@@ -497,10 +497,10 @@ export default function DataJoinWizard({
                   key={option.value}
                   type="button"
                   onClick={() => setJoinType(option.value)}
-                  className={`rounded-[1.1rem] border px-4 py-4 text-left transition ${
+                  className={`rounded-lg border px-4 py-4 text-left transition ${
                     joinType === option.value
                       ? "border-cyan-400/40 bg-cyan-500/12 text-cyan-700 dark:border-cyan-400/30 dark:text-cyan-300"
-                      : "border-white/15 bg-white/55 text-slate-700 hover:bg-white/70 dark:bg-slate-950/25 dark:text-slate-200"
+                      : "border-white/15 bg-white text-slate-700 hover:bg-white dark:bg-slate-950/25 dark:text-slate-200"
                   }`}
                 >
                   <p className="text-sm font-semibold">{option.label} join</p>
@@ -518,7 +518,7 @@ export default function DataJoinWizard({
                 const suggestions = suggestedPairs.find((entry) => entry.pairId === pair.id)?.matches ?? [];
 
                 return (
-                  <div key={pair.id} className="rounded-[1.2rem] border border-white/15 bg-white/55 p-4 dark:bg-slate-950/25">
+                  <div key={pair.id} className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/25">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                       <div>
                         <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -533,7 +533,7 @@ export default function DataJoinWizard({
                           value={pair.leftColumn}
                           onChange={(event) => updateJoinPair(pair.id, "leftColumn", event.target.value)}
                           disabled={joinType === "CROSS"}
-                          className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none disabled:opacity-60 dark:bg-slate-950/60 dark:text-slate-50"
+                          className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none disabled:opacity-60 dark:bg-slate-950 dark:text-slate-50"
                         >
                           {leftColumns.map((column) => (
                             <option key={column} value={column}>
@@ -545,7 +545,7 @@ export default function DataJoinWizard({
                           value={pair.rightColumn}
                           onChange={(event) => updateJoinPair(pair.id, "rightColumn", event.target.value)}
                           disabled={joinType === "CROSS"}
-                          className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none disabled:opacity-60 dark:bg-slate-950/60 dark:text-slate-50"
+                          className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none disabled:opacity-60 dark:bg-slate-950 dark:text-slate-50"
                         >
                           {rightColumns.map((column) => (
                             <option key={column} value={column}>
@@ -559,13 +559,13 @@ export default function DataJoinWizard({
                 );
               })}
 
-              <div className="rounded-[1.2rem] border border-white/15 bg-white/55 p-4 dark:bg-slate-950/25">
+              <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/25">
                 <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
                   Output column selector
                 </p>
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                   {selectedTables.map((tableName) => (
-                    <div key={tableName} className="rounded-[1rem] border border-white/15 bg-white/60 p-4 dark:bg-slate-900/35">
+                    <div key={tableName} className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
                       <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{tableName}</p>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {(schemas[tableName]?.columns ?? []).map((column) => {
@@ -578,7 +578,7 @@ export default function DataJoinWizard({
                               className={`rounded-full px-3 py-1 text-xs transition ${
                                 active
                                   ? "bg-cyan-500/15 text-cyan-700 dark:text-cyan-300"
-                                  : "bg-slate-200/70 text-slate-700 dark:bg-slate-800/70 dark:text-slate-300"
+                                  : "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
                               }`}
                             >
                               {column}
@@ -595,13 +595,13 @@ export default function DataJoinWizard({
 
           {step === 4 ? (
             <div className="space-y-4">
-              <div className="rounded-[1rem] border border-white/15 bg-slate-950 px-4 py-3 text-xs text-slate-200">
+              <div className="rounded-lg border border-white/15 bg-slate-950 px-4 py-3 text-xs text-slate-200">
                 <pre className="overflow-x-auto whitespace-pre-wrap">{activeSql}</pre>
               </div>
-              <div className="overflow-hidden rounded-[1rem] border border-white/15 bg-white/55 dark:bg-slate-950/25">
+              <div className="overflow-hidden rounded-lg border border-white/15 bg-white dark:bg-slate-950/25">
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-left text-sm">
-                    <thead className="bg-white/60 dark:bg-slate-900/60">
+                    <thead className="bg-white dark:bg-slate-900">
                       <tr>
                         {Object.keys(previewRows[0] ?? {}).map((column) => (
                           <th
@@ -632,7 +632,7 @@ export default function DataJoinWizard({
 
           {step === 5 ? (
             <div className="space-y-4">
-              <div className="rounded-[1rem] border border-white/15 bg-white/55 p-4 dark:bg-slate-950/25">
+              <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/25">
                 <label
                   htmlFor="data-join-wizard-result-name"
                   className="block text-sm font-semibold text-slate-900 dark:text-slate-50"
@@ -643,11 +643,11 @@ export default function DataJoinWizard({
                   id="data-join-wizard-result-name"
                   value={resultTableName}
                   onChange={(event) => setResultTableName(event.target.value)}
-                  className="mt-3 w-full rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                  className="mt-3 w-full rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
                 />
               </div>
 
-              <div className="rounded-[1rem] border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300">
+              <div className="rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4" />
                   <span>The result is created as a DuckDB table and returned through the completion callback.</span>
@@ -663,7 +663,7 @@ export default function DataJoinWizard({
           type="button"
           onClick={() => setStep((current) => Math.max(current - 1, 1))}
           disabled={step === 1}
-          className="rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 transition disabled:opacity-40 dark:bg-slate-900/30 dark:text-slate-200"
+          className="rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition disabled:opacity-40 dark:bg-slate-900/30 dark:text-slate-200"
         >
           Back
         </button>
@@ -673,7 +673,7 @@ export default function DataJoinWizard({
             <button
               type="button"
               onClick={() => setStep((current) => Math.min(current + 1, 5))}
-              className="rounded-[1rem] bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
+              className="rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
             >
               Next
             </button>
@@ -682,7 +682,7 @@ export default function DataJoinWizard({
             <button
               type="button"
               onClick={() => void previewJoin()}
-              className="inline-flex items-center gap-2 rounded-[1rem] bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
+              className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
               Preview join
@@ -692,7 +692,7 @@ export default function DataJoinWizard({
             <button
               type="button"
               onClick={() => setStep(5)}
-              className="rounded-[1rem] bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
+              className="rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
             >
               Name result
             </button>
@@ -701,7 +701,7 @@ export default function DataJoinWizard({
             <button
               type="button"
               onClick={() => void materializeJoin()}
-              className="inline-flex items-center gap-2 rounded-[1rem] bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Create joined table

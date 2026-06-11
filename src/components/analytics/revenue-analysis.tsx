@@ -520,7 +520,7 @@ export default function RevenueAnalysis({ tableName, columns }: RevenueAnalysisP
           {result && result.segments.length > 0 ? (
             <ReactEChartsCore echarts={echarts} option={barOption} notMerge style={{ height: 340 }} />
           ) : (
-            <div className="flex min-h-[14rem] items-center justify-center rounded-[1.5rem] border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex min-h-[14rem] items-center justify-center rounded-lg border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
               Run the analysis to see segment data.
             </div>
           )}
@@ -538,7 +538,7 @@ export default function RevenueAnalysis({ tableName, columns }: RevenueAnalysisP
           {result && result.growth.length > 0 ? (
             <ReactEChartsCore echarts={echarts} option={growthOption} notMerge style={{ height: 340 }} />
           ) : (
-            <div className="flex min-h-[14rem] items-center justify-center rounded-[1.5rem] border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex min-h-[14rem] items-center justify-center rounded-lg border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
               Add a date column to see growth trends.
             </div>
           )}

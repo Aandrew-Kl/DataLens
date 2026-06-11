@@ -44,10 +44,10 @@ const SURFACES: Record<string, string> = {
 
 function PreviewTable({ dataset }: { dataset: SampleDataset }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-white/40 bg-white/75 dark:border-white/10 dark:bg-slate-950/50">
+    <div className="overflow-x-auto rounded-2xl border border-white/40 bg-white dark:border-white/10 dark:bg-slate-950">
       <table className="min-w-full border-separate border-spacing-0 text-left text-[11px]">
         <thead>
-          <tr className="bg-white/80 dark:bg-slate-900/80">
+          <tr className="bg-white dark:bg-slate-900">
             {dataset.columns.slice(0, 4).map((column) => (
               <th
                 key={column}
@@ -119,7 +119,7 @@ export default function SampleDatasetsGallery({
   return (
     <section
       className={[
-        "rounded-[1.75rem] border border-white/20 bg-white/50 p-5 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.55)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-900/35",
+        "rounded-lg border border-white/20 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/35",
         className ?? "",
       ].join(" ")}
     >
@@ -140,15 +140,15 @@ export default function SampleDatasetsGallery({
           const Icon = ICONS[dataset.slug] ?? ShoppingBag;
           const surface =
             SURFACES[dataset.slug] ??
-            "border-white/15 bg-white/45 dark:border-white/10 dark:bg-slate-900/30";
+            "border-white/15 bg-white dark:border-white/10 dark:bg-slate-900/30";
 
           return (
             <article
               key={dataset.slug}
-              className={`rounded-[1.3rem] border ${surface} p-5 text-left shadow-[0_18px_40px_-28px_rgba(15,23,42,0.6)] backdrop-blur-xl transition hover:-translate-y-0.5`}
+              className={`rounded-lg border ${surface} p-5 text-left shadow-sm transition hover:-translate-y-0.5`}
             >
               <div className="flex h-full flex-col">
-                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/25 bg-white/70 text-slate-700 dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-200">
+                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/25 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200">
                   <Icon className="h-5 w-5" />
                 </div>
                 <h4 className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -157,7 +157,7 @@ export default function SampleDatasetsGallery({
                 <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
                   {dataset.description}
                 </p>
-                <div className="mt-3 inline-flex w-fit rounded-full border border-white/20 bg-white/70 px-3 py-1 text-xs font-medium text-slate-600 dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-300">
+                <div className="mt-3 inline-flex w-fit rounded-full border border-white/20 bg-white px-3 py-1 text-xs font-medium text-slate-600 dark:border-white/10 dark:bg-slate-950 dark:text-slate-300">
                   {dataset.rowCount.toLocaleString()} rows ×{" "}
                   {dataset.columnCount} columns
                 </div>

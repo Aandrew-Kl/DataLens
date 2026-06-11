@@ -242,7 +242,7 @@ export default function AIInsights({ tableName, columns, rowCount }: AIInsightsP
   const interestingCount = insights.filter((item) => item.severity === "interesting").length;
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white/85 shadow-sm backdrop-blur-sm dark:border-gray-700/70 dark:bg-gray-900/65">
+    <section className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white shadow-sm dark:border-gray-700/70 dark:bg-gray-900">
       <div className="border-b border-gray-200/70 px-6 py-5 dark:border-gray-700/70">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -250,7 +250,7 @@ export default function AIInsights({ tableName, columns, rowCount }: AIInsightsP
             <h2 className="mt-3 text-xl font-semibold text-gray-900 dark:text-gray-50">Dataset findings generated from DuckDB</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-600 dark:text-gray-300">The panel scans {formatNumber(columns.length)} columns and {formatNumber(rowCount)} rows directly in DuckDB to surface quality, distribution, anomaly, and extreme-value signals without routing through Ollama.</p>
           </div>
-          <div className="rounded-xl border border-gray-200/70 bg-gray-50/80 px-4 py-3 text-sm dark:border-gray-700/70 dark:bg-gray-950/30">
+          <div className="rounded-xl border border-gray-200/70 bg-gray-50 px-4 py-3 text-sm dark:border-gray-700/70 dark:bg-gray-950/30">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Current scan</p>
             <div className="mt-2 flex items-end justify-between gap-6">
               <div><p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{formatNumber(insights.length)}</p><p className="text-xs text-gray-500 dark:text-gray-400">cards generated</p></div>
@@ -262,12 +262,12 @@ export default function AIInsights({ tableName, columns, rowCount }: AIInsightsP
         <div className="mt-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-2">
             {FILTERS.map((option) => (
-              <button key={option.value} type="button" onClick={() => setFilter(option.value)} className={`rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] transition ${option.value === filter ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900" : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-gray-100"}`}>{option.label}</button>
+              <button key={option.value} type="button" onClick={() => setFilter(option.value)} className={`rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] transition ${option.value === filter ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900" : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-gray-100"}`}>{option.label}</button>
             ))}
           </div>
           <div className="flex items-center gap-3">
             <p className="text-xs text-gray-500 dark:text-gray-400">{lastUpdated ? `Refreshed ${new Date(lastUpdated).toLocaleTimeString()}` : "Waiting for first scan"}</p>
-            <button type="button" onClick={() => setRefreshNonce((value) => value + 1)} disabled={loading} className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-300 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-200 dark:hover:border-gray-500">
+            <button type="button" onClick={() => setRefreshNonce((value) => value + 1)} disabled={loading} className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-300 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-500">
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />Refresh
             </button>
           </div>
@@ -285,11 +285,11 @@ export default function AIInsights({ tableName, columns, rowCount }: AIInsightsP
                 const meta = KIND_META[insight.kind];
                 const open = Boolean(expanded[insight.id]);
                 return (
-                  <motion.article key={insight.id} layout variants={itemVariants} className="overflow-hidden rounded-2xl border border-gray-200/70 bg-gray-50/80 dark:border-gray-700/70 dark:bg-gray-950/25">
+                  <motion.article key={insight.id} layout variants={itemVariants} className="overflow-hidden rounded-2xl border border-gray-200/70 bg-gray-50 dark:border-gray-700/70 dark:bg-gray-950/25">
                     <div className="p-5">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex items-start gap-3">
-                          <div className="rounded-xl border border-gray-200/80 bg-white p-2.5 dark:border-gray-700/80 dark:bg-gray-900/80"><meta.Icon className={`h-5 w-5 ${meta.accent}`} /></div>
+                          <div className="rounded-xl border border-gray-200/80 bg-white p-2.5 dark:border-gray-700/80 dark:bg-gray-900"><meta.Icon className={`h-5 w-5 ${meta.accent}`} /></div>
                           <div>
                             <div className="flex flex-wrap items-center gap-2">
                               <span className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{meta.label}</span>
@@ -298,12 +298,12 @@ export default function AIInsights({ tableName, columns, rowCount }: AIInsightsP
                             <h3 className="mt-2 text-lg font-semibold text-gray-900 dark:text-gray-50">{insight.title}</h3>
                           </div>
                         </div>
-                        <div className="rounded-full border border-gray-200/80 bg-white px-3 py-1 text-sm font-semibold text-gray-700 dark:border-gray-700/80 dark:bg-gray-900/80 dark:text-gray-200">{insight.metric}</div>
+                        <div className="rounded-full border border-gray-200/80 bg-white px-3 py-1 text-sm font-semibold text-gray-700 dark:border-gray-700/80 dark:bg-gray-900 dark:text-gray-200">{insight.metric}</div>
                       </div>
 
                       <p className="mt-4 text-sm leading-6 text-gray-600 dark:text-gray-300">{insight.description}</p>
                       <div className="mt-4">
-                        <button type="button" onClick={() => setExpanded((current) => ({ ...current, [insight.id]: !current[insight.id] }))} className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-gray-600 transition hover:border-gray-300 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900/80 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-gray-100">
+                        <button type="button" onClick={() => setExpanded((current) => ({ ...current, [insight.id]: !current[insight.id] }))} className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-gray-600 transition hover:border-gray-300 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-gray-100">
                           SQL Query <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
                         </button>
                       </div>

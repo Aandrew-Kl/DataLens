@@ -341,7 +341,7 @@ export default function ReportAnnotations({ tableName, columns }: ReportAnnotati
               {visibleAnnotations.map((annotation) => (
                 <article
                   key={annotation.id}
-                  className="rounded-3xl border border-white/15 bg-white/60 p-4 dark:bg-slate-950/25"
+                  className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/25"
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>

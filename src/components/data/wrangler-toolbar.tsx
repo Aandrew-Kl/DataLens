@@ -77,7 +77,7 @@ export function WranglerToolbar({
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:border-white/10 dark:bg-slate-950/35">
+          <div className="rounded-2xl border border-white/15 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-950/35">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Columns</div>
             <div className="mt-1 text-xl font-semibold text-slate-950 dark:text-white">{formatNumber(columnsLength)}</div>
           </div>
@@ -85,7 +85,7 @@ export function WranglerToolbar({
             type="button"
             onClick={onUndoLatest}
             disabled={!hasUndoableEntry || busy}
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/30 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100"
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/30 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100"
           >
             <RotateCcw className="h-4 w-4" />
             Undo latest

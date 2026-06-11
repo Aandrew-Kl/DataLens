@@ -160,7 +160,7 @@ export default function DataLineage({ tableName }: DataLineageProps) {
       </div>
 
       {/* Summary bar */}
-      <div className="flex flex-wrap items-center gap-4 rounded-lg border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm dark:border-gray-800 dark:bg-gray-800/60">
+      <div className="flex flex-wrap items-center gap-4 rounded-lg border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm dark:border-gray-800 dark:bg-gray-800">
         <span className="text-gray-500 dark:text-gray-400">
           <span className="font-medium text-gray-900 dark:text-white">{entries.length}</span>
           {" "}operation{entries.length !== 1 && "s"}

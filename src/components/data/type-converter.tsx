@@ -159,7 +159,7 @@ export default function TypeConverter({ tableName, columns, onConvert }: TypeCon
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white/80 shadow-sm backdrop-blur-sm dark:border-gray-800/80 dark:bg-gray-950/40"
+      className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white shadow-sm dark:border-gray-800/80 dark:bg-gray-950"
     >
       <div className="flex flex-col gap-4 border-b border-gray-200/70 px-5 py-5 dark:border-gray-800/80 lg:flex-row lg:items-center lg:justify-between">
         <div>
@@ -195,7 +195,7 @@ export default function TypeConverter({ tableName, columns, onConvert }: TypeCon
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.02, duration: 0.18 }}
                 onClick={() => setSelectedColumn(column.name)}
-                className={`w-full rounded-2xl border p-4 text-left transition ${selectedColumn === column.name ? "border-cyan-400/60 bg-cyan-500/10 dark:border-cyan-500/40 dark:bg-cyan-500/10" : "border-gray-200/70 bg-gray-50/60 hover:border-cyan-300 dark:border-gray-800/80 dark:bg-gray-950/20 dark:hover:border-cyan-700/70"}`}
+                className={`w-full rounded-2xl border p-4 text-left transition ${selectedColumn === column.name ? "border-cyan-400/60 bg-cyan-500/10 dark:border-cyan-500/40 dark:bg-cyan-500/10" : "border-gray-200/70 bg-gray-50 hover:border-cyan-300 dark:border-gray-800/80 dark:bg-gray-950/20 dark:hover:border-cyan-700/70"}`}
               >
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div className="min-w-0">
@@ -230,7 +230,7 @@ export default function TypeConverter({ tableName, columns, onConvert }: TypeCon
           })}
         </div>
 
-        <div className="rounded-2xl border border-gray-200/70 bg-gray-50/60 p-4 dark:border-gray-800/80 dark:bg-gray-950/20">
+        <div className="rounded-2xl border border-gray-200/70 bg-gray-50 p-4 dark:border-gray-800/80 dark:bg-gray-950/20">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
@@ -262,7 +262,7 @@ export default function TypeConverter({ tableName, columns, onConvert }: TypeCon
               previewRows.map((row, index) => (
                 <div
                   key={`${row.original}-${index}`}
-                  className={`rounded-xl border px-3 py-2 text-sm ${row.invalid ? "border-amber-500/30 bg-amber-500/10" : "border-gray-200/70 bg-white/80 dark:border-gray-800/80 dark:bg-gray-900/60"}`}
+                  className={`rounded-xl border px-3 py-2 text-sm ${row.invalid ? "border-amber-500/30 bg-amber-500/10" : "border-gray-200/70 bg-white dark:border-gray-800/80 dark:bg-gray-900"}`}
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="truncate font-mono text-gray-600 dark:text-gray-300">{row.original}</span>

@@ -455,7 +455,7 @@ export default function EngagementMetrics({ tableName, columns }: EngagementMetr
         {result ? (
           <ReactEChartsCore echarts={echarts} option={chartOption} notMerge style={{ height: 380 }} />
         ) : (
-          <div className="flex min-h-[20rem] items-center justify-center rounded-[1.5rem] border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
+          <div className="flex min-h-[20rem] items-center justify-center rounded-lg border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
             Select user and date columns, then analyze engagement.
           </div>
         )}

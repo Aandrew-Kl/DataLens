@@ -46,9 +46,9 @@ type ColorMode = "value" | "category";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950/45 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950 dark:text-slate-100";
 const CATEGORY_PALETTE = ["#06b6d4", "#34d399", "#2563eb", "#f97316", "#8b5cf6", "#f43f5e", "#f59e0b"] as const;
 
 function subscribeDarkMode(listener: () => void) {
@@ -268,7 +268,7 @@ function TreemapMetric({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 dark:bg-slate-950/45">
+    <div className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-950">
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{label}</p>
       <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100">{value}</p>
     </div>
@@ -394,7 +394,7 @@ export default function TreemapChart({ tableName, columns }: TreemapChartProps) 
             </option>
           ))}
         </select>
-        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/45 dark:text-slate-200">
+        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-200">
           <Palette className="h-4 w-4 text-cyan-500" />
           <select value={colorMode} onChange={(event) => setColorMode(event.target.value as ColorMode)} className="w-full bg-transparent outline-none">
             <option value="value">Color by value</option>
@@ -419,9 +419,9 @@ export default function TreemapChart({ tableName, columns }: TreemapChartProps) 
       ) : null}
 
       <div className="mt-6 grid gap-5 xl:grid-cols-[1.45fr_0.8fr]">
-        <div className="rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+        <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           {rows.length === 0 ? (
-            <div className="flex min-h-[400px] items-center justify-center rounded-[1.25rem] border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
               Build the treemap to start drilling into categories and nested segments.
             </div>
           ) : (
@@ -436,7 +436,7 @@ export default function TreemapChart({ tableName, columns }: TreemapChartProps) 
           )}
         </div>
 
-        <div className="space-y-4 rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+        <div className="space-y-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Nested navigation</p>
@@ -446,7 +446,7 @@ export default function TreemapChart({ tableName, columns }: TreemapChartProps) 
               type="button"
               onClick={() => exportChartImage(chartRef.current, dark, `${tableName}-treemap.png`)}
               disabled={rows.length === 0}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-950/65"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-950"
             >
               <Download className="h-4 w-4" />
               Export PNG
@@ -458,7 +458,7 @@ export default function TreemapChart({ tableName, columns }: TreemapChartProps) 
               const nodeValue = Number(node.value ?? node.children?.reduce((sum, child) => sum + Number(child.value ?? 0), 0) ?? 0);
               const share = total === 0 ? 0 : (nodeValue / total) * 100;
               return (
-                <div key={node.name} className="rounded-2xl border border-white/15 bg-white/70 p-4 dark:bg-slate-950/45">
+                <div key={node.name} className="rounded-2xl border border-white/15 bg-white p-4 dark:bg-slate-950">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{node.name}</p>
@@ -470,7 +470,7 @@ export default function TreemapChart({ tableName, columns }: TreemapChartProps) 
                       {share.toFixed(1)}%
                     </span>
                   </div>
-                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200/70 dark:bg-slate-800/70">
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                     <div
                       className="h-full rounded-full bg-violet-500"
                       style={{ width: `${share}%` }}

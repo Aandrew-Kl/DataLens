@@ -55,9 +55,9 @@ interface HistogramResult {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "border border-white/20 bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 rounded-[1.75rem] shadow-xl shadow-slate-950/10";
+  "border border-white/20 bg-white dark:bg-slate-950 rounded-lg shadow-xl shadow-slate-950/10";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950/50 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950 dark:text-slate-100";
 function toNumber(value: unknown): number | null {
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric : null;
@@ -384,7 +384,7 @@ export default function HistogramChart({
             ))}
           </select>
 
-          <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-700 dark:bg-slate-900/50 dark:text-slate-200">
+          <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-900 dark:text-slate-200">
             <span>Bins</span>
             <input
               aria-label="Histogram bin count"
@@ -393,7 +393,7 @@ export default function HistogramChart({
               max={40}
               value={binCount}
               onChange={(event) => setBinCount(Number(event.currentTarget.value))}
-              className="w-24 rounded-xl border border-white/20 bg-white/80 px-3 py-2 dark:bg-slate-950/50"
+              className="w-24 rounded-xl border border-white/20 bg-white px-3 py-2 dark:bg-slate-950"
             />
           </label>
         </div>
@@ -416,7 +416,7 @@ export default function HistogramChart({
           Build histogram
         </button>
 
-        <label className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-3 py-2 text-sm text-slate-700 dark:bg-slate-900/50 dark:text-slate-200">
+        <label className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white px-3 py-2 text-sm text-slate-700 dark:bg-slate-900 dark:text-slate-200">
           <input
             type="checkbox"
             checked={showDensity}
@@ -425,7 +425,7 @@ export default function HistogramChart({
           Density curve
         </label>
 
-        <label className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-3 py-2 text-sm text-slate-700 dark:bg-slate-900/50 dark:text-slate-200">
+        <label className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white px-3 py-2 text-sm text-slate-700 dark:bg-slate-900 dark:text-slate-200">
           <input
             type="checkbox"
             checked={showReferenceLines}
@@ -438,7 +438,7 @@ export default function HistogramChart({
           type="button"
           onClick={handleExportPng}
           disabled={!result}
-          className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900/50 dark:text-slate-200"
+          className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900 dark:text-slate-200"
         >
           <Download className="h-4 w-4" />
           Export PNG
@@ -447,14 +447,14 @@ export default function HistogramChart({
           type="button"
           onClick={handleExportCsv}
           disabled={!result}
-          className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900/50 dark:text-slate-200"
+          className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-900 dark:text-slate-200"
         >
           <Download className="h-4 w-4" />
           Export CSV
         </button>
       </div>
 
-      <div className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/40 dark:text-slate-300">
+      <div className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
         {numericColumns.length === 0
           ? "Add at least one numeric column to render a histogram."
           : status}
@@ -467,7 +467,7 @@ export default function HistogramChart({
               Distribution summary
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/50">
+              <div className="rounded-2xl bg-white p-4 dark:bg-slate-900">
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Sample size
                 </p>
@@ -475,7 +475,7 @@ export default function HistogramChart({
                   {formatNumber(result.sampleSize)}
                 </p>
               </div>
-              <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/50">
+              <div className="rounded-2xl bg-white p-4 dark:bg-slate-900">
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Bins
                 </p>
@@ -483,7 +483,7 @@ export default function HistogramChart({
                   {formatNumber(result.bins.length)}
                 </p>
               </div>
-              <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/50">
+              <div className="rounded-2xl bg-white p-4 dark:bg-slate-900">
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Mean
                 </p>
@@ -491,7 +491,7 @@ export default function HistogramChart({
                   {result.mean.toFixed(2)}
                 </p>
               </div>
-              <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/50">
+              <div className="rounded-2xl bg-white p-4 dark:bg-slate-900">
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                   Median
                 </p>

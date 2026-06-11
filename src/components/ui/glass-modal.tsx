@@ -22,7 +22,7 @@ export interface GlassModalProps {
 }
 
 const GLASS_PANEL =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800";
 const MOTION_EASE = [0.22, 1, 0.36, 1] as const;
 const SIZE_CLASSES: Record<NonNullable<GlassModalProps["size"]>, string> = {
   sm: "max-w-md",
@@ -87,7 +87,7 @@ export default function GlassModal({
           onClick={handleOverlayClick}
         >
           <motion.div
-            className="absolute inset-0 bg-slate-950/35 backdrop-blur-md"
+            className="absolute inset-0 bg-zinc-950/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -98,15 +98,13 @@ export default function GlassModal({
             aria-modal="true"
             aria-labelledby={title ? titleId : undefined}
             aria-describedby={description ? descriptionId : undefined}
-            className={`relative z-10 w-full overflow-hidden rounded-[2rem] shadow-2xl shadow-slate-950/20 ${SIZE_CLASSES[size]} ${GLASS_PANEL}`}
+            className={`relative z-10 w-full overflow-hidden rounded-lg shadow-lg ${SIZE_CLASSES[size]} ${GLASS_PANEL}`}
             initial={{ opacity: 0, y: 16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.98 }}
             transition={{ duration: 0.24, ease: MOTION_EASE }}
           >
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent dark:via-white/20" />
-
-            <div className="flex items-start justify-between gap-4 border-b border-white/15 px-6 py-5">
+            <div className="flex items-start justify-between gap-4 border-b border-zinc-200 px-6 py-5 dark:border-zinc-800">
               <div className="min-w-0">
                 {title ? (
                   <h2
@@ -129,7 +127,7 @@ export default function GlassModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-2xl border border-white/15 bg-white/50 p-2 text-slate-500 transition hover:bg-white/80 hover:text-slate-900 dark:bg-slate-900/40 dark:text-slate-300 dark:hover:bg-slate-900/70 dark:hover:text-slate-50"
+                className="rounded-md border border-zinc-200 bg-white p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
                 aria-label="Close modal"
               >
                 <X className="h-4 w-4" />
@@ -141,7 +139,7 @@ export default function GlassModal({
             </div>
 
             {footer ? (
-              <div className="border-t border-white/15 px-6 py-4">{footer}</div>
+              <div className="border-t border-zinc-200 px-6 py-4 dark:border-zinc-800">{footer}</div>
             ) : null}
           </motion.section>
         </motion.div>

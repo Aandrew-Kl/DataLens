@@ -439,7 +439,7 @@ export default function AIPromptLibrary({
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-2">
-                    <span className="rounded-full border border-white/15 bg-white/50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-950/25 dark:text-slate-300">
+                    <span className="rounded-full border border-white/15 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-950/25 dark:text-slate-300">
                       {prompt.category}
                     </span>
                     <h3 className="text-lg font-semibold text-slate-950 dark:text-white">

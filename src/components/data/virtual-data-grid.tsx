@@ -203,7 +203,7 @@ function LoadingRow({
     <div
       style={{ ...style, gridTemplateColumns }}
       className={`grid items-center border-b border-gray-200/70 dark:border-gray-800 ${
-        striped ? "bg-white dark:bg-gray-900" : "bg-gray-50/70 dark:bg-gray-950/70"
+        striped ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-950"
       }`}
     >
       <div className="px-4 text-xs font-mono text-gray-300 dark:text-gray-600">{rowIndex + 1}</div>
@@ -459,7 +459,7 @@ export default function VirtualDataGrid({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.22, ease: "easeOut" }}
-      className="w-full rounded-2xl border border-gray-200/70 bg-white/90 shadow-sm backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/90"
+      className="w-full rounded-2xl border border-gray-200/70 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900"
     >
       <div className="border-b border-gray-200/70 px-4 py-4 dark:border-gray-800">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -542,7 +542,7 @@ export default function VirtualDataGrid({
       <div ref={scrollRef} onScroll={handleScroll} className="relative overflow-auto" style={{ height: GRID_HEIGHT }}>
         <div
           ref={headerRef}
-          className="sticky top-0 z-20 border-b border-gray-200/80 bg-white/95 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/95"
+          className="sticky top-0 z-20 border-b border-gray-200/80 bg-white dark:border-gray-800 dark:bg-gray-900"
           style={{ minWidth: minGridWidth }}
         >
           <div className="grid" style={{ gridTemplateColumns }}>
@@ -629,7 +629,7 @@ export default function VirtualDataGrid({
                     key={`${queryKey}-${rowIndex}`}
                     style={rowStyle}
                     className={`grid items-center border-b border-gray-200/70 text-sm dark:border-gray-800 ${
-                      striped ? "bg-white dark:bg-gray-900" : "bg-gray-50/70 dark:bg-gray-950/70"
+                      striped ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-950"
                     }`}
                   >
                     <div className="border-r border-gray-200/70 px-4 font-mono text-xs text-gray-400 dark:border-gray-800 dark:text-gray-500">

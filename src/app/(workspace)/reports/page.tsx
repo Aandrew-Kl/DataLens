@@ -34,7 +34,7 @@ interface ScheduledReport {
 }
 
 const glass =
-  "rounded-2xl border border-white/30 bg-white/60 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60";
+  "rounded-2xl border border-white/30 bg-white p-5 dark:border-white/10 dark:bg-slate-900";
 
 const templates: ReportTemplate[] = [
   {
@@ -89,7 +89,7 @@ function TemplateCard({
       type="button"
       onClick={onSelect}
       className={`w-full rounded-2xl border p-4 text-left ${
-        selected ? "border-cyan-400 bg-cyan-50 dark:bg-slate-950/50" : "border-white/40 bg-white/45 dark:border-white/15"
+        selected ? "border-cyan-400 bg-cyan-50 dark:bg-slate-950" : "border-white/40 bg-white dark:border-white/15"
       }`}
     >
       <p className="font-semibold text-slate-900 dark:text-slate-100">{template.title}</p>
@@ -237,7 +237,7 @@ export default function ReportsPage() {
             />
           ))}
         </div>
-        <p className="mt-3 rounded-2xl border border-cyan-300/30 bg-cyan-50 p-3 text-sm text-cyan-800 dark:bg-slate-950/60 dark:text-cyan-200">
+        <p className="mt-3 rounded-2xl border border-cyan-300/30 bg-cyan-50 p-3 text-sm text-cyan-800 dark:bg-slate-950 dark:text-cyan-200">
           Selected: {currentTemplate?.title}
         </p>
       </section>
@@ -254,7 +254,7 @@ export default function ReportsPage() {
               <label
                 key={format}
                 className={`inline-flex cursor-pointer items-center gap-2 rounded-2xl border px-4 py-2 text-sm ${
-                  active ? "border-cyan-300 bg-cyan-50 dark:bg-slate-950/60" : "border-white/40"
+                  active ? "border-cyan-300 bg-cyan-50 dark:bg-slate-950" : "border-white/40"
                 }`}
               >
                 <input type="checkbox" checked={active} onChange={() => toggleFormat(format)} />
@@ -273,7 +273,7 @@ export default function ReportsPage() {
           >
             Export now
           </button>
-          <p className="rounded-2xl border border-white/40 bg-white/45 px-4 py-2 text-xs text-slate-700 dark:text-slate-300">
+          <p className="rounded-2xl border border-white/40 bg-white px-4 py-2 text-xs text-slate-700 dark:text-slate-300">
             {activeDataset ? `Active dataset: ${activeDataset.name}` : "No dataset selected"}
           </p>
         </div>
@@ -287,7 +287,7 @@ export default function ReportsPage() {
             <select
               value={frequency}
               onChange={(event) => setFrequency(event.target.value as ScheduleFrequency)}
-              className="rounded-2xl border border-white/40 bg-white/50 p-2.5 text-sm dark:bg-slate-950/50"
+              className="rounded-2xl border border-white/40 bg-white p-2.5 text-sm dark:bg-slate-950"
             >
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
@@ -301,7 +301,7 @@ export default function ReportsPage() {
               type="time"
               value={runTime}
               onChange={(event) => setRunTime(event.target.value)}
-              className="rounded-2xl border border-white/40 bg-white/50 p-2.5 text-sm dark:bg-slate-950/50"
+              className="rounded-2xl border border-white/40 bg-white p-2.5 text-sm dark:bg-slate-950"
             />
           </label>
 
@@ -310,7 +310,7 @@ export default function ReportsPage() {
             <input
               value={runDay}
               onChange={(event) => setRunDay(event.target.value)}
-              className="rounded-2xl border border-white/40 bg-white/50 p-2.5 text-sm dark:bg-slate-950/50"
+              className="rounded-2xl border border-white/40 bg-white p-2.5 text-sm dark:bg-slate-950"
             />
           </label>
 
@@ -318,7 +318,7 @@ export default function ReportsPage() {
             <button
               type="button"
               onClick={scheduleReport}
-              className="w-full rounded-2xl border border-white/40 bg-white/50 px-4 py-2 text-sm font-semibold hover:bg-white/70 dark:hover:bg-slate-900/50"
+              className="w-full rounded-2xl border border-white/40 bg-white px-4 py-2 text-sm font-semibold hover:bg-white dark:hover:bg-slate-900"
             >
               Add schedule
             </button>
@@ -337,7 +337,7 @@ export default function ReportsPage() {
               return (
                 <div
                   key={entry.id}
-                  className="flex flex-col gap-2 rounded-2xl border border-white/30 bg-white/45 p-3 md:flex-row md:items-center md:justify-between"
+                  className="flex flex-col gap-2 rounded-2xl border border-white/30 bg-white p-3 md:flex-row md:items-center md:justify-between"
                 >
                   <div>
                     <p className="font-semibold">{template?.title ?? "Template"}</p>

@@ -19,7 +19,7 @@ const MAX_SELECTED = 4;
 const DEFAULT_SELECTED = 3;
 const SAMPLE_ROWS = 320;
 const MAX_CATEGORY_BUCKETS = 8;
-const PANEL = "rounded-2xl border border-gray-200/70 bg-white/85 shadow-sm backdrop-blur dark:border-gray-800 dark:bg-gray-900/80";
+const PANEL = "rounded-2xl border border-gray-200/70 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900";
 const CATEGORY_COLORS = ["#38bdf8", "#34d399", "#f59e0b", "#f472b6", "#818cf8", "#fb7185", "#2dd4bf", "#f97316"];
 function isCategoricalCandidate(column: ColumnProfile) {
   if (column.type === "string" || column.type === "boolean") return true;
@@ -236,7 +236,7 @@ export default function ScatterMatrix({ tableName, columns }: ScatterMatrixProps
                     type="button"
                     disabled={disabled}
                     onClick={() => setSelectedColumns((current) => selected ? (current.length > MIN_SELECTED ? current.filter((name) => name !== column.name) : current) : (current.length < MAX_SELECTED ? [...current, column.name] : current))}
-                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition ${selected ? "border-cyan-400/60 bg-cyan-500/12 text-cyan-700 dark:border-cyan-400/40 dark:bg-cyan-500/12 dark:text-cyan-300" : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-gray-100"} ${disabled ? "cursor-not-allowed opacity-45" : ""}`}
+                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition ${selected ? "border-cyan-400/60 bg-cyan-500/12 text-cyan-700 dark:border-cyan-400/40 dark:bg-cyan-500/12 dark:text-cyan-300" : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-gray-100"} ${disabled ? "cursor-not-allowed opacity-45" : ""}`}
                   >
                     {selected ? <Check className="h-3.5 w-3.5" /> : <span className="h-3.5 w-3.5 rounded-full border border-current/40" />}
                     {column.name}
@@ -251,7 +251,7 @@ export default function ScatterMatrix({ tableName, columns }: ScatterMatrixProps
             <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Color by category</span>
             <div className="relative">
               <Palette className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <select value={categoryColumn} onChange={(event) => setCategoryColumn(event.target.value)} className="w-full appearance-none rounded-2xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-700 outline-none transition focus:border-cyan-400 dark:border-gray-700 dark:bg-gray-950/70 dark:text-gray-200">
+              <select value={categoryColumn} onChange={(event) => setCategoryColumn(event.target.value)} className="w-full appearance-none rounded-2xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-700 outline-none transition focus:border-cyan-400 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200">
                 <option value="">None</option>
                 {categoricalColumns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
               </select>
@@ -271,7 +271,7 @@ export default function ScatterMatrix({ tableName, columns }: ScatterMatrixProps
         {categoryLegend.length ? (
           <div className="flex flex-wrap gap-2">
             {categoryLegend.map((label, index) => (
-              <span key={label} className="inline-flex items-center gap-2 rounded-full border border-gray-200/80 bg-white/80 px-3 py-1 text-xs font-medium text-gray-600 dark:border-gray-700 dark:bg-gray-950/40 dark:text-gray-300">
+              <span key={label} className="inline-flex items-center gap-2 rounded-full border border-gray-200/80 bg-white px-3 py-1 text-xs font-medium text-gray-600 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-300">
                 <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[index % CATEGORY_COLORS.length] }} />
                 {label}
               </span>
@@ -280,7 +280,7 @@ export default function ScatterMatrix({ tableName, columns }: ScatterMatrixProps
         ) : null}
 
         {loading && !matrixRows.length ? (
-          <div className="flex min-h-72 items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-300/80 bg-gray-50/70 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-950/30 dark:text-gray-400">
+          <div className="flex min-h-72 items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-300/80 bg-gray-50 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-950/30 dark:text-gray-400">
             <Loader2 className="h-4 w-4 animate-spin" />Sampling rows for the matrix
           </div>
         ) : matrixRows.length ? (
@@ -291,10 +291,10 @@ export default function ScatterMatrix({ tableName, columns }: ScatterMatrixProps
                 const points = entry?.points ?? [];
                 const diagonal = rowIndex === columnIndex;
                 return (
-                  <motion.div key={`${rowColumn.name}:${column.name}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: rowIndex * 0.04 + columnIndex * 0.02, duration: 0.2 }} className="relative aspect-square overflow-hidden rounded-2xl border border-gray-200/80 bg-white/80 shadow-sm dark:border-gray-800 dark:bg-gray-950/40">
+                  <motion.div key={`${rowColumn.name}:${column.name}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: rowIndex * 0.04 + columnIndex * 0.02, duration: 0.2 }} className="relative aspect-square overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
                     <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-2 p-2">
-                      <span className="rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-semibold text-gray-700 shadow-sm dark:bg-gray-950/80 dark:text-gray-200">r {formatCorrelation(entry?.correlation ?? null)}</span>
-                      <span className="rounded-full bg-white/85 px-2.5 py-1 text-[11px] text-gray-500 shadow-sm dark:bg-gray-950/80 dark:text-gray-400">{formatNumber(points.length)} pts</span>
+                      <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 shadow-sm dark:bg-gray-950 dark:text-gray-200">r {formatCorrelation(entry?.correlation ?? null)}</span>
+                      <span className="rounded-full bg-white px-2.5 py-1 text-[11px] text-gray-500 shadow-sm dark:bg-gray-950 dark:text-gray-400">{formatNumber(points.length)} pts</span>
                     </div>
 
                     {diagonal ? (
@@ -316,7 +316,7 @@ export default function ScatterMatrix({ tableName, columns }: ScatterMatrixProps
             </div>
           </div>
         ) : (
-          <div className="flex min-h-60 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-300/80 bg-gray-50/70 text-center dark:border-gray-700 dark:bg-gray-950/30">
+          <div className="flex min-h-60 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-300/80 bg-gray-50 text-center dark:border-gray-700 dark:bg-gray-950/30">
             <Sigma className="h-8 w-8 text-gray-400 dark:text-gray-500" />
             <div className="space-y-1">
               <p className="text-sm font-medium text-gray-900 dark:text-white">No pairwise points available</p>

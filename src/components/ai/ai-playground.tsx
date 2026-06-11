@@ -81,7 +81,7 @@ function ConnectionBadge({ status }: { status: OllamaConnectionState }) {
         ? "bg-rose-500/15 text-rose-700 dark:text-rose-300"
         : status.kind === "checking"
           ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
-          : "bg-slate-200/70 text-slate-600 dark:bg-slate-800/70 dark:text-slate-300";
+          : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300";
 
   return (
     <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${className}`}>
@@ -335,7 +335,7 @@ export default function AiPlayground() {
             <div className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">
               Response
             </div>
-            <div className="min-h-48 whitespace-pre-wrap rounded-[1.25rem] border border-white/15 bg-white/55 px-4 py-4 text-sm leading-7 text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
+            <div className="min-h-48 whitespace-pre-wrap rounded-lg border border-white/15 bg-white px-4 py-4 text-sm leading-7 text-slate-700 dark:bg-slate-950/35 dark:text-slate-200">
               {response || "Run a prompt to render the model output here."}
             </div>
           </div>
@@ -368,7 +368,7 @@ export default function AiPlayground() {
                         setPrompt(entry.prompt);
                         setResponse(entry.response);
                       }}
-                      className="w-full rounded-[1.25rem] border border-white/15 bg-white/55 px-4 py-4 text-left dark:bg-slate-950/35"
+                      className="w-full rounded-lg border border-white/15 bg-white px-4 py-4 text-left dark:bg-slate-950/35"
                     >
                       <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {entry.prompt}

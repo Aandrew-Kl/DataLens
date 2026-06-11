@@ -570,7 +570,7 @@ export default function CohortRetention({ tableName, columns }: CohortRetentionP
             style={{ height: 420 }}
           />
         ) : (
-          <div className="flex min-h-[22rem] items-center justify-center rounded-[1.5rem] border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
+          <div className="flex min-h-[22rem] items-center justify-center rounded-lg border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
             Build monthly cohorts to map retention and reveal drop-off points.
           </div>
         )}
@@ -584,7 +584,7 @@ export default function CohortRetention({ tableName, columns }: CohortRetentionP
         {result ? (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
-              <thead className="bg-white/60 dark:bg-slate-900/60">
+              <thead className="bg-white dark:bg-slate-900">
                 <tr>
                   <th className="px-5 py-3 font-semibold text-slate-700 dark:text-slate-200">Cohort</th>
                   <th className="px-5 py-3 font-semibold text-slate-700 dark:text-slate-200">Users</th>

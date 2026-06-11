@@ -159,7 +159,7 @@ export default function ProfileSection({
           description="Search the active schema by name, type, or sampled values, then jump straight into the detailed column drawer."
         >
           <ErrorBoundary>
-            <div className="space-y-4 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div className="space-y-4 rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm dark:border-slate-700/60 dark:bg-slate-900">
               <SearchInput
                 value={columnSearch}
                 onChange={setColumnSearch}

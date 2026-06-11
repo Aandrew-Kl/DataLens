@@ -11,7 +11,7 @@ import { SVGRenderer } from "echarts/renderers";
 import { formatNumber, formatPercent } from "@/lib/utils/formatters";
 
 const GLASS_PANEL_CLASS =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-slate-950 border border-white/20";
 
 registerECharts([LineChart, GridComponent, TooltipComponent, SVGRenderer]);
 
@@ -132,7 +132,7 @@ export default function StatCard({
       </div>
 
       {chartOption ? (
-        <div className="mt-4 rounded-2xl border border-white/15 bg-white/40 p-2 dark:bg-slate-900/35">
+        <div className="mt-4 rounded-2xl border border-white/15 bg-white p-2 dark:bg-slate-900/35">
           <ReactEChartsCore
             option={chartOption}
             notMerge

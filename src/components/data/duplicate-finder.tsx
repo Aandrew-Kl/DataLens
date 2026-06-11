@@ -164,7 +164,7 @@ export default function DuplicateFinder({ tableName, columns }: DuplicateFinderP
     }
   }
 
-  if (!columns.length) return <section className="rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-950/50"><p className="text-sm text-slate-600 dark:text-slate-300">No columns available for duplicate analysis.</p></section>;
+  if (!columns.length) return <section className="rounded-3xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-950"><p className="text-sm text-slate-600 dark:text-slate-300">No columns available for duplicate analysis.</p></section>;
 
   return (
     <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: "easeOut" }} className="overflow-hidden rounded-3xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-sky-50/70 shadow-xl shadow-slate-950/5 dark:border-slate-800/80 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
@@ -177,14 +177,14 @@ export default function DuplicateFinder({ tableName, columns }: DuplicateFinderP
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={handleAnalyze} disabled={loading || deduplicating || !selectedColumns.length} className="inline-flex items-center gap-2 rounded-2xl bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:bg-slate-400 dark:disabled:bg-slate-700">{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}Run duplicate query</button>
-            <button type="button" onClick={handleDeduplicate} disabled={loading || deduplicating || !selectedColumns.length} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300/80 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800/80">{deduplicating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}Deduplicate</button>
+            <button type="button" onClick={handleDeduplicate} disabled={loading || deduplicating || !selectedColumns.length} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300/80 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">{deduplicating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}Deduplicate</button>
           </div>
         </div>
       </div>
 
       <div className="grid gap-6 px-6 py-6 xl:grid-cols-[1.25fr_0.75fr]">
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white/70 p-4 dark:border-slate-800/80 dark:bg-slate-950/35">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 dark:border-slate-800/80 dark:bg-slate-950/35">
             <div>
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Selected duplicate key</p>
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{selectedColumns.length ? selectedColumns.map((column) => column.name).join(", ") : "Choose at least one column."}</p>
@@ -199,7 +199,7 @@ export default function DuplicateFinder({ tableName, columns }: DuplicateFinderP
             {columns.map((column) => {
               const active = selectedNames.includes(column.name);
               return (
-                <button key={column.name} type="button" onClick={() => toggleColumn(column.name)} className={`rounded-2xl border p-4 text-left transition ${active ? "border-sky-400/50 bg-sky-500/10 text-sky-900 dark:border-sky-500/40 dark:bg-sky-500/10 dark:text-sky-100" : "border-slate-200/80 bg-white/70 text-slate-700 hover:border-slate-300 dark:border-slate-800/80 dark:bg-slate-950/30 dark:text-slate-200 dark:hover:border-slate-700"}`}>
+                <button key={column.name} type="button" onClick={() => toggleColumn(column.name)} className={`rounded-2xl border p-4 text-left transition ${active ? "border-sky-400/50 bg-sky-500/10 text-sky-900 dark:border-sky-500/40 dark:bg-sky-500/10 dark:text-sky-100" : "border-slate-200/80 bg-white text-slate-700 hover:border-slate-300 dark:border-slate-800/80 dark:bg-slate-950/30 dark:text-slate-200 dark:hover:border-slate-700"}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div><p className="text-sm font-semibold">{column.name}</p><p className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{column.type}</p></div>
                     {active && <CheckCircle className="h-4 w-4 shrink-0 text-sky-500" />}
@@ -227,8 +227,8 @@ export default function DuplicateFinder({ tableName, columns }: DuplicateFinderP
             { label: "Duplicate groups", value: summary ? formatNumber(summary.duplicateGroups) : "—" },
             { label: "Total duplicate rows", value: summary ? formatNumber(summary.totalDuplicateRows) : "—" },
             { label: "Share of table", value: summary ? formatPercent(summary.percentage, summary.percentage >= 10 ? 1 : 2) : "—" },
-          ].map((item) => <div key={item.label} className="rounded-2xl border border-slate-200/80 bg-white/70 p-4 dark:border-slate-800/80 dark:bg-slate-950/35"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{item.label}</p><p className="mt-3 text-2xl font-semibold text-slate-950 dark:text-slate-50">{item.value}</p></div>)}
-          <div className="rounded-2xl border border-slate-200/80 bg-white/70 p-4 text-sm leading-6 text-slate-600 dark:border-slate-800/80 dark:bg-slate-950/35 dark:text-slate-300">DuckDB groups `NULL` values together, so matching null-patterns count as duplicates for the selected key.</div>
+          ].map((item) => <div key={item.label} className="rounded-2xl border border-slate-200/80 bg-white p-4 dark:border-slate-800/80 dark:bg-slate-950/35"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{item.label}</p><p className="mt-3 text-2xl font-semibold text-slate-950 dark:text-slate-50">{item.value}</p></div>)}
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 text-sm leading-6 text-slate-600 dark:border-slate-800/80 dark:bg-slate-950/35 dark:text-slate-300">DuckDB groups `NULL` values together, so matching null-patterns count as duplicates for the selected key.</div>
         </div>
       </div>
 
@@ -243,12 +243,12 @@ export default function DuplicateFinder({ tableName, columns }: DuplicateFinderP
             <motion.div key="table" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="mt-4 overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80">
               <div className="max-h-[26rem] overflow-auto">
                 <table className="min-w-full divide-y divide-slate-200/80 text-sm dark:divide-slate-800/80">
-                  <thead className="sticky top-0 bg-slate-100/95 backdrop-blur dark:bg-slate-900/95">
+                  <thead className="sticky top-0 bg-slate-100 dark:bg-slate-900">
                     <tr>{selectedColumns.map((column) => <th key={column.name} className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-200">{column.name}</th>)}<th className="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-200">count</th></tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200/70 bg-white/80 dark:divide-slate-800/80 dark:bg-slate-950/35">
+                  <tbody className="divide-y divide-slate-200/70 bg-white dark:divide-slate-800/80 dark:bg-slate-950/35">
                     {sampleRows.map((row, index) => (
-                      <tr key={`${index}-${selectedColumns.map((column) => String(row[column.name])).join("|")}`} className="hover:bg-sky-50/70 dark:hover:bg-slate-900/80">
+                      <tr key={`${index}-${selectedColumns.map((column) => String(row[column.name])).join("|")}`} className="hover:bg-sky-50/70 dark:hover:bg-slate-900">
                         {selectedColumns.map((column) => <td key={column.name} className="px-4 py-3 text-slate-700 dark:text-slate-200">{formatCell(row[column.name], columnTypes[column.name])}</td>)}
                         <td className="px-4 py-3 text-right font-semibold text-slate-900 dark:text-slate-50">{formatNumber(Number(row.duplicate_count ?? 0))}</td>
                       </tr>

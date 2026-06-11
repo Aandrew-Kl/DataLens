@@ -45,9 +45,9 @@ interface LineageNode {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "overflow-hidden rounded-[1.9rem] border border-white/15 bg-white/60 shadow-[0_24px_90px_-46px_rgba(15,23,42,0.78)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "overflow-hidden rounded-lg border border-white/15 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 const CARD_CLASS =
-  "rounded-[1.3rem] border border-white/15 bg-white/55 shadow-[0_18px_54px_-36px_rgba(15,23,42,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/38";
+  "rounded-lg border border-white/15 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950/38";
 const STORAGE_PREFIX = "datalens:lineage-graph:";
 const listeners = new Map<string, Set<() => void>>();
 const snapshotCache = new Map<string, { raw: string | null; entries: LineageEvent[] }>();
@@ -304,10 +304,10 @@ function GraphCanvas({
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.34, delay: index * 0.04, ease: EASE }}
                 onClick={() => onSelect(node.id)}
-                className={`absolute overflow-hidden rounded-[1.4rem] border px-5 py-4 text-left transition ${
+                className={`absolute overflow-hidden rounded-lg border px-5 py-4 text-left transition ${
                   active
-                    ? "border-cyan-400/45 bg-white/78 shadow-[0_22px_70px_-34px_rgba(14,165,233,0.55)] dark:bg-slate-950/65"
-                    : "border-white/15 bg-white/55 hover:border-cyan-300/30 dark:border-white/10 dark:bg-slate-950/40"
+                    ? "border-cyan-400/45 bg-white shadow-sm dark:bg-slate-950"
+                    : "border-white/15 bg-white hover:border-cyan-300/30 dark:border-white/10 dark:bg-slate-950"
                 }`}
                 style={{
                   left: node.x,
@@ -412,7 +412,7 @@ export default function DataLineageGraph({ tableName }: DataLineageGraphProps) {
             type="button"
             onClick={() => exportLineageEvents(tableName)}
             disabled={events.length === 0}
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/55 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/35 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100"
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-cyan-300/35 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-100"
           >
             <Download className="h-4 w-4" />
             Export JSON
@@ -422,7 +422,7 @@ export default function DataLineageGraph({ tableName }: DataLineageGraphProps) {
 
       {events.length === 0 ? (
         <div className="flex min-h-[22rem] flex-col items-center justify-center gap-4 text-center">
-          <div className="rounded-full border border-white/15 bg-white/60 p-5 dark:border-white/10 dark:bg-slate-950/40">
+          <div className="rounded-full border border-white/15 bg-white p-5 dark:border-white/10 dark:bg-slate-950">
             <Database className="h-8 w-8 text-slate-400" />
           </div>
           <div className="space-y-2">
@@ -470,7 +470,7 @@ export default function DataLineageGraph({ tableName }: DataLineageGraphProps) {
               </p>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-white/40 px-4 py-3 dark:bg-slate-950/35">
+                <div className="rounded-2xl border border-white/10 bg-white px-4 py-3 dark:bg-slate-950/35">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Rows before
                   </div>
@@ -478,7 +478,7 @@ export default function DataLineageGraph({ tableName }: DataLineageGraphProps) {
                     {activeNode.event.rowsBefore == null ? "—" : formatNumber(activeNode.event.rowsBefore)}
                   </div>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-white/40 px-4 py-3 dark:bg-slate-950/35">
+                <div className="rounded-2xl border border-white/10 bg-white px-4 py-3 dark:bg-slate-950/35">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Rows after
                   </div>
@@ -497,7 +497,7 @@ export default function DataLineageGraph({ tableName }: DataLineageGraphProps) {
                     {activeNode.event.sourceTables.map((source) => (
                       <span
                         key={source}
-                        className="rounded-full border border-white/10 bg-white/45 px-3 py-1 text-xs text-slate-600 dark:bg-slate-950/35 dark:text-slate-300"
+                        className="rounded-full border border-white/10 bg-white px-3 py-1 text-xs text-slate-600 dark:bg-slate-950/35 dark:text-slate-300"
                       >
                         {source}
                       </span>
@@ -511,7 +511,7 @@ export default function DataLineageGraph({ tableName }: DataLineageGraphProps) {
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     Metadata
                   </div>
-                  <pre className="mt-3 overflow-x-auto rounded-2xl border border-white/10 bg-slate-950/90 p-4 text-xs leading-6 text-slate-200">
+                  <pre className="mt-3 overflow-x-auto rounded-2xl border border-white/10 bg-slate-950 p-4 text-xs leading-6 text-slate-200">
                     {JSON.stringify(activeNode.event.metadata, null, 2)}
                   </pre>
                 </div>
@@ -522,7 +522,7 @@ export default function DataLineageGraph({ tableName }: DataLineageGraphProps) {
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                     SQL
                   </div>
-                  <pre className="mt-3 overflow-x-auto rounded-2xl border border-white/10 bg-slate-950/90 p-4 text-xs leading-6 text-slate-200">
+                  <pre className="mt-3 overflow-x-auto rounded-2xl border border-white/10 bg-slate-950 p-4 text-xs leading-6 text-slate-200">
                     {activeNode.event.sql}
                   </pre>
                 </div>

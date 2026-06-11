@@ -277,7 +277,7 @@ export default function TextMiningTool({
               </option>
             ))}
           </select>
-          <label className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/55 dark:text-slate-100">
+          <label className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-100">
             Min word length
             <input
               aria-label="Minimum word length"
@@ -289,7 +289,7 @@ export default function TextMiningTool({
               className="w-16 bg-transparent text-right outline-none"
             />
           </label>
-          <label className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/55 dark:text-slate-100">
+          <label className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-100">
             N-gram size
             <input
               aria-label="N-gram size"

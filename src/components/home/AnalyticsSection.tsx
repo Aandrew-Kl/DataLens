@@ -202,7 +202,7 @@ export default function AnalyticsSection({
 
           {analyticsColumn && (
             <div className="space-y-4">
-              <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-800/80 dark:bg-slate-950/55 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm dark:border-slate-800/80 dark:bg-slate-950 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                     Focused Column Statistics
@@ -311,7 +311,7 @@ export default function AnalyticsSection({
               onClick={() =>
                 setShowAdvancedAnalytics((current) => !current)
               }
-              className="flex w-full items-center justify-between gap-2 bg-slate-50/80 px-4 py-3 text-left transition-colors hover:bg-slate-100 dark:bg-slate-900/60 dark:hover:bg-slate-800/60"
+              className="flex w-full items-center justify-between gap-2 bg-slate-50 px-4 py-3 text-left transition-colors hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800"
             >
               <div>
                 <h3 className="text-base font-semibold text-slate-900 dark:text-white">

@@ -423,7 +423,7 @@ function LegacyChartGallery({
 }: LegacyChartGalleryProps) {
   if (charts.length === 0) {
     return (
-      <div className="rounded-[28px] border border-white/15 bg-white/55 p-8 text-center shadow-[0_24px_80px_-40px_rgba(15,23,42,0.6)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/44">
+      <div className="rounded-lg border border-white/15 bg-white p-8 text-center shadow-sm dark:border-white/10 dark:bg-slate-950">
         <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">No saved charts yet</p>
         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Save a chart from the builder to keep a rendered copy here.</p>
       </div>
@@ -433,7 +433,7 @@ function LegacyChartGallery({
   return (
     <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
       {charts.map((chart) => (
-        <div key={chart.id} className="rounded-[28px] border border-white/15 bg-white/55 p-4 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.6)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/44">
+        <div key={chart.id} className="rounded-lg border border-white/15 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-slate-950">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-base font-semibold text-slate-900 dark:text-slate-50">{chart.title || "Untitled chart"}</p>
@@ -444,7 +444,7 @@ function LegacyChartGallery({
               <button type="button" onClick={() => onRemove(chart.id)} className="rounded-xl border border-rose-300/40 px-3 py-1.5 text-xs font-medium text-rose-700 dark:border-rose-500/30 dark:text-rose-300">Remove</button>
             </div>
           </div>
-          <div className="mt-4 overflow-hidden rounded-[22px] border border-slate-200/80 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-900/60">
+          <div className="mt-4 overflow-hidden rounded-lg border border-slate-200/80 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
             <ChartRenderer config={chart} data={chartData[chart.id] ?? chart.data ?? []} />
           </div>
         </div>
@@ -575,7 +575,7 @@ function ShowcaseChartGallery({
   }, [context.lowCardinality, context.primaryCategory, context.primaryDate, context.primaryNumeric, context.secondaryCategory, context.secondaryNumeric, deferredQuery]);
 
   return (
-    <section className="overflow-hidden rounded-[30px] border border-white/15 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_22%),linear-gradient(180deg,rgba(255,255,255,0.72),rgba(248,250,252,0.66))] p-6 shadow-[0_28px_90px_-42px_rgba(15,23,42,0.7)] backdrop-blur-2xl dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.1),transparent_24%),linear-gradient(180deg,rgba(2,6,23,0.88),rgba(15,23,42,0.82))]">
+    <section className="overflow-hidden rounded-lg border border-white/15 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_22%),linear-gradient(180deg,rgba(255,255,255,0.72),rgba(248,250,252,0.66))] p-6 shadow-sm dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.1),transparent_24%),linear-gradient(180deg,rgba(2,6,23,0.88),rgba(15,23,42,0.82))]">
       <div className="flex flex-col gap-4 border-b border-white/15 pb-5 dark:border-white/10 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-700 dark:text-cyan-300">
@@ -594,7 +594,7 @@ function ShowcaseChartGallery({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Find chart types"
-            className="w-full rounded-2xl border border-white/20 bg-white/70 py-3 pl-11 pr-4 text-sm text-slate-900 shadow-sm outline-none ring-0 placeholder:text-slate-400 focus:border-cyan-400/40 dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-100"
+            className="w-full rounded-2xl border border-white/20 bg-white py-3 pl-11 pr-4 text-sm text-slate-900 shadow-sm outline-none ring-0 placeholder:text-slate-400 focus:border-cyan-400/40 dark:border-white/10 dark:bg-slate-900 dark:text-slate-100"
           />
         </label>
       </div>
@@ -608,7 +608,7 @@ function ShowcaseChartGallery({
               type="button"
               variants={cardVariants}
               onClick={() => onSelect?.(definition.id)}
-              className="group overflow-hidden rounded-[28px] border border-white/15 bg-white/58 p-5 text-left shadow-[0_24px_84px_-44px_rgba(15,23,42,0.8)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-cyan-400/25 hover:bg-white/72 dark:border-white/10 dark:bg-slate-950/44 dark:hover:bg-slate-900/56"
+              className="group overflow-hidden rounded-lg border border-white/15 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400/25 hover:bg-white dark:border-white/10 dark:bg-slate-950 dark:hover:bg-slate-900"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className={`rounded-2xl bg-linear-to-br ${definition.accent} p-3`}>
@@ -626,7 +626,7 @@ function ShowcaseChartGallery({
                 <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-400">{definition.description}</p>
               </div>
 
-              <div className="mt-4 h-44 overflow-hidden rounded-[24px] border border-white/15 bg-white/70 p-3 dark:border-white/10 dark:bg-slate-900/70">
+              <div className="mt-4 h-44 overflow-hidden rounded-lg border border-white/15 bg-white p-3 dark:border-white/10 dark:bg-slate-900">
                 <ReactECharts
                   option={buildPreviewOption(definition.id, context, dark)}
                   notMerge

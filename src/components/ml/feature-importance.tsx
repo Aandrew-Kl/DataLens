@@ -224,7 +224,7 @@ async function loadFeatureImportance(
           (feature) =>
             `TRY_CAST(${quoteIdentifier(feature)} AS DOUBLE) AS ${quoteIdentifier(feature)}`,
         )
-        .join(",\n      ")}
+        .join(",\n ")}
     FROM ${quoteIdentifier(tableName)}
     WHERE TRY_CAST(${quoteIdentifier(targetColumn)} AS DOUBLE) IS NOT NULL
       ${featureColumns
@@ -232,7 +232,7 @@ async function loadFeatureImportance(
           (feature) =>
             `AND TRY_CAST(${quoteIdentifier(feature)} AS DOUBLE) IS NOT NULL`,
         )
-        .join("\n      ")}
+        .join("\n ")}
     LIMIT ${SAMPLE_LIMIT}
   `;
 
@@ -499,7 +499,7 @@ export default function FeatureImportance({
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
-                <thead className="bg-white/55 dark:bg-slate-900/55">
+                <thead className="bg-white dark:bg-slate-900">
                   <tr>
                     <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">Feature</th>
                     <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">Permutation</th>

@@ -118,7 +118,7 @@ export default function ColumnRenamer({ tableName, columns, onComplete }: Column
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.24, ease: "easeOut" }}
-      className="overflow-hidden rounded-3xl border border-gray-200/70 bg-white/85 shadow-sm backdrop-blur-sm dark:border-gray-800/80 dark:bg-gray-950/45"
+      className="overflow-hidden rounded-3xl border border-gray-200/70 bg-white shadow-sm dark:border-gray-800/80 dark:bg-gray-950"
     >
       <div className="border-b border-gray-200/70 px-5 py-5 dark:border-gray-800/80">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
@@ -166,7 +166,7 @@ export default function ColumnRenamer({ tableName, columns, onComplete }: Column
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.02, duration: 0.18 }}
-                className={`rounded-2xl border p-4 ${item.current === item.next ? "border-gray-200/70 bg-gray-50/60 dark:border-gray-800/80 dark:bg-gray-950/20" : "border-sky-300/60 bg-sky-500/10 dark:border-sky-700/60 dark:bg-sky-500/10"}`}
+                className={`rounded-2xl border p-4 ${item.current === item.next ? "border-gray-200/70 bg-gray-50 dark:border-gray-800/80 dark:bg-gray-950/20" : "border-sky-300/60 bg-sky-500/10 dark:border-sky-700/60 dark:bg-sky-500/10"}`}
               >
                 <div className="flex items-center justify-between gap-3 text-xs font-medium uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
                   <span className="inline-flex items-center gap-2"><Type className="h-3.5 w-3.5" />{item.type}</span>
@@ -187,7 +187,7 @@ export default function ColumnRenamer({ tableName, columns, onComplete }: Column
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-2xl border border-gray-200/70 bg-gray-50/70 p-4 dark:border-gray-800/80 dark:bg-gray-950/25">
+          <div className="rounded-2xl border border-gray-200/70 bg-gray-50 p-4 dark:border-gray-800/80 dark:bg-gray-950/25">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100"><Eye className="h-4 w-4 text-sky-500" />Preview Before Apply</p>
@@ -206,7 +206,7 @@ export default function ColumnRenamer({ tableName, columns, onComplete }: Column
               </div>
             )}
 
-            <div className="mt-4 rounded-2xl border border-gray-200/70 bg-white/70 p-3 dark:border-gray-800/80 dark:bg-gray-950/30">
+            <div className="mt-4 rounded-2xl border border-gray-200/70 bg-white p-3 dark:border-gray-800/80 dark:bg-gray-950/30">
               <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
                 <span>Rename map</span>
                 <span>{plan.changes.length ? `${plan.changes.length} updates` : "No-op"}</span>
@@ -231,7 +231,7 @@ export default function ColumnRenamer({ tableName, columns, onComplete }: Column
             <pre className="mt-4 overflow-x-auto rounded-2xl bg-gray-950 px-4 py-3 text-xs text-gray-100">{plan.changes.length ? plan.sqlPreview : "-- No column names changed yet --"}</pre>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-200/70 bg-white/70 p-4 dark:border-gray-800/80 dark:bg-gray-950/25">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-200/70 bg-white p-4 dark:border-gray-800/80 dark:bg-gray-950/25">
             <div>
               <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Apply rename batch</p>
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">This updates the underlying DuckDB table in place.</p>

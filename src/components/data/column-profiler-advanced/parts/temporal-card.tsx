@@ -29,7 +29,7 @@ export function TemporalCard({
             <MetricCell label="Max Date" value={temporal.maxDate ?? "—"} />
             <MetricCell label="Range" value={`${formatNumber(temporal.rangeDays)} days`} />
           </div>
-          <div className="rounded-3xl border border-white/20 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-slate-900/45">
+          <div className="rounded-3xl border border-white/20 bg-slate-50 p-4 dark:border-white/10 dark:bg-slate-900">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
               Largest Gaps
             </p>
@@ -38,7 +38,7 @@ export function TemporalCard({
                 temporal.gaps.map((gap) => (
                   <div
                     key={`${gap.start}-${gap.end}`}
-                    className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm dark:border-white/10 dark:bg-slate-950/50"
+                    className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-slate-950"
                   >
                     <div className="font-medium text-slate-950 dark:text-white">
                       {gap.days} day gap
@@ -57,7 +57,7 @@ export function TemporalCard({
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/20 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-slate-900/45">
+        <div className="rounded-3xl border border-white/20 bg-slate-50 p-4 dark:border-white/10 dark:bg-slate-900">
           <ReactECharts
             option={buildHistogramOption(temporal.dayOfWeek, dark, "#34d399")}
             style={{ height: 320, width: "100%" }}

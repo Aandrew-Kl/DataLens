@@ -21,7 +21,7 @@ export default function DemoBanner() {
   return (
     <>
       <div className="h-16" />
-      <div className="fixed inset-x-4 top-20 z-40 mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border border-amber-200 bg-amber-100/90 px-4 py-3 text-sm text-amber-950 shadow-lg backdrop-blur-xl dark:border-amber-500/20 dark:bg-amber-950/40 dark:text-amber-100">
+      <div className="fixed inset-x-4 top-20 z-40 mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border border-amber-200 bg-amber-100/90 px-4 py-3 text-sm text-amber-950 shadow-lg dark:border-amber-500/20 dark:bg-amber-950/40 dark:text-amber-100">
         <p className="flex-1">
           You&apos;re in demo mode — data resets on refresh.
         </p>

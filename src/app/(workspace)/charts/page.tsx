@@ -222,7 +222,7 @@ export default function ChartsPage() {
     <RouteErrorBoundary scope="charts-route">
       <main className="min-h-screen bg-slate-950/30 p-4 md:p-6">
         <div className="mx-auto max-w-7xl space-y-4">
-          <section className="rounded-3xl border border-white/20 bg-white/10 px-4 py-5 shadow-2xl backdrop-blur-xl md:px-6">
+          <section className="rounded-3xl border border-white/20 bg-white/10 px-4 py-5 shadow-2xl md:px-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h1 className="text-2xl font-semibold text-white">Charts</h1>
               <button
@@ -237,7 +237,7 @@ export default function ChartsPage() {
           </section>
 
           <section className="grid gap-4 lg:grid-cols-[340px_1fr]">
-            <section className="rounded-3xl border border-white/20 bg-white/10 p-4 backdrop-blur-xl">
+            <section className="rounded-3xl border border-white/20 bg-white/10 p-4 ">
               <div className="mb-3 text-sm font-medium text-slate-100">Saved charts</div>
 
               <div className="max-h-[300px] space-y-2 overflow-y-auto pr-1">
@@ -281,7 +281,7 @@ export default function ChartsPage() {
             </section>
 
             <div className="space-y-4">
-              <section className="rounded-3xl border border-white/20 bg-white/10 p-4 backdrop-blur-xl">
+              <section className="rounded-3xl border border-white/20 bg-white/10 p-4 ">
                 <div className="mb-3 flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-white">Chart preview</h2>
                   <button
@@ -321,7 +321,7 @@ export default function ChartsPage() {
                 ) : null}
               </section>
 
-              <section className="rounded-3xl border border-white/20 bg-white/10 p-4 backdrop-blur-xl">
+              <section className="rounded-3xl border border-white/20 bg-white/10 p-4 ">
                 <h2 className="mb-3 text-lg font-semibold text-white">Dashboard builder</h2>
 
                 {activeDataset ? (

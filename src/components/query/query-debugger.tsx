@@ -44,7 +44,7 @@ interface DebugResult {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 backdrop-blur-2xl shadow-xl shadow-slate-950/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:bg-slate-950";
 function defaultQuery(tableName: string) {
   return `SELECT *\nFROM ${quoteIdentifier(tableName)}\nLIMIT 100;`;
 }
@@ -258,7 +258,7 @@ function QueryDebuggerPanel({ tableName }: QueryDebuggerProps) {
             <textarea
               value={queryText}
               onChange={(event) => setQueryText(event.target.value)}
-              className="min-h-[18rem] w-full rounded-3xl border border-white/20 bg-white/85 px-4 py-4 font-mono text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950/45 dark:text-slate-100"
+              className="min-h-[18rem] w-full rounded-3xl border border-white/20 bg-white px-4 py-4 font-mono text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:bg-slate-950 dark:text-slate-100"
             />
           </label>
 
@@ -308,7 +308,7 @@ function QueryDebuggerPanel({ tableName }: QueryDebuggerProps) {
                 result.nodes.map((node) => (
                   <div
                     key={node.id}
-                    className="rounded-3xl border border-white/20 bg-white/70 px-4 py-3 dark:bg-slate-950/25"
+                    className="rounded-3xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-950/25"
                     style={{ marginLeft: `${node.depth * 12}px` }}
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -353,7 +353,7 @@ function QueryDebuggerPanel({ tableName }: QueryDebuggerProps) {
                           {formatDuration(timing.durationMs)}
                         </span>
                       </div>
-                      <div className="h-2 overflow-hidden rounded-full bg-slate-200/70 dark:bg-slate-800/70">
+                      <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                         <div
                           className="h-full rounded-full bg-cyan-500"
                           style={{ width: `${Math.max(width, 8)}%` }}

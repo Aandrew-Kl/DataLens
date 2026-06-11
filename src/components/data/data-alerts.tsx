@@ -51,9 +51,9 @@ interface AlertEvent {
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const panelClass =
-  "overflow-hidden rounded-[28px] border border-white/20 bg-white/75 shadow-[0_24px_90px_-48px_rgba(15,23,42,0.75)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "overflow-hidden rounded-lg border border-white/20 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 const fieldClass =
-  "w-full rounded-2xl border border-slate-200/70 bg-white/85 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950/65 dark:text-slate-100";
+  "w-full rounded-2xl border border-slate-200/70 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-100";
 const RULES_KEY = "datalens:alert-rules";
 const EVENTS_KEY = "datalens:alert-events";
 function quoteLiteral(value: string) {
@@ -257,7 +257,7 @@ export default function DataAlerts({ tableName, columns, rowCount }: DataAlertsP
 
       <div className="grid gap-6 px-6 py-6 xl:grid-cols-[0.85fr_1.15fr]">
         <div className="space-y-4">
-          <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+          <div className="rounded-lg border border-slate-200/70 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
             <p className="text-sm font-semibold text-slate-900 dark:text-white">Create alert rule</p>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <select value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value as RuleType })} className={fieldClass}>
@@ -285,10 +285,10 @@ export default function DataAlerts({ tableName, columns, rowCount }: DataAlertsP
             <button type="button" onClick={() => void handleCreateRule()} className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white dark:bg-slate-100 dark:text-slate-900"><Bell className="h-4 w-4" />Add rule</button>
           </div>
 
-          <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/75 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+          <div className="rounded-lg border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/35">
             <p className="text-sm font-semibold text-slate-900 dark:text-white">Saved rules</p>
             <div className="mt-4 space-y-3">
-              {rules.length === 0 ? <p className="text-sm text-slate-500 dark:text-slate-400">No alert rules configured yet.</p> : rules.map((rule) => <div key={rule.id} className="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-4 dark:border-slate-800 dark:bg-slate-950/45 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-sm font-medium text-slate-900 dark:text-white">{rule.type === "threshold" ? `${rule.column} ${rule.condition} ${rule.value}` : rule.type === "nulls" ? `${rule.column} nulls > ${rule.value}%` : `${rule.column} new outliers`}</p><p className="text-xs text-slate-500 dark:text-slate-400">Severity: {rule.severity}</p></div><button type="button" onClick={() => { const nextRules = rules.filter((item) => item.id !== rule.id); setRules(nextRules); writeStorage(`${RULES_KEY}:${tableName}`, nextRules); }} className="rounded-xl border border-rose-300/60 px-3 py-2 text-sm text-rose-700 transition hover:bg-rose-500/10 dark:text-rose-300">Delete</button></div>)}
+              {rules.length === 0 ? <p className="text-sm text-slate-500 dark:text-slate-400">No alert rules configured yet.</p> : rules.map((rule) => <div key={rule.id} className="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white p-4 dark:border-slate-800 dark:bg-slate-950 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-sm font-medium text-slate-900 dark:text-white">{rule.type === "threshold" ? `${rule.column} ${rule.condition} ${rule.value}` : rule.type === "nulls" ? `${rule.column} nulls > ${rule.value}%` : `${rule.column} new outliers`}</p><p className="text-xs text-slate-500 dark:text-slate-400">Severity: {rule.severity}</p></div><button type="button" onClick={() => { const nextRules = rules.filter((item) => item.id !== rule.id); setRules(nextRules); writeStorage(`${RULES_KEY}:${tableName}`, nextRules); }} className="rounded-xl border border-rose-300/60 px-3 py-2 text-sm text-rose-700 transition hover:bg-rose-500/10 dark:text-rose-300">Delete</button></div>)}
             </div>
           </div>
         </div>
@@ -296,7 +296,7 @@ export default function DataAlerts({ tableName, columns, rowCount }: DataAlertsP
         <div className="space-y-4">
           {notice && <div className={`rounded-2xl border px-4 py-3 text-sm ${notice.tone === "error" ? "border-rose-400/40 bg-rose-500/10 text-rose-700 dark:text-rose-300" : "border-emerald-400/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"}`}>{notice.message}</div>}
 
-          <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+          <div className="rounded-lg border border-slate-200/70 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white"><BellRing className="h-4 w-4 text-rose-500" />Active alerts</div>
             <div className="mt-4 space-y-3">
               <AnimatePresence>
@@ -305,10 +305,10 @@ export default function DataAlerts({ tableName, columns, rowCount }: DataAlertsP
             </div>
           </div>
 
-          <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/75 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+          <div className="rounded-lg border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/35">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white"><Bell className="h-4 w-4 text-cyan-500" />Alert history</div>
             <div className="mt-4 space-y-3">
-              {events.length === 0 ? <p className="text-sm text-slate-500 dark:text-slate-400">No alert history yet.</p> : events.map((event) => <div key={event.id} className="rounded-2xl border border-slate-200/70 bg-white/80 p-4 dark:border-slate-800 dark:bg-slate-950/45"><div className="flex items-center justify-between gap-3"><p className="text-sm font-medium text-slate-900 dark:text-white">{event.title}</p><span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${severityTone(event.severity)}`}>{event.status}</span></div><p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{event.detail}</p><p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{new Date(event.triggeredAt).toLocaleString()}</p></div>)}
+              {events.length === 0 ? <p className="text-sm text-slate-500 dark:text-slate-400">No alert history yet.</p> : events.map((event) => <div key={event.id} className="rounded-2xl border border-slate-200/70 bg-white p-4 dark:border-slate-800 dark:bg-slate-950"><div className="flex items-center justify-between gap-3"><p className="text-sm font-medium text-slate-900 dark:text-white">{event.title}</p><span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${severityTone(event.severity)}`}>{event.status}</span></div><p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{event.detail}</p><p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{new Date(event.triggeredAt).toLocaleString()}</p></div>)}
             </div>
           </div>
         </div>

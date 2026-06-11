@@ -248,7 +248,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
           <Bot className="h-4 w-4" />
         </div>
       ) : null}
-      <div className={`max-w-[82%] rounded-3xl border px-4 py-3 ${assistant ? "border-white/10 bg-white/10 text-slate-700 dark:bg-slate-900/70 dark:text-slate-200" : "border-cyan-400/20 bg-cyan-600 text-white"}`}>
+      <div className={`max-w-[82%] rounded-3xl border px-4 py-3 ${assistant ? "border-white/10 bg-white/10 text-slate-700 dark:bg-slate-900 dark:text-slate-200" : "border-cyan-400/20 bg-cyan-600 text-white"}`}>
         <p className="whitespace-pre-wrap text-sm leading-6">{message.content}</p>
         <p className={`mt-2 text-[11px] ${assistant ? "text-slate-500 dark:text-slate-400" : "text-cyan-100"}`}>
           {formatTimestamp(message.timestamp)}
@@ -318,7 +318,7 @@ export default function AiAssistant({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.96 }}
             transition={{ duration: 0.22, ease: EASE }}
-            className="fixed bottom-24 right-4 z-50 flex h-[min(42rem,calc(100vh-8rem))] w-[min(26rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[28px] border border-white/10 bg-white/10 shadow-2xl shadow-slate-950/20 backdrop-blur-2xl dark:bg-slate-950/60"
+            className="fixed bottom-24 right-4 z-50 flex h-[min(42rem,calc(100vh-8rem))] w-[min(26rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-lg border border-white/10 bg-white/10 shadow-2xl shadow-slate-950/20 dark:bg-slate-950"
           >
             <div className="border-b border-white/10 px-5 py-4">
               <div className="flex items-start justify-between gap-3">
@@ -411,7 +411,7 @@ export default function AiAssistant({
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.18, ease: EASE }}
-        className="fixed bottom-4 right-4 z-50 inline-flex h-16 w-16 items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-600 text-white shadow-2xl shadow-cyan-900/30 backdrop-blur-xl"
+        className="fixed bottom-4 right-4 z-50 inline-flex h-16 w-16 items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-600 text-white shadow-2xl shadow-cyan-900/30 "
         aria-label="Toggle AI assistant"
       >
         <div className="relative">

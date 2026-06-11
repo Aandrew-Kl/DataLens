@@ -36,8 +36,8 @@ interface ThemeSettingsState {
 
 const STORAGE_KEY = "datalens:theme-settings";
 const DEFAULT_SETTINGS: ThemeSettingsState = {
-  theme: "system",
-  accent: "cyan",
+  theme: "light",
+  accent: "slate",
   fontSize: 16,
   compactMode: false,
 };
@@ -216,7 +216,7 @@ export default function ThemeSettings() {
                   onClick={() => updateSettings({ accent: preset.value })}
                   className={
                     settings.accent === preset.value
-                      ? "rounded-3xl border border-white/30 bg-white/70 p-4 text-left dark:bg-slate-950/50"
+                      ? "rounded-3xl border border-white/30 bg-white p-4 text-left dark:bg-slate-950"
                       : `${GLASS_CARD_CLASS} p-4 text-left`
                   }
                 >
@@ -296,7 +296,7 @@ export default function ThemeSettings() {
           </div>
 
           <div
-            className="mt-4 rounded-[2rem] border border-white/20 p-5 shadow-lg"
+            className="mt-4 rounded-lg border border-white/20 p-5 shadow-lg"
             style={{
               background: preview.background,
               color: preview.color,

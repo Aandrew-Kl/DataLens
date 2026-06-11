@@ -53,7 +53,7 @@ export function StepHeader({
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <span className="rounded-full border border-white/20 bg-white/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500 dark:border-white/10 dark:bg-slate-950/40 dark:text-slate-400">
+        <span className="rounded-full border border-white/20 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500 dark:border-white/10 dark:bg-slate-950 dark:text-slate-400">
           First-run tour
         </span>
       </div>
@@ -83,7 +83,7 @@ export function FooterButton({
   const className =
     variant === "primary"
       ? "bg-slate-950 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
-      : "border border-white/20 bg-white/60 text-slate-700 hover:bg-white/80 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200 dark:hover:bg-slate-950/55";
+      : "border border-white/20 bg-white text-slate-700 hover:bg-white dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200 dark:hover:bg-slate-950";
 
   return (
     <button

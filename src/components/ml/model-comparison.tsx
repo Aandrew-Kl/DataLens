@@ -75,12 +75,12 @@ function buildModelComparisonQuery(
           (column, index) =>
             `TRY_CAST(${column} AS DOUBLE) AS ${quoteIdentifier(modelColumns[index] ?? "")}`,
         )
-        .join(",\n      ")}
+        .join(",\n ")}
     FROM ${quoteIdentifier(tableName)}
     WHERE TRY_CAST(${safeActual} AS DOUBLE) IS NOT NULL
       ${safeModels
         .map((column) => `AND TRY_CAST(${column} AS DOUBLE) IS NOT NULL`)
-        .join("\n      ")}
+        .join("\n ")}
     LIMIT ${SAMPLE_LIMIT}
   `;
 }
@@ -477,7 +477,7 @@ export default function ModelComparison({
                   return (
                     <label
                       key={column.name}
-                      className="flex cursor-pointer items-center justify-between rounded-2xl border border-white/15 bg-white/50 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/25 dark:text-slate-200"
+                      className="flex cursor-pointer items-center justify-between rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/25 dark:text-slate-200"
                     >
                       <span>{column.name}</span>
                       <input

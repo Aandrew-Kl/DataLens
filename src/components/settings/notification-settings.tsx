@@ -202,14 +202,14 @@ export default function NotificationSettings({
                 className={`rounded-2xl border px-4 py-3 text-sm font-medium transition ${
                   settings.position === position
                     ? "border-cyan-400/70 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300"
-                    : "border-white/20 bg-white/70 text-slate-700 dark:border-white/10 dark:bg-slate-950/40 dark:text-slate-200"
+                    : "border-white/20 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200"
                 }`}
               >
                 {position}
               </button>
             ))}
           </div>
-          <div className="mt-4 rounded-2xl border border-white/20 bg-white/70 p-4 dark:border-white/10 dark:bg-slate-950/40">
+          <div className="mt-4 rounded-2xl border border-white/20 bg-white p-4 dark:border-white/10 dark:bg-slate-950">
             <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-white">
               <CheckCircle2 className="h-4 w-4 text-cyan-700 dark:text-cyan-300" />
               Current preview

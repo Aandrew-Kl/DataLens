@@ -54,9 +54,9 @@ interface OperationSpec {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100";
 function slugify(value: string) {
   return (
     value
@@ -157,7 +157,7 @@ function buildBinningExpression(column: string, mode: BinningMode, binCount: num
     return `
       CASE
         WHEN ${metric} IS NULL THEN NULL
-        ${cases.join("\n        ")}
+        ${cases.join("\n ")}
         ELSE '${finalLabel}'
       END
     `;
@@ -335,7 +335,7 @@ async function replaceTableWithSelect(tableName: string, selectSql: string) {
 
 function PreviewLoading() {
   return (
-    <div className="flex min-h-[14rem] items-center justify-center rounded-3xl border border-white/15 bg-white/45 dark:bg-slate-950/35">
+    <div className="flex min-h-[14rem] items-center justify-center rounded-3xl border border-white/15 bg-white dark:bg-slate-950/35">
       <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-300">
         <Loader2 className="h-4 w-4 animate-spin" />
         Building preview…
@@ -372,7 +372,7 @@ function PreviewPanel({
 
   return (
     <div className="space-y-4">
-      <div className="overflow-x-auto rounded-3xl border border-white/15 bg-white/45 dark:bg-slate-950/35">
+      <div className="overflow-x-auto rounded-3xl border border-white/15 bg-white dark:bg-slate-950/35">
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-white/15 text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
             <tr>
@@ -665,7 +665,7 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                       <option value="custom">Custom breakpoints</option>
                     </select>
                   </label>
-                  <div className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
+                  <div className="rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/35">
                     <label
                       htmlFor="data-enrichment-bin-count"
                       className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
@@ -774,7 +774,7 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                           <option value="lead">Next value</option>
                         </select>
                       </label>
-                      <div className="rounded-2xl border border-white/15 bg-white/45 px-4 py-3 dark:bg-slate-950/35">
+                      <div className="rounded-2xl border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/35">
                         <label
                           htmlFor="data-enrichment-lag-lead-offset"
                           className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400"
@@ -839,7 +839,7 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-            <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+            <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <Columns3 className="h-3.5 w-3.5" />
                 Target column
@@ -848,7 +848,7 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                 {spec.newColumnName}
               </div>
             </div>
-            <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+            <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <Split className="h-3.5 w-3.5" />
                 Operation type
@@ -857,7 +857,7 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                 {operation.replaceAll("_", " ")}
               </div>
             </div>
-            <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+            <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <Waves className="h-3.5 w-3.5" />
                 Preview columns
@@ -866,7 +866,7 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
                 {spec.previewColumns.join(", ") || "Generated only"}
               </div>
             </div>
-            <div className="rounded-3xl border border-white/15 bg-white/45 p-4 dark:bg-slate-950/35">
+            <div className="rounded-3xl border border-white/15 bg-white p-4 dark:bg-slate-950/35">
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 <TimerReset className="h-3.5 w-3.5" />
                 Input columns
@@ -905,7 +905,7 @@ export default function DataEnrichment({ tableName, columns }: DataEnrichmentPro
             type="button"
             disabled={busy}
             onClick={() => void handleApply()}
-            className="rounded-2xl border border-white/20 bg-white/55 px-3 py-2 text-sm text-slate-600 transition hover:border-cyan-300/40 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950/35 dark:text-slate-200"
+            className="rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-600 transition hover:border-cyan-300/40 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950/35 dark:text-slate-200"
           >
             <span className="flex items-center gap-2">
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}

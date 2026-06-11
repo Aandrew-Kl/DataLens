@@ -554,7 +554,7 @@ function ColumnChip({
       className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
         active
           ? "border-cyan-400/40 bg-cyan-500/10 text-cyan-700 dark:text-cyan-200"
-          : "border-white/20 bg-white/70 text-slate-700 dark:bg-slate-950/45 dark:text-slate-200"
+          : "border-white/20 bg-white text-slate-700 dark:bg-slate-950 dark:text-slate-200"
       }`}
     >
       {label}
@@ -578,7 +578,7 @@ function MethodButton({
       className={`rounded-2xl border px-4 py-2.5 text-sm font-medium transition ${
         active
           ? "border-cyan-400/40 bg-cyan-500/10 text-cyan-700 dark:text-cyan-200"
-          : "border-white/20 bg-white/70 text-slate-700 dark:bg-slate-950/45 dark:text-slate-200"
+          : "border-white/20 bg-white text-slate-700 dark:bg-slate-950 dark:text-slate-200"
       }`}
     >
       {label}

@@ -206,7 +206,7 @@ export default function DashboardPage() {
 
   return (
     <main className="space-y-5 pb-6">
-      <section className="rounded-3xl border border-white/25 bg-white/20 px-5 py-5 backdrop-blur-xl">
+      <section className="rounded-3xl border border-white/25 bg-white/20 px-5 py-5 ">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
@@ -273,7 +273,7 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.22 }}
-            className="rounded-2xl border border-white/25 bg-white/20 px-4 py-4 backdrop-blur-xl"
+            className="rounded-2xl border border-white/25 bg-white/20 px-4 py-4 "
           >
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -287,7 +287,7 @@ export default function DashboardPage() {
                   {metric.subtitle}
                 </p>
               </div>
-              <span className="rounded-xl border border-white/40 bg-white/60 p-2 text-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
+              <span className="rounded-xl border border-white/40 bg-white p-2 text-slate-700 dark:bg-slate-900 dark:text-slate-200">
                 <metric.icon className="h-4 w-4" />
               </span>
             </div>
@@ -296,7 +296,7 @@ export default function DashboardPage() {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[2fr_1fr]">
-        <section className="rounded-3xl border border-white/25 bg-white/20 p-4 backdrop-blur-xl">
+        <section className="rounded-3xl border border-white/25 bg-white/20 p-4 ">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Saved charts</h2>
@@ -309,14 +309,14 @@ export default function DashboardPage() {
 
             <Link
               href="/charts"
-              className="rounded-lg border border-white/40 bg-white/35 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-white/55 dark:border-white/20 dark:text-slate-100"
+              className="rounded-lg border border-white/40 bg-white/35 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-white dark:border-white/20 dark:text-slate-100"
             >
               Open chart workspace
             </Link>
           </div>
 
           {datasetCharts.length === 0 ? (
-            <p className="rounded-2xl border border-white/40 bg-white/45 px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-300">
+            <p className="rounded-2xl border border-white/40 bg-white px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-300">
               No saved charts for this dataset yet. Create one from the Charts page.
             </p>
           ) : (
@@ -327,7 +327,7 @@ export default function DashboardPage() {
                 return (
                   <article
                     key={chart.id}
-                    className="rounded-2xl border border-white/45 bg-white/45 p-3 backdrop-blur-xl"
+                    className="rounded-2xl border border-white/45 bg-white p-3 "
                   >
                     <div className="flex items-start justify-between gap-2">
                       <button
@@ -366,7 +366,7 @@ export default function DashboardPage() {
                     <button
                       type="button"
                       onClick={() => handleOpenChart(chart)}
-                      className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/50 bg-white/60 px-2.5 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-white/75 dark:bg-slate-900/40 dark:text-slate-100"
+                      className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/50 bg-white px-2.5 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-white dark:bg-slate-900 dark:text-slate-100"
                     >
                       <BarChart3 className="h-3.5 w-3.5" />
                       Open in charts
@@ -378,7 +378,7 @@ export default function DashboardPage() {
           )}
         </section>
 
-        <section className="rounded-3xl border border-white/25 bg-white/20 p-4 backdrop-blur-xl">
+        <section className="rounded-3xl border border-white/25 bg-white/20 p-4 ">
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>
               <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Query history</h2>
@@ -394,7 +394,7 @@ export default function DashboardPage() {
                 type="button"
                 onClick={handleCopyQuery}
                 disabled={!selectedQuery}
-                className="inline-flex items-center gap-2 rounded-lg border border-white/40 bg-white/45 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-100"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/40 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-100"
               >
                 <ClipboardCopy className="h-3.5 w-3.5" />
                 Copy selected
@@ -414,7 +414,7 @@ export default function DashboardPage() {
           {activeDataset ? (
             <QueryHistory datasetId={activeDataset.id} onSelectQuery={handleSelectQuery} />
           ) : (
-            <p className="rounded-2xl border border-white/40 bg-white/45 px-4 py-6 text-sm text-slate-500 dark:text-slate-300">
+            <p className="rounded-2xl border border-white/40 bg-white px-4 py-6 text-sm text-slate-500 dark:text-slate-300">
               Pick a dataset to see its query history.
             </p>
           )}

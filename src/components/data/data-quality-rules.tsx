@@ -80,9 +80,9 @@ interface RulePreset {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950/45 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950 dark:text-slate-100";
 const STORAGE_PREFIX = "datalens:data-quality-rules";
 const storageListeners = new Set<() => void>();
 const EMPTY_RULE_SETS: SavedRuleSet[] = [];
@@ -441,7 +441,7 @@ function RulePresetButton({
     <button
       type="button"
       onClick={() => onApply(preset)}
-      className="rounded-2xl border border-white/20 bg-white/80 p-4 text-left transition hover:bg-white dark:bg-slate-950/45 dark:hover:bg-slate-950/65"
+      className="rounded-2xl border border-white/20 bg-white p-4 text-left transition hover:bg-white dark:bg-slate-950 dark:hover:bg-slate-950"
     >
       <div className="inline-flex items-center gap-2 rounded-full bg-cyan-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-cyan-700 dark:text-cyan-300">
         <Sparkles className="h-3.5 w-3.5" />
@@ -474,7 +474,7 @@ function RuleBuilderCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -12 }}
       transition={{ duration: 0.24, ease: EASE }}
-      className="rounded-[1.5rem] border border-white/15 bg-white/70 p-4 dark:bg-slate-950/45"
+      className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950"
     >
       <div className="grid gap-3 lg:grid-cols-[1fr_1fr_auto]">
         <select
@@ -592,7 +592,7 @@ function ResultCard({ result }: { result: RuleResult }) {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, ease: EASE }}
-      className="rounded-[1.5rem] border border-white/15 bg-slate-950/88 p-4"
+      className="rounded-lg border border-white/15 bg-slate-950 p-4"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -603,7 +603,7 @@ function ResultCard({ result }: { result: RuleResult }) {
           <p className="mt-3 text-base font-semibold text-slate-100">{result.summary}</p>
           <p className="mt-1 text-sm text-slate-400">{result.description}</p>
         </div>
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3 text-right">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-3 text-right">
           <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Compliance</p>
           <p className="mt-1 text-lg font-semibold text-slate-100">{result.compliance.toFixed(1)}%</p>
           <p className="mt-1 text-xs text-slate-400">{formatNumber(result.violationCount)} violations</p>
@@ -617,7 +617,7 @@ function ResultCard({ result }: { result: RuleResult }) {
           <div className="overflow-hidden rounded-2xl border border-slate-800">
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
-                <thead className="bg-slate-900/85">
+                <thead className="bg-slate-900">
                   <tr>
                     {headers.map((header) => (
                       <th key={header} className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
@@ -626,7 +626,7 @@ function ResultCard({ result }: { result: RuleResult }) {
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800 bg-slate-950/60">
+                <tbody className="divide-y divide-slate-800 bg-slate-950">
                   {result.sampleRows.map((row, rowIndex) => (
                     <tr key={`${result.id}-${rowIndex}`}>
                       {headers.map((header) => (
@@ -816,7 +816,7 @@ export default function DataQualityRules({ tableName, columns }: DataQualityRule
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <ScoreBadge score={overallCompliance} />
-          <div className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-600 dark:bg-slate-950/45 dark:text-slate-300">
+          <div className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-950 dark:text-slate-300">
             {formatNumber(tasks.length)} rules across {formatNumber(rowCount)} rows
           </div>
         </div>
@@ -829,7 +829,7 @@ export default function DataQualityRules({ tableName, columns }: DataQualityRule
       </div>
 
       <div className="mt-6 grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
-        <div className="space-y-4 rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+        <div className="space-y-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Rule builder</p>
@@ -868,7 +868,7 @@ export default function DataQualityRules({ tableName, columns }: DataQualityRule
               type="button"
               onClick={saveRuleSet}
               disabled={normalizedRules.length === 0}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/80 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-950/65"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-950"
             >
               <Save className="h-4 w-4" />
               Save set
@@ -889,7 +889,7 @@ export default function DataQualityRules({ tableName, columns }: DataQualityRule
               type="button"
               onClick={() => void exportViolations()}
               disabled={exporting || results.every((result) => result.violationCount === 0)}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/80 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-950/65"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-950"
             >
               {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
               Export violations CSV
@@ -897,20 +897,20 @@ export default function DataQualityRules({ tableName, columns }: DataQualityRule
           </div>
         </div>
 
-        <div className="space-y-4 rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+        <div className="space-y-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Saved rule sets</p>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Load reusable presets from localStorage, or remove old versions you no longer need.</p>
           </div>
 
           {savedRuleSets.length === 0 ? (
-            <div className="rounded-[1.25rem] border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="rounded-lg border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
               No saved rule sets yet.
             </div>
           ) : (
             <div className="space-y-3">
               {savedRuleSets.map((ruleSet) => (
-                <div key={ruleSet.id} className="rounded-[1.25rem] border border-white/15 bg-white/70 p-4 dark:bg-slate-950/45">
+                <div key={ruleSet.id} className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{ruleSet.name}</p>
@@ -930,7 +930,7 @@ export default function DataQualityRules({ tableName, columns }: DataQualityRule
                     <button
                       type="button"
                       onClick={() => loadRuleSet(ruleSet)}
-                      className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-950/65"
+                      className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-950"
                     >
                       <Upload className="h-4 w-4" />
                       Load
@@ -958,7 +958,7 @@ export default function DataQualityRules({ tableName, columns }: DataQualityRule
         </div>
 
         {results.length === 0 ? (
-          <div className="rounded-[1.5rem] border border-dashed border-white/20 px-4 py-12 text-center text-sm text-slate-500 dark:text-slate-400">
+          <div className="rounded-lg border border-dashed border-white/20 px-4 py-12 text-center text-sm text-slate-500 dark:text-slate-400">
             Run the rule engine to see violations, compliance, and sampled failure rows.
           </div>
         ) : (

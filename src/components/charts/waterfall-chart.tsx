@@ -49,9 +49,9 @@ type SortMode = "original" | "ascending" | "descending";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 const FIELD_CLASS =
-  "rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950/45 dark:text-slate-100";
+  "rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 dark:bg-slate-950 dark:text-slate-100";
 
 function subscribeDarkMode(listener: () => void) {
   if (typeof document === "undefined") return () => undefined;
@@ -295,7 +295,7 @@ function WaterfallSummary({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 dark:bg-slate-950/45">
+    <div className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:bg-slate-950">
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{label}</p>
       <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100">{value}</p>
     </div>
@@ -411,7 +411,7 @@ export default function WaterfallChart({ tableName, columns }: WaterfallChartPro
           <option value="ascending">Ascending</option>
           <option value="descending">Descending</option>
         </select>
-        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-700 dark:bg-slate-950/45 dark:text-slate-200">
+        <label className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-200">
           <input
             type="checkbox"
             checked={showConnectors}
@@ -432,15 +432,15 @@ export default function WaterfallChart({ tableName, columns }: WaterfallChartPro
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/65 px-3 py-1 dark:bg-slate-950/35">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white px-3 py-1 dark:bg-slate-950/35">
           <ArrowDownAZ className="h-4 w-4 text-emerald-500" />
           Positive bars are green
         </span>
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/65 px-3 py-1 dark:bg-slate-950/35">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white px-3 py-1 dark:bg-slate-950/35">
           <ArrowUpAZ className="h-4 w-4 text-rose-500" />
           Negative bars are red
         </span>
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/65 px-3 py-1 dark:bg-slate-950/35">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white px-3 py-1 dark:bg-slate-950/35">
           <Download className="h-4 w-4 text-blue-500" />
           Total bar is blue
         </span>
@@ -453,9 +453,9 @@ export default function WaterfallChart({ tableName, columns }: WaterfallChartPro
       ) : null}
 
       <div className="mt-6 grid gap-5 xl:grid-cols-[1.5fr_0.75fr]">
-        <div className="rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+        <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           {points.length === 0 ? (
-            <div className="flex min-h-[360px] items-center justify-center rounded-[1.25rem] border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex min-h-[360px] items-center justify-center rounded-lg border border-dashed border-white/20 text-center text-sm text-slate-500 dark:text-slate-400">
               {hasColumns ? "Build the chart to calculate the running totals." : "Add at least one dimension column and one numeric column to use the waterfall chart."}
             </div>
           ) : (
@@ -470,7 +470,7 @@ export default function WaterfallChart({ tableName, columns }: WaterfallChartPro
           )}
         </div>
 
-        <div className="space-y-4 rounded-[1.5rem] border border-white/15 bg-white/65 p-4 dark:bg-slate-950/35">
+        <div className="space-y-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Contribution ledger</p>
@@ -480,7 +480,7 @@ export default function WaterfallChart({ tableName, columns }: WaterfallChartPro
               type="button"
               onClick={() => exportChartImage(chartRef.current, dark, `${tableName}-waterfall.png`)}
               disabled={points.length === 0}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-950/65"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-950"
             >
               <Download className="h-4 w-4" />
               Export PNG
@@ -489,7 +489,7 @@ export default function WaterfallChart({ tableName, columns }: WaterfallChartPro
 
           <div className="max-h-[340px] space-y-3 overflow-y-auto pr-1">
             {points.map((point) => (
-              <div key={point.category} className="rounded-2xl border border-white/15 bg-white/70 p-4 dark:bg-slate-950/45">
+              <div key={point.category} className="rounded-2xl border border-white/15 bg-white p-4 dark:bg-slate-950">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{point.category}</p>
@@ -502,7 +502,7 @@ export default function WaterfallChart({ tableName, columns }: WaterfallChartPro
                     {formatNumber(point.value)}
                   </span>
                 </div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200/70 dark:bg-slate-800/70">
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                   <div
                     className={`h-full rounded-full ${point.value < 0 ? "bg-rose-500" : "bg-emerald-500"}`}
                     style={{ width: `${Math.min(100, Math.abs(point.contributionPct))}%` }}

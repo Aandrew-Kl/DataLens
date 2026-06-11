@@ -66,7 +66,7 @@ interface TransformHistoryEntry {
 const STORAGE_KEY = "datalens:transform-recipes";
 const EASE = [0.22, 1, 0.36, 1] as const;
 const CARD_CLASS =
-  "rounded-[1.75rem] border border-white/20 bg-white/75 shadow-xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "rounded-lg border border-white/20 bg-white shadow-xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950";
 function quoteLiteral(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;
 }
@@ -231,17 +231,17 @@ function PreviewTable({
 
   if (rows.length === 0 || columns.length === 0) {
     return (
-      <div className="rounded-[1rem] border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+      <div className="rounded-lg border border-dashed border-white/20 px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
         Preview the first 20 rows before applying the transformation chain.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-[1rem] border border-white/15 bg-white/55 dark:bg-slate-950/25">
+    <div className="overflow-hidden rounded-lg border border-white/15 bg-white dark:bg-slate-950/25">
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-white/60 dark:bg-slate-900/60">
+          <thead className="bg-white dark:bg-slate-900">
             <tr>
               {columns.map((column) => (
                 <th key={column} className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">
@@ -456,7 +456,7 @@ export default function ColumnTransformer({
     <section className={`${CARD_CLASS} overflow-hidden p-5`}>
       <div className="flex flex-col gap-5 border-b border-white/15 pb-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
             <Wand2 className="h-5 w-5" />
           </div>
           <div>
@@ -473,7 +473,7 @@ export default function ColumnTransformer({
           <button
             type="button"
             onClick={() => void undoLastTransformation()}
-            className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/45 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/60 dark:bg-slate-900/30 dark:text-slate-200"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-900/30 dark:text-slate-200"
           >
             <RotateCcw className="h-4 w-4" />
             Undo last
@@ -481,7 +481,7 @@ export default function ColumnTransformer({
           <button
             type="button"
             onClick={saveRecipe}
-            className="inline-flex items-center gap-2 rounded-[1rem] bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
+            className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
           >
             <Save className="h-4 w-4" />
             Save recipe
@@ -490,12 +490,12 @@ export default function ColumnTransformer({
       </div>
 
       {error ? (
-        <div className="mt-4 rounded-[1.2rem] border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
+        <div className="mt-4 rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
           {error}
         </div>
       ) : null}
       {notice ? (
-        <div className="mt-4 rounded-[1.2rem] border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-800 dark:text-cyan-300">
+        <div className="mt-4 rounded-lg border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-800 dark:text-cyan-300">
           {notice}
         </div>
       ) : null}
@@ -506,13 +506,13 @@ export default function ColumnTransformer({
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.28, ease: EASE }}
-            className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30"
+            className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30"
           >
             <div className="grid gap-3 md:grid-cols-2">
               <select
                 value={draftStep.sourceColumn}
                 onChange={(event) => updateDraft({ sourceColumn: event.target.value })}
-                className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               >
                 {availableColumns.map((column) => (
                   <option key={column} value={column}>
@@ -524,12 +524,12 @@ export default function ColumnTransformer({
                 value={draftStep.newColumnName}
                 onChange={(event) => updateDraft({ newColumnName: event.target.value })}
                 placeholder="New column name"
-                className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               />
               <select
                 value={draftStep.kind}
                 onChange={(event) => updateDraft({ kind: event.target.value as TransformKind })}
-                className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               >
                 <option value="normalize_minmax">Normalize · Min-max</option>
                 <option value="normalize_zscore">Normalize · Z-score</option>
@@ -550,7 +550,7 @@ export default function ColumnTransformer({
                 value={recipeName}
                 onChange={(event) => setRecipeName(event.target.value)}
                 placeholder="Recipe name"
-                className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
               />
             </div>
 
@@ -570,7 +570,7 @@ export default function ColumnTransformer({
                     max={20}
                     value={draftStep.bins}
                     onChange={(event) => updateDraft({ bins: Math.max(Number(event.target.value), 2) })}
-                    className="w-full rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                    className="w-full rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
                   />
                 </motion.div>
               ) : null}
@@ -587,7 +587,7 @@ export default function ColumnTransformer({
                     value={draftStep.matchValue}
                     onChange={(event) => updateDraft({ matchValue: event.target.value })}
                     placeholder="Value to match"
-                    className="w-full rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                    className="w-full rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
                   />
                 </motion.div>
               ) : null}
@@ -604,13 +604,13 @@ export default function ColumnTransformer({
                     value={draftStep.regexPattern}
                     onChange={(event) => updateDraft({ regexPattern: event.target.value })}
                     placeholder="Regex pattern"
-                    className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                    className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
                   />
                   <input
                     value={draftStep.regexReplacement}
                     onChange={(event) => updateDraft({ regexReplacement: event.target.value })}
                     placeholder="Replacement"
-                    className="rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                    className="rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
                   />
                 </motion.div>
               ) : null}
@@ -627,7 +627,7 @@ export default function ColumnTransformer({
                     value={draftStep.customSql}
                     onChange={(event) => updateDraft({ customSql: event.target.value })}
                     rows={4}
-                    className="w-full rounded-[1rem] border border-white/20 bg-white/75 px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950/60 dark:text-slate-50"
+                    className="w-full rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-50"
                   />
                   <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                     Use <code>{"{{column}}"}</code> as the source column placeholder.
@@ -640,7 +640,7 @@ export default function ColumnTransformer({
               <button
                 type="button"
                 onClick={queueCurrentStep}
-                className="inline-flex items-center gap-2 rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/70 dark:bg-slate-950/35 dark:text-slate-200"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:bg-slate-950/35 dark:text-slate-200"
               >
                 <Sparkles className="h-4 w-4" />
                 Add to chain
@@ -648,7 +648,7 @@ export default function ColumnTransformer({
               <button
                 type="button"
                 onClick={() => void previewPipeline()}
-                className="inline-flex items-center gap-2 rounded-[1rem] bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
+                className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500"
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
                 Preview
@@ -656,7 +656,7 @@ export default function ColumnTransformer({
               <button
                 type="button"
                 onClick={() => void applyPipeline()}
-                className="inline-flex items-center gap-2 rounded-[1rem] bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
               >
                 <Database className="h-4 w-4" />
                 Apply chain
@@ -664,7 +664,7 @@ export default function ColumnTransformer({
             </div>
           </motion.div>
 
-          <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
               Transformation chain
             </p>
@@ -677,7 +677,7 @@ export default function ColumnTransformer({
                 effectiveSteps.map((step, index) => (
                   <div
                     key={step.id}
-                    className="flex items-center gap-3 rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 dark:bg-slate-950/25"
+                    className="flex items-center gap-3 rounded-lg border border-white/15 bg-white px-4 py-3 dark:bg-slate-950/25"
                   >
                     <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                       {index + 1}
@@ -698,7 +698,7 @@ export default function ColumnTransformer({
             </div>
           </div>
 
-          <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">Saved recipes</p>
             <div className="mt-4 space-y-3">
               {recipes.length === 0 ? (
@@ -711,7 +711,7 @@ export default function ColumnTransformer({
                     key={recipe.id}
                     type="button"
                     onClick={() => loadRecipe(recipe)}
-                    className="w-full rounded-[1rem] border border-white/15 bg-white/55 px-4 py-3 text-left transition hover:bg-white/70 dark:bg-slate-950/25 dark:hover:bg-slate-950/40"
+                    className="w-full rounded-lg border border-white/15 bg-white px-4 py-3 text-left transition hover:bg-white dark:bg-slate-950/25 dark:hover:bg-slate-950"
                   >
                     <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{recipe.name}</p>
                     <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
@@ -725,7 +725,7 @@ export default function ColumnTransformer({
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-[1.4rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/30">
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
               Before / after preview
             </p>

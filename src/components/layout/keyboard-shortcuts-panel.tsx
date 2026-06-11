@@ -69,7 +69,7 @@ function KeyCaps({ keys }: { keys: readonly string[] }) {
       {keys.map((key) => (
         <kbd
           key={`${keys.join("-")}-${key}`}
-          className="rounded-xl border border-white/20 bg-white/70 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-200"
+          className="rounded-xl border border-white/20 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200"
         >
           {key}
         </kbd>
@@ -141,7 +141,7 @@ export default function KeyboardShortcutsPanel({
           type="button"
           aria-label="Close keyboard shortcuts panel"
           onClick={() => setOpen(false)}
-          className="absolute inset-0 bg-slate-950/55 backdrop-blur-md"
+          className="absolute inset-0 bg-slate-950/60 "
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -155,7 +155,7 @@ export default function KeyboardShortcutsPanel({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 16, scale: 0.96 }}
           transition={{ duration: 0.24, ease: ANALYTICS_EASE }}
-          className="relative w-full max-w-5xl rounded-[2rem] bg-white/75 p-6 shadow-[0_30px_120px_-48px_rgba(15,23,42,0.9)] backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20"
+          className="relative w-full max-w-5xl rounded-lg bg-white p-6 shadow-sm dark:bg-slate-950 border border-white/20"
         >
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -178,7 +178,7 @@ export default function KeyboardShortcutsPanel({
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-2xl border border-white/20 bg-white/70 p-2.5 text-slate-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-300"
+              className="rounded-2xl border border-white/20 bg-white p-2.5 text-slate-500 dark:border-white/10 dark:bg-slate-950 dark:text-slate-300"
               aria-label="Close panel"
             >
               <X className="h-4 w-4" />
@@ -224,7 +224,7 @@ export default function KeyboardShortcutsPanel({
                     {section.shortcuts.map((shortcut) => (
                       <div
                         key={`${shortcut.category}-${shortcut.description}`}
-                        className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 dark:border-white/10 dark:bg-slate-950/40"
+                        className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-950"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <p className="text-sm leading-6 text-slate-700 dark:text-slate-200">

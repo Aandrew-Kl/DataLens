@@ -193,7 +193,7 @@ function MetricCard({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.36, delay: index * 0.04, ease: EASE }}
-      className="rounded-3xl border border-white/20 bg-white/70 p-4 shadow-xl shadow-slate-950/5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45"
+      className="rounded-3xl border border-white/20 bg-white p-4 shadow-xl shadow-slate-950/5 dark:border-white/10 dark:bg-slate-950"
     >
       <div className="flex items-start justify-between gap-3">
         <div className={`rounded-2xl p-3 ${accent}`}>
@@ -484,12 +484,12 @@ export default function DataProfilerSummary({
 
   if (loading && !metrics) {
     return (
-      <section className="rounded-[2rem] border border-white/20 bg-white/70 p-6 shadow-xl shadow-slate-950/5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45">
+      <section className="rounded-lg border border-white/20 bg-white p-6 shadow-xl shadow-slate-950/5 dark:border-white/10 dark:bg-slate-950">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, index) => (
             <div
               key={index}
-              className="h-36 animate-pulse rounded-3xl border border-white/20 bg-slate-200/60 dark:border-white/10 dark:bg-slate-800/40"
+              className="h-36 animate-pulse rounded-3xl border border-white/20 bg-slate-200 dark:border-white/10 dark:bg-slate-800"
             />
           ))}
         </div>
@@ -499,7 +499,7 @@ export default function DataProfilerSummary({
 
   if (!metrics) {
     return (
-      <section className="rounded-[2rem] border border-rose-300/30 bg-rose-500/10 p-6 backdrop-blur-xl dark:border-rose-500/20 dark:bg-rose-500/10">
+      <section className="rounded-lg border border-rose-300/30 bg-rose-500/10 p-6 dark:border-rose-500/20 dark:bg-rose-500/10">
         <p className="text-sm font-medium text-rose-700 dark:text-rose-300">
           {loadState.error ?? "Unable to compute the dataset summary."}
         </p>
@@ -512,7 +512,7 @@ export default function DataProfilerSummary({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.42, ease: EASE }}
-      className="rounded-[2rem] border border-white/20 bg-white/70 p-6 shadow-xl shadow-slate-950/5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45"
+      className="rounded-lg border border-white/20 bg-white p-6 shadow-xl shadow-slate-950/5 dark:border-white/10 dark:bg-slate-950"
     >
       <div className="flex flex-col gap-4 border-b border-slate-200/70 pb-5 dark:border-slate-800/70 lg:flex-row lg:items-end lg:justify-between">
         <div>
@@ -538,11 +538,11 @@ export default function DataProfilerSummary({
       </div>
 
       <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)]">
-        <div className="rounded-3xl border border-white/20 bg-slate-50/80 p-5 dark:border-white/10 dark:bg-slate-900/45">
+        <div className="rounded-3xl border border-white/20 bg-slate-50 p-5 dark:border-white/10 dark:bg-slate-900">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
             Column Type Mix
           </p>
-          <div className="mt-4 overflow-hidden rounded-full bg-slate-200/80 dark:bg-slate-800/80">
+          <div className="mt-4 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
             <div className="flex h-4 w-full">
               {typeDistribution.map((segment) => (
                 <div
@@ -560,7 +560,7 @@ export default function DataProfilerSummary({
             {typeDistribution.map((segment) => (
               <div
                 key={segment.label}
-                className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 dark:border-white/10 dark:bg-slate-950/50"
+                className="rounded-2xl border border-white/20 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-950"
               >
                 <p className="text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                   {segment.label}
@@ -573,18 +573,18 @@ export default function DataProfilerSummary({
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/20 bg-slate-50/80 p-5 dark:border-white/10 dark:bg-slate-900/45">
+        <div className="rounded-3xl border border-white/20 bg-slate-50 p-5 dark:border-white/10 dark:bg-slate-900">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
             Quality Notes
           </p>
           <div className="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
-            <div className="rounded-2xl border border-white/20 bg-white/70 p-4 dark:border-white/10 dark:bg-slate-950/50">
+            <div className="rounded-2xl border border-white/20 bg-white p-4 dark:border-white/10 dark:bg-slate-950">
               Cell completeness is <span className="font-semibold text-slate-950 dark:text-white">{formatPercent(metrics.completeness)}</span> across {formatNumber(metrics.totalRows * Math.max(metrics.totalColumns, 1))} observed cells.
             </div>
-            <div className="rounded-2xl border border-white/20 bg-white/70 p-4 dark:border-white/10 dark:bg-slate-950/50">
+            <div className="rounded-2xl border border-white/20 bg-white p-4 dark:border-white/10 dark:bg-slate-950">
               Estimated in-browser footprint is <span className="font-semibold text-slate-950 dark:text-white">{formatBytes(metrics.memoryBytes)}</span>, based on DuckDB string-size estimates for all visible values.
             </div>
-            <div className="rounded-2xl border border-white/20 bg-white/70 p-4 dark:border-white/10 dark:bg-slate-950/50">
+            <div className="rounded-2xl border border-white/20 bg-white p-4 dark:border-white/10 dark:bg-slate-950">
               {metrics.outlierColumns === 0
                 ? "Numeric columns are broadly stable under an IQR scan."
                 : `${metrics.outlierColumns} numeric column${metrics.outlierColumns === 1 ? "" : "s"} exceed the outlier significance threshold and deserve follow-up.`}

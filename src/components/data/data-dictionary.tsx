@@ -151,7 +151,7 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
       <motion.section
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-gray-200/70 bg-white/85 p-5 shadow-sm backdrop-blur dark:border-gray-800 dark:bg-gray-900/75"
+        className="rounded-2xl border border-gray-200/70 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900"
       >
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div className="space-y-2">
@@ -188,7 +188,7 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
             { icon: Pencil, label: "Documented", value: formatNumber(documentedCount) },
             { icon: BarChart3, label: "Coverage", value: formatPercent(completeness) },
           ].map(({ icon: Icon, label, value }) => (
-            <div key={label} className="rounded-xl border border-gray-200/70 bg-white/70 p-4 dark:border-gray-800 dark:bg-gray-950/40">
+            <div key={label} className="rounded-xl border border-gray-200/70 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
               <div className="mb-2 flex items-center gap-2 text-gray-500 dark:text-gray-400"><Icon className="h-4 w-4" /><span className="text-xs font-medium uppercase tracking-[0.16em]">{label}</span></div>
               <p className="text-xl font-semibold text-gray-900 dark:text-white">{value}</p>
             </div>
@@ -212,10 +212,10 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
         </div>
       </motion.section>
 
-      <div className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white/90 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
+      <div className="overflow-hidden rounded-2xl border border-gray-200/70 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-            <thead className="bg-gray-50/80 dark:bg-gray-950/60">
+            <thead className="bg-gray-50 dark:bg-gray-950">
               <tr className="text-left text-xs uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">
                 <th className="w-10 px-4 py-3" />
                 <th className="px-4 py-3">Column</th>
@@ -261,7 +261,7 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
                     <AnimatePresence initial={false}>
                       {isExpanded && (
                         <tr>
-                          <td colSpan={5} className="bg-gray-50/70 px-4 py-0 dark:bg-gray-950/30">
+                          <td colSpan={5} className="bg-gray-50 px-4 py-0 dark:bg-gray-950/30">
                             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                               <div className="grid gap-4 py-4 lg:grid-cols-[1.1fr,0.9fr]">
                                 <div className="space-y-3">
@@ -285,7 +285,7 @@ export default function DataDictionary({ tableName, columns, rowCount }: DataDic
                                   <div className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"><BarChart3 className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />Statistics Summary</div>
                                   <div className="grid gap-2 sm:grid-cols-2">
                                     {stats.map((item) => (
-                                      <div key={item.label} className="rounded-xl border border-gray-200/70 bg-white/80 px-3 py-2 dark:border-gray-800 dark:bg-gray-900/70">
+                                      <div key={item.label} className="rounded-xl border border-gray-200/70 bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-900">
                                         <p className="text-xs uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">{item.label}</p>
                                         <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">{item.value}</p>
                                       </div>

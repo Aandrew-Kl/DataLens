@@ -43,7 +43,7 @@ interface BookmarkEntry {
 }
 
 const GLASS_PANEL =
-  "bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20";
+  "bg-white dark:bg-slate-950 border border-white/20";
 const CARD_EASE = [0.22, 1, 0.36, 1] as const;
 const OPERATORS: BookmarkOperator[] = [
   "=",
@@ -240,7 +240,7 @@ export default function DataBookmarkManager({
   }
 
   return (
-    <section className={`overflow-hidden rounded-[2rem] ${GLASS_PANEL}`}>
+    <section className={`overflow-hidden rounded-lg ${GLASS_PANEL}`}>
       <div className="border-b border-white/15 px-5 py-5">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-700 dark:text-sky-300">
@@ -262,7 +262,7 @@ export default function DataBookmarkManager({
       </div>
 
       <div className="grid gap-5 px-5 py-5 xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="rounded-[1.75rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+        <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
           <div className="flex items-center justify-between gap-3">
             <div>
               <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -275,7 +275,7 @@ export default function DataBookmarkManager({
             <button
               type="button"
               onClick={addCriterion}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/70 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white/90 dark:bg-slate-950/40 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200"
             >
               <Plus className="h-4 w-4" />
               Add filter
@@ -290,7 +290,7 @@ export default function DataBookmarkManager({
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder="Top-value customers"
-              className="mt-2 w-full rounded-2xl border border-white/15 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-sky-400 dark:bg-slate-950/55 dark:text-slate-50"
+              className="mt-2 w-full rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-sky-400 dark:bg-slate-950 dark:text-slate-50"
             />
           </label>
 
@@ -298,7 +298,7 @@ export default function DataBookmarkManager({
             {criteria.map((criterion, index) => (
               <div
                 key={criterion.id}
-                className="grid gap-3 rounded-[1.5rem] border border-white/15 bg-white/55 p-3 dark:bg-slate-950/30 md:grid-cols-[minmax(0,1fr)_140px_minmax(0,1fr)_auto]"
+                className="grid gap-3 rounded-lg border border-white/15 bg-white p-3 dark:bg-slate-950/30 md:grid-cols-[minmax(0,1fr)_140px_minmax(0,1fr)_auto]"
               >
                 <label className="space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
@@ -309,7 +309,7 @@ export default function DataBookmarkManager({
                     onChange={(event) =>
                       updateCriterion(criterion.id, { column: event.target.value })
                     }
-                    className="w-full rounded-2xl border border-white/15 bg-white/80 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/55 dark:text-slate-50"
+                    className="w-full rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50"
                   >
                     {columns.map((column) => (
                       <option key={column.name} value={column.name}>
@@ -330,7 +330,7 @@ export default function DataBookmarkManager({
                         operator: event.target.value as BookmarkOperator,
                       })
                     }
-                    className="w-full rounded-2xl border border-white/15 bg-white/80 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/55 dark:text-slate-50"
+                    className="w-full rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50"
                   >
                     {OPERATORS.map((operator) => (
                       <option key={operator} value={operator}>
@@ -350,7 +350,7 @@ export default function DataBookmarkManager({
                       updateCriterion(criterion.id, { value: event.target.value })
                     }
                     placeholder="Example value"
-                    className="w-full rounded-2xl border border-white/15 bg-white/80 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/55 dark:text-slate-50"
+                    className="w-full rounded-2xl border border-white/15 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50"
                   />
                 </label>
 
@@ -359,7 +359,7 @@ export default function DataBookmarkManager({
                   onClick={() => removeCriterion(criterion.id)}
                   disabled={criteria.length === 1}
                   aria-label={`Remove filter ${index + 1}`}
-                  className="self-end rounded-2xl border border-white/15 bg-white/70 p-3 text-slate-500 transition hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950/40 dark:text-slate-300"
+                  className="self-end rounded-2xl border border-white/15 bg-white p-3 text-slate-500 transition hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950 dark:text-slate-300"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -379,7 +379,7 @@ export default function DataBookmarkManager({
             <button
               type="button"
               onClick={resetForm}
-              className="rounded-2xl border border-white/15 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white/90 dark:bg-slate-950/40 dark:text-slate-200"
+              className="rounded-2xl border border-white/15 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200"
             >
               Reset
             </button>
@@ -394,7 +394,7 @@ export default function DataBookmarkManager({
 
         <div className="space-y-4">
           {activeBookmark ? (
-            <div className="rounded-[1.75rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-900/35">
+            <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900/35">
               <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
                 <Filter className="h-4 w-4 text-sky-600" />
                 Quick-loaded view
@@ -418,10 +418,10 @@ export default function DataBookmarkManager({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.22, ease: CARD_EASE }}
-                  className={`rounded-[1.75rem] border p-4 shadow-lg shadow-slate-950/8 ${
+                  className={`rounded-lg border p-4 shadow-lg shadow-slate-950/8 ${
                     bookmark.id === activeBookmarkId
                       ? "border-sky-400/30 bg-sky-500/10"
-                      : "border-white/15 bg-white/45 dark:bg-slate-900/35"
+                      : "border-white/15 bg-white dark:bg-slate-900/35"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -433,7 +433,7 @@ export default function DataBookmarkManager({
                         Updated {formatTimestamp(bookmark.updatedAt)}
                       </p>
                     </div>
-                    <div className="rounded-full bg-white/70 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-950/45 dark:text-slate-300">
+                    <div className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-950 dark:text-slate-300">
                       {bookmark.criteria.length} filters
                     </div>
                   </div>
@@ -454,7 +454,7 @@ export default function DataBookmarkManager({
                     <button
                       type="button"
                       onClick={() => editBookmark(bookmark)}
-                      className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/70 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white/90 dark:bg-slate-950/40 dark:text-slate-200"
+                      className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white dark:bg-slate-950 dark:text-slate-200"
                     >
                       <Pencil className="h-4 w-4" />
                       Edit
@@ -474,7 +474,7 @@ export default function DataBookmarkManager({
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-[1.75rem] border border-dashed border-white/20 bg-white/35 px-5 py-10 text-center text-sm text-slate-500 dark:bg-slate-950/20 dark:text-slate-400"
+                className="rounded-lg border border-dashed border-white/20 bg-white/35 px-5 py-10 text-center text-sm text-slate-500 dark:bg-slate-950/20 dark:text-slate-400"
               >
                 Save a bookmark to build your quick-load list.
               </motion.div>

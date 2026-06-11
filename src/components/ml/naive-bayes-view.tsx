@@ -114,7 +114,7 @@ async function runNaiveBayes(
           (columnName) =>
             `TRY_CAST(${quoteIdentifier(columnName)} AS DOUBLE) AS ${quoteIdentifier(columnName)}`,
         )
-        .join(",\n      ")}
+        .join(",\n ")}
     FROM ${quoteIdentifier(tableName)}
     WHERE ${quoteIdentifier(targetColumn)} IS NOT NULL
       ${featureColumns
@@ -122,7 +122,7 @@ async function runNaiveBayes(
           (columnName) =>
             `AND TRY_CAST(${quoteIdentifier(columnName)} AS DOUBLE) IS NOT NULL`,
         )
-        .join("\n      ")}
+        .join("\n ")}
     LIMIT ${SAMPLE_LIMIT}
   `);
 
@@ -354,7 +354,7 @@ export default function NaiveBayesView({
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-600 dark:bg-slate-900/40 dark:text-slate-300">
+      <div className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">
         {status}
       </div>
 
@@ -366,7 +366,7 @@ export default function NaiveBayesView({
                 aria-label="Target column"
                 value={targetColumn}
                 onChange={(event) => setTargetColumn(event.currentTarget.value)}
-                className="w-full rounded-2xl border border-white/20 bg-white/80 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-500/10 dark:border-white/10 dark:bg-slate-950/55 dark:text-slate-100"
+                className="w-full rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-500/10 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100"
               >
                 {targetOptions.map((column) => (
                   <option key={column.name} value={column.name}>
@@ -385,7 +385,7 @@ export default function NaiveBayesView({
                       className={`rounded-full border px-3 py-2 text-sm transition ${
                         active
                           ? "border-violet-400 bg-violet-500/15 text-violet-700 dark:text-violet-300"
-                          : "border-white/20 bg-white/70 text-slate-700 dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-200"
+                          : "border-white/20 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-950 dark:text-slate-200"
                       }`}
                     >
                       {column.name}
@@ -413,7 +413,7 @@ export default function NaiveBayesView({
             </div>
             {result ? (
               <table className="min-w-full text-left text-sm">
-                <thead className="bg-white/50 dark:bg-slate-950/20">
+                <thead className="bg-white dark:bg-slate-950/20">
                   <tr className="text-slate-500 dark:text-slate-400">
                     <th className="px-5 py-3 font-medium">Label</th>
                     <th className="px-5 py-3 font-medium">Count</th>
@@ -445,7 +445,7 @@ export default function NaiveBayesView({
             </div>
             {result ? (
               <table className="min-w-full text-left text-sm">
-                <thead className="bg-white/50 dark:bg-slate-950/20">
+                <thead className="bg-white dark:bg-slate-950/20">
                   <tr className="text-slate-500 dark:text-slate-400">
                     <th className="px-5 py-3 font-medium">Actual</th>
                     <th className="px-5 py-3 font-medium">Predicted</th>
@@ -475,7 +475,7 @@ export default function NaiveBayesView({
             </div>
             {result ? (
               <table className="min-w-full text-left text-sm">
-                <thead className="bg-white/50 dark:bg-slate-950/20">
+                <thead className="bg-white dark:bg-slate-950/20">
                   <tr className="text-slate-500 dark:text-slate-400">
                     <th className="px-5 py-3 font-medium">Actual \ Predicted</th>
                     {result.labels.map((label) => (

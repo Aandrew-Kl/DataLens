@@ -55,7 +55,7 @@ interface TransformPanelProps {
 
 function StatPill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-gray-200/60 bg-white/50 px-3 py-2 dark:border-gray-700/60 dark:bg-gray-950/35">
+    <div className="rounded-xl border border-gray-200/60 bg-white px-3 py-2 dark:border-gray-700/60 dark:bg-gray-950/35">
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">{label}</p>
       <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-50">{value}</p>
     </div>
@@ -186,7 +186,7 @@ export default function TransformPanel({ tableName, columns, onTransformComplete
   }
 
   return (
-    <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: "easeOut" }} className="overflow-hidden rounded-2xl border border-white/30 bg-white/55 shadow-[0_20px_80px_-30px_rgba(15,23,42,0.35)] backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/55">
+    <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: "easeOut" }} className="overflow-hidden rounded-2xl border border-white/30 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900">
       <div className="border-b border-gray-200/50 px-5 py-4 dark:border-gray-700/50">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">

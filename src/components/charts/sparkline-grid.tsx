@@ -147,7 +147,7 @@ export default function SparklineGrid({ tableName, columns }: SparklineGridProps
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, ease: "easeOut" }}
-      className="rounded-2xl border border-gray-200/70 bg-white/85 p-5 shadow-sm backdrop-blur dark:border-gray-800 dark:bg-gray-900/80"
+      className="rounded-2xl border border-gray-200/70 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900"
     >
       <div className="flex flex-col gap-4 border-b border-gray-200/70 pb-4 dark:border-gray-800">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
@@ -194,7 +194,7 @@ export default function SparklineGrid({ tableName, columns }: SparklineGridProps
       ) : (
         <div className="mt-5 overflow-x-auto">
           <div className="min-w-[820px] overflow-hidden rounded-2xl border border-gray-200/70 dark:border-gray-800">
-            <div className={`${GRID_CLASS} bg-gray-50/80 text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:bg-gray-950/60 dark:text-gray-400`}>
+            <div className={`${GRID_CLASS} bg-gray-50 text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:bg-gray-950 dark:text-gray-400`}>
               {["Column", "Type", "Sparkline", "Min", "Max", "Mean"].map((label) => <div key={label} className="px-4 py-3">{label}</div>)}
             </div>
             <div className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -207,7 +207,7 @@ export default function SparklineGrid({ tableName, columns }: SparklineGridProps
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.03, duration: 0.22 }}
-                    className={`${GRID_CLASS} items-center bg-white/70 dark:bg-gray-900/40`}
+                    className={`${GRID_CLASS} items-center bg-white dark:bg-gray-900`}
                   >
                     <div className="flex min-w-0 items-center gap-3 px-4 py-3">
                       <div className="rounded-xl bg-cyan-100 p-2 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300">
@@ -222,7 +222,7 @@ export default function SparklineGrid({ tableName, columns }: SparklineGridProps
                     <div className="px-4 py-3">
                       {loading && !ready ? (
                         <div className="flex items-center gap-2">
-                          <div className="h-6 w-20 animate-pulse rounded-md bg-gray-200/80 dark:bg-gray-800/80" />
+                          <div className="h-6 w-20 animate-pulse rounded-md bg-gray-200/80 dark:bg-gray-800" />
                           <Loader2 className="h-3.5 w-3.5 animate-spin text-cyan-500" />
                         </div>
                       ) : ready ? (

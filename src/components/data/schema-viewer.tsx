@@ -20,11 +20,11 @@ type SortKey = "name" | "type" | "nullPct" | "cardinality";
 type SortDir = "asc" | "desc";
 
 const TYPE_BADGE: Record<ColumnType, { bg: string; text: string; label: string }> = {
-  number:  { bg: "bg-blue-100 dark:bg-blue-900/40",    text: "text-blue-600 dark:text-blue-400",      label: "Number" },
-  string:  { bg: "bg-emerald-100 dark:bg-emerald-900/40", text: "text-emerald-600 dark:text-emerald-400", label: "String" },
-  date:    { bg: "bg-purple-100 dark:bg-purple-900/40", text: "text-purple-600 dark:text-purple-400",  label: "Date" },
-  boolean: { bg: "bg-orange-100 dark:bg-orange-900/40", text: "text-orange-600 dark:text-orange-400",  label: "Boolean" },
-  unknown: { bg: "bg-gray-100 dark:bg-gray-800",        text: "text-gray-500 dark:text-gray-400",      label: "Unknown" },
+  number: { bg: "bg-blue-100 dark:bg-blue-900/40", text: "text-blue-600 dark:text-blue-400", label: "Number" },
+  string: { bg: "bg-emerald-100 dark:bg-emerald-900/40", text: "text-emerald-600 dark:text-emerald-400", label: "String" },
+  date: { bg: "bg-purple-100 dark:bg-purple-900/40", text: "text-purple-600 dark:text-purple-400", label: "Date" },
+  boolean: { bg: "bg-orange-100 dark:bg-orange-900/40", text: "text-orange-600 dark:text-orange-400", label: "Boolean" },
+  unknown: { bg: "bg-gray-100 dark:bg-gray-800", text: "text-gray-500 dark:text-gray-400", label: "Unknown" },
 };
 
 const TYPE_ICON: Record<ColumnType, React.ElementType> = {
@@ -40,13 +40,13 @@ function getCardinality(col: ColumnProfile, rows: number) {
 }
 function nullColor(pct: number) {
   if (pct === 0) return "bg-emerald-500";
-  if (pct < 5)   return "bg-emerald-400";
-  if (pct < 20)  return "bg-amber-400";
+  if (pct < 5) return "bg-emerald-400";
+  if (pct < 20) return "bg-amber-400";
   return "bg-red-400";
 }
 
 /* ------------------------------------------------------------------ */
-/*  Schema Summary Card                                                */
+/* Schema Summary Card */
 /* ------------------------------------------------------------------ */
 function SchemaSummary({ columns, rowCount }: { columns: ColumnProfile[]; rowCount: number }) {
   const totalCells = columns.length * rowCount;
@@ -64,7 +64,7 @@ function SchemaSummary({ columns, rowCount }: { columns: ColumnProfile[]; rowCou
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
-      className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white/80 dark:bg-gray-900/60 backdrop-blur-sm p-5">
+      className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white dark:bg-gray-900 p-5">
       <div className="flex items-center gap-2 mb-4">
         <Database className="h-4 w-4 text-indigo-500" />
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Schema Summary</h3>
@@ -115,7 +115,7 @@ function StatLine({ label, value }: { label: string; value: string | number }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Expanded detail row (fetches stddev via DuckDB)                    */
+/* Expanded detail row (fetches stddev via DuckDB) */
 /* ------------------------------------------------------------------ */
 function ExpandedDetail({ col, tableName, rowCount }: { col: ColumnProfile; tableName: string; rowCount: number }) {
   const isNumeric = col.type === "number";
@@ -137,7 +137,7 @@ function ExpandedDetail({ col, tableName, rowCount }: { col: ColumnProfile; tabl
   return (
     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
       exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: "easeInOut" }} className="overflow-hidden">
-      <div className="px-6 py-4 grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-50/60 dark:bg-gray-800/30 border-t border-gray-100 dark:border-gray-800">
+      <div className="px-6 py-4 grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-50 dark:bg-gray-800/30 border-t border-gray-100 dark:border-gray-800">
         {/* Null analysis */}
         <div className="space-y-1.5">
           <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-semibold">Null Analysis</p>
@@ -182,7 +182,7 @@ function ExpandedDetail({ col, tableName, rowCount }: { col: ColumnProfile; tabl
       </div>
       {/* Sample values */}
       {col.sampleValues.length > 0 && (
-        <div className="px-6 pb-3 bg-gray-50/60 dark:bg-gray-800/30">
+        <div className="px-6 pb-3 bg-gray-50 dark:bg-gray-800/30">
           <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-semibold mb-1.5">Sample Values</p>
           <div className="flex flex-wrap gap-1">
             {col.sampleValues.slice(0, 3).map((v, i) => (
@@ -198,7 +198,7 @@ function ExpandedDetail({ col, tableName, rowCount }: { col: ColumnProfile; tabl
 }
 
 /* ------------------------------------------------------------------ */
-/*  Sortable table header                                              */
+/* Sortable table header */
 /* ------------------------------------------------------------------ */
 function SortHeader({ label, sortKey, currentKey, onSort, align = "left" }: {
   label: string; sortKey: SortKey; currentKey: SortKey;
@@ -217,7 +217,7 @@ function SortHeader({ label, sortKey, currentKey, onSort, align = "left" }: {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Main Component                                                     */
+/* Main Component */
 /* ------------------------------------------------------------------ */
 export default function SchemaViewer({ tableName, columns, rowCount }: SchemaViewerProps) {
   const [search, setSearch] = useState("");
@@ -301,10 +301,10 @@ export default function SchemaViewer({ tableName, columns, rowCount }: SchemaVie
       </div>
 
       {/* Schema table */}
-      <div className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 overflow-hidden bg-white/80 dark:bg-gray-900/60 backdrop-blur-sm">
+      <div className="rounded-xl border border-gray-200/60 dark:border-gray-700/50 overflow-hidden bg-white dark:bg-gray-900 ">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 dark:bg-gray-800/60">
+            <tr className="bg-gray-50 dark:bg-gray-800">
               <th className="w-8" />
               <SortHeader label="Column" sortKey="name" currentKey={sortKey} onSort={handleSort} />
               <SortHeader label="Type" sortKey="type" currentKey={sortKey} onSort={handleSort} />

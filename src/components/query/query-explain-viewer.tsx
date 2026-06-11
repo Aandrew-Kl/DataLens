@@ -44,9 +44,9 @@ interface CompareSummary {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const GLASS_PANEL_CLASS =
-  "border border-white/20 bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45";
+  "border border-white/20 bg-white dark:bg-slate-950";
 const FIELD_CLASS =
-  "w-full rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950/65 dark:text-slate-100";
+  "w-full rounded-2xl border border-slate-200/70 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-100";
 const BUTTON_CLASS =
   "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60";
 
@@ -197,7 +197,7 @@ export default function QueryExplainViewer({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, ease: EASE }}
-      className={`rounded-[2rem] p-6 shadow-[0_28px_90px_-52px_rgba(15,23,42,0.85)] ${GLASS_PANEL_CLASS}`}
+      className={`rounded-lg p-6 shadow-sm ${GLASS_PANEL_CLASS}`}
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
@@ -231,7 +231,7 @@ export default function QueryExplainViewer({
       </div>
 
       <div className="mt-6 grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-        <div className={`rounded-[1.75rem] p-5 ${GLASS_PANEL_CLASS}`}>
+        <div className={`rounded-lg p-5 ${GLASS_PANEL_CLASS}`}>
           <label className="block">
             <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               SQL query
@@ -262,7 +262,7 @@ export default function QueryExplainViewer({
               type="button"
               onClick={handleUseAsBaseline}
               disabled={!currentRun}
-              className={`${BUTTON_CLASS} border border-white/20 bg-white/70 text-slate-800 hover:bg-white dark:bg-slate-950/45 dark:text-slate-100 dark:hover:bg-slate-950/60`}
+              className={`${BUTTON_CLASS} border border-white/20 bg-white text-slate-800 hover:bg-white dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-950`}
             >
               <ArrowLeftRight className="h-4 w-4" />
               Use current as baseline
@@ -295,7 +295,7 @@ export default function QueryExplainViewer({
           ) : null}
         </div>
 
-        <div className={`rounded-[1.75rem] p-5 ${GLASS_PANEL_CLASS}`}>
+        <div className={`rounded-lg p-5 ${GLASS_PANEL_CLASS}`}>
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
             <h3 className="text-lg font-semibold text-slate-950 dark:text-white">
@@ -315,7 +315,7 @@ export default function QueryExplainViewer({
                   className={`rounded-3xl border px-4 py-4 ${
                     node.expensive
                       ? "border-amber-500/25 bg-amber-500/10"
-                      : "border-white/20 bg-white/60 dark:bg-slate-950/35"
+                      : "border-white/20 bg-white dark:bg-slate-950/35"
                   }`}
                   style={{ marginLeft: `${node.depth * 16}px` }}
                 >

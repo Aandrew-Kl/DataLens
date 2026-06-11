@@ -311,7 +311,7 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
   }
 
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-white/20 bg-white/60 shadow-2xl shadow-slate-950/10 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45">
+    <section className="overflow-hidden rounded-lg border border-white/20 bg-white shadow-2xl shadow-slate-950/10 dark:border-white/10 dark:bg-slate-950">
       <div className="border-b border-white/15 px-5 py-5">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-700 dark:text-amber-300">
@@ -328,21 +328,21 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
         {notice ? <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">{notice}</div> : null}
 
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE }} className="grid gap-4 lg:grid-cols-[1.2fr_0.9fr]">
-          <div className="space-y-4 rounded-[1.75rem] border border-white/15 bg-white/50 p-4 dark:bg-slate-900/40">
+          <div className="space-y-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900">
             <div className="grid gap-3 md:grid-cols-4">
-              <select value={config.chartType} onChange={(event) => setConfig((current) => ({ ...current, chartType: event.target.value as ChartType }))} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+              <select value={config.chartType} onChange={(event) => setConfig((current) => ({ ...current, chartType: event.target.value as ChartType }))} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                 <option value="bar">Bar</option>
                 <option value="line">Line</option>
                 <option value="area">Area</option>
                 <option value="scatter">Scatter</option>
               </select>
-              <select value={config.xColumn} onChange={(event) => setConfig((current) => ({ ...current, xColumn: event.target.value }))} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+              <select value={config.xColumn} onChange={(event) => setConfig((current) => ({ ...current, xColumn: event.target.value }))} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                 {columns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
               </select>
-              <select value={config.yColumn} onChange={(event) => setConfig((current) => ({ ...current, yColumn: event.target.value }))} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+              <select value={config.yColumn} onChange={(event) => setConfig((current) => ({ ...current, yColumn: event.target.value }))} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                 {columns.map((column) => <option key={column.name} value={column.name}>{column.name}</option>)}
               </select>
-              <select value={config.aggregation} onChange={(event) => setConfig((current) => ({ ...current, aggregation: event.target.value as ChartConfig["aggregation"] }))} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+              <select value={config.aggregation} onChange={(event) => setConfig((current) => ({ ...current, aggregation: event.target.value as ChartConfig["aggregation"] }))} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                 <option value="SUM">SUM</option>
                 <option value="AVG">AVG</option>
                 <option value="COUNT">COUNT</option>
@@ -354,13 +354,13 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
                 <LineChart className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                 {loading ? "Loading chart" : "Load chart"}
               </button>
-              <button type="button" onClick={exportPng} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+              <button type="button" onClick={exportPng} className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:text-slate-200">
                 <Download className="h-4 w-4" />
                 Export PNG
               </button>
             </div>
 
-            <div className="overflow-hidden rounded-[1.5rem] border border-white/15 bg-white/35 p-3 dark:bg-slate-950/30">
+            <div className="overflow-hidden rounded-lg border border-white/15 bg-white/35 p-3 dark:bg-slate-950/30">
               <ReactECharts ref={chartRef} option={option} style={{ height: 420 }} onEvents={{ click: (params: { value?: number[] | number; name?: string }) => {
                 if (config.chartType === "scatter" && Array.isArray(params.value)) {
                   setPointX(String(params.value[0] ?? ""));
@@ -374,32 +374,32 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
             </div>
           </div>
 
-          <div className="space-y-4 rounded-[1.75rem] border border-white/15 bg-white/50 p-4 dark:bg-slate-900/40">
+          <div className="space-y-4 rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-900">
             <div className="grid gap-3">
-              <select value={annotationKind} onChange={(event) => setAnnotationKind(event.target.value as AnnotationKind)} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+              <select value={annotationKind} onChange={(event) => setAnnotationKind(event.target.value as AnnotationKind)} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                 <option value="text">Text annotation</option>
                 <option value="line">Reference line</option>
                 <option value="region">Highlight region</option>
               </select>
-              <input value={label} onChange={(event) => setLabel(event.target.value)} placeholder="Label" className="w-full rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
-              <input value={color} onChange={(event) => setColor(event.target.value)} type="color" className="h-12 w-full rounded-2xl border border-white/20 bg-white/70 px-3 py-2 dark:bg-slate-950/60" />
+              <input value={label} onChange={(event) => setLabel(event.target.value)} placeholder="Label" className="w-full rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
+              <input value={color} onChange={(event) => setColor(event.target.value)} type="color" className="h-12 w-full rounded-2xl border border-white/20 bg-white px-3 py-2 dark:bg-slate-950" />
               {annotationKind === "text" ? (
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <input value={pointX} onChange={(event) => setPointX(event.target.value)} placeholder="X value" className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
-                  <input value={pointY} onChange={(event) => setPointY(event.target.value)} placeholder="Y value" className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
+                  <input value={pointX} onChange={(event) => setPointX(event.target.value)} placeholder="X value" className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
+                  <input value={pointY} onChange={(event) => setPointY(event.target.value)} placeholder="Y value" className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
                 </div>
               ) : null}
               {annotationKind !== "text" ? (
-                <select value={axis} onChange={(event) => setAxis(event.target.value as "x" | "y")} className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50">
+                <select value={axis} onChange={(event) => setAxis(event.target.value as "x" | "y")} className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50">
                   <option value="x">Vertical / X axis</option>
                   <option value="y">Horizontal / Y axis</option>
                 </select>
               ) : null}
-              {annotationKind === "line" ? <input value={lineValue} onChange={(event) => setLineValue(event.target.value)} placeholder="Line value" className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" /> : null}
+              {annotationKind === "line" ? <input value={lineValue} onChange={(event) => setLineValue(event.target.value)} placeholder="Line value" className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" /> : null}
               {annotationKind === "region" ? (
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <input value={regionStart} onChange={(event) => setRegionStart(event.target.value)} placeholder="Start" className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
-                  <input value={regionEnd} onChange={(event) => setRegionEnd(event.target.value)} placeholder="End" className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950/60 dark:text-slate-50" />
+                  <input value={regionStart} onChange={(event) => setRegionStart(event.target.value)} placeholder="Start" className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
+                  <input value={regionEnd} onChange={(event) => setRegionEnd(event.target.value)} placeholder="End" className="rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm text-slate-950 outline-none dark:bg-slate-950 dark:text-slate-50" />
                 </div>
               ) : null}
               <div className="grid gap-2 sm:grid-cols-2">
@@ -407,7 +407,7 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
                   <Plus className="h-4 w-4" />
                   {editingId ? "Update" : "Add"}
                 </button>
-                <button type="button" onClick={resetEditor} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+                <button type="button" onClick={resetEditor} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-4 py-3 text-sm text-slate-700 transition hover:bg-white dark:text-slate-200">
                   <Trash2 className="h-4 w-4" />
                   Reset
                 </button>
@@ -418,12 +418,12 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
               <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Annotation panel</h3>
               <AnimatePresence initial={false}>
                 {annotations.length === 0 ? (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-[1.5rem] border border-dashed border-white/20 bg-white/35 px-5 py-8 text-center text-sm text-slate-500 dark:bg-slate-900/30 dark:text-slate-400">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-lg border border-dashed border-white/20 bg-white/35 px-5 py-8 text-center text-sm text-slate-500 dark:bg-slate-900/30 dark:text-slate-400">
                     No annotations saved for the current chart shape.
                   </motion.div>
                 ) : (
                   annotations.map((annotation) => (
-                    <motion.article key={annotation.id} layout initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.24, ease: EASE }} className="rounded-[1.25rem] border border-white/15 bg-white/35 p-4 dark:bg-slate-900/30">
+                    <motion.article key={annotation.id} layout initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.24, ease: EASE }} className="rounded-lg border border-white/15 bg-white/35 p-4 dark:bg-slate-900/30">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-2">
@@ -434,7 +434,7 @@ export default function ChartAnnotator({ tableName, columns }: ChartAnnotatorPro
                           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{annotationSummary(annotation)}</p>
                         </div>
                         <div className="flex gap-2">
-                          <button type="button" onClick={() => editAnnotation(annotation)} className="rounded-2xl border border-white/20 p-2 text-slate-700 transition hover:bg-white/40 dark:text-slate-200">
+                          <button type="button" onClick={() => editAnnotation(annotation)} className="rounded-2xl border border-white/20 p-2 text-slate-700 transition hover:bg-white dark:text-slate-200">
                             <Pencil className="h-4 w-4" />
                           </button>
                           <button type="button" onClick={() => deleteAnnotation(annotation.id)} className="rounded-2xl border border-rose-300/40 bg-rose-500/10 p-2 text-rose-700 transition hover:bg-rose-500/15 dark:text-rose-300">

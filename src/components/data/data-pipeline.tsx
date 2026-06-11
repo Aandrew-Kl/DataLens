@@ -41,9 +41,9 @@ type Notice = { tone: "error" | "success" | "info"; message: string } | null;
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const panelClass =
-  "overflow-hidden rounded-[28px] border border-white/20 bg-white/75 shadow-[0_24px_90px_-48px_rgba(15,23,42,0.75)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "overflow-hidden rounded-lg border border-white/20 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 const fieldClass =
-  "w-full rounded-2xl border border-slate-200/70 bg-white/85 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950/65 dark:text-slate-100";
+  "w-full rounded-2xl border border-slate-200/70 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-100";
 const STORAGE_KEY = "datalens:pipelines";
 
 function readPipelines(tableName: string) {
@@ -68,7 +68,7 @@ function makeId() {
 
 function EmptyPipelineState() {
   return (
-    <div className="rounded-[26px] border border-dashed border-slate-300/80 bg-slate-50/80 p-8 text-center dark:border-slate-700 dark:bg-slate-950/30">
+    <div className="rounded-lg border border-dashed border-slate-300/80 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-950/30">
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
         <WandSparkles className="h-5 w-5" />
       </div>
@@ -80,7 +80,7 @@ function EmptyPipelineState() {
 
 function PipelineGuide() {
   return (
-    <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/75 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+    <div className="rounded-lg border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/35">
       <p className="text-sm font-semibold text-slate-900 dark:text-white">Pipeline guide</p>
       <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
         <li>Filter and sort steps are row-preserving and work well near the top of the flow.</li>
@@ -108,7 +108,7 @@ function PreviewSummary({
   ];
   return (
     <div className="grid gap-3 md:grid-cols-3">
-      {items.map((item) => <div key={item.label} className="rounded-2xl border border-slate-200/70 bg-slate-50/80 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/30"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">{item.label}</p><p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">{item.value}</p></div>)}
+      {items.map((item) => <div key={item.label} className="rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/30"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">{item.label}</p><p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">{item.value}</p></div>)}
     </div>
   );
 }
@@ -132,7 +132,7 @@ function SQLNotes() {
   ];
 
   return (
-    <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+    <div className="rounded-lg border border-slate-200/70 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
       <p className="text-sm font-semibold text-slate-900 dark:text-white">Execution notes</p>
       <div className="mt-3 space-y-3">
         {notes.map((note, index) => (
@@ -154,11 +154,11 @@ function PipelinePatterns() {
     { title: "Sample last", detail: "Place sampling near the end of the flow when you want a cheap preview of the final result instead of altering upstream logic." },
   ];
   return (
-    <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/75 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+    <div className="rounded-lg border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/35">
       <p className="text-sm font-semibold text-slate-900 dark:text-white">Common patterns</p>
       <div className="mt-3 space-y-3">
         {patterns.map((pattern) => (
-          <div key={pattern.title} className="rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/40">
+          <div key={pattern.title} className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-950">
             <p className="text-sm font-medium text-slate-900 dark:text-white">{pattern.title}</p>
             <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{pattern.detail}</p>
           </div>
@@ -170,7 +170,7 @@ function PipelinePatterns() {
 
 function StorageNotes() {
   return (
-    <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+    <div className="rounded-lg border border-slate-200/70 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
       <p className="text-sm font-semibold text-slate-900 dark:text-white">Persistence behavior</p>
       <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
         <li>Saved pipelines are scoped to the current table name in localStorage.</li>
@@ -200,7 +200,7 @@ function StepCard({
   onRemove: () => void;
 }) {
   return (
-    <motion.div layout initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.26, ease }} className="relative rounded-[26px] border border-slate-200/70 bg-white/75 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+    <motion.div layout initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.26, ease }} className="relative rounded-lg border border-slate-200/70 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">{index + 1}</div>
@@ -210,8 +210,8 @@ function StepCard({
           </div>
         </div>
         <div className="flex gap-2">
-          <button type="button" onClick={() => onMove(-1)} disabled={index === 0} className="rounded-xl border border-slate-300/80 p-2 text-slate-600 transition hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-900/60"><ArrowUp className="h-4 w-4" /></button>
-          <button type="button" onClick={() => onMove(1)} disabled={index === total - 1} className="rounded-xl border border-slate-300/80 p-2 text-slate-600 transition hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-900/60"><ArrowDown className="h-4 w-4" /></button>
+          <button type="button" onClick={() => onMove(-1)} disabled={index === 0} className="rounded-xl border border-slate-300/80 p-2 text-slate-600 transition hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-900"><ArrowUp className="h-4 w-4" /></button>
+          <button type="button" onClick={() => onMove(1)} disabled={index === total - 1} className="rounded-xl border border-slate-300/80 p-2 text-slate-600 transition hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-900"><ArrowDown className="h-4 w-4" /></button>
           <button type="button" onClick={onRemove} className="rounded-xl border border-rose-300/60 p-2 text-rose-600 transition hover:bg-rose-50 dark:border-rose-500/30 dark:text-rose-300 dark:hover:bg-rose-500/10"><Trash2 className="h-4 w-4" /></button>
         </div>
       </div>
@@ -235,7 +235,7 @@ function StepCard({
         {(step.type === "group" || step.type === "remove-column" || step.type === "deduplicate") && (
           <div className="md:col-span-2 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{step.type === "group" ? "Grouping keys" : step.type === "remove-column" ? "Columns to drop" : "Deduplicate using these keys"}</p>
-            <div className="flex flex-wrap gap-2">{columns.map((name) => <button key={name} type="button" onClick={() => onUpdate({ [step.type === "group" ? "groupColumns" : "columns"]: toggleSelection(step.type === "group" ? step.groupColumns : step.columns, name) } as Partial<PipelineStep>)} className={`rounded-full border px-3 py-1.5 text-sm transition ${(step.type === "group" ? step.groupColumns : step.columns).includes(name) ? "border-cyan-400/50 bg-cyan-500/10 text-cyan-700 dark:border-cyan-500/35 dark:text-cyan-300" : "border-slate-200 bg-white text-slate-600 dark:border-slate-700 dark:bg-slate-950/50 dark:text-slate-300"}`}>{name}</button>)}</div>
+            <div className="flex flex-wrap gap-2">{columns.map((name) => <button key={name} type="button" onClick={() => onUpdate({ [step.type === "group" ? "groupColumns" : "columns"]: toggleSelection(step.type === "group" ? step.groupColumns : step.columns, name) } as Partial<PipelineStep>)} className={`rounded-full border px-3 py-1.5 text-sm transition ${(step.type === "group" ? step.groupColumns : step.columns).includes(name) ? "border-cyan-400/50 bg-cyan-500/10 text-cyan-700 dark:border-cyan-500/35 dark:text-cyan-300" : "border-slate-200 bg-white text-slate-600 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300"}`}>{name}</button>)}</div>
           </div>
         )}
 
@@ -243,7 +243,7 @@ function StepCard({
           <>
             <div className="md:col-span-2 space-y-2">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Optional group keys</p>
-              <div className="flex flex-wrap gap-2">{columns.map((name) => <button key={name} type="button" onClick={() => onUpdate({ groupColumns: toggleSelection(step.groupColumns, name) })} className={`rounded-full border px-3 py-1.5 text-sm transition ${step.groupColumns.includes(name) ? "border-cyan-400/50 bg-cyan-500/10 text-cyan-700 dark:border-cyan-500/35 dark:text-cyan-300" : "border-slate-200 bg-white text-slate-600 dark:border-slate-700 dark:bg-slate-950/50 dark:text-slate-300"}`}>{name}</button>)}</div>
+              <div className="flex flex-wrap gap-2">{columns.map((name) => <button key={name} type="button" onClick={() => onUpdate({ groupColumns: toggleSelection(step.groupColumns, name) })} className={`rounded-full border px-3 py-1.5 text-sm transition ${step.groupColumns.includes(name) ? "border-cyan-400/50 bg-cyan-500/10 text-cyan-700 dark:border-cyan-500/35 dark:text-cyan-300" : "border-slate-200 bg-white text-slate-600 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300"}`}>{name}</button>)}</div>
             </div>
             <select value={step.aggregateFunction} onChange={(event) => onUpdate({ aggregateFunction: event.target.value as AggregateFunction })} className={fieldClass}>{["COUNT", "SUM", "AVG", "MIN", "MAX"].map((name) => <option key={name} value={name}>{name}</option>)}</select>
             <select value={step.aggregateColumn} onChange={(event) => onUpdate({ aggregateColumn: event.target.value })} className={fieldClass}>{columns.map((name) => <option key={name} value={name}>{name}</option>)}</select>
@@ -388,7 +388,7 @@ export default function DataPipeline({ tableName, columns }: DataPipelineProps) 
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={runPipeline} disabled={runningPipeline} className="inline-flex items-center gap-2 rounded-2xl bg-cyan-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-cyan-500 disabled:cursor-not-allowed disabled:opacity-60">{runningPipeline ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}Run pipeline</button>
-            <button type="button" onClick={() => downloadFile(`${compiled.sql};\n`, `${tableName}-pipeline.sql`, "text/sql;charset=utf-8;")} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300/80 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900/60"><Download className="h-4 w-4" />Export SQL</button>
+            <button type="button" onClick={() => downloadFile(`${compiled.sql};\n`, `${tableName}-pipeline.sql`, "text/sql;charset=utf-8;")} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300/80 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"><Download className="h-4 w-4" />Export SQL</button>
           </div>
         </div>
       </div>
@@ -396,7 +396,7 @@ export default function DataPipeline({ tableName, columns }: DataPipelineProps) 
       <div className="grid gap-6 px-6 py-6 xl:grid-cols-[1.2fr_0.8fr]">
         <div className="space-y-5">
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {(Object.keys(STEP_META) as StepType[]).map((type) => <button key={type} type="button" onClick={() => setSteps((current) => [...current, createPipelineStep(type, columns)])} className="rounded-3xl border border-slate-200/70 bg-white/65 p-4 text-left transition hover:border-cyan-300 dark:border-slate-700/70 dark:bg-slate-950/35 dark:hover:border-cyan-500/35"><p className="text-sm font-semibold text-slate-900 dark:text-white">{STEP_META[type].label}</p><p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{STEP_META[type].hint}</p></button>)}
+            {(Object.keys(STEP_META) as StepType[]).map((type) => <button key={type} type="button" onClick={() => setSteps((current) => [...current, createPipelineStep(type, columns)])} className="rounded-3xl border border-slate-200/70 bg-white p-4 text-left transition hover:border-cyan-300 dark:border-slate-700/70 dark:bg-slate-950/35 dark:hover:border-cyan-500/35"><p className="text-sm font-semibold text-slate-900 dark:text-white">{STEP_META[type].label}</p><p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{STEP_META[type].hint}</p></button>)}
           </div>
 
           <div className="relative space-y-4">
@@ -407,13 +407,13 @@ export default function DataPipeline({ tableName, columns }: DataPipelineProps) 
             {steps.length === 0 && <EmptyPipelineState />}
           </div>
 
-          <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/75 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+          <div className="rounded-lg border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/35">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div><p className="text-sm font-semibold text-slate-900 dark:text-white">Save or load pipelines</p><p className="text-xs text-slate-500 dark:text-slate-400">Persist reusable flows for this table in localStorage.</p></div>
               <div className="flex gap-2"><input value={pipelineName} onChange={(event) => setPipelineName(event.target.value)} placeholder="Pipeline name" className={fieldClass} /><button type="button" onClick={savePipeline} className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-medium text-white dark:bg-slate-100 dark:text-slate-900"><Save className="h-4 w-4" />Save</button></div>
             </div>
             <div className="mt-4 space-y-3">
-              {savedPipelines.length === 0 ? <p className="text-sm text-slate-500 dark:text-slate-400">No saved pipelines yet.</p> : savedPipelines.map((pipeline) => <div key={pipeline.id} className="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-4 dark:border-slate-800 dark:bg-slate-950/45 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-sm font-medium text-slate-900 dark:text-white">{pipeline.name}</p><p className="text-xs text-slate-500 dark:text-slate-400">{pipeline.steps.length} steps · {new Date(pipeline.savedAt).toLocaleString()}</p></div><div className="flex gap-2"><button type="button" onClick={() => setSteps(pipeline.steps)} className="rounded-xl border border-cyan-400/40 px-3 py-2 text-sm text-cyan-700 transition hover:bg-cyan-500/10 dark:text-cyan-300">Load</button><button type="button" onClick={() => { const next = savedPipelines.filter((item) => item.id !== pipeline.id); setSavedPipelines(next); writePipelines(tableName, next); }} className="rounded-xl border border-rose-300/60 px-3 py-2 text-sm text-rose-700 transition hover:bg-rose-500/10 dark:text-rose-300">Delete</button></div></div>)}
+              {savedPipelines.length === 0 ? <p className="text-sm text-slate-500 dark:text-slate-400">No saved pipelines yet.</p> : savedPipelines.map((pipeline) => <div key={pipeline.id} className="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white p-4 dark:border-slate-800 dark:bg-slate-950 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-sm font-medium text-slate-900 dark:text-white">{pipeline.name}</p><p className="text-xs text-slate-500 dark:text-slate-400">{pipeline.steps.length} steps · {new Date(pipeline.savedAt).toLocaleString()}</p></div><div className="flex gap-2"><button type="button" onClick={() => setSteps(pipeline.steps)} className="rounded-xl border border-cyan-400/40 px-3 py-2 text-sm text-cyan-700 transition hover:bg-cyan-500/10 dark:text-cyan-300">Load</button><button type="button" onClick={() => { const next = savedPipelines.filter((item) => item.id !== pipeline.id); setSavedPipelines(next); writePipelines(tableName, next); }} className="rounded-xl border border-rose-300/60 px-3 py-2 text-sm text-rose-700 transition hover:bg-rose-500/10 dark:text-rose-300">Delete</button></div></div>)}
             </div>
           </div>
           <PipelineGuide />
@@ -422,21 +422,21 @@ export default function DataPipeline({ tableName, columns }: DataPipelineProps) 
         <div className="space-y-4">
           {notice && <div className={`rounded-2xl border px-4 py-3 text-sm ${notice.tone === "error" ? "border-rose-400/40 bg-rose-500/10 text-rose-700 dark:text-rose-300" : notice.tone === "success" ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "border-cyan-400/40 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300"}`}>{notice.message}</div>}
 
-          <div className="rounded-[26px] border border-slate-200/70 bg-white/65 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+          <div className="rounded-lg border border-slate-200/70 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
             <div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-900 dark:text-white">Live preview</p><p className="text-xs text-slate-500 dark:text-slate-400">First 100 rows from the compiled query · {formatNumber(previewCount)} total rows</p></div>{loadingPreview && <Loader2 className="h-4 w-4 animate-spin text-cyan-500" />}</div>
             <div className="mt-4"><PreviewSummary stepCount={steps.length} previewCount={previewCount} previewColumns={previewColumns} /></div>
             <div className="mt-4"><PipelineStatusStrip steps={steps.length} savedCount={savedPipelines.length} /></div>
             <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800">
               <div className="max-h-[420px] overflow-auto">
                 <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
-                  <thead className="bg-slate-50/80 dark:bg-slate-900/70"><tr>{previewColumns.map((name) => <th key={name} className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">{name}</th>)}</tr></thead>
-                  <tbody className="divide-y divide-slate-200/70 bg-white/80 dark:divide-slate-800 dark:bg-slate-950/40">{previewRows.map((row, index) => <tr key={`${index}-${Object.values(row).join("|")}`} className="align-top">{previewColumns.map((name) => <td key={`${index}-${name}`} className="max-w-[220px] truncate px-4 py-3 text-slate-700 dark:text-slate-200">{String(row[name] ?? "null")}</td>)}</tr>)}</tbody>
+                  <thead className="bg-slate-50 dark:bg-slate-900"><tr>{previewColumns.map((name) => <th key={name} className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">{name}</th>)}</tr></thead>
+                  <tbody className="divide-y divide-slate-200/70 bg-white dark:divide-slate-800 dark:bg-slate-950">{previewRows.map((row, index) => <tr key={`${index}-${Object.values(row).join("|")}`} className="align-top">{previewColumns.map((name) => <td key={`${index}-${name}`} className="max-w-[220px] truncate px-4 py-3 text-slate-700 dark:text-slate-200">{String(row[name] ?? "null")}</td>)}</tr>)}</tbody>
                 </table>
               </div>
             </div>
           </div>
 
-          <div className="rounded-[26px] border border-slate-200/70 bg-slate-50/75 p-5 dark:border-slate-800 dark:bg-slate-950/35">
+          <div className="rounded-lg border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/35">
             <p className="text-sm font-semibold text-slate-900 dark:text-white">Compiled SQL</p>
             <textarea readOnly value={compiled.sql} className="mt-3 h-72 w-full rounded-2xl border border-slate-200/70 bg-slate-950 px-4 py-3 font-mono text-xs text-slate-100 outline-none dark:border-slate-700" />
           </div>

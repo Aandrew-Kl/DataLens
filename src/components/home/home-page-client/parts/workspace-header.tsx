@@ -43,7 +43,7 @@ export function WorkspaceHeader({
   onToggleTheme,
 }: WorkspaceHeaderProps) {
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur-xl dark:border-slate-700/50 dark:bg-gray-900/80">
+    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white dark:border-slate-700/50 dark:bg-gray-900">
       <div className="flex items-center justify-between px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           {datasetCount === 0 && (

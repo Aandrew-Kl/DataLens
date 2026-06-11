@@ -58,7 +58,7 @@ interface SummaryBundle {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PANEL_CLASS =
-  "overflow-hidden rounded-[1.9rem] border border-white/20 bg-white/75 shadow-[0_24px_90px_-48px_rgba(15,23,42,0.75)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "overflow-hidden rounded-lg border border-white/20 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 
 const DEFAULT_SECTIONS: Record<SectionKey, boolean> = {
   summary: true,
@@ -463,7 +463,7 @@ function CollapsibleSection({
   children: ReactNode;
 }) {
   return (
-    <div className="rounded-[1.5rem] border border-white/15 bg-white/45 dark:bg-slate-950/30">
+    <div className="rounded-lg border border-white/15 bg-white dark:bg-slate-950/30">
       <button
         type="button"
         onClick={() => onToggle(sectionKey)}
@@ -478,7 +478,7 @@ function CollapsibleSection({
         <motion.div
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.28, ease: EASE }}
-          className="rounded-full border border-white/15 bg-white/55 p-2 text-slate-500 dark:bg-slate-950/45 dark:text-slate-300"
+          className="rounded-full border border-white/15 bg-white p-2 text-slate-500 dark:bg-slate-950 dark:text-slate-300"
         >
           <ChevronDown className="h-4 w-4" />
         </motion.div>
@@ -557,7 +557,7 @@ export default function DataSummarizer({
             <button
               type="button"
               onClick={() => void handleCopy()}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/55 px-3 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
             >
               <Copy className="h-4 w-4" />
               Copy
@@ -565,7 +565,7 @@ export default function DataSummarizer({
             <button
               type="button"
               onClick={() => handleExport("markdown")}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/55 px-3 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
             >
               <FileText className="h-4 w-4" />
               Export Markdown
@@ -573,7 +573,7 @@ export default function DataSummarizer({
             <button
               type="button"
               onClick={() => handleExport("text")}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/55 px-3 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-cyan-300/40 dark:bg-slate-950/35 dark:text-slate-200"
             >
               <Download className="h-4 w-4" />
               Export Text
@@ -595,7 +595,7 @@ export default function DataSummarizer({
 
       <div className="space-y-4 px-5 py-5">
         <div className="grid gap-3 md:grid-cols-3">
-          <div className="rounded-[1.5rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-950/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/30">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Rows
             </div>
@@ -603,7 +603,7 @@ export default function DataSummarizer({
               {formatNumber(rowCount)}
             </div>
           </div>
-          <div className="rounded-[1.5rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-950/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/30">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Columns
             </div>
@@ -611,7 +611,7 @@ export default function DataSummarizer({
               {formatNumber(columns.length)}
             </div>
           </div>
-          <div className="rounded-[1.5rem] border border-white/15 bg-white/45 p-4 dark:bg-slate-950/30">
+          <div className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/30">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Findings generated
             </div>
@@ -651,7 +651,7 @@ export default function DataSummarizer({
             {bundle.findings.map((finding) => (
               <div
                 key={finding.id}
-                className={`rounded-[1.35rem] border px-4 py-4 ${toneClasses(finding.tone)}`}
+                className={`rounded-lg border px-4 py-4 ${toneClasses(finding.tone)}`}
               >
                 <div className="flex items-start gap-3">
                   <div className="mt-0.5">
@@ -678,7 +678,7 @@ export default function DataSummarizer({
             {bundle.snapshots.map((snapshot) => (
               <div
                 key={snapshot.name}
-                className="rounded-[1.35rem] border border-white/15 bg-white/50 p-4 dark:bg-slate-950/35"
+                className="rounded-lg border border-white/15 bg-white p-4 dark:bg-slate-950/35"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -689,7 +689,7 @@ export default function DataSummarizer({
                       {snapshot.type}
                     </div>
                   </div>
-                  <div className="rounded-full border border-white/20 bg-white/65 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-950/45 dark:text-slate-300">
+                  <div className="rounded-full border border-white/20 bg-white px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-950 dark:text-slate-300">
                     {snapshot.qualityLabel}
                   </div>
                 </div>
@@ -701,7 +701,7 @@ export default function DataSummarizer({
                     <span>Missing rate</span>
                     <span>{formatPercent(snapshot.missingRate, 1)}</span>
                   </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-white/70 dark:bg-slate-900/70">
+                  <div className="h-2 overflow-hidden rounded-full bg-white dark:bg-slate-900">
                     <div
                       className={`h-full rounded-full ${
                         snapshot.missingRate >= 25
@@ -730,7 +730,7 @@ export default function DataSummarizer({
             {bundle.recommendations.map((recommendation) => (
               <div
                 key={recommendation.id}
-                className="rounded-[1.35rem] border border-white/15 bg-white/50 px-4 py-4 dark:bg-slate-950/35"
+                className="rounded-lg border border-white/15 bg-white px-4 py-4 dark:bg-slate-950/35"
               >
                 <div className="text-sm font-semibold text-slate-950 dark:text-white">
                   {recommendation.title}

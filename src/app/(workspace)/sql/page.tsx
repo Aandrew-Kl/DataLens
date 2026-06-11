@@ -29,7 +29,7 @@ import {
 } from "@/lib/utils/formatters";
 
 const GLASS_PANEL_CLASS =
-  "bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/30 dark:border-white/10";
+  "bg-white dark:bg-slate-900 rounded-2xl border border-white/30 dark:border-white/10";
 
 function getStarterSQL(tableName: string) {
   return "SELECT *\nFROM \"" + tableName + "\"\nLIMIT 100;";
@@ -147,7 +147,7 @@ export default function SqlPage() {
               Write and run SQL directly against your active dataset.
             </p>
           </div>
-          <span className="inline-flex items-center gap-2 rounded-xl border border-white/40 bg-white/40 px-3 py-1.5 text-xs font-medium text-slate-600 dark:border-white/20 dark:text-slate-300">
+          <span className="inline-flex items-center gap-2 rounded-xl border border-white/40 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 dark:border-white/20 dark:text-slate-300">
             <Database className="h-3.5 w-3.5" />
             {activeDataset ? activeDataset.name : "No active dataset"}
           </span>
@@ -155,7 +155,7 @@ export default function SqlPage() {
 
         <div className="mt-5">
           {!activeDataset ? (
-            <div className="rounded-2xl border border-white/30 bg-white/55 px-4 py-3 text-sm text-slate-600 dark:border-white/10 dark:bg-slate-950/40 dark:text-slate-300">
+            <div className="rounded-2xl border border-white/30 bg-white px-4 py-3 text-sm text-slate-600 dark:border-white/10 dark:bg-slate-950 dark:text-slate-300">
               Open a dataset in the workspace to start writing and running SQL.
             </div>
           ) : (
@@ -171,7 +171,7 @@ export default function SqlPage() {
                 value={sql}
                 onChange={(event) => setSQL(event.target.value)}
                 onKeyDown={handleKeyDown}
-                className="h-44 w-full resize-y rounded-xl border border-white/40 bg-white/80 px-3 py-3 font-mono text-sm text-slate-900 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/25 dark:border-white/10 dark:bg-slate-950/60 dark:text-slate-100"
+                className="h-44 w-full resize-y rounded-xl border border-white/40 bg-white px-3 py-3 font-mono text-sm text-slate-900 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/25 dark:border-white/10 dark:bg-slate-950 dark:text-slate-100"
                 spellCheck={false}
               />
 
@@ -227,21 +227,21 @@ export default function SqlPage() {
         </div>
 
         {isQuerying && !lastResult ? (
-          <div className="rounded-2xl border border-white/25 bg-white/40 p-4 text-sm text-slate-600 dark:border-white/15 dark:bg-slate-950/40 dark:text-slate-300">
+          <div className="rounded-2xl border border-white/25 bg-white p-4 text-sm text-slate-600 dark:border-white/15 dark:bg-slate-950 dark:text-slate-300">
             Running query with DuckDB...
           </div>
         ) : null}
 
         {lastResult ? (
           <>
-            <div className="mb-3 rounded-xl border border-white/40 bg-white/55 px-3 py-2">
+            <div className="mb-3 rounded-xl border border-white/40 bg-white px-3 py-2">
               <pre className="overflow-x-auto rounded-lg bg-slate-950 p-3 text-xs text-slate-100">
                 {lastResult.sql}
               </pre>
             </div>
 
             {lastResult.data.length === 0 ? (
-              <p className="rounded-xl border border-white/40 bg-white/45 px-3 py-3 text-sm text-slate-600 dark:border-white/15 dark:bg-slate-950/40 dark:text-slate-300">
+              <p className="rounded-xl border border-white/40 bg-white px-3 py-3 text-sm text-slate-600 dark:border-white/15 dark:bg-slate-950 dark:text-slate-300">
                 Query ran successfully, but returned no rows.
               </p>
             ) : (
@@ -257,7 +257,7 @@ export default function SqlPage() {
           </>
         ) : (
           !isQuerying && (
-            <p className="rounded-xl border border-dashed border-white/35 bg-white/45 px-3 py-3 text-sm text-slate-600 dark:border-white/15 dark:bg-slate-950/35 dark:text-slate-300">
+            <p className="rounded-xl border border-dashed border-white/35 bg-white px-3 py-3 text-sm text-slate-600 dark:border-white/15 dark:bg-slate-950/35 dark:text-slate-300">
               Run a query to populate the result table.
             </p>
           )
@@ -271,7 +271,7 @@ export default function SqlPage() {
         </h2>
 
         {datasetHistory.length === 0 ? (
-          <p className="rounded-xl border border-white/35 bg-white/45 px-3 py-3 text-sm text-slate-600 dark:border-white/15 dark:bg-slate-950/30 dark:text-slate-300">
+          <p className="rounded-xl border border-white/35 bg-white px-3 py-3 text-sm text-slate-600 dark:border-white/15 dark:bg-slate-950/30 dark:text-slate-300">
             No saved SQL history for this dataset yet.
           </p>
         ) : (
@@ -281,7 +281,7 @@ export default function SqlPage() {
                 type="button"
                 key={entry.id}
                 onClick={() => loadQueryFromHistory(entry.sql)}
-                className="w-full rounded-xl border border-white/35 bg-white/55 px-3 py-2 text-left transition hover:border-cyan-300/80 hover:bg-white/70 dark:border-white/15 dark:bg-slate-950/45 dark:hover:border-cyan-700/70 dark:hover:bg-slate-950/55"
+                className="w-full rounded-xl border border-white/35 bg-white px-3 py-2 text-left transition hover:border-cyan-300/80 hover:bg-white dark:border-white/15 dark:bg-slate-950 dark:hover:border-cyan-700/70 dark:hover:bg-slate-950"
               >
                 <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
                   {entry.question}

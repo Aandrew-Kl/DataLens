@@ -24,7 +24,7 @@ export function ColumnTable({
   return (
     <motion.div
       variants={itemVariants}
-      className="overflow-hidden rounded-[30px] border border-white/30 bg-white/68 shadow-[0_26px_90px_-44px_rgba(15,23,42,0.58)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/48"
+      className="overflow-hidden rounded-lg border border-white/30 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950"
     >
       <div className="flex flex-col gap-4 border-b border-slate-200/80 px-6 py-5 dark:border-slate-800/80 lg:flex-row lg:items-start lg:justify-between">
         <div>
@@ -43,7 +43,7 @@ export function ColumnTable({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-950/55">
+          <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Healthy columns
             </p>
@@ -51,7 +51,7 @@ export function ColumnTable({
               {healthiestColumns}
             </p>
           </div>
-          <div className="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-950/55">
+          <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Flagged columns
             </p>
@@ -64,7 +64,7 @@ export function ColumnTable({
 
       <div className="overflow-x-auto">
         <table className="min-w-[1120px] w-full">
-          <thead className="sticky top-0 z-10 bg-white/90 backdrop-blur-xl dark:bg-slate-950/90">
+          <thead className="sticky top-0 z-10 bg-white dark:bg-slate-950">
             <tr className="border-b border-slate-200/80 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:border-slate-800/80 dark:text-slate-400">
               {[
                 "Column",
@@ -87,7 +87,7 @@ export function ColumnTable({
             {metrics.columnRows.map((column) => (
               <tr
                 key={column.name}
-                className="bg-white/55 transition-colors hover:bg-white/78 dark:bg-slate-950/34 dark:hover:bg-slate-950/52"
+                className="bg-white transition-colors hover:bg-white dark:bg-slate-950/34 dark:hover:bg-slate-950"
               >
                 <td className="px-4 py-4 align-top">
                   <div className="min-w-0">
@@ -123,7 +123,7 @@ export function ColumnTable({
                   <ScoreBar value={column.timeliness} color={DIMENSION_META.timeliness.color} />
                 </td>
                 <td className="px-4 py-4 align-top">
-                  <div className="max-w-[220px] rounded-2xl border border-slate-200/80 bg-white/72 px-3 py-2 text-xs leading-5 text-slate-600 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-300">
+                  <div className="max-w-[220px] rounded-2xl border border-slate-200/80 bg-white px-3 py-2 text-xs leading-5 text-slate-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300">
                     {column.flag}
                   </div>
                 </td>

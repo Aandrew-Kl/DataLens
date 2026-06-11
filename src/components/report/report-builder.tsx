@@ -236,7 +236,7 @@ function PreviewChart({
       : 1;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-slate-950/40">
+    <div className="overflow-hidden rounded-2xl border border-white/10 bg-slate-950">
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <div>
           <h4 className="text-sm font-semibold text-white">{title}</h4>
@@ -537,7 +537,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="space-y-6"
     >
-      <div className="glass overflow-hidden rounded-[28px] border border-white/10 shadow-2xl shadow-cyan-950/20">
+      <div className="glass overflow-hidden rounded-lg border border-white/10 shadow-2xl shadow-cyan-950/20">
         <div className="border-b border-white/10 bg-gradient-to-r from-slate-950 via-slate-900 to-cyan-950/80 px-6 py-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-3">
@@ -581,7 +581,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
           </div>
         </div>
 
-        <div className="grid gap-6 bg-slate-950/60 p-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid gap-6 bg-slate-950 p-6 xl:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-6">
             <div className="glass rounded-3xl border border-white/10 bg-white/5 p-5">
               <div className="mb-4 flex items-center gap-3">
@@ -595,7 +595,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                   <input
                     value={title}
                     onChange={(event) => setTitle(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
                     placeholder="Quarterly performance review"
                   />
                 </label>
@@ -608,7 +608,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                     value={description}
                     onChange={(event) => setDescription(event.target.value)}
                     rows={4}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
                     placeholder="Summarize the scope and intent of the report."
                   />
                 </label>
@@ -626,7 +626,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                   <input
                     value={chartTitle}
                     onChange={(event) => setChartTitle(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
                     placeholder="Widget title"
                   />
 
@@ -635,7 +635,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                     onChange={(event) =>
                       setChartType(event.target.value as ChartTypeValue)
                     }
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
                   >
                     {CHART_TYPES.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -647,7 +647,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                   <select
                     value={chartXAxis}
                     onChange={(event) => setChartXAxis(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
                   >
                     {columns.map((column) => (
                       <option key={column.name} value={column.name}>
@@ -659,7 +659,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                   <select
                     value={chartYAxis}
                     onChange={(event) => setChartYAxis(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
                   >
                     {numericColumns.length > 0 ? (
                       numericColumns.map((column) => (
@@ -681,7 +681,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                     onChange={(event) =>
                       setChartAggregation(event.target.value as ChartAggregation)
                     }
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
                   >
                     {AGGREGATIONS.map((option) => (
                       <option key={option} value={option}>
@@ -711,7 +711,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                     value={textContent}
                     onChange={(event) => setTextContent(event.target.value)}
                     rows={8}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-400/40"
                     placeholder="Add commentary, methodology, or recommendations."
                   />
 
@@ -735,14 +735,14 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                   <input
                     value={metricLabel}
                     onChange={(event) => setMetricLabel(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400/40"
                     placeholder="Metric label"
                   />
 
                   <select
                     value={metricColumn}
                     onChange={(event) => setMetricColumn(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400/40"
                   >
                     {numericColumns.length > 0 ? (
                       numericColumns.map((column) => (
@@ -764,7 +764,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                     onChange={(event) =>
                       setMetricAggregation(event.target.value as ChartAggregation)
                     }
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400/40"
                   >
                     {AGGREGATIONS.map((option) => (
                       <option key={option} value={option}>
@@ -778,7 +778,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                     onChange={(event) =>
                       setMetricFormat(event.target.value as MetricFormat)
                     }
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400/40"
                   >
                     {METRIC_FORMATS.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -820,7 +820,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -12 }}
-                      className="flex items-start justify-between gap-4 rounded-2xl border border-white/10 bg-slate-950/50 p-4"
+                      className="flex items-start justify-between gap-4 rounded-2xl border border-white/10 bg-slate-950 p-4"
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
@@ -883,7 +883,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                 </AnimatePresence>
 
                 {widgets.length === 0 && (
-                  <div className="rounded-2xl border border-dashed border-white/15 bg-slate-950/40 p-6 text-center text-sm text-slate-400">
+                  <div className="rounded-2xl border border-dashed border-white/15 bg-slate-950 p-6 text-center text-sm text-slate-400">
                     Start by adding a chart, text block, or KPI card.
                   </div>
                 )}
@@ -955,7 +955,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
 
               <div className="grid gap-4">
                 {widgets.length === 0 && (
-                  <div className="rounded-2xl border border-dashed border-white/15 bg-slate-950/40 p-8 text-center text-sm text-slate-400">
+                  <div className="rounded-2xl border border-dashed border-white/15 bg-slate-950 p-8 text-center text-sm text-slate-400">
                     The preview area will populate once you add widgets.
                   </div>
                 )}
@@ -966,7 +966,7 @@ export default function ReportBuilder({ dataset, columns }: ReportBuilderProps) 
                       <motion.div
                         key={widget.id}
                         layout
-                        className="rounded-3xl border border-white/10 bg-slate-950/50 p-5"
+                        className="rounded-3xl border border-white/10 bg-slate-950 p-5"
                       >
                         <div className="mb-3 flex items-center gap-2">
                           <FileText className="h-4 w-4 text-amber-300" />

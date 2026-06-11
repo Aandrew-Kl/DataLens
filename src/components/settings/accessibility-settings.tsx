@@ -223,7 +223,7 @@ export default function AccessibilitySettings({
                 className={`rounded-full border px-4 py-2 text-sm transition ${
                   active
                     ? "border-indigo-400/40 bg-indigo-500/15 text-indigo-700 dark:text-indigo-200"
-                    : "border-white/20 bg-white/65 text-slate-700 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200"
+                    : "border-white/20 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200"
                 }`}
               >
                 {option.label}

@@ -248,7 +248,7 @@ export default function ChartRecommendations({ tableName, columns, rowCount }: C
     }
   }
   return (
-    <section className="overflow-hidden rounded-[28px] border border-slate-200/70 bg-linear-to-br from-slate-50 via-white to-slate-100/70 shadow-[0_28px_90px_-44px_rgba(15,23,42,0.45)] dark:border-slate-800/80 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900/90">
+    <section className="overflow-hidden rounded-lg border border-slate-200/70 bg-linear-to-br from-slate-50 via-white to-slate-100/70 shadow-sm dark:border-slate-800/80 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900/90">
       <div className="border-b border-slate-200/80 px-6 py-5 dark:border-slate-800/80">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
@@ -256,13 +256,13 @@ export default function ChartRecommendations({ tableName, columns, rowCount }: C
             <h2 className="mt-3 text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Schema-aware chart ideas for {tableName}</h2>
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{formatNumber(rowCount)} rows across {columns.length} columns. Click any card to run its preview query.</p>
           </div>
-          <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-2 text-sm text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-300"><Database className="h-4 w-4" />DuckDB + ECharts preview</div>
+          <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/70 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"><Database className="h-4 w-4" />DuckDB + ECharts preview</div>
         </div>
       </div>
 
       {recommendations.length === 0 ? (
         <div className="px-6 py-14 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200/80 bg-white/80 text-slate-400 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-500"><BarChart3 className="h-7 w-7" /></div>
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200/80 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-500"><BarChart3 className="h-7 w-7" /></div>
           <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">No confident recommendations yet</h3>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Add at least one usable numeric, date, or categorical profile to unlock chart suggestions.</p>
         </div>
@@ -275,14 +275,14 @@ export default function ChartRecommendations({ tableName, columns, rowCount }: C
               const isActive = recommendation.id === activeId;
               const isLoading = recommendation.id === loadingId;
               return (
-                <motion.button key={recommendation.id} type="button" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05, duration: 0.3 }} onClick={() => void handleRun(recommendation)} className={`w-full rounded-[24px] border p-5 text-left transition ${isActive ? "border-cyan-400/40 bg-cyan-500/8 shadow-[0_18px_50px_-34px_rgba(6,182,212,0.8)]" : "border-slate-200/80 bg-white/75 hover:border-cyan-300/50 hover:bg-white dark:border-slate-800 dark:bg-slate-950/55 dark:hover:border-cyan-500/30 dark:hover:bg-slate-950/75"}`}>
+                <motion.button key={recommendation.id} type="button" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05, duration: 0.3 }} onClick={() => void handleRun(recommendation)} className={`w-full rounded-lg border p-5 text-left transition ${isActive ? "border-cyan-400/40 bg-cyan-500/8 shadow-sm" : "border-slate-200/80 bg-white hover:border-cyan-300/50 hover:bg-white dark:border-slate-800 dark:bg-slate-950 dark:hover:border-cyan-500/30 dark:hover:bg-slate-950"}`}>
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${meta.accent}`}><Icon className="h-3.5 w-3.5" />{meta.label}</div>
                       <h3 className="mt-3 text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-100">{recommendation.title}</h3>
                       <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">{recommendation.reason}</p>
                     </div>
-                    <span className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/70 bg-slate-100/80 px-3 py-2 text-xs font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                    <span className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/70 bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
                       {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                       {cachedResults[recommendation.id] ? "Cached" : isLoading ? "Running" : "Run"}
                     </span>
@@ -296,11 +296,11 @@ export default function ChartRecommendations({ tableName, columns, rowCount }: C
             })}
           </div>
 
-          <motion.div layout className="rounded-[28px] border border-slate-200/80 bg-white/75 p-5 shadow-inner dark:border-slate-800 dark:bg-slate-950/60">
+          <motion.div layout className="rounded-lg border border-slate-200/80 bg-white p-5 shadow-inner dark:border-slate-800 dark:bg-slate-950">
             <AnimatePresence mode="wait">
               {!activeRecommendation ? (
                 <motion.div key="idle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex min-h-[420px] flex-col items-center justify-center gap-4 text-center">
-                  <div className="rounded-2xl border border-slate-200/80 bg-slate-100/80 p-4 dark:border-slate-800 dark:bg-slate-900"><Sparkles className="h-8 w-8 text-cyan-600 dark:text-cyan-300" /></div>
+                  <div className="rounded-2xl border border-slate-200/80 bg-slate-100 p-4 dark:border-slate-800 dark:bg-slate-900"><Sparkles className="h-8 w-8 text-cyan-600 dark:text-cyan-300" /></div>
                   <div>
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Pick a recommendation</h3>
                     <p className="mt-2 max-w-sm text-sm text-slate-600 dark:text-slate-400">The engine inferred chart types from column kinds, null rates, and cardinality. Click any card to execute its SQL.</p>
@@ -329,9 +329,9 @@ export default function ChartRecommendations({ tableName, columns, rowCount }: C
                       <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Live Preview</p>
                       <h3 className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100">{activeRecommendation.title}</h3>
                     </div>
-                    <span className="rounded-full border border-slate-200/70 bg-slate-100/80 px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">{formatNumber(activeRows.length)} preview rows</span>
+                    <span className="rounded-full border border-slate-200/70 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">{formatNumber(activeRows.length)} preview rows</span>
                   </div>
-                  <div className="rounded-[24px] border border-slate-200/80 bg-linear-to-br from-white via-slate-50 to-slate-100/70 p-4 dark:border-slate-800 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
+                  <div className="rounded-lg border border-slate-200/80 bg-linear-to-br from-white via-slate-50 to-slate-100/70 p-4 dark:border-slate-800 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
                     {activeRows.length > 0 ? <ReactECharts option={buildOption(activeRecommendation, activeRows, dark)} style={{ height: 360, width: "100%" }} opts={{ renderer: "svg" }} notMerge lazyUpdate /> : <div className="flex h-[360px] items-center justify-center text-sm text-slate-500 dark:text-slate-400">Query returned no rows for this preview.</div>}
                   </div>
                 </motion.div>

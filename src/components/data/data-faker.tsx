@@ -30,9 +30,9 @@ interface TemplateDefinition {
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const panelClass =
-  "overflow-hidden rounded-[28px] border border-white/20 bg-white/70 shadow-[0_24px_90px_-48px_rgba(15,23,42,0.7)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/45";
+  "overflow-hidden rounded-lg border border-white/20 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950";
 const fieldClass =
-  "w-full rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950/60 dark:text-slate-100";
+  "w-full rounded-2xl border border-slate-200/70 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-100";
 
 const makeColumn = (name: string, type: FakerType, constraints = ""): FakerColumn => ({
   id: generateId(),
@@ -131,7 +131,7 @@ function generateCsv(columns: FakerColumn[], count: number) {
 
 function StepCard({ step, label, active }: { step: number; label: string; active: boolean }) {
   return (
-    <div className={`rounded-2xl border px-4 py-3 text-sm transition ${active ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-800 dark:text-cyan-200" : "border-slate-200/70 bg-white/60 text-slate-500 dark:border-slate-700/70 dark:bg-slate-950/35 dark:text-slate-400"}`}>
+    <div className={`rounded-2xl border px-4 py-3 text-sm transition ${active ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-800 dark:text-cyan-200" : "border-slate-200/70 bg-white text-slate-500 dark:border-slate-700/70 dark:bg-slate-950/35 dark:text-slate-400"}`}>
       <p className="text-[11px] font-semibold uppercase tracking-[0.2em]">Step {step}</p>
       <p className="mt-1 font-semibold">{label}</p>
     </div>
@@ -215,7 +215,7 @@ export default function DataFaker({ onDataGenerated }: DataFakerProps) {
         {step === 1 ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {TEMPLATES.map((item) => (
-              <button key={item.id} type="button" onClick={() => loadTemplate(item.id)} className={`rounded-[24px] border p-5 text-left transition ${templateId === item.id ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-800 dark:text-cyan-200" : "border-slate-200/70 bg-white/60 text-slate-700 hover:border-slate-300 dark:border-slate-700/70 dark:bg-slate-950/35 dark:text-slate-200 dark:hover:border-slate-600"}`}>
+              <button key={item.id} type="button" onClick={() => loadTemplate(item.id)} className={`rounded-lg border p-5 text-left transition ${templateId === item.id ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-800 dark:text-cyan-200" : "border-slate-200/70 bg-white text-slate-700 hover:border-slate-300 dark:border-slate-700/70 dark:bg-slate-950/35 dark:text-slate-200 dark:hover:border-slate-600"}`}>
                 <p className="text-sm font-semibold">{item.label}</p>
                 <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">{item.description}</p>
                 <p className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">{item.columns.length} preset columns</p>
@@ -227,7 +227,7 @@ export default function DataFaker({ onDataGenerated }: DataFakerProps) {
         {step === 2 ? (
           <div className="space-y-4">
             {columns.map((column) => (
-              <div key={column.id} className="grid gap-3 rounded-[24px] border border-slate-200/70 bg-white/60 p-4 shadow-sm backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-950/35 md:grid-cols-[1.3fr_0.7fr_1.5fr_auto]">
+              <div key={column.id} className="grid gap-3 rounded-lg border border-slate-200/70 bg-white p-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-950/35 md:grid-cols-[1.3fr_0.7fr_1.5fr_auto]">
                 <input value={column.name} onChange={(event) => updateColumn(column.id, "name", event.target.value)} placeholder="column_name" className={fieldClass} />
                 <select value={column.type} onChange={(event) => updateColumn(column.id, "type", event.target.value)} className={fieldClass}>
                   <option value="number">number</option>
@@ -236,12 +236,12 @@ export default function DataFaker({ onDataGenerated }: DataFakerProps) {
                   <option value="boolean">boolean</option>
                 </select>
                 <input value={column.constraints} onChange={(event) => updateColumn(column.id, "constraints", event.target.value)} placeholder="min=0,max=100 or choices=A|B|C" className={fieldClass} />
-                <button type="button" onClick={() => replaceColumns(columns.filter((item) => item.id !== column.id))} disabled={columns.length <= 1} className="inline-flex items-center justify-center rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-3 text-slate-600 transition hover:text-rose-600 disabled:opacity-50 dark:border-slate-700/70 dark:bg-slate-950/60 dark:text-slate-300">
+                <button type="button" onClick={() => replaceColumns(columns.filter((item) => item.id !== column.id))} disabled={columns.length <= 1} className="inline-flex items-center justify-center rounded-2xl border border-slate-200/70 bg-white px-4 py-3 text-slate-600 transition hover:text-rose-600 disabled:opacity-50 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-300">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             ))}
-            <button type="button" onClick={() => replaceColumns([...columns, makeColumn(`column_${columns.length + 1}`, "text")])} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300/70 bg-white/70 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700/70 dark:bg-slate-950/55 dark:text-slate-200 dark:hover:bg-slate-900">
+            <button type="button" onClick={() => replaceColumns([...columns, makeColumn(`column_${columns.length + 1}`, "text")])} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300/70 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900">
               <Plus className="h-4 w-4" />
               Add column
             </button>
@@ -249,7 +249,7 @@ export default function DataFaker({ onDataGenerated }: DataFakerProps) {
         ) : null}
 
         {step === 3 ? (
-          <div className="rounded-[26px] border border-slate-200/70 bg-white/60 p-6 shadow-sm backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-950/35">
+          <div className="rounded-lg border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700/70 dark:bg-slate-950/35">
             <label className="block space-y-3">
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Row count</span>
               <input type="range" min={100} max={100000} step={100} value={rowCount} onChange={(event) => { setRowCount(Number(event.target.value)); setPreviewDirty(true); setGeneratedCsv(""); }} className="w-full accent-cyan-500" />
@@ -270,16 +270,16 @@ export default function DataFaker({ onDataGenerated }: DataFakerProps) {
                 {generating ? <FileDown className="h-4 w-4 animate-pulse" /> : <Sparkles className="h-4 w-4" />}
                 Generate CSV
               </button>
-              <button type="button" onClick={() => void handleDownload()} disabled={generating} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300/70 bg-white/70 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700/70 dark:bg-slate-950/55 dark:text-slate-200 dark:hover:bg-slate-900">
+              <button type="button" onClick={() => void handleDownload()} disabled={generating} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300/70 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900">
                 <Download className="h-4 w-4" />
                 Download CSV
               </button>
-              <button type="button" onClick={() => void handleLoadIntoDataLens()} disabled={generating} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300/70 bg-white/70 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700/70 dark:bg-slate-950/55 dark:text-slate-200 dark:hover:bg-slate-900">
+              <button type="button" onClick={() => void handleLoadIntoDataLens()} disabled={generating} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300/70 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900">
                 <FileDown className="h-4 w-4" />
                 Load into DataLens
               </button>
             </div>
-            <div className="overflow-hidden rounded-[26px] border border-slate-200/70 bg-white/60 shadow-sm backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-950/35">
+            <div className="overflow-hidden rounded-lg border border-slate-200/70 bg-white shadow-sm dark:border-slate-700/70 dark:bg-slate-950/35">
               <div className="flex items-center justify-between border-b border-slate-200/70 px-5 py-4 dark:border-slate-700/70">
                 <div>
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Preview rows</p>
@@ -292,7 +292,7 @@ export default function DataFaker({ onDataGenerated }: DataFakerProps) {
                   <div className="px-5 py-8 text-center text-sm text-slate-500 dark:text-slate-400">Refresh the preview to generate sample rows.</div>
                 ) : (
                   <table className="min-w-full text-left text-sm">
-                    <thead className="sticky top-0 bg-white/90 backdrop-blur dark:bg-slate-950/90">
+                    <thead className="sticky top-0 bg-white dark:bg-slate-950">
                       <tr>
                         {columns.map((column) => (
                           <th key={column.id} className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{column.name}</th>
@@ -317,7 +317,7 @@ export default function DataFaker({ onDataGenerated }: DataFakerProps) {
       </div>
 
       <div className="flex items-center justify-between border-t border-white/30 px-6 py-4 dark:border-white/10">
-        <button type="button" onClick={() => setStep((current) => Math.max(1, current - 1))} disabled={step === 1} className="rounded-2xl border border-slate-300/70 bg-white/70 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 dark:border-slate-700/70 dark:bg-slate-950/55 dark:text-slate-200 dark:hover:bg-slate-900">Back</button>
+        <button type="button" onClick={() => setStep((current) => Math.max(1, current - 1))} disabled={step === 1} className="rounded-2xl border border-slate-300/70 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 dark:border-slate-700/70 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900">Back</button>
         <p className="text-xs text-slate-500 dark:text-slate-400">{formatNumber(columns.length)} columns configured</p>
         <button type="button" onClick={() => { const next = Math.min(4, step + 1); setStep(next); if (next === 4) ensurePreview(); }} disabled={step === 4} className="rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-500 disabled:opacity-50">Next</button>
       </div>

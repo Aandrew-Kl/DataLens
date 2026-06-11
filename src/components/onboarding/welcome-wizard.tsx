@@ -193,9 +193,9 @@ export default function WelcomeWizard({ open, onClose }: WelcomeWizardProps) {
         {FEATURES.map(({ icon: Icon, label, description }) => (
           <div
             key={label}
-            className="rounded-2xl border border-white/20 bg-white/65 p-4 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.5)] dark:border-white/10 dark:bg-slate-950/40"
+            className="rounded-2xl border border-white/20 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-slate-950"
           >
-            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/75 text-slate-700 dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-200">
+            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-900 dark:text-slate-200">
               <Icon className="h-5 w-5" />
             </div>
             <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{label}</h3>
@@ -215,7 +215,7 @@ export default function WelcomeWizard({ open, onClose }: WelcomeWizardProps) {
     </div>,
     <div key="ollama" className="space-y-5">
       <StepHeader title={STEP_TITLES[2]} />
-      <div className="rounded-2xl border border-white/20 bg-white/65 p-5 dark:border-white/10 dark:bg-slate-950/40">
+      <div className="rounded-2xl border border-white/20 bg-white p-5 dark:border-white/10 dark:bg-slate-950">
         <div className="flex items-center gap-3">
           {ollamaState === "ready" ? (
             <CheckCircle2 className="h-5 w-5 text-emerald-500" />
@@ -262,7 +262,7 @@ export default function WelcomeWizard({ open, onClose }: WelcomeWizardProps) {
         {SQL_TEMPLATES.map((template) => (
           <article
             key={template.id}
-            className="rounded-2xl border border-white/20 bg-white/65 p-4 dark:border-white/10 dark:bg-slate-950/40"
+            className="rounded-2xl border border-white/20 bg-white p-4 dark:border-white/10 dark:bg-slate-950"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -276,7 +276,7 @@ export default function WelcomeWizard({ open, onClose }: WelcomeWizardProps) {
               <button
                 type="button"
                 onClick={() => void handleCopy(template.id, template.code)}
-                className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/70 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-900"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-900"
               >
                 <Copy className="h-3.5 w-3.5" />
                 {copiedId === template.id ? "Copied!" : "Copy"}
@@ -303,14 +303,14 @@ export default function WelcomeWizard({ open, onClose }: WelcomeWizardProps) {
           <button
             type="button"
             aria-label="Close welcome wizard"
-            className="absolute inset-0 bg-slate-950/30 backdrop-blur-md"
+            className="absolute inset-0 bg-slate-950/30 "
             onClick={onClose}
           />
           <motion.div
             role="dialog"
             aria-modal="true"
             aria-labelledby="welcome-wizard-title"
-            className="relative flex max-h-[85vh] w-full max-w-[640px] flex-col overflow-hidden rounded-[1.75rem] border border-white/15 bg-white/80 shadow-[0_40px_120px_-50px_rgba(15,23,42,0.8)] backdrop-blur-2xl dark:bg-slate-900/80"
+            className="relative flex max-h-[85vh] w-full max-w-[640px] flex-col overflow-hidden rounded-lg border border-white/15 bg-white shadow-sm dark:bg-slate-900"
             initial={{ opacity: 0, scale: 0.96, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 16 }}
