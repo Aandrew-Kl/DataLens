@@ -120,7 +120,7 @@ export default function LoginForm({
 
   return (
     <section
-      className={`bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20 rounded-3xl p-8 shadow-xl shadow-slate-950/10 ${className}`}
+      className={`bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-8 ${className}`}
     >
       <form onSubmit={(event) => void handleSubmit(event)} className="space-y-5">
         <div className="space-y-1">
@@ -136,7 +136,7 @@ export default function LoginForm({
             autoComplete="email"
             value={email}
             onChange={(event): void => setEmail(event.target.value)}
-            className="w-full rounded-xl border border-white/25 bg-white/60 px-4 py-3 text-slate-900 outline-none ring-0 transition focus:border-cyan-300 focus:shadow-sm focus:shadow-cyan-200 dark:bg-slate-900/60 dark:text-slate-100"
+            className="w-full rounded-md border border-zinc-300 bg-white px-4 py-3 text-zinc-900 outline-none ring-0 transition-colors focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400"
             placeholder="you@example.com"
             required
           />
@@ -150,7 +150,7 @@ export default function LoginForm({
             autoComplete="current-password"
             value={password}
             onChange={(event): void => setPassword(event.target.value)}
-            className="w-full rounded-xl border border-white/25 bg-white/60 px-4 py-3 text-slate-900 outline-none ring-0 transition focus:border-cyan-300 focus:shadow-sm focus:shadow-cyan-200 dark:bg-slate-900/60 dark:text-slate-100"
+            className="w-full rounded-md border border-zinc-300 bg-white px-4 py-3 text-zinc-900 outline-none ring-0 transition-colors focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400"
             placeholder="Enter your password"
             required
           />
@@ -165,7 +165,7 @@ export default function LoginForm({
         <button
           type="submit"
           disabled={isBusy || isRateLimited}
-          className="inline-flex w-full items-center justify-center rounded-xl bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           {isBusy ? (
             <span className="inline-flex items-center gap-2">
@@ -184,7 +184,7 @@ export default function LoginForm({
         Don&apos;t have an account?{" "}
         <Link
           href={buildAuthLink("/register", redirectTo)}
-          className="font-semibold text-cyan-700 underline underline-offset-4 dark:text-cyan-300"
+          className="font-medium text-zinc-900 underline underline-offset-4 dark:text-zinc-100"
         >
           Register
         </Link>

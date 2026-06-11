@@ -144,7 +144,7 @@ function RegisterFormContent({
 
   return (
     <section
-      className={`bg-white/75 backdrop-blur-2xl dark:bg-slate-950/45 border border-white/20 rounded-3xl p-8 shadow-xl shadow-slate-950/10 ${className}`}
+      className={`bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-8 ${className}`}
     >
       <form onSubmit={(event) => void handleSubmit(event)} className="space-y-5">
         <div className="space-y-1">
@@ -165,7 +165,7 @@ function RegisterFormContent({
                 setError(null);
               }
             }}
-            className="w-full rounded-xl border border-white/25 bg-white/60 px-4 py-3 text-slate-900 outline-none ring-0 transition focus:border-cyan-300 focus:shadow-sm focus:shadow-cyan-200 dark:bg-slate-900/60 dark:text-slate-100"
+            className="w-full rounded-md border border-zinc-300 bg-white px-4 py-3 text-zinc-900 outline-none ring-0 transition-colors focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400"
             placeholder="you@example.com"
             required
           />
@@ -186,10 +186,10 @@ function RegisterFormContent({
             }}
             aria-invalid={passwordError ? true : undefined}
             aria-describedby={passwordError ? passwordErrorId : undefined}
-            className={`w-full rounded-xl border bg-white/60 px-4 py-3 text-slate-900 outline-none ring-0 transition focus:border-cyan-300 focus:shadow-sm focus:shadow-cyan-200 dark:bg-slate-900/60 dark:text-slate-100 ${
+            className={`w-full rounded-md border bg-white px-4 py-3 text-zinc-900 outline-none ring-0 transition-colors focus:border-zinc-900 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400 ${
               passwordError
                 ? "border-red-300 dark:border-red-700"
-                : "border-white/25"
+                : "border-zinc-300 dark:border-zinc-700"
             }`}
             placeholder="Min 8 chars, uppercase, lowercase, digit"
             required
@@ -218,7 +218,7 @@ function RegisterFormContent({
                 setError(null);
               }
             }}
-            className="w-full rounded-xl border border-white/25 bg-white/60 px-4 py-3 text-slate-900 outline-none ring-0 transition focus:border-cyan-300 focus:shadow-sm focus:shadow-cyan-200 dark:bg-slate-900/60 dark:text-slate-100"
+            className="w-full rounded-md border border-zinc-300 bg-white px-4 py-3 text-zinc-900 outline-none ring-0 transition-colors focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400"
             placeholder="Repeat your password"
             required
           />
@@ -239,7 +239,7 @@ function RegisterFormContent({
         <button
           type="submit"
           disabled={isBusy}
-          className="inline-flex w-full items-center justify-center rounded-xl bg-cyan-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex w-full items-center justify-center rounded-md bg-zinc-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           {isBusy ? (
             <span className="inline-flex items-center gap-2">
@@ -256,7 +256,7 @@ function RegisterFormContent({
         Already have an account?{" "}
         <Link
           href={buildAuthLink("/login", redirectTo)}
-          className="font-semibold text-cyan-700 underline underline-offset-4 dark:text-cyan-300"
+          className="font-medium text-zinc-900 underline underline-offset-4 dark:text-zinc-100"
         >
           Login
         </Link>

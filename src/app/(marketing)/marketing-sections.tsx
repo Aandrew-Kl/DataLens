@@ -32,11 +32,11 @@ export function FeaturesSection() {
             return (
               <Reveal key={feature.title} delay={index * 0.06}>
                 <motion.div
-                  whileHover={{ y: -6 }}
+                  whileHover={{ y: -2 }}
                   transition={{ duration: 0.2 }}
-                  className="group h-full rounded-[1.75rem] border border-white/40 bg-white/65 p-6 shadow-[0_24px_70px_-45px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/65"
+                  className="group h-full rounded-md border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
                 >
-                  <div className="inline-flex rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-3 text-cyan-700 dark:text-cyan-200">
+                  <div className="inline-flex rounded-md border border-slate-200 bg-slate-100 p-3 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
                     <Icon className="h-5 w-5" />
                   </div>
                   <h3 className="mt-5 text-xl font-semibold text-slate-950 dark:text-white">
@@ -45,7 +45,7 @@ export function FeaturesSection() {
                   <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
                     {feature.description}
                   </p>
-                  <div className="mt-6 h-px bg-gradient-to-r from-cyan-500/20 via-blue-500/10 to-transparent" />
+                  <div className="mt-6 h-px bg-slate-200 dark:bg-slate-800" />
                   <p className="mt-4 text-xs uppercase tracking-[0.26em] text-slate-400 transition group-hover:text-cyan-600 dark:text-slate-500 dark:group-hover:text-cyan-300">
                     Private by default
                   </p>
@@ -77,9 +77,9 @@ export function HowItWorksSection() {
 
             return (
               <Reveal key={step.title} delay={index * 0.08}>
-                <div className="h-full rounded-[1.75rem] border border-white/40 bg-white/70 p-6 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/70">
+                <div className="h-full rounded-md border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
                   <div className="flex items-center justify-between gap-4">
-                    <div className="inline-flex rounded-2xl border border-white/50 bg-white/85 p-3 text-slate-700 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100">
+                    <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-3 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100">
                       <Icon className="h-5 w-5" />
                     </div>
                     <span className="text-4xl font-semibold tracking-tight text-slate-300 dark:text-slate-700">
@@ -123,7 +123,7 @@ export function StatsSection({
         <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-5">
           {stats.map((stat, index) => (
             <Reveal key={stat.label} delay={index * 0.05}>
-              <div className="h-full rounded-[1.75rem] border border-white/40 bg-white/70 p-6 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/70">
+              <div className="h-full rounded-md border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
                 <p className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">
                   {stat.value}
                 </p>
@@ -138,7 +138,7 @@ export function StatsSection({
           ))}
 
           <Reveal delay={0.25}>
-            <div className="h-full rounded-[1.75rem] border border-cyan-400/20 bg-gradient-to-br from-cyan-500/12 to-blue-500/12 p-6 backdrop-blur-xl dark:border-cyan-400/15 dark:from-cyan-400/12 dark:to-blue-500/10">
+            <div className="h-full rounded-md border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
               <p className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">
                 {stars === null ? "Live" : stars.toLocaleString()}
               </p>
@@ -178,11 +178,11 @@ export function ComparisonSection() {
         </Reveal>
 
         <Reveal className="mt-12">
-          <div className="overflow-hidden rounded-[2rem] border border-white/40 bg-white/70 shadow-[0_24px_70px_-45px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/70">
+          <div className="overflow-hidden rounded-md border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
             <div className="overflow-x-auto">
               <table className="min-w-full text-left">
                 <thead>
-                  <tr className="border-b border-white/40 dark:border-white/10">
+                  <tr className="border-b border-slate-200 dark:border-slate-800">
                     <th className="px-6 py-5 text-xs font-semibold uppercase tracking-[0.26em] text-slate-500 dark:text-slate-400">
                       Capability
                     </th>
@@ -207,7 +207,7 @@ export function ComparisonSection() {
                       className={cn(
                         "align-top",
                         index !== comparisonRows.length - 1 &&
-                          "border-b border-white/30 dark:border-white/10",
+                          "border-b border-slate-200 dark:border-slate-800",
                       )}
                     >
                       <td className="px-6 py-5">
@@ -235,7 +235,7 @@ export function ComparisonSection() {
                 </tbody>
               </table>
             </div>
-            <div className="border-t border-white/40 px-6 py-4 text-xs leading-6 text-slate-500 dark:border-white/10 dark:text-slate-400">
+            <div className="border-t border-slate-200 px-6 py-4 text-xs leading-6 text-slate-500 dark:border-slate-800 dark:text-slate-400">
               Comparison reflects default deployment model, AI posture, licensing,
               and public pricing pages as of April 16, 2026.
             </div>
@@ -255,7 +255,7 @@ export function FinalCtaSection({
     <section className="px-6 py-20 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-7xl">
         <Reveal>
-          <div className="overflow-hidden rounded-[2.2rem] border border-cyan-400/20 bg-gradient-to-br from-cyan-500/14 via-white/85 to-blue-500/12 p-8 shadow-[0_24px_70px_-45px_rgba(8,145,178,0.45)] backdrop-blur-xl sm:p-10 dark:from-cyan-400/14 dark:via-slate-900/82 dark:to-blue-500/12">
+          <div className="overflow-hidden rounded-md border border-slate-200 bg-white p-8 sm:p-10 dark:border-slate-800 dark:bg-slate-900">
             <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.32em] text-cyan-700 dark:text-cyan-300">
@@ -282,17 +282,17 @@ export function FinalCtaSection({
                   href={GITHUB_REPO_URL}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/40 bg-white/75 px-6 py-3.5 text-sm font-semibold text-slate-700 backdrop-blur transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-slate-950/65 dark:text-slate-100"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
                 >
                   Star on GitHub
-                  <span className="rounded-full bg-slate-950/6 px-2.5 py-0.5 text-xs text-slate-600 dark:bg-white/10 dark:text-slate-300">
+                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                     {starsLabel}
                   </span>
                 </Link>
               </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-white/40 pt-6 text-sm text-slate-600 dark:border-white/10 dark:text-slate-300">
+            <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-slate-200 pt-6 text-sm text-slate-600 dark:border-slate-800 dark:text-slate-300">
               <Link
                 href={DOCS_URL}
                 target="_blank"

@@ -83,48 +83,41 @@ export default function MarketingPageClient() {
 
   return (
     <div className={theme === "dark" ? "dark" : undefined}>
-      <div className="relative min-h-screen overflow-hidden bg-slate-50 text-slate-950 transition-colors dark:bg-slate-950 dark:text-slate-50">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute inset-x-0 top-[-14rem] h-[32rem] bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.22),transparent_58%)] dark:bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.18),transparent_58%)]" />
-          <div className="absolute right-[-10rem] top-36 h-80 w-80 rounded-full bg-blue-500/12 blur-3xl dark:bg-blue-500/14" />
-          <div className="absolute left-[-8rem] top-[34rem] h-80 w-80 rounded-full bg-cyan-400/12 blur-3xl dark:bg-cyan-400/10" />
-          <div className="absolute inset-0 opacity-[0.14] [background-image:linear-gradient(rgba(148,163,184,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.18)_1px,transparent_1px)] [background-size:96px_96px]" />
-        </div>
-
-        <header className="sticky top-0 z-40 px-6 pt-6 sm:px-8 lg:px-12">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-[1.75rem] border border-white/40 bg-white/70 px-4 py-3 shadow-[0_20px_50px_-35px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/70">
+      <div className="min-h-screen bg-white text-zinc-900 transition-colors dark:bg-zinc-950 dark:text-zinc-50">
+        <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/90 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3 sm:px-8 lg:px-12">
             <Link href="/" className="inline-flex items-center gap-3">
-              <div className="rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 px-3 py-2 text-sm font-semibold text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-900 text-xs font-semibold text-white dark:bg-zinc-50 dark:text-zinc-900">
                 DL
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-950 dark:text-white">
+                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
                   DataLens
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   Browser-native analytics
                 </p>
               </div>
             </Link>
 
-            <nav className="hidden items-center gap-6 text-sm text-slate-600 lg:flex dark:text-slate-300">
-              <a href="#features" className="transition hover:text-slate-950 dark:hover:text-white">
+            <nav className="hidden items-center gap-6 text-sm text-zinc-500 lg:flex dark:text-zinc-400">
+              <a href="#features" className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-100">
                 Features
               </a>
-              <a href="#how-it-works" className="transition hover:text-slate-950 dark:hover:text-white">
+              <a href="#how-it-works" className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-100">
                 How it works
               </a>
-              <a href="#stats" className="transition hover:text-slate-950 dark:hover:text-white">
+              <a href="#stats" className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-100">
                 Stats
               </a>
-              <a href="#comparison" className="transition hover:text-slate-950 dark:hover:text-white">
+              <a href="#comparison" className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-100">
                 Compare
               </a>
               <Link
                 href={DOCS_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 transition hover:text-slate-950 dark:hover:text-white"
+                className="inline-flex items-center gap-1 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
               >
                 Docs
                 <ExternalLink className="h-3.5 w-3.5" />
@@ -136,13 +129,13 @@ export default function MarketingPageClient() {
                 href={GITHUB_REPO_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="hidden rounded-2xl border border-white/40 bg-white/75 px-4 py-2 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:bg-white dark:border-white/10 dark:bg-slate-950/60 dark:text-slate-200 md:inline-flex"
+                className="hidden rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-zinc-500 md:inline-flex"
               >
                 GitHub
               </Link>
               <Link
                 href="/login"
-                className="rounded-2xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 dark:bg-white dark:text-slate-950"
+                className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
                 Try it free
               </Link>
@@ -156,7 +149,7 @@ export default function MarketingPageClient() {
           </div>
         </header>
 
-        <main className="relative z-10">
+        <main>
           <MarketingHero starsLabel={starsLabel} />
           <FeaturesSection />
           <HowItWorksSection />
