@@ -44,7 +44,9 @@ jobs:
         run: touch out/.nojekyll
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        # Third-party action with contents:write — pinned to a commit SHA
+        # so a moved tag cannot push arbitrary content to the repo.
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs-site/out

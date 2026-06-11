@@ -47,12 +47,22 @@ class Settings(BaseSettings):
     @classmethod
     def parse_cors_origins(cls, value: str | list[str] | tuple[str, ...] | None) -> list[str]:
         if value is None:
-            return ["http://localhost:3000"]
-        if isinstance(value, str):
-            return [origin.strip() for origin in value.split(",") if origin.strip()] or [
+            origins = ["http://localhost:3000"]
+        elif isinstance(value, str):
+            origins = [origin.strip() for origin in value.split(",") if origin.strip()] or [
                 "http://localhost:3000"
             ]
-        return [origin.strip() for origin in value if origin.strip()]
+        else:
+            origins = [origin.strip() for origin in value if origin.strip()]
+        if "*" in origins:
+            # CORSMiddleware runs with allow_credentials=True; a wildcard
+            # origin would make Starlette reflect any Origin header back
+            # with credentials allowed.
+            raise ValueError(
+                "CORS_ORIGINS must be an explicit allowlist of origins; "
+                "'*' is not allowed because CORS credentials are enabled"
+            )
+        return origins
 
     @model_validator(mode="after")
     def validate_jwt_secret(self) -> "Settings":

@@ -6,7 +6,10 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/datalens
-      JWT_SECRET: change-me
+      ENVIRONMENT: production
+      # Required from the host environment or a .env file — the app refuses
+      # known-weak values. Generate with: openssl rand -hex 32
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET (generate with: openssl rand -hex 32)}
       OLLAMA_URL: http://host.docker.internal:11434
     depends_on:
       postgres:
@@ -21,7 +24,10 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      # Host-only: the DB ships with default credentials and must not be
+      # reachable from outside the box. The backend connects over the
+      # compose network, not this binding.
+      - "127.0.0.1:5432:5432"
     environment:
       POSTGRES_DB: datalens
       POSTGRES_USER: postgres
